@@ -78,7 +78,7 @@ export default function AdminLayout({ children }) {
     // { name: 'Doctors', href: '/admin/doctors', icon: UserCheck },
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Bookings', href: '/admin/bookings', icon: Calendar },
-    { name: 'Therapists', href: '/admin/doctors', icon: UserCheck },
+    { name: 'Therapists', href: '/admin/therapists', icon: UserCheck },
     { name: 'Events', href: '/admin/events', icon: Ticket },
     { name: 'Assessment Sessions', href: '/admin/assessment-sessions', icon: Package },
     { name: 'Rescheduling', href: '/admin/rescheduling', icon: RefreshCw },

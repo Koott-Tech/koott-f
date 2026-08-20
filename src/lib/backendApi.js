@@ -1277,6 +1277,17 @@ export const adminApi = {
     });
   },
 
+  /** Therapist roster with booking counts / latest activity. Optional { dateFrom, dateTo }. */
+  async getTherapistsSummary(params = {}) {
+    const q = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v === undefined || v === null || v === '') return;
+      q.append(k, String(v));
+    });
+    const qs = q.toString();
+    return apiRequest(`/admin/therapists/summary${qs ? `?${qs}` : ''}`);
+  },
+
   // Get packages with remaining sessions (admin only - for Packages tab)
   async getPackagesWithRemaining() {
     return apiRequest('/admin/bookings/packages-with-remaining');

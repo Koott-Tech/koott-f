@@ -141,6 +141,7 @@ export default function BookingsPage() {
   const [packagesLoading, setPackagesLoading] = useState(false);
   const [orphansData, setOrphansData] = useState(null); // { orphans: [], summary: {} }
   const [platformFilterType, setPlatformFilterType] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
   const [openPlatformRowId, setOpenPlatformRowId] = useState(null);
 
   // Pagination state
@@ -153,13 +154,13 @@ export default function BookingsPage() {
 
   useEffect(() => {
     loadBookings();
-  }, [currentPage, filterStatus, dateRange, platformFilterType]);
+  }, [currentPage, filterStatus, dateRange, platformFilterType, sourceFilter]);
 
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-  }, [filterStatus, searchTerm, dateRange, platformFilterType]);
+  }, [filterStatus, searchTerm, dateRange, platformFilterType, sourceFilter]);
 
   const loadBookings = async () => {
     try {
@@ -186,6 +187,12 @@ export default function BookingsPage() {
       // Session type tabs (platformFilterType) override the packages-via-status approach
       if (platformFilterType && platformFilterType !== 'all') {
         params.session_type = platformFilterType;
+      }
+
+      // Where the booking came from: 'website' = the client booked it themselves,
+      // 'admin_manual' = someone on the team created it.
+      if (sourceFilter && sourceFilter !== 'all') {
+        params.source = sourceFilter;
       }
 
       if (searchTerm.trim()) {
@@ -917,6 +924,12 @@ export default function BookingsPage() {
     { label: 'Rescheduled', value: 'rescheduled' },
   ];
 
+  const sourceTabs = [
+    { label: 'All sources', value: 'all' },
+    { label: 'Website', value: 'website' },
+    { label: 'Admin-created', value: 'admin_manual' },
+  ];
+
   const sessionTypeTabs = [
     { label: 'All', value: 'all' },
     { label: 'Individual', value: 'individual' },
@@ -1063,6 +1076,32 @@ export default function BookingsPage() {
           </nav>
         </div>
       
+
+      {/* Booking Source Tabs */}
+      <div className="bg-white rounded-xl border border-gray-200/80 shadow-sm p-1.5 mb-3">
+        <nav className="flex gap-1 overflow-x-auto" aria-label="Filter by booking source">
+          {sourceTabs.map((tab) => {
+            const isActive = sourceFilter === tab.value;
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setSourceFilter(tab.value)}
+                className={`
+                  relative px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap
+                  transition-all duration-200 ease-out
+                  ${isActive
+                    ? 'bg-[#025545] text-white shadow-sm'
+                    : 'text-gray-600 hover:text-[#025545] hover:bg-[#025545]/8 active:bg-[#025545]/12'
+                  }
+                `}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
 
       {/* Session Type Tabs (Platform) */}
       
