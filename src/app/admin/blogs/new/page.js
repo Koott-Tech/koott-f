@@ -7,7 +7,7 @@ import { ArrowLeft, Save, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminSidebar } from '@/contexts/AdminSidebarContext';
 import { useNotification } from '@/contexts/NotificationContext';
-import BlogEditorWix from '@/components/BlogEditorWix';
+import BlogEditor from '@/components/BlogEditor';
 import { getStoredToken } from '@/lib/authStorage';
 
 const initialBlogState = (userName = '') => ({
@@ -162,9 +162,9 @@ export default function NewBlogPage() {
 
   return (
     <div className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-[#fafbfc]">
-      {/* Editor: single chrome (nav + formatting toolbar) via BlogEditorWix */}
+      {/* Editor: single chrome (nav + formatting toolbar) via BlogEditor */}
       <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <BlogEditorWix
+        <BlogEditor
           ref={blogEditorRef}
           blog={blog}
           onChange={setBlog}

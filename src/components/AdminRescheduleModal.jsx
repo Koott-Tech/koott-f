@@ -177,17 +177,12 @@ export default function AdminRescheduleModal({
         noshow_fee_receipt_url: feeReceiptUrl,
       } : {};
 
-      let response;
-      if (session._isWixBooking && session._wixBookingId) {
-        response = await adminApi.rescheduleWixBooking(session._wixBookingId, { new_date, new_time, ...noShowFee });
-      } else {
-        response = await adminApi.rescheduleSession(session.id, {
-          new_date,
-          new_time,
-          reason: 'Admin rescheduled',
-          ...noShowFee,
-        });
-      }
+      const response = await adminApi.rescheduleSession(session.id, {
+        new_date,
+        new_time,
+        reason: 'Admin rescheduled',
+        ...noShowFee,
+      });
 
       if (response.success) {
         showSuccess('Session rescheduled successfully!', 'Reschedule Success');

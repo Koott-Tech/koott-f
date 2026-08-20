@@ -893,9 +893,7 @@ export default function DoctorsPage() {
                               </div>
                               <div>
                                 <p className="text-slate-700">{formatDateTime(session.booking_created_at || session.created_at)}</p>
-                                {session.wix_order_number ? (
-                                  <p className="text-xs text-slate-400 mt-1">Order: {session.wix_order_number}</p>
-                                ) : null}
+                                
                               </div>
                             </div>
                           );

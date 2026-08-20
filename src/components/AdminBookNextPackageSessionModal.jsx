@@ -58,9 +58,6 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
   // Duration
   const [duration, setDuration] = useState(50);
 
-  // Wix vs internal package
-  const isWixSession = !!session?.wix_row_id || !!session?._isWixBooking;
-  const wixRowId = session?.wix_row_id ?? session?._wixBookingId ?? null;
   const clientId = session?.client_id ?? normRel(session?.client)?.id;
   const packageId = session?.package_id ?? session?.package?.id;
 
@@ -95,8 +92,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDateObj) { setError('Please select a date.'); return; }
-    if (!isWixSession && (!clientId || !packageId)) { setError('Missing client or package information.'); return; }
-    if (isWixSession && !wixRowId) { setError('Missing Wix booking reference.'); return; }
+    if (!clientId || !packageId) { setError('Missing client or package information.'); return; }
 
     setError(null);
     setSubmitting(true);
@@ -104,11 +100,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
       const scheduled_date = `${selectedDateObj.getFullYear()}-${String(selectedDateObj.getMonth() + 1).padStart(2, '0')}-${String(selectedDateObj.getDate()).padStart(2, '0')}`;
       const scheduled_time = buildTime24(hour, minute, ampm);
 
-      if (isWixSession) {
-        await adminApi.bookWixNextSession({ wix_row_id: wixRowId, scheduled_date, scheduled_time, duration_minutes: duration });
-      } else {
-        await adminApi.bookPackageNextSession({ client_id: clientId, package_id: packageId, scheduled_date, scheduled_time, duration_minutes: duration });
-      }
+      await adminApi.bookPackageNextSession({ client_id: clientId, package_id: packageId, scheduled_date, scheduled_time, duration_minutes: duration });
       showSuccess('Next session booked successfully.', 'Booked');
       onSuccess?.();
       onClose();

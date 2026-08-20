@@ -91,10 +91,10 @@ const PANELISTS = [
     image: "https://www.koott.in/api/images/profile-pictures/irene-1761805889946.webp",
   },
   {
+    // No photo on file — LeadershipMemberCard renders initials when `image` is omitted.
+    // (This previously hotlinked a Wix empty-state placeholder from static.wixstatic.com.)
     name: "Lakshmi",
     title: "Workshop panelist",
-    image:
-      "https://static.wixstatic.com/media/624142_20fd35759ae94c32bc333c9ba016dc89~mv2.webp/v1/fill/w_256,h_300,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Image-empty-state.webp",
   },
   {
     name: "Shuhaima Katti",

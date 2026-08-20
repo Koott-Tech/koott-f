@@ -727,7 +727,7 @@ export default function BlogPost({ slug }) {
         <div ref={blogContentRef} className="blog-content w-full">
           <style dangerouslySetInnerHTML={{ __html: getBlogPostPageTypographyCss(BLOG_BODY_IMAGE_MAX_WIDTH) }} />
           {(() => {
-            // Prefer HTML content when it has block structure (from BlogEditorWix/CMS) so headings display correctly
+            // Prefer HTML content when it has block structure (from BlogEditor/CMS) so headings display correctly
             const hasHtmlBlocks = blogPost.content && /<(p|div|br|h[1-6]|ul|ol|li|blockquote)\b/i.test(blogPost.content);
             const useStructured = !hasHtmlBlocks && blogPost.structured_content && blogPost.structured_content.length > 0;
             const raw = blogPost.content || '';

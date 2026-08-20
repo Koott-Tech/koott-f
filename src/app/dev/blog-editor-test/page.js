@@ -5,7 +5,7 @@
  * Access at /dev/blog-editor-test
  */
 import { useState, useRef } from 'react';
-import BlogEditorWix from '@/components/BlogEditorWix';
+import BlogEditor from '@/components/BlogEditor';
 
 export default function DevBlogEditorTestPage() {
   const [blog, setBlog] = useState({
@@ -30,7 +30,7 @@ export default function DevBlogEditorTestPage() {
         Select &quot;para 1&quot;, open the block type dropdown (Paragraph), choose Heading 1. Para 1 should become a heading.
       </p>
       <div className="bg-white rounded-lg shadow p-6 max-w-4xl">
-        <BlogEditorWix
+        <BlogEditor
           ref={blogEditorRef}
           blog={blog}
           onChange={setBlog}

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import DateRangePicker from "@/components/ui/date-range-picker";
 import { hasDateRangeBounds } from "@/lib/dateRangeBounds";
-import { formatIstCalendarYmd, istCalendarMonthBounds } from "@/lib/wixFinanceDates";
+import { formatIstCalendarYmd, istCalendarMonthBounds } from "@/lib/istCalendarDates";
 import { sessionBookingCreatedIstYmd } from "@/lib/sessionBookedAt";
 
 export default function PsychologistDashboard() {

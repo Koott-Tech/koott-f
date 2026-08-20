@@ -7,7 +7,7 @@ import { financeApi } from '@/lib/backendApi';
 import { useAuth } from '@/contexts/AuthContext';
 import DateRangePicker from '@/components/ui/date-range-picker';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
-import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/wixFinanceDates';
+import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/istCalendarDates';
 import { exportFinanceRowsToExcel } from '@/lib/financeExcelExport';
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-/** Pending-payout month in Asia/Kolkata (same calendar as Wix / finance range). */
+/** Pending-payout month in Asia/Kolkata (same calendar as the finance range). */
 function pendingPayoutIstMonthYear(from) {
   const ymd = formatIstCalendarYmd(from);
   if (!ymd) return { month: undefined, year: undefined };
@@ -68,7 +68,7 @@ const fmtBookedDate = (d) => {
 /**
  * Status to SHOW. A session whose scheduled time has passed but that the therapist hasn't
  * marked completed reads as "pending" (awaiting completion) rather than "booked" — the same
- * rule the admin Wix Discovery page applies, so both screens agree. Display-only.
+ * rule the admin bookings page applies, so both screens agree. Display-only.
  */
 function displaySessionStatus(row) {
   const st = String(row?.status || '').toLowerCase();
@@ -105,7 +105,6 @@ const SOURCE_STYLES = {
   admin: { cls: 'bg-sky-100 text-sky-800', label: 'Admin' },
   admin_manual: { cls: 'bg-sky-100 text-sky-800', label: 'Admin' },
   razorpay: { cls: 'bg-violet-100 text-violet-800', label: 'Razorpay' },
-  wix: { cls: 'bg-violet-100 text-violet-800', label: 'Razorpay' },
   platform: { cls: 'bg-violet-100 text-violet-800', label: 'Razorpay' },
   koott: { cls: 'bg-violet-100 text-violet-800', label: 'Razorpay' },
 };

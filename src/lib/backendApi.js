@@ -45,8 +45,8 @@ const getTimeoutForRequest = (endpoint) => {
   if (isRecurringBlocksEndpoint) {
     return 45000;
   }
-  // Wix Velo HTTP function can be slow (cold start, external APIs)
-  if (endpoint.includes('/admin/wix/discover-inspect') || endpoint.includes('/admin/wix/sync')) {
+  // Bulk admin session listing can be slow on large date ranges
+  if (endpoint.includes('/admin/sessions/all')) {
     return 60000;
   }
   // Public psychologist availability range: optional ?sync=1 runs GCal sync — must not abort at 15s
@@ -785,7 +785,6 @@ export const psychologistApi = {
     });
   },
 
-
   // Get availability
   async getAvailability(params = {}) {
     const queryParams = new URLSearchParams();
@@ -1056,16 +1055,16 @@ export const adminApi = {
     });
   },
 
-  // Transfer a Wix booking to a different therapist (optionally with a new date/time)
-  async transferWixBooking(wixBookingId, { new_psychologist_id, new_date, new_time, new_duration }) {
-    return apiRequest(`/admin/wix/bookings/${wixBookingId}/transfer`, {
+  // Transfer a booking to a different therapist (optionally with a new date/time)
+  async transferSession(sessionId, { new_psychologist_id, new_date, new_time, new_duration }) {
+    return apiRequest(`/admin/sessions/${sessionId}/transfer`, {
       method: 'POST',
       body: JSON.stringify({ new_psychologist_id, new_date, new_time, new_duration }),
     });
   },
 
-  async rescheduleWixBooking(wixBookingId, { new_date, new_time, noshow_fee_amount, noshow_fee_method, noshow_fee_receipt_url } = {}) {
-    return apiRequest(`/admin/wix/bookings/${wixBookingId}/reschedule`, {
+  async rescheduleSessionAsAdmin(sessionId, { new_date, new_time, noshow_fee_amount, noshow_fee_method, noshow_fee_receipt_url } = {}) {
+    return apiRequest(`/admin/sessions/${sessionId}`, {
       method: 'POST',
       body: JSON.stringify({
         new_date, new_time,
@@ -1075,9 +1074,9 @@ export const adminApi = {
     });
   },
 
-  // Cancel a Wix booking WITHOUT refund — frees the slot, keeps it reschedulable (on_hold).
-  async cancelOnlyWixBooking(wixBookingId) {
-    return apiRequest(`/admin/wix/bookings/${wixBookingId}/cancel-only`, {
+  // Cancel WITHOUT refund — frees the slot, keeps it reschedulable (on_hold).
+  async cancelOnlySession(sessionId) {
+    return apiRequest(`/admin/sessions/${sessionId}/cancel-only`, {
       method: 'POST',
     });
   },
@@ -1184,100 +1183,48 @@ export const adminApi = {
     return apiRequest(`/admin/psychologists/${psychologistId}/calendar-events?startDate=${startDate}&endDate=${endDate}`);
   },
 
-  /**
-   * Calls Wix `/_functions/discover` via backend (keys never exposed to browser).
-   * @param {{ includeRaw?: boolean }} options — includeRaw adds full discover JSON (large).
-   */
-  async getWixDiscoverInspect(options = {}) {
-    const params = new URLSearchParams();
-    if (options.includeRaw) params.set('includeRaw', '1');
-    const q = params.toString();
-    return apiRequest(`/admin/wix/discover-inspect${q ? `?${q}` : ''}`);
-  },
-
-  /** Upsert all bookings from Wix discover into `wix_bookings`. */
-  async syncWixBookings() {
-    return apiRequest('/admin/wix/sync', {
-      method: 'POST',
-      body: JSON.stringify({}),
-    });
-  },
-
-  /** Paginated list from Supabase `wix_bookings` (after sync). */
-  async getWixBookings(params = {}) {
+  /** Paginated admin booking list, straight from `sessions`. */
+  async getAdminBookings(params = {}) {
     const queryParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value === undefined || value === null || value === '') return;
       queryParams.append(key, String(value));
     });
     const q = queryParams.toString();
-    return apiRequest(`/admin/wix/bookings${q ? `?${q}` : ''}`);
+    return apiRequest(`/admin/sessions/all${q ? `?${q}` : ''}`);
   },
 
-  /** Platform/manual sessions shown alongside Wix Discover rows. */
-  async getWixPlatformSessions(params = {}) {
-    const queryParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === undefined || value === null || value === '') return;
-      if (Array.isArray(value)) {
-        value.forEach((v) => {
-          if (v !== undefined && v !== null && v !== '') queryParams.append(key, String(v));
-        });
-        return;
-      }
-      queryParams.append(key, String(value));
-    });
-    const q = queryParams.toString();
-    return apiRequest(`/admin/wix/platform-sessions${q ? `?${q}` : ''}`);
+  /** Get a single session by id. */
+  async getAdminBookingDetails(id) {
+    return apiRequest(`/admin/sessions/${id}`);
   },
 
-  /** Detect orphan / suspicious Wix bookings (unlinked ₹0, duplicates, dangling children). */
-  async getWixOrphans() {
-    return apiRequest('/admin/wix/orphans');
-  },
-
-  /** List therapists discovered from Wix booking mirror. */
-  async getWixTherapists(params = {}) {
-    const queryParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === undefined || value === null || value === '') return;
-      queryParams.append(key, String(value));
-    });
-    const q = queryParams.toString();
-    return apiRequest(`/admin/wix/therapists${q ? `?${q}` : ''}`);
-  },
-
-  /** Get a single wix_bookings row by Supabase id. */
-  async getWixBookingDetails(id) {
-    return apiRequest(`/admin/wix/bookings/${id}`);
-  },
-
-  /** Edit a Wix booking (sets locally_modified=true, sync-safe). */
-  async editWixBooking(id, updates) {
-    return apiRequest(`/admin/wix/bookings/${id}`, {
+  /** Edit a booking. */
+  async editAdminBooking(id, updates) {
+    return apiRequest(`/admin/sessions/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(updates),
     });
   },
 
-  /** Soft-delete a Wix booking (status→deleted, locally_modified→true). */
-  async deleteWixBooking(id) {
-    return apiRequest(`/admin/wix/bookings/${id}`, {
+  /** Delete a booking. */
+  async deleteAdminBooking(id) {
+    return apiRequest(`/admin/sessions/${id}`, {
       method: 'DELETE',
     });
   },
 
-  /** Mark a Wix booking as completed (locally_modified→true). */
-  async completeWixBooking(id) {
-    return apiRequest(`/admin/wix/bookings/${id}/complete`, {
+  /** Mark a booking as completed. */
+  async completeAdminBooking(id) {
+    return apiRequest(`/admin/sessions/${id}/complete`, {
       method: 'PATCH',
       body: JSON.stringify({}),
     });
   },
 
-  /** Mark a Wix booking as no-show (locally_modified→true). */
-  async noShowWixBooking(id) {
-    return apiRequest(`/admin/wix/bookings/${id}/no-show`, {
+  /** Mark a booking as no-show. */
+  async noShowAdminBooking(id) {
+    return apiRequest(`/admin/sessions/${id}/no-show`, {
       method: 'PATCH',
       body: JSON.stringify({}),
     });
@@ -1307,9 +1254,9 @@ export const adminApi = {
     });
   },
 
-  /** Cancel a Wix booking and mark as refunded. Removes the Google Calendar event. */
-  async cancelRefundWixBooking(id) {
-    return apiRequest(`/admin/wix/bookings/${id}/cancel-refund`, {
+  /** Cancel a booking and mark as refunded. Removes the Google Calendar event. */
+  async cancelRefundAdminBooking(id) {
+    return apiRequest(`/admin/sessions/${id}/cancel-refund`, {
       method: 'PATCH',
       body: JSON.stringify({}),
     });
@@ -1356,11 +1303,11 @@ export const adminApi = {
     });
   },
 
-  // Book next session for a Wix package booking (uses wix_bookings.id, no internal package required)
-  async bookWixNextSession({ wix_row_id, scheduled_date, scheduled_time, duration_minutes }) {
-    return apiRequest(`/admin/wix/bookings/${wix_row_id}/book-next-session`, {
+  // Book the next session of a client's package.
+  async bookPackageNextSession({ client_id, package_id, scheduled_date, scheduled_time, duration_minutes }) {
+    return apiRequest('/admin/bookings/book-package-next-session', {
       method: 'POST',
-      body: JSON.stringify({ scheduled_date, scheduled_time, duration_minutes }),
+      body: JSON.stringify({ client_id, package_id, scheduled_date, scheduled_time, duration_minutes }),
     });
   },
 
@@ -2229,7 +2176,6 @@ export const financeApi = {
       method: 'DELETE',
     });
   },
-
 
   // Settings
   async getExpenseCategories() {

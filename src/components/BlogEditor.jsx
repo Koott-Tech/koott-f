@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import DocumentStyleEditor, { getDefaultToolbarState } from '@/components/DocumentStyleEditor';
 import { normalizeImageUrl } from '@/utils/urlNormalizer';
-import styles from './BlogEditorWix.module.css';
+import styles from './BlogEditor.module.css';
 
 const generateSlug = (title) => {
   if (!title) return '';
@@ -58,7 +58,7 @@ const toolbarCmd = (e, fn) => {
   fn();
 };
 
-const BlogEditorWix = forwardRef(function BlogEditorWix({
+const BlogEditor = forwardRef(function BlogEditor({
   blog,
   onChange,
   onFeaturedImageUpload,
@@ -542,4 +542,4 @@ const BlogEditorWix = forwardRef(function BlogEditorWix({
   );
 });
 
-export default BlogEditorWix;
+export default BlogEditor;

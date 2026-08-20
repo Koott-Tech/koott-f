@@ -8,7 +8,7 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { normalizeImageUrl } from '@/utils/urlNormalizer';
 import DateRangePicker from '@/components/ui/date-range-picker';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
-import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/wixFinanceDates';
+import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/istCalendarDates';
 import {
   DropdownMenu,
   DropdownMenuContent,

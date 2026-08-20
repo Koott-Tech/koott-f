@@ -20,7 +20,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cache, withCache } from '@/lib/cache';
 import DateRangePicker from '@/components/ui/date-range-picker';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
-import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/wixFinanceDates';
+import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/istCalendarDates';
 import { sessionBookedAtIso } from '@/lib/sessionBookedAt';
 import { Filter } from 'lucide-react';
 

@@ -7,7 +7,7 @@ import { financeApi } from '@/lib/backendApi';
 import { useNotification } from '@/contexts/NotificationContext';
 import DateRangePicker from '@/components/ui/date-range-picker';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
-import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/wixFinanceDates';
+import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/istCalendarDates';
 import { exportFinanceRowsToExcel } from '@/lib/financeExcelExport';
 
 const inr = (n) =>
@@ -72,7 +72,6 @@ const SOURCE_STYLES = {
   admin: { cls: 'bg-sky-100 text-sky-800', label: 'Admin' },
   admin_manual: { cls: 'bg-sky-100 text-sky-800', label: 'Admin' },
   razorpay: { cls: 'bg-violet-100 text-violet-800', label: 'Razorpay' },
-  wix: { cls: 'bg-violet-100 text-violet-800', label: 'Razorpay' },
   platform: { cls: 'bg-violet-100 text-violet-800', label: 'Razorpay' },
   koott: { cls: 'bg-violet-100 text-violet-800', label: 'Razorpay' },
 };

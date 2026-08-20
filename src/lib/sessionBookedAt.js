@@ -16,49 +16,13 @@ function parseIsoFlexible(value) {
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
 
-function parseObjectLike(value) {
-  if (!value) return null;
-  if (typeof value === 'object') return value;
-  if (typeof value !== 'string') return null;
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === 'object' ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
-function pickFromPayload(payload) {
-  if (!payload || typeof payload !== 'object') return null;
-  const nested =
-    payload.rawBookedEntity?.createdDate ??
-    payload.rawBookedEntity?._createdDate ??
-    payload.rawBookedEntity?.createdAt ??
-    payload.booking?.createdDate ??
-    payload.booking?.createdAt;
-  const direct =
-    payload.createdDate ??
-    payload._createdDate ??
-    payload.createdAt ??
-    nested;
-  return parseIsoFlexible(direct);
-}
-
 /**
- * Client booking instant (Wix `createdDate` after backfill), not DB row insert/sync time.
+ * Client booking instant, not the DB row insert time.
  */
 export function sessionBookedAtIso(session) {
   if (!session || typeof session !== 'object') return null;
-  const fromColumn = parseIsoFlexible(session.booking_created_at);
-  if (fromColumn) return fromColumn;
-
-  const fromPayload = pickFromPayload(parseObjectLike(session.wix_payload) || parseObjectLike(session.payload));
-  if (fromPayload) return fromPayload;
-
-  return parseIsoFlexible(session.created_at);
+  return parseIsoFlexible(session.booking_created_at) || parseIsoFlexible(session.created_at);
 }
-
-export const wixBookingBookedAtIso = sessionBookedAtIso;
 
 /** UTC calendar booking day — legacy; finance uses IST (see {@link sessionBookingCreatedIstYmd}). */
 export function sessionBookingCreatedUtcYmd(session) {
@@ -69,7 +33,7 @@ export function sessionBookingCreatedUtcYmd(session) {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
 }
 
-/** IST calendar booking day — matches Wix Admin “today” and finance dashboards. */
+/** IST calendar booking day — the business day the finance dashboards use. */
 export function sessionBookingCreatedIstYmd(session) {
   const raw = sessionBookedAtIso(session);
   if (!raw) return '';

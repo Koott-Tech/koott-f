@@ -7,7 +7,7 @@ import { ArrowLeft, Save, Eye, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminSidebar } from '@/contexts/AdminSidebarContext';
 import { useNotification } from '@/contexts/NotificationContext';
-import BlogEditorWix from '@/components/BlogEditorWix';
+import BlogEditor from '@/components/BlogEditor';
 import { getStoredToken } from '@/lib/authStorage';
 
 export default function EditBlogPage() {
@@ -200,7 +200,7 @@ export default function EditBlogPage() {
   return (
     <div className="flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-[#fafbfc]">
       <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <BlogEditorWix
+        <BlogEditor
           ref={blogEditorRef}
           blog={blog}
           onChange={setBlog}

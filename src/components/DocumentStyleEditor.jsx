@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 /**
- * Google Docs / Wix-style document editor
+ * Google Docs-style document editor
  * - Click anywhere to type
  * - Floating toolbar on text selection
  * - Type "/" to insert blocks

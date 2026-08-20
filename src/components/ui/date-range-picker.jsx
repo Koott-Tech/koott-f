@@ -44,7 +44,7 @@ const months = [
 ];
 
 /**
- * @param {'ist' | 'utc'} [presetTimezone] — default `ist` (Asia/Kolkata) matches Wix Admin India listings; pass `utc` only for explicit UTC aggregates.
+ * @param {'ist' | 'utc'} [presetTimezone] — default `ist` (Asia/Kolkata) matches the India listings; pass `utc` only for explicit UTC aggregates.
  */
 export default function DateRangePicker({ selectedRange, onSelect, onCancel, presetTimezone = 'ist' }) {
   const presetsUtc = presetTimezone === 'utc';

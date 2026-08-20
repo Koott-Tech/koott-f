@@ -1,6 +1,7 @@
 /**
- * Wix site “today” and Indian booking analytics use Asia/Kolkata calendar days for display.
- * Use these helpers for `/finance` (and compatible admin views) so ranges + API params match Wix Admin.
+ * Indian booking analytics use Asia/Kolkata calendar days for display.
+ * Use these helpers for `/finance` (and compatible admin views) so ranges and API
+ * params all agree on the same business day.
  */
 
 import dayjs from 'dayjs';
@@ -10,21 +11,21 @@ import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export const WIX_FINANCE_TIMEZONE = 'Asia/Kolkata';
+export const IST_TIMEZONE = 'Asia/Kolkata';
 
-/** YYYY-MM-DD in IST for a Date/instant — same calendar day as Wix lists for Little Care India. */
+/** YYYY-MM-DD in IST for a Date/instant. */
 export function formatIstCalendarYmd(dateLike) {
   if (dateLike == null || dateLike === '') return '';
   const d = dayjs(dateLike);
   if (!d.isValid()) return '';
-  return d.tz(WIX_FINANCE_TIMEZONE).format('YYYY-MM-DD');
+  return d.tz(IST_TIMEZONE).format('YYYY-MM-DD');
 }
 
 /** Start/end `Date`s for IST month containing `anchor` (finance default range). */
 export function istCalendarMonthBounds(anchor = new Date()) {
-  const d = dayjs(anchor).tz(WIX_FINANCE_TIMEZONE);
+  const d = dayjs(anchor).tz(IST_TIMEZONE);
   if (!d.isValid()) {
-    const z = dayjs.unix(0).tz(WIX_FINANCE_TIMEZONE);
+    const z = dayjs.unix(0).tz(IST_TIMEZONE);
     return { from: z.toDate(), to: z.toDate() };
   }
   return {
@@ -35,7 +36,7 @@ export function istCalendarMonthBounds(anchor = new Date()) {
 
 /** Monday-start week in IST containing `anchor`. */
 export function istWeekMondayBounds(anchor = new Date()) {
-  const base = dayjs(anchor).tz(WIX_FINANCE_TIMEZONE);
+  const base = dayjs(anchor).tz(IST_TIMEZONE);
   if (!base.isValid()) return { from: new Date(), to: new Date() };
   let cur = base.startOf('day');
   const dow = cur.day();
@@ -47,9 +48,9 @@ export function istWeekMondayBounds(anchor = new Date()) {
 }
 
 export function istYearBounds(anchor = new Date()) {
-  const d = dayjs(anchor).tz(WIX_FINANCE_TIMEZONE);
+  const d = dayjs(anchor).tz(IST_TIMEZONE);
   if (!d.isValid()) {
-    const z = dayjs.unix(0).tz(WIX_FINANCE_TIMEZONE);
+    const z = dayjs.unix(0).tz(IST_TIMEZONE);
     return { from: z.toDate(), to: z.toDate() };
   }
   return {

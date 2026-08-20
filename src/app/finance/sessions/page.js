@@ -40,7 +40,7 @@ import WheelPagination from '@/components/ui/wheel-pagination';
 import DateRangePicker from '@/components/ui/date-range-picker';
 import AdminEditSessionModal from '@/components/AdminEditSessionModal';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
-import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/wixFinanceDates';
+import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/istCalendarDates';
 import { sessionBookedAtIso } from '@/lib/sessionBookedAt';
 
 export default function FinanceSessionsPage() {
@@ -57,7 +57,7 @@ export default function FinanceSessionsPage() {
   const [commissionSaving, setCommissionSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [wixFilterType, setWixFilterType] = useState('all');
+  const [sessionFilterType, setSessionFilterType] = useState('all');
   
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -102,13 +102,13 @@ export default function FinanceSessionsPage() {
 
   useEffect(() => {
     loadSessions();
-  }, [currentPage, filterStatus, wixFilterType, dateRange]);
+  }, [currentPage, filterStatus, sessionFilterType, dateRange]);
 
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-  }, [filterStatus, wixFilterType, searchTerm, dateRange]);
+  }, [filterStatus, sessionFilterType, searchTerm, dateRange]);
 
   const loadSessions = async () => {
     try {
@@ -134,9 +134,7 @@ export default function FinanceSessionsPage() {
       if (response && response.success) {
         const sessionsData = (response.data?.sessions || []).filter((s) => {
           const src = String(s.source || '').toLowerCase();
-          const wp = s.wix_payload;
-          const isUndefinedWix = src === 'wix' && !s.payment_id && (!wp || typeof wp !== 'object' || !wp.sessionId);
-          return !isUndefinedWix;
+          return true;
         });
         setSessions(sessionsData);
       } else {
@@ -293,118 +291,24 @@ export default function FinanceSessionsPage() {
     return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const parseWixIso = (v) => {
-    if (!v) return null;
-    const d = new Date(v);
-    return Number.isNaN(d.getTime()) ? null : d;
-  };
+  const getScheduledDateValue = (booking) => booking?.scheduled_date || null;
 
-  /** @returns {object|null} */
-  const wixPayload = (booking) => {
-    const w = booking?.wix_payload;
-    if (w == null) return null;
-    if (typeof w === 'string') {
-      try {
-        const o = JSON.parse(w);
-        return typeof o === 'object' && o !== null ? o : null;
-      } catch {
-        return null;
-      }
-    }
-    return typeof w === 'object' ? w : null;
-  };
+  const getScheduledTimeValue = (booking) => booking?.scheduled_time || null;
 
-  const wixStartInstant = (p) => {
-    if (!p) return null;
-    const cands = [
-      p.startTime,
-      p.start,
-      p.sessionInfo?.start,
-      p.rawBookedEntity?.singleSession?.start,
-      p.rawBookedEntity?.start,
-      p.bookedSessionInfo?.start,
-      p.slot?.startDate,
-    ];
-    for (const c of cands) {
-      const d = parseWixIso(c);
-      if (d) return d;
-    }
-    return null;
-  };
+  const getClientDisplayName = (booking) =>
+    `${booking?.client?.first_name || ''} ${booking?.client?.last_name || ''}`.trim() || '—';
 
-  const getScheduledDateValue = (booking) => {
-    if (booking?.scheduled_date) return booking.scheduled_date;
-    const p = wixPayload(booking);
-    const d = wixStartInstant(p);
-    return d ? d.toISOString().split('T')[0] : null;
-  };
-
-  const getScheduledTimeValue = (booking) => {
-    if (booking?.scheduled_time) return booking.scheduled_time;
-    const p = wixPayload(booking);
-    const d = wixStartInstant(p);
-    if (!d) return null;
-    return d.toLocaleTimeString('en-GB', {
-      timeZone: 'Asia/Kolkata',
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  };
-
-  const getClientDisplayName = (booking) => {
-    const direct = `${booking?.client?.first_name || ''} ${booking?.client?.last_name || ''}`.trim();
-    if (direct) return direct;
-    const p = wixPayload(booking);
-    if (!p) return '—';
-    const c = p.client || p.formInfo?.contactDetails || p.contactDetails;
-    const wixName =
-      c?.fullName ||
-      [c?.firstName, c?.lastName].filter(Boolean).join(' ').trim() ||
-      c?.name ||
-      p.client?.fullName;
-    return wixName || '—';
-  };
-
-  const getPsychologistDisplayName = (booking) => {
-    const direct = `${booking?.psychologist?.first_name || ''} ${booking?.psychologist?.last_name || ''}`.trim();
-    if (direct) return direct;
-    const p = wixPayload(booking);
-    if (!p) return '—';
-    return (
-      p.therapist?.name ||
-      p.therapist?.displayName ||
-      p.staffMember?.name ||
-      p.staff?.name ||
-      p.provider?.name ||
-      (typeof p.therapist === 'string' ? p.therapist : null) ||
-      '—'
-    );
-  };
+  const getPsychologistDisplayName = (booking) =>
+    `${booking?.psychologist?.first_name || ''} ${booking?.psychologist?.last_name || ''}`.trim() || '—';
 
   const getPriceDisplayAmount = (booking) => {
     const n = booking?.amount ?? booking?.price;
-    if (n != null && n !== '' && !Number.isNaN(Number(n)) && Number(n) !== 0) {
-      return Number(n);
-    }
-    const p = wixPayload(booking);
-    if (p) {
-      const wixFinal = p.paymentDetails?.balance?.finalPrice?.amount;
-      if (wixFinal != null && wixFinal !== '' && !Number.isNaN(Number(wixFinal))) return Number(wixFinal);
-      const plan = p.pricingPlanInfo?.priceDetails?.price ?? p.pricingPlanInfo?.totalPrice;
-      if (plan != null && plan !== '' && !Number.isNaN(Number(plan))) return Number(plan);
-      const wixPrice = p.price ?? p.rawBookedEntity?.rate?.defaultVariedPrice?.amount;
-      if (wixPrice != null && wixPrice !== '' && !Number.isNaN(Number(wixPrice))) return Number(wixPrice);
-    }
-    if (n != null && n !== '' && !Number.isNaN(Number(n))) return Number(n);
-    return 0;
+    if (n == null || n === '' || Number.isNaN(Number(n))) return 0;
+    return Number(n);
   };
 
   const deriveSessionType = (booking) => {
-    const p = wixPayload(booking) || {};
-    const rawCredits = p.pricingPlanInfo?.credits || {};
-    const type = booking?.session_type || p.bookingType || null;
+    const type = booking?.session_type || null;
     const isCouple = type === 'couple';
     const isChild = !!booking?.package_parent_booking_id && !!booking?.session_index;
     // session_type='package' with session_count=1 and no series evidence = single plan-credit booking → treat as individual
@@ -412,23 +316,12 @@ export default function FinanceSessionsPage() {
       || booking?.package_session_number != null
       || !!booking?.package_id
       || !!booking?.package
-      || isChild
-      || p.planSessionNumber != null
-      || (p.creditsAvailable != null && Number(p.creditsAvailable) > 1)
-      || (rawCredits.available != null && Number(rawCredits.available) > 1);
+      || isChild;
     const isPkg = (type === 'package' && hasSeriesEvidence) || !!booking?.package_id || !!booking?.package || isChild;
 
-    // Mirror wix-discover priority: DB column → Velo payload → raw pricingPlanInfo credits
-    const pkgNum = booking?.package_session_number
-      ?? p.planSessionNumber
-      ?? (rawCredits.available != null && rawCredits.remaining != null ? rawCredits.available - rawCredits.remaining : null)
-      ?? null;
-    const pkgTotal = booking?.session_count
-      ?? p.creditsAvailable
-      ?? rawCredits.available
-      ?? p.detectedSessionCount
-      ?? null;
-    const hasPlan = !!(pkgNum || rawCredits.available != null) && !!(p.creditsAvailable || rawCredits.available);
+    const pkgNum = booking?.package_session_number ?? null;
+    const pkgTotal = booking?.session_count ?? null;
+    const hasPlan = false;
     const pkgSuffix = pkgNum && pkgTotal ? ` (${pkgNum}/${pkgTotal})` : pkgNum ? ` (${pkgNum})` : pkgTotal && pkgTotal > 1 ? ` (1/${pkgTotal})` : '';
 
     if (isCouple && (hasPlan || isPkg)) return `Couple Package${pkgSuffix}`;
@@ -450,25 +343,11 @@ export default function FinanceSessionsPage() {
   };
 
   const derivePaymentMethod = (booking) => {
-    const p = wixPayload(booking) || {};
-    // Admin-created booking (Wix admin-manual mirror or platform manual) → "Admin".
-    if (p.isAdminManual === true || String(booking.source || '').toLowerCase() === 'admin_manual') return 'Admin';
-    const vendors = p.paymentDetails?.wixPayMultipleDetails;
-    if (Array.isArray(vendors) && vendors.length > 0) {
-      const v = vendors[0]?.paymentVendorName;
-      if (v === 'inPerson') return 'Manual';
-      if (v === 'Razorpay') return 'Razorpay';
-      if (v) return v;
-    }
-    if (p.paymentState === 'FREE') return 'Free';
-    // A completed online Wix payment collapses the vendor breakdown to [] and only reports
-    // paymentState:'COMPLETE' — for Koott the only online gateway is Razorpay.
-    if (p.paymentState === 'COMPLETE') return 'Razorpay';
-    // ₹0 package follow-ups aren't "Free": the whole package price sits on session #1 and the
-    // follow-ups inherit its method. A non-admin Wix package (admin handled above) = Razorpay.
+    if (String(booking.source || '').toLowerCase() === 'admin_manual') return 'Admin';
+    // Rs.0 package follow-ups aren't "Free": the whole package price sits on session #1 and
+    // the follow-ups inherit its method.
     if (deriveSessionTypeKey(booking) === 'package') return 'Razorpay';
     if (getPriceDisplayAmount(booking) === 0) return 'Free';
-    // A real-priced Wix booking with no explicit vendor/state is an online Razorpay payment.
     return 'Razorpay';
   };
 
@@ -525,22 +404,20 @@ export default function FinanceSessionsPage() {
   const filteredSessions = sessions.filter(s => {
     const statusMatch = filterStatus === 'all' || normalizeStatus(s.status) === filterStatus;
     if (!statusMatch) return false;
-    const typeMatch = wixFilterType === 'all' || deriveSessionTypeKey(s) === wixFilterType;
+    const typeMatch = sessionFilterType === 'all' || deriveSessionTypeKey(s) === sessionFilterType;
     if (!typeMatch) return false;
     if (!searchTerm) return true;
     const q = searchTerm.toLowerCase().replace(/^#/, ''); // strip leading # if pasted from UI
     const clientName = getClientDisplayName(s).toLowerCase();
-    const clientEmail = (s.client?.user?.email || s.client?.email || s.wix_payload?.client?.email || '').toLowerCase();
+    const clientEmail = (s.client?.user?.email || s.client?.email || '').toLowerCase();
     const sessionId = (s.id || '').toLowerCase();
-    const wixBookingId = (s.wix_booking_id || '').toLowerCase();
-    const displayId = s.wix_booking_id
-      ? s.wix_booking_id.slice(-6).toLowerCase()
+    const displayId = s.id
+      ? String(s.id).slice(0, 6).toLowerCase()
       : (s.id || '').slice(0, 6).toLowerCase();
     return (
       clientName.includes(q) ||
       clientEmail.includes(q) ||
       sessionId.includes(q) ||
-      wixBookingId.includes(q) ||
       displayId.includes(q)
     );
   });
@@ -581,7 +458,7 @@ export default function FinanceSessionsPage() {
     { value: 'no_show', label: 'No Show' }
   ];
 
-  const wixTypeTabs = [
+  const sessionTypeTabs = [
     { value: 'all', label: 'All Types' },
     { value: 'individual', label: 'Individual' },
     { value: 'couple', label: 'Couple' },
@@ -599,13 +476,6 @@ export default function FinanceSessionsPage() {
     if (!s) return false;
     // Admin-created sessions
     if (s.source === 'admin_manual') return true;
-    if (String(s.wix_booking_id || '').startsWith('admin_manual_')) return true;
-    if (s.wix_payload?.isAdminManual === true || s.wix_payload?.manualBooking === true) return true;
-    // Wix plan-credit / inPerson payment sessions
-    const vendor = (s.wix_payload?.paymentDetails?.wixPayMultipleDetails?.[0]?.paymentVendorName || '').toLowerCase();
-    if (vendor === 'inperson') return true;
-    const payState = (s.wix_payload?.paymentState || s.wix_payload?.paymentDetails?.state || '').toUpperCase();
-    if (payState === 'UNDEFINED' && !s.wix_payload?.paymentDetails?.balance?.finalPrice?.amount) return true;
     return false;
   };
 
@@ -750,13 +620,13 @@ export default function FinanceSessionsPage() {
 
         <div className="bg-white rounded-xl border border-gray-200/80 shadow-sm p-1.5">
           <nav className="flex gap-1 overflow-x-auto" aria-label="Filter by session type">
-            {wixTypeTabs.map((tab) => {
-              const isActive = wixFilterType === tab.value;
+            {sessionTypeTabs.map((tab) => {
+              const isActive = sessionFilterType === tab.value;
               return (
                 <button
                   key={tab.value}
                   type="button"
-                  onClick={() => setWixFilterType(tab.value)}
+                  onClick={() => setSessionFilterType(tab.value)}
                   className={`
                     relative px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap
                     transition-all duration-200 ease-out
@@ -773,7 +643,7 @@ export default function FinanceSessionsPage() {
           </nav>
         </div>
 
-        {/* Sessions Table — same style as Wix Discovery */}
+        {/* Sessions Table */}
         <div className="rounded-xl border border-gray-200 bg-white overflow-x-auto shadow-sm">
           <table className="min-w-full divide-y divide-gray-100 text-sm">
             <thead>
@@ -809,7 +679,6 @@ export default function FinanceSessionsPage() {
                     : paymentLabel === 'Free'
                       ? 'bg-sky-50 text-sky-700'
                       : 'bg-emerald-50 text-emerald-700';
-                  const _wp = wixPayload(booking) || {};
                   const _wpContact = _wp.client || _wp.formInfo?.contactDetails || _wp.contactDetails || {};
                   const clientEmail = booking.client?.user?.email || booking.client?.email || booking.client_email || _wpContact.email || null;
                   const clientPhone = booking.client?.phone_number || booking.client_phone || _wpContact.phone || _wpContact.phoneNumber || null;
@@ -823,7 +692,7 @@ export default function FinanceSessionsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
                           <p className="font-medium text-gray-900 text-xs leading-snug">
-                            {booking.wix_order_number ? `#${booking.wix_order_number}` : booking.wix_booking_id ? `ID: ${booking.wix_booking_id.slice(-6).toUpperCase()}` : `ID: ${booking.id?.slice(0, 6).toUpperCase()}`}
+                            {`ID: ${booking.id?.slice(0, 6).toUpperCase()}`}
                           </p>
                         </div>
                         <p className="text-gray-500 text-xs mt-0.5">{formatDate(getScheduledDateValue(booking))} at {formatTime(getScheduledTimeValue(booking))}</p>
@@ -923,11 +792,11 @@ export default function FinanceSessionsPage() {
                 </span>
               </>
             )}
-            {wixFilterType !== 'all' && (
+            {sessionFilterType !== 'all' && (
               <>
                 {' '}in{' '}
                 <span className="font-medium text-gray-900">
-                  {wixTypeTabs.find((tab) => tab.value === wixFilterType)?.label || wixFilterType}
+                  {sessionTypeTabs.find((tab) => tab.value === sessionFilterType)?.label || sessionFilterType}
                 </span>
               </>
             )}
@@ -952,7 +821,7 @@ export default function FinanceSessionsPage() {
 
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      {selectedSession?.wix_order_number ? `#${selectedSession.wix_order_number}` : (selectedSession ? `#${selectedSession.id?.slice(0, 8)}` : 'Loading...')}
+                      {selectedSession ? `#${selectedSession.id?.slice(0, 8)}` : 'Loading...'}
                     </p>
                   </div>
                 </div>
@@ -982,14 +851,7 @@ export default function FinanceSessionsPage() {
                             #{selectedSession.id}
                           </div>
                         </div>
-                        {selectedSession.wix_booking_id && (
-                          <div>
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Booking ID</p>
-                            <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 font-mono">
-                              {selectedSession.wix_booking_id}
-                            </div>
-                          </div>
-                        )}
+                        
                         <div>
                           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Status</p>
                           <div className="bg-white border border-slate-200 rounded-lg px-3 py-2">
@@ -1135,10 +997,8 @@ export default function FinanceSessionsPage() {
                     {(() => {
                       const amountPaid = getAmountPaid(selectedSession);
                       if (amountPaid === null || amountPaid === undefined) return null;
-                      const wp = selectedSession?.wix_payment;
-                      const razorpayOrderId = wp?.razorpay_order_id || selectedSession?.payment?.razorpay_order_id || null;
-                      const paymentType = wp?.vendor || selectedSession?.payment?.payment_method || null;
-                      const wixTxId = wp?.wix_transaction_id || null;
+                      const razorpayOrderId = selectedSession?.payment?.razorpay_order_id || null;
+                      const paymentType = selectedSession?.payment?.payment_method || null;
                       return (
                         <div className="rounded-xl border border-slate-200 bg-slate-50/30 p-4">
                           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3" role="heading" aria-level={3}>Payment</div>
@@ -1172,14 +1032,7 @@ export default function FinanceSessionsPage() {
                                 </div>
                               </div>
                             )}
-                            {wixTxId && (
-                              <div className="md:col-span-2">
-                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Wix Transaction ID</p>
-                                <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 font-mono break-all">
-                                  {wixTxId}
-                                </div>
-                              </div>
-                            )}
+                            
                           </div>
                         </div>
                       );
@@ -1197,16 +1050,16 @@ export default function FinanceSessionsPage() {
                           )}
                         </div>
                         {/* Fallback when no payment record linked */}
-                        {!selectedSession.payment && !selectedSession.wix_payment && !selectedSession.receipt_url && (
+                        {!selectedSession.payment && !selectedSession.receipt_url && (
                           <p className="text-sm text-amber-700/70 italic">No payment record linked to this manual booking.</p>
                         )}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {(selectedSession.payment?.payment_method || selectedSession.wix_payment?.vendor) && (
+                          {selectedSession.payment?.payment_method && (
                             <div>
                               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Payment Method</p>
                               <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 capitalize">
                                 {(() => {
-                                  const raw = (selectedSession.payment?.payment_method || selectedSession.wix_payment?.vendor || '').toLowerCase().trim();
+                                  const raw = (selectedSession.payment?.payment_method || '').toLowerCase().trim();
                                   if (raw === 'inperson') return 'Manual (In Person)';
                                   if (raw === 'cash' || raw === 'cash payment') return 'Cash';
                                   if (raw === 'upi') return 'UPI';

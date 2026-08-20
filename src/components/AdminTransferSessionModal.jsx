@@ -22,8 +22,7 @@ import { useNotification } from '@/contexts/NotificationContext';
  * Props:
  *  isOpen          – boolean
  *  onClose         – () => void
- *  session         – session object. If session._isWixBooking is true the modal calls
- *                    adminApi.transferWixBooking(session._wixBookingId, …), otherwise
+ *  session         – session object. The modal calls
  *                    adminApi.transferSession(session.id, …).
  *  onTransferSuccess – () => void  (called after a successful transfer so parent can reload)
  */
@@ -204,10 +203,7 @@ export default function AdminTransferSessionModal({ isOpen, onClose, session, on
           transfer_fee_receipt_url: feeReceiptUrl
         } : {})
       };
-      // Route to the right endpoint depending on whether this is a Wix booking or a platform session
-      const res = session._isWixBooking
-        ? await adminApi.transferWixBooking(session._wixBookingId, payload)
-        : await adminApi.transferSession(session.id, payload);
+      const res = await adminApi.transferSession(session.id, payload);
       if (!res?.success) throw new Error(res?.error || 'Transfer failed');
       showSuccess(
         res.data?.newMeetLink
@@ -236,7 +232,7 @@ export default function AdminTransferSessionModal({ isOpen, onClose, session, on
   if (!isOpen || !session) return null;
 
   // ── Resolve display fields — handles both platform sessions (nested objects)
-  // and Wix booking rows (flat string fields like therapist_name / client_full_name)
+  // and flat string fields like therapist_name / client_full_name
   const currentPsych = Array.isArray(session.psychologist) ? session.psychologist[0] : session.psychologist;
   const currentTherapistName =
     (currentPsych ? `${currentPsych.first_name || ''} ${currentPsych.last_name || ''}`.trim() : '') ||
@@ -252,7 +248,7 @@ export default function AdminTransferSessionModal({ isOpen, onClose, session, on
     session.client_email ||
     '—';
 
-  // For Wix rows scheduled_date / scheduled_time come from start_time slice; guard nulls
+  // scheduled_date / scheduled_time may be absent; guard nulls
   const displayDate = session.scheduled_date || null;
   const displayTime = session.scheduled_time || null;
 

@@ -38,9 +38,9 @@ import {
   istCalendarMonthBounds,
   istWeekMondayBounds,
   istYearBounds,
-} from '@/lib/wixFinanceDates';
+} from '@/lib/istCalendarDates';
 
-/** When range is incomplete: IST month-start → IST today (matches Wix Admin India). */
+/** When range is incomplete: IST month-start -> IST today. */
 function financeApiFallbackDateStrings() {
   const { from } = istCalendarMonthBounds(new Date());
   return { from: formatIstCalendarYmd(from), to: formatIstCalendarYmd(new Date()) };
@@ -1183,13 +1183,9 @@ export default function FinanceDashboard() {
                           <div className="flex flex-col">
                             <div className="flex items-center gap-1.5">
                               <span className="text-xs font-bold text-gray-900">
-                                {session.wix_order_number ? `#${session.wix_order_number}` : (session.source === 'wix' ? 'Wix' : `ID: ${session.id?.slice(0, 6)}`)}
+                                {`ID: ${session.id?.slice(0, 6)}`}
                               </span>
-                              {session.source === 'wix' ? (
-                                <span className="text-[9px] font-bold bg-amber-50 text-amber-700 px-1 py-0.5 rounded border border-amber-100">WIX</span>
-                              ) : (
-                                <span className="text-[9px] font-bold bg-indigo-50 text-indigo-700 px-1 py-0.5 rounded border border-indigo-100">PLATFORM</span>
-                              )}
+                              
                             </div>
                             <div className="text-[10px] text-gray-500 mt-1">
                               {new Date(session.session_date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })} at {session.scheduled_time?.slice(0, 5)}

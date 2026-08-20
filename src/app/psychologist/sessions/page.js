@@ -43,7 +43,7 @@ import WheelPagination from "../../../components/ui/wheel-pagination";
 import { useNotification } from "../../../contexts/NotificationContext";
 import DateRangePicker from "@/components/ui/date-range-picker";
 import { hasDateRangeBounds } from "@/lib/dateRangeBounds";
-import { formatIstCalendarYmd, istCalendarMonthBounds } from "@/lib/wixFinanceDates";
+import { formatIstCalendarYmd, istCalendarMonthBounds } from "@/lib/istCalendarDates";
 import { sessionBookedAtIso, sessionBookingCreatedIstYmd } from "@/lib/sessionBookedAt";
 
 const labelClass = "block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5";
