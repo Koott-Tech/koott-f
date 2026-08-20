@@ -136,7 +136,7 @@ export default function Header() {
   useEffect(() => {
     const fetchCounsellingMenu = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/counselling?limit=50`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'}/counselling?limit=50`);
         
         if (!response.ok) {
           // Silently fail if backend is not available
@@ -199,7 +199,7 @@ export default function Header() {
   useEffect(() => {
     const fetchAssessmentsMenu = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/assessments?limit=50`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'}/assessments?limit=50`);
         if (!response.ok) {
           return;
         }
@@ -243,7 +243,7 @@ export default function Header() {
   useEffect(() => {
     const fetchBetterParentingMenu = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/better-parenting?limit=50`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'}/better-parenting?limit=50`);
         if (!response.ok) return;
         const data = await response.json();
         const pages = data?.data?.pages || data?.message?.pages;

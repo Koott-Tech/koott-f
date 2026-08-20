@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const DEFAULT_BACKEND_BASE_URL = "http://localhost:5000/api";
+const DEFAULT_BACKEND_BASE_URL = "http://localhost:5001/api";
 
 export async function POST(request) {
   try {

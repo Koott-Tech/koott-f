@@ -45,3 +45,6 @@ scratch/
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Keep the template committed (it holds no secrets)
+!.env.example

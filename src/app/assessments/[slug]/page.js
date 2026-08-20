@@ -87,10 +87,10 @@ export async function generateMetadata({ params, searchParams }) {
 
 async function fetchAssessment(slug, { preview = false } = {}) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const timestamp = Date.now();
     const previewSuffix = preview ? '&preview=1' : '';
-    const url = `${baseUrl}/api/assessments/${slug}?t=${timestamp}${previewSuffix}`;
+    const url = `${baseUrl}/assessments/${slug}?t=${timestamp}${previewSuffix}`;
     
     console.log(`[Assessment] Fetching: ${url}`);
     
@@ -152,9 +152,9 @@ async function fetchAssessment(slug, { preview = false } = {}) {
 
 async function fetchPublicTherapists(limit = 6) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     // Use ISR with revalidation for better performance
-    const response = await fetch(`${baseUrl}/api/public/psychologists?limit=${limit}`, {
+    const response = await fetch(`${baseUrl}/public/psychologists?limit=${limit}`, {
       next: { revalidate: 300 } // Revalidate every 5 minutes (psychologists change less frequently)
     });
 

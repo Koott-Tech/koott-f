@@ -48,7 +48,7 @@ export default function ImageUploadAssessments({ currentImageUrl, onImageUpload,
       const token = getStoredToken();
       if (!token || token === 'null' || token === 'undefined') throw new Error('Not authenticated. Please log in again.');
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/assessments/admin/upload-image`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'}/assessments/admin/upload-image`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData

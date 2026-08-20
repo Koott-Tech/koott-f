@@ -5,7 +5,7 @@ export const revalidate = 0;
 
 async function fetchAssessment(slug) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/assessments/${slug}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'}/assessments/${slug}`, {
       cache: 'no-store'
     });
     if (response.ok) {

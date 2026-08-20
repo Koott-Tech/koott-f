@@ -46,10 +46,10 @@ export async function generateMetadata({ params, searchParams }) {
   
     try {
     // Try to fetch from API for dynamic metadata
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const timestamp = Date.now();
     const previewSuffix = isPreview ? '&preview=1' : '';
-    const response = await fetch(`${baseUrl}/api/counselling/${slug}?t=${timestamp}${previewSuffix}`, {
+    const response = await fetch(`${baseUrl}/counselling/${slug}?t=${timestamp}${previewSuffix}`, {
       cache: 'no-store'
     });
     
@@ -121,10 +121,10 @@ const removeAssessmentSpecialist = (docs = []) => {
 
 async function fetchCounsellingService(slug, { preview = false } = {}) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     const timestamp = Date.now();
     const previewSuffix = preview ? '&preview=1' : '';
-    const response = await fetch(`${baseUrl}/api/counselling/${slug}?t=${timestamp}${previewSuffix}`, {
+    const response = await fetch(`${baseUrl}/counselling/${slug}?t=${timestamp}${previewSuffix}`, {
       cache: 'no-store'
     });
     
@@ -148,8 +148,8 @@ async function fetchCounsellingService(slug, { preview = false } = {}) {
 
 async function fetchPublicTherapists(limit = 6) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
-    const response = await fetch(`${baseUrl}/api/public/psychologists`, {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+    const response = await fetch(`${baseUrl}/public/psychologists`, {
       cache: 'no-store'
     });
 

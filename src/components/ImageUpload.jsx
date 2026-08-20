@@ -65,7 +65,7 @@ export default function ImageUpload({
         throw new Error('Not authenticated. Please log in again.');
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/counselling/admin/upload-image`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'}/counselling/admin/upload-image`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

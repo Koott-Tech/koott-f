@@ -43,8 +43,8 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
     useEffect(() => {
         async function fetchCounselling() {
             try {
-                const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
-                const res = await fetch(`${base}/api/counselling?limit=50`, { cache: 'no-store' });
+                const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+                const res = await fetch(`${base}/counselling?limit=50`, { cache: 'no-store' });
                 if (!res.ok) return;
                 const data = await res.json();
                 const services = Array.isArray(data)
@@ -88,8 +88,8 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
     useEffect(() => {
         async function fetchAssessments() {
             try {
-                const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
-                const res = await fetch(`${base}/api/assessments?limit=50`, { cache: 'no-store' });
+                const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+                const res = await fetch(`${base}/assessments?limit=50`, { cache: 'no-store' });
                 if (!res.ok) return;
                 const data = await res.json();
                 const list = data?.data?.assessments
@@ -122,8 +122,8 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
     useEffect(() => {
         async function fetchBetterParenting() {
             try {
-                const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
-                const res = await fetch(`${base}/api/better-parenting?limit=50`, { cache: 'no-store' });
+                const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+                const res = await fetch(`${base}/better-parenting?limit=50`, { cache: 'no-store' });
                 if (!res.ok) return;
                 const data = await res.json();
                 const pages = data?.data?.pages || data?.message?.pages;

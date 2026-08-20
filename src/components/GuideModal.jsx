@@ -97,10 +97,10 @@ export default function GuideModal({ open, onClose, defaultCategory = null }) {
       // Use BACKEND_URL consistently (same as other components)
       const base = process.env.NEXT_PUBLIC_BACKEND_URL 
         ? process.env.NEXT_PUBLIC_BACKEND_URL.replace(/\/api\/?$/, '') // Remove /api suffix if present
-        : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001');
+        : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api');
       
       if (key === 'counselling') {
-        const res = await fetch(`${base}/api/counselling?limit=50`, { 
+        const res = await fetch(`${base}/counselling?limit=50`, { 
           cache: 'no-store',
           headers: {
             'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ export default function GuideModal({ open, onClose, defaultCategory = null }) {
         }
         requestAnimationFrame(() => setMounted(true));
       } else if (key === 'assessments') {
-        const res = await fetch(`${base}/api/assessments?limit=50`, { 
+        const res = await fetch(`${base}/assessments?limit=50`, { 
           cache: 'no-store',
           headers: {
             'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ export default function GuideModal({ open, onClose, defaultCategory = null }) {
         }
         requestAnimationFrame(() => setMounted(true));
       } else if (key === 'better-parenting') {
-        const res = await fetch(`${base}/api/better-parenting?limit=50`, { 
+        const res = await fetch(`${base}/better-parenting?limit=50`, { 
           cache: 'no-store',
           headers: {
             'Content-Type': 'application/json',

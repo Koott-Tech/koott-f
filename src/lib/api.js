@@ -1,6 +1,6 @@
 import { clearAuthData, getStoredToken } from './authStorage';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:5001/api';
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
@@ -18,7 +18,7 @@ const handleResponse = async (response) => {
 
 // Helper function to make API requests
 async function apiRequest(endpoint, options = {}) {
-  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
   const url = `${baseURL}${endpoint}`;
   
   // Get token from localStorage if available
