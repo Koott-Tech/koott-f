@@ -1055,32 +1055,6 @@ export const adminApi = {
     });
   },
 
-  // Transfer a booking to a different therapist (optionally with a new date/time)
-  async transferSession(sessionId, { new_psychologist_id, new_date, new_time, new_duration }) {
-    return apiRequest(`/admin/sessions/${sessionId}/transfer`, {
-      method: 'POST',
-      body: JSON.stringify({ new_psychologist_id, new_date, new_time, new_duration }),
-    });
-  },
-
-  async rescheduleSessionAsAdmin(sessionId, { new_date, new_time, noshow_fee_amount, noshow_fee_method, noshow_fee_receipt_url } = {}) {
-    return apiRequest(`/admin/sessions/${sessionId}`, {
-      method: 'POST',
-      body: JSON.stringify({
-        new_date, new_time,
-        // No-show reschedule fee (only present when rescheduling a no-show session).
-        ...(noshow_fee_amount !== undefined ? { noshow_fee_amount, noshow_fee_method, noshow_fee_receipt_url } : {}),
-      }),
-    });
-  },
-
-  // Cancel WITHOUT refund — frees the slot, keeps it reschedulable (on_hold).
-  async cancelOnlySession(sessionId) {
-    return apiRequest(`/admin/sessions/${sessionId}/cancel-only`, {
-      method: 'POST',
-    });
-  },
-
   // Reschedule session
   async rescheduleSession(sessionId, rescheduleData) {
     const mappedData = {
@@ -1292,14 +1266,6 @@ export const adminApi = {
     return apiRequest('/admin/bookings/record-only-package', {
       method: 'POST',
       body: JSON.stringify(data),
-    });
-  },
-
-  // Book next package session (admin only) - for clients who prefer admin to book remaining sessions
-  async bookPackageNextSession({ client_id, package_id, scheduled_date, scheduled_time }) {
-    return apiRequest('/admin/bookings/book-package-next-session', {
-      method: 'POST',
-      body: JSON.stringify({ client_id, package_id, scheduled_date, scheduled_time }),
     });
   },
 

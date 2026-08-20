@@ -23,6 +23,8 @@ import {
   Trash2,
   MessageSquare,
   MoreVertical,
+  PauseCircle,
+  ArrowLeftRight,
   FileText,
   Video,
   Globe,
@@ -38,6 +40,7 @@ import {
 import { adminApi, sessionsApi } from '@/lib/backendApi';
 import { useNotification } from '@/contexts/NotificationContext';
 import AdminRescheduleModal from '@/components/AdminRescheduleModal';
+import AdminTransferSessionModal from '@/components/AdminTransferSessionModal';
 import AdminManualBookingModal from '@/components/AdminManualBookingModal';
 import AdminBookNextPackageSessionModal from '@/components/AdminBookNextPackageSessionModal';
 import AdminEditSessionModal from '@/components/AdminEditSessionModal';
@@ -126,6 +129,10 @@ export default function BookingsPage() {
   const [sessionToDelete, setSessionToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [cancelRefundTarget, setCancelRefundTarget] = useState(null);
+  const [cancelOnlyTarget, setCancelOnlyTarget] = useState(null);
+  const [isCancellingOnly, setIsCancellingOnly] = useState(false);
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [selectedTransferSession, setSelectedTransferSession] = useState(null);
   const [isCancelRefunding, setIsCancelRefunding] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [selectedCompleteSession, setSelectedCompleteSession] = useState(null);
@@ -467,6 +474,33 @@ export default function BookingsPage() {
     finally { setIsCancelRefunding(false); }
   };
 
+  /**
+   * Cancel WITHOUT refund — frees the slot but keeps the booking reschedulable (on_hold).
+   * For a client who can't attend but hasn't asked for their money back.
+   */
+  const handleCancelOnlyConfirm = async () => {
+    if (!cancelOnlyTarget) return;
+    setIsCancellingOnly(true);
+    try {
+      const res = await adminApi.cancelOnlySession(cancelOnlyTarget.id);
+      if (!res?.success) throw new Error(res?.error || 'Failed');
+      showSuccess('Cancelled without refund and put on hold. The slot is now free — reschedule it when the client confirms a new time.', 'On Hold');
+      setCancelOnlyTarget(null);
+      loadBookings();
+    } catch (e) { showError(e?.message || 'Failed to cancel', 'Error'); }
+    finally { setIsCancellingOnly(false); }
+  };
+
+  const handleTransfer = (session) => {
+    setOpenPlatformRowId(null);
+    setSelectedTransferSession({
+      ...session,
+      id: session.id,
+      psychologist_id: session.psychologist_id || session.psychologist?.id || null,
+    });
+    setIsTransferOpen(true);
+  };
+
   const handleRescheduleSuccess = (updatedSession) => {
     // Update the booking in the list
     setBookings(prevBookings => 
@@ -549,6 +583,8 @@ export default function BookingsPage() {
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'cancelled':
         return <XCircle className="h-4 w-4 text-red-500" />;
+      case 'on_hold':
+        return <PauseCircle className="h-4 w-4 text-amber-500" />;
       case 'no_show':
         return <AlertCircle className="h-4 w-4 text-orange-500" />;
       case 'rescheduled':
@@ -599,6 +635,8 @@ export default function BookingsPage() {
         return 'bg-green-100 text-green-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
+      case 'on_hold':
+        return 'bg-amber-100 text-amber-800';
       case 'no_show':
         return 'bg-orange-100 text-orange-800';
       case 'rescheduled':
@@ -638,6 +676,8 @@ export default function BookingsPage() {
         return 'Completed';
       case 'cancelled':
         return 'Cancelled';
+      case 'on_hold':
+        return 'On Hold';
       case 'no_show':
         return 'No Show';
       case 'rescheduled':
@@ -872,6 +912,7 @@ export default function BookingsPage() {
     { label: 'Completed', value: 'completed' },
     { label: 'No Show', value: 'no_show' },
     { label: 'Cancelled', value: 'cancelled' },
+    { label: 'On Hold', value: 'on_hold' },
     { label: 'Pending', value: 'pending' },
     { label: 'Rescheduled', value: 'rescheduled' },
   ];
@@ -1344,6 +1385,18 @@ export default function BookingsPage() {
                             </>
                           )}
                           {!['cancelled', 'refunded', 'completed'].includes(booking.status) && (
+                            <DropdownMenuItem onClick={() => handleTransfer(booking)} className="cursor-pointer">
+                              <ArrowLeftRight className="h-4 w-4 mr-2" />
+                              Transfer Therapist
+                            </DropdownMenuItem>
+                          )}
+                          {!['cancelled', 'refunded', 'completed', 'on_hold'].includes(booking.status) && (
+                            <DropdownMenuItem onClick={() => setCancelOnlyTarget(booking)} className="cursor-pointer text-amber-700">
+                              <PauseCircle className="h-4 w-4 mr-2" />
+                              On Hold
+                            </DropdownMenuItem>
+                          )}
+                          {!['cancelled', 'refunded', 'completed'].includes(booking.status) && (
                             <>
                               <DropdownMenuItem onClick={() => setCancelRefundTarget(booking)} className="cursor-pointer text-red-600">
                                 <XCircle className="h-4 w-4 mr-2" />
@@ -1706,6 +1759,48 @@ export default function BookingsPage() {
           </div>
         </div>
       )}
+
+      {cancelOnlyTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => !isCancellingOnly && setCancelOnlyTarget(null)}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 mb-2">
+              <PauseCircle className="h-5 w-5 text-amber-500 flex-shrink-0" />
+              <h3 className="text-base font-semibold text-gray-900">Put on hold?</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-1">This will:</p>
+            <ul className="text-sm text-gray-500 list-disc ml-4 mb-4 space-y-1">
+              <li>Mark the booking as <strong>on hold</strong> — no refund is recorded</li>
+              <li>Remove the therapist&apos;s <strong>Google Calendar event</strong> so the slot reopens</li>
+              <li>Keep the booking <strong>reschedulable</strong> for when the client confirms a new time</li>
+            </ul>
+            <p className="text-xs text-gray-400 mb-5">No notifications are sent — this is a silent pause.</p>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setCancelOnlyTarget(null)} disabled={isCancellingOnly} className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
+                Back
+              </button>
+              <button onClick={handleCancelOnlyConfirm} disabled={isCancellingOnly} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 text-white text-sm hover:bg-amber-700 disabled:opacity-40">
+                {isCancellingOnly ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <PauseCircle className="h-3.5 w-3.5" />}
+                Confirm On Hold
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transfer to another therapist */}
+      <AdminTransferSessionModal
+        isOpen={isTransferOpen}
+        onClose={() => {
+          setIsTransferOpen(false);
+          setSelectedTransferSession(null);
+        }}
+        session={selectedTransferSession}
+        onTransferSuccess={async () => {
+          setIsTransferOpen(false);
+          setSelectedTransferSession(null);
+          await loadBookings();
+        }}
+      />
 
       {/* Complete Session Modal */}
       <SessionCompletionModal
