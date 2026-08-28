@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Keep the template committed (it holds no secrets)
 !.env.example
+
+# Claude Code personal settings (launch.json stays committed — it's shared config)
+.claude/settings.local.json
