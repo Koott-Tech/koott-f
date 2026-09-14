@@ -1,9 +1,11 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import Header from './Header';
+// KoottHeader is the cloned koott.in header. The previous Koott header is kept
+// in Header.jsx, unused, so the swap is easy to reverse.
+import Header from './KoottHeader';
 
-export default function HeaderWrapper() {
+export default function HeaderWrapper({ conditionMenu }) {
   const pathname = usePathname();
   
   // Hide global site header on admin, superadmin, psychologist, finance dashboards
@@ -22,10 +24,10 @@ export default function HeaderWrapper() {
   if (isClientDashboard) {
     return (
       <div className="hidden md:block fixed top-0 left-0 right-0 z-50 bg-white">
-        <Header />
+        <Header conditionMenu={conditionMenu} />
       </div>
     );
   }
   
-  return <Header />;
+  return <Header conditionMenu={conditionMenu} />;
 }

@@ -1,29 +1,31 @@
 import styles from "./therapy-agreement.module.css";
 
+/**
+ * Therapy Agreement.
+ *
+ * Copy is the text published at koott.in/agreement; the layout and type scale
+ * are this page's existing design. Regenerate with scripts rather than editing
+ * the prose here by hand, so the two stay in step.
+ */
+
 export const metadata = {
-    title: "Therapy Agreement | MyKoott",
-    description:
-        "Therapy agreement outlining services, expectations, confidentiality, payment, and legal terms for clients of MyKoott by MyKoott Care Pvt. Ltd.",
+    title: { absolute: "Therapy Agreement | Koott Wellness PVT. LTD." },
+    description: "Understand our therapy agreement before booking your appointment with a Koott therapist. Learn about session fees, cancellation policies, and patient confidentiality",
+    alternates: { canonical: "https://www.koott.in/therapy-agreement" },
     openGraph: {
-        title: "Therapy Agreement | MyKoott",
-        description:
-            "Therapy agreement outlining services, expectations, confidentiality, payment, and legal terms for clients of MyKoott by MyKoott Care Pvt. Ltd.",
+        title: "Therapy Agreement | Koott Wellness PVT. LTD.",
+        description: "Understand our therapy agreement before booking your appointment with a Koott therapist. Learn about session fees, cancellation policies, and patient confidentiality",
         type: "website",
         url: "https://www.koott.in/therapy-agreement",
+        siteName: "Koott",
         images: [
-            {
-                url: "https://www.koott.in/logo.png",
-                width: 1200,
-                height: 630,
-                alt: "MyKoott logo",
-            },
+            { url: "https://www.koott.in/logo.png", width: 1200, height: 630, alt: "Koott logo" },
         ],
     },
     twitter: {
         card: "summary_large_image",
-        title: "Therapy Agreement | MyKoott",
-        description:
-            "Therapy agreement outlining services, expectations, confidentiality, payment, and legal terms for clients of MyKoott by MyKoott Care Pvt. Ltd.",
+        title: "Therapy Agreement | Koott Wellness PVT. LTD.",
+        description: "Understand our therapy agreement before booking your appointment with a Koott therapist. Learn about session fees, cancellation policies, and patient confidentiality",
         images: ["https://www.koott.in/logo.png"],
     },
 };
@@ -31,237 +33,100 @@ export const metadata = {
 export const dynamic = 'force-static';
 
 export default function TherapyAgreementPage() {
+    // Header.jsx is position:fixed and reserves no space of its own.
     return (
-        <div className={`bg-white text-gray-900 ${styles.page}`}>
+        <div className={`bg-white text-gray-900 ${styles.page}`} style={{ paddingTop: 64 }}>
             <div className="max-w-5xl mx-auto px-6 py-16 lg:px-8 lg:py-24">
-                <h3 className={`${styles.title} mt-2 text-gray-900`}>
-                    MyKoott Therapy Agreement
-                </h3>
-                <p className="mt-6 text-base leading-relaxed text-gray-700">
-                    This Therapy Agreement outlines expectations, responsibilities, and consent terms for clients engaging
-                    with MyKoott by MyKoott Care Pvt. Ltd. Please review it carefully before booking or participating in
-                    services.
-                </p>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Company &amp; Services</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li><strong>Company:</strong> MyKoott by MyKoott Care Pvt. Ltd.</li>
-                        <li>
-                            <strong>Services Covered:</strong> Child Counseling, Child Assessment, Better Parenting — delivered
-                            exclusively through online/tele-therapy platforms.
-                        </li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Nature of Therapy</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        Psychological therapy is collaborative and depends on the therapeutic relationship as well as the concerns
-                        you bring forward. Therapy is not a one-time consultation; active participation is required during and
-                        between sessions. You may be encouraged to practice strategies, reflections, or exercises outside of
-                        therapy to support progress.
-                    </p>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Appointment Structure &amp; Fees</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>Sessions are generally 50 minutes, scheduled weekly, and typically span 4–5 sessions depending on need.</li>
-                        <li>Fees are determined by the therapist and must be paid before each session.</li>
-                        <li>Professional services outside scheduled sessions (reports, assessments, extended communication) are chargeable.</li>
-                        <li>Cancellations or rescheduling require at least 24 hours&rsquo; notice; otherwise, the full session fee applies.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Risks &amp; Benefits</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        Therapy may involve exploring sensitive or distressing experiences, which can bring up emotions such as
-                        sadness, anger, guilt, or anxiety. This is a normal part of healing. Therapy also offers meaningful
-                        benefits, including improved coping skills, emotional balance, healthier relationships, personal growth,
-                        and greater overall well-being.
-                    </p>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Clinical Records &amp; Reports</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>MyKoott maintains professional clinical records in line with legal and ethical standards.</li>
-                        <li>Clients are not automatically entitled to full therapy records.</li>
-                        <li>Reports or summaries for educational, medical, or organizational purposes must be formally requested and discussed with the therapist.</li>
-                        <li>Additional charges may apply for reports or psychological assessments.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Minor Clients (Under 18 Years)</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>A parent or legal guardian must provide consent for therapy.</li>
-                        <li>Parents/guardians have legal access to records but are requested to waive this right to maintain confidentiality.</li>
-                        <li>Only general updates are shared with parents unless there is a risk of harm.</li>
-                        <li>A treatment summary may be provided at the conclusion of therapy after discussion with the child where appropriate.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Confidentiality</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        Communications between client and therapist are confidential except when required by law or ethics, including:
-                    </p>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>Serious risk of harm to the client or others.</li>
-                        <li>Suspected abuse or neglect of a child, elder, or dependent adult.</li>
-                        <li>A valid court order mandates disclosure.</li>
-                        <li>Professional supervision is needed to improve quality of care (identifying details minimized).</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Suicidality &amp; Crisis</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>MyKoott does not provide 24-hour emergency or crisis intervention.</li>
-                        <li>If you are in crisis or experiencing suicidal thoughts, contact local emergency services or visit the nearest hospital immediately.</li>
-                        <li>You agree to inform your therapist if experiencing suicidal thoughts or intent.</li>
-                        <li>You agree to use emergency or crisis resources when necessary and understand online therapy is not a substitute for emergency care.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Tele-Therapy Considerations</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>Ensure sessions take place in a private, quiet setting.</li>
-                        <li>Online sessions may face connectivity or security risks, despite MyKoott&rsquo;s secure technology.</li>
-                        <li>Technical disruptions may lead to rescheduling or extension of remaining time.</li>
-                        <li>Online therapy may not suit severe psychiatric conditions; referrals for in-person care may be recommended.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Couple &amp; Family Therapy</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>The therapist acts as a neutral facilitator and does not guarantee continuation of any relationship.</li>
-                        <li>All parties must provide separate informed consent.</li>
-                        <li>Disputes regarding therapy should be submitted to MyKoott in writing.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Court Involvement &amp; Legal Proceedings</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>MyKoott and its therapists do not participate in legal disputes.</li>
-                        <li>If compelled by subpoena or court order, clients are responsible for all related professional fees, including preparation and travel.</li>
-                        <li>A subpoena alone does not permit release of records; valid consent or court order is required.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Payment &amp; Billing</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>Fees are communicated before therapy begins.</li>
-                        <li>Payment is due before each session via approved methods (UPI, card, bank transfer, etc.).</li>
-                        <li>Missed or late-canceled sessions (less than 24 hours&rsquo; notice) are fully chargeable.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Informed Consent &amp; Voluntary Participation</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>Participation in therapy is voluntary.</li>
-                        <li>You understand the nature, risks, and benefits of therapy.</li>
-                        <li>You may discontinue therapy at any time without penalty; discontinuation does not create liability for MyKoott or its therapists.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Data Protection, Privacy &amp; Session Recordings</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>Personal data and clinical records are stored securely with restricted access.</li>
-                        <li>MyKoott complies with Indian privacy laws and applicable international standards.</li>
-                        <li>Sessions are not recorded unless explicit written consent is provided.</li>
-                        <li>Clients may not record sessions without written permission from MyKoott.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Communication Outside Sessions</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>Therapists are not available for therapy via calls, texts, or emails outside scheduled sessions.</li>
-                        <li>Communication outside sessions is limited to scheduling and administrative purposes.</li>
-                        <li>Response times may take 24–48 business hours.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Termination of Therapy</h3>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>You may end therapy at any time.</li>
-                        <li>Therapists may discontinue therapy if fees remain unpaid, abusive or inappropriate behavior occurs, attendance is inconsistent, or therapy is no longer effective or appropriate.</li>
-                        <li>Referral options or recommendations will be provided where possible.</li>
-                    </ul>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Non-Discrimination &amp; Respect</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        MyKoott provides inclusive, professional mental health services without discrimination based on
-                        religion, caste, gender, marital status, sexual orientation, disability, or background. Mutual respect
-                        and cooperation are expected from both client and therapist.
-                    </p>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Intellectual Property &amp; Resources</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        All materials shared during therapy, including worksheets, tools, assessments, and guides, remain the
-                        intellectual property of MyKoott and are for personal use only. They may not be copied, shared, or
-                        distributed without written consent.
-                    </p>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Insurance Disclaimer</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        MyKoott by MyKoott Care Pvt. Ltd. does not accept or process insurance claims. Clients are solely
-                        responsible for payment of all fees.
-                    </p>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Corporate Clients</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        For corporate wellness services, all individual session details remain strictly confidential. Only
-                        anonymized, aggregated data (e.g., number of participants, session topics) may be shared with the
-                        organization.
-                    </p>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Governing Law &amp; Jurisdiction</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        This Agreement is governed by the laws of India. Any disputes fall under the exclusive jurisdiction of
-                        the courts in Calicut, Kerala.
-                    </p>
-                </section>
-
-                <section className="mt-10 space-y-4">
-                    <h3 className={`${styles.sectionHeading} text-gray-900`}>Acknowledgment &amp; Consent</h3>
-                    <p className="text-base leading-relaxed text-gray-700">
-                        By electronically ticking the acceptance box or booking a session, you confirm that you:
-                    </p>
-                    <ul className="space-y-2 text-base leading-relaxed text-gray-700 list-disc list-inside">
-                        <li>Have read and understood this agreement.</li>
-                        <li>Enter therapy voluntarily and with informed consent.</li>
-                        <li>Acknowledge the risks, benefits, and limitations of therapy.</li>
-                        <li>Consent to participate in services provided by MyKoott by MyKoott Care Pvt. Ltd.</li>
-                    </ul>
-                    <div className="mt-8 space-y-4 text-base leading-relaxed text-gray-700">
-                        <p>Client(s) Email for Records: ________________________</p>
-                        <p>Signature (Electronic Acceptance): ___________________</p>
-                    </div>
-                </section>
+                <h1 className={`${styles.title} mt-2 text-gray-900`}>{"Therapy Agreement"}</h1>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Company: Koott Care Pvt. Ltd. Services Covered: Individual Therapy, Couple Therapy, Child Therapy, Corporate Wellness Sessions, and Psychiatry Consultations (delivered exclusively through online/tele-therapy platforms)."}</p>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Psychological therapy is not easily described in general statements. The process varies depending on the personalities of both the therapist and the client, as well as the particular concerns you bring forward."}</p>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Therapy is not like a medical consultation. It requires active participation from you. To maximize effectiveness, you may be expected to apply strategies, exercises, or reflective practices outside of the sessions."}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"Sessions are generally 50 minutes in length, scheduled once a week, and typically run for 4–5 sessions depending on therapeutic need."}</li>
+                    <li key={1}>{"Fees are determined by the therapist you select and are to be paid before each session."}</li>
+                    <li key={2}>{"Professional services outside scheduled sessions (e.g., assessments, reports, written summaries, or extended communication) are also chargeable."}</li>
+                    <li key={3}>{"Cancellations/Rescheduling: Clients must provide at least 24 hours’ prior notice. Sessions canceled without such notice will be fully charged."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Therapy may involve discussing distressing aspects of life, which can evoke difficult emotions such as sadness, guilt, anger, frustration, or loneliness. These experiences are a normal part of the process."}</p>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"At the same time, therapy has shown substantial benefits, including improved coping, better emotional balance, personal growth, and enhanced relationships."}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"Koott Care maintains professional clinical records in compliance with legal and ethical standards."}</li>
+                    <li key={1}>{"Clients are not automatically entitled to full records. If a report or summary is required (for example, for medical, educational, or organizational purposes), this must be formally discussed with the therapist. Charges may apply depending on the nature of the request and assessments involved."}</li>
+                    <li key={2}>{"Reports and psychological assessments may carry additional charges based on the tests or tools used."}</li>
+                    <li key={3}>{"Parents/guardians may legally have access to a minor’s records. However, it is our practice to request that parents/guardians waive this right to ensure confidentiality."}</li>
+                    <li key={4}>{"Only general progress updates will be provided unless there is a serious risk of harm to the child or others. In such cases, specific information may be shared with parents/guardians."}</li>
+                    <li key={5}>{"A treatment summary may be provided at the conclusion of therapy. Where possible, discussions with the minor will precede the sharing of any information."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"All communications between client and therapist are confidential, with the following legal and ethical exceptions:"}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"Risk of Harm: If the client poses a threat of serious harm to themselves or others, protective action may be taken (e.g., contacting family, police, or hospitalization)."}</li>
+                    <li key={1}>{"Abuse or Neglect: Therapists are legally obligated to report suspected abuse or neglect of a child, elderly person, or dependent adult."}</li>
+                    <li key={2}>{"Court Orders: Confidentiality may be breached if mandated by a valid court order in medicolegal cases."}</li>
+                    <li key={3}>{"Professional Consultation: Therapists may occasionally consult with other professionals for supervision. Client identities are protected in such cases."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Koott Care does not provide 24-hour emergency or crisis services. If you experience suicidal thoughts or a mental health crisis:"}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"Contact your local emergency services immediately,"}</li>
+                    <li key={1}>{"Or go to the nearest hospital emergency department."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Suicidal Contract (Commitment to Safety): By signing this agreement, you confirm that:"}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"You will inform your therapist if you are experiencing suicidal thoughts."}</li>
+                    <li key={1}>{"You agree to use emergency resources when necessary."}</li>
+                    <li key={2}>{"You acknowledge that online therapy is not a substitute for crisis intervention."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Since services are delivered online, clients acknowledge and accept the following limitations:"}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"Privacy: Clients should ensure they attend sessions from a private, quiet location where they will not be interrupted."}</li>
+                    <li key={1}>{"Technical Issues: Despite secure technology, risks such as poor connectivity, disruption, or unauthorized interception cannot be fully eliminated."}</li>
+                    <li key={2}>{"Rescheduling: If sessions are disrupted due to technical failure, the remaining time may be added to a subsequent session, or a fresh appointment will be scheduled."}</li>
+                    <li key={3}>{"Limitations: Online therapy may not be appropriate for severe psychiatric conditions (e.g., active psychosis, high suicide risk). Such cases may be referred for in-person or hospital care."}</li>
+                    <li key={4}>{"The therapist acts as a neutral facilitator and does not guarantee resolution or continuation of the relationship."}</li>
+                    <li key={5}>{"A copy of this agreement will be emailed to both parties, and both must consent."}</li>
+                    <li key={6}>{"Any disputes regarding the agreement should be communicated to Koott Care in writing."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Koott Care and its therapists are not intended to participate in legal disputes. However, if a therapist is required by subpoena, request, or order to provide records, reports, or court testimony, the client is responsible for all professional fees, preparation time, travel, and documentation costs."}</p>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Please note: a subpoena does not automatically permit release of records. A valid client consent or court order is required, and therapists remain bound by ethical and legal standards."}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"Fees are discussed with you prior to commencing therapy."}</li>
+                    <li key={1}>{"Payment must be made before each session, in the mode agreed upon (UPI, card, bank transfer, etc.)."}</li>
+                    <li key={2}>{"Missed or late-canceled sessions (less than 24 hours’ notice) are fully chargeable."}</li>
+                    <li key={3}>{"Therapy is a voluntary process. You confirm that you are entering into therapy of your own free will."}</li>
+                    <li key={4}>{"You retain the right to discontinue therapy at any point without penalty."}</li>
+                    <li key={5}>{"Discontinuation does not create liability for Koott Care or its therapists."}</li>
+                    <li key={6}>{"All personal data and clinical records are stored securely with limited access."}</li>
+                    <li key={7}>{"Koott Care complies with Indian privacy laws, and where relevant, international standards such as GDPR."}</li>
+                    <li key={8}>{"Sessions are not recorded unless explicit prior written consent is given by the client."}</li>
+                    <li key={9}>{"Clients are not permitted to record sessions without written consent from Koott Care."}</li>
+                    <li key={10}>{"Therapists are not available for therapy via calls, messages, or email outside scheduled sessions."}</li>
+                    <li key={11}>{"Communication outside sessions is strictly for scheduling or administrative purposes."}</li>
+                    <li key={12}>{"Responses may take 24–48 business hours."}</li>
+                    <li key={13}>{"You may end therapy at any time."}</li>
+                    <li key={14}>{"Your therapist may also terminate therapy under certain circumstances, including: Non-payment of fees, Abusive or threatening behavior, Persistent non-compliance, If therapy is deemed ineffective."}</li>
+                    <li key={15}>{"Non-payment of fees,"}</li>
+                    <li key={16}>{"Abusive or threatening behavior,"}</li>
+                    <li key={17}>{"Persistent non-compliance,"}</li>
+                    <li key={18}>{"If therapy is deemed ineffective."}</li>
+                    <li key={19}>{"Where appropriate, referral options will be provided."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Koott Care provides services in an inclusive and professional manner, without discrimination based on religion, caste, gender, marital status, sexual orientation, disability, or background. Mutual respect is expected at all times."}</p>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"All therapy-related materials (worksheets, assessments, tests, handouts) are for personal use only. They remain the intellectual property of Koott Care and must not be shared, copied, or distributed without written consent."}</p>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Koott Care Pvt. Ltd. does not accept or process insurance claims. Clients are fully responsible for all payments."}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"In corporate wellness services, client confidentiality is fully maintained."}</li>
+                    <li key={1}>{"Employers will never receive individual session details."}</li>
+                    <li key={2}>{"Only anonymized or aggregated reports (e.g., number of sessions attended) may be shared with organizations."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"This Agreement shall be governed by the laws of India. Any dispute arising shall fall under the exclusive jurisdiction of the courts in Calicut, Kerala."}</p>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"By electronically ticking the acceptance box while booking, you confirm that you:"}</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-gray-700 list-disc list-inside">
+                    <li key={0}>{"Have read and understood the terms of this agreement,"}</li>
+                    <li key={1}>{"Enter therapy voluntarily and with informed consent,"}</li>
+                    <li key={2}>{"Understand the risks, benefits, and limitations of therapy,"}</li>
+                    <li key={3}>{"Consent to participate in services provided by Koott Care Pvt. Ltd."}</li>
+                </ul>
+                <p className="mt-4 text-base leading-relaxed text-gray-700">{"Client(s) Email for Records: ________________________ Signature (Electronic Acceptance): ___________________"}</p>
             </div>
         </div>
     );
 }
-

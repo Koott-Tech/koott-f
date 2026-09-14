@@ -24,6 +24,7 @@ import {
 } from "@/constants/heroTypography";
 
 import { SUMMER_WORKSHOP_2026_HERO_IMAGE } from "@/data/summerWorkshop2026Assets";
+import { eventHasEnded, isImportedEventShape, mergeWorkshopEventCms } from "@/data/workshopEventPageCms";
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001/api";
 
@@ -37,7 +38,11 @@ async function getPublishedEventCards() {
     const rows = Array.isArray(json?.data) ? json.data : [];
 
     return rows.map((row) => {
-      const cms = row?.cms_data || {};
+      // Events imported from Wix store { title, summary, date, schedule, venue, image };
+      // map them onto the workshop shape so the card shows their own title and image.
+      const cms = isImportedEventShape(row?.cms_data)
+        ? mergeWorkshopEventCms(row.cms_data)
+        : (row?.cms_data || {});
       const listCard = cms?.eventListCard || {};
       const details = Array.isArray(cms?.sessionBanner?.details) ? cms.sessionBanner.details : [];
       const date = cms.date || details.find((d) => String(d?.label || "").toLowerCase().includes("date"))?.value || "";
@@ -48,12 +53,13 @@ async function getPublishedEventCards() {
         id: row?.id || slug,
         category: cms.method || listCard?.category || cms?.whatIsThis?.eyebrow || "Family Workshop",
         title: cms.topic || listCard?.title || cms?.sessionBanner?.title || cms?.hero?.title || row?.seo_title || "Event",
-        description: cms.speaker ? `Speaker: ${cms.speaker}` : listCard?.description || cms?.hero?.body || row?.seo_description || "Join this event with MyKoott.",
-        organizer: listCard?.organizer || "MyKoott",
+        description: cms.speaker ? `Speaker: ${cms.speaker}` : listCard?.description || cms?.hero?.body || row?.seo_description || "Join this event with Koott.",
+        organizer: listCard?.organizer || "Koott",
         schedule: schedule || "Schedule to be announced",
         image: cms.posterUrl || listCard?.imageUrl || cms?.heroImageUrl || SUMMER_WORKSHOP_2026_HERO_IMAGE,
         detailsHref: `/events/${slug}`,
         ticketHref: `/events/${slug}`,
+        ended: eventHasEnded([cms.time, cms.date, listCard?.scheduleText].filter(Boolean).join(" ")),
       };
     });
   } catch {
@@ -64,14 +70,14 @@ async function getPublishedEventCards() {
 export const metadata = {
   title: "Events",
   description:
-    "MyKoott workshops and family events — parent–child sessions on emotions, communication, and growing together.",
+    "Koott workshops and family events — parent–child sessions on emotions, communication, and growing together.",
   openGraph: {
-    title: "Events | MyKoott",
+    title: "Events | Koott",
     description:
-      "Join MyKoott workshops for parents and children — safe spaces to learn, feel, and grow together.",
+      "Join Koott workshops for parents and children — safe spaces to learn, feel, and grow together.",
     type: "website",
     url: "https://www.koott.in/events",
-    siteName: "MyKoott",
+    siteName: "Koott",
   },
   alternates: {
     canonical: "https://www.koott.in/events",
@@ -146,14 +152,12 @@ export default async function EventsPage() {
           <span className={`inline-flex rounded-full border border-[#025545]/20 bg-[#025545]/10 px-5 py-1.5 text-sm font-semibold text-[#025545] ${BLOG_UI_LINE_HEIGHT_CLASS}`}>
             Events
           </span>
-          <div
+          <h1
             className={`mt-6 text-gray-900 ${HERO_DISPLAY_HEADING_CLASS}`}
-            role="heading"
-            aria-level={1}
             style={HERO_DISPLAY_HEADING_STYLE}
           >
             Grow Your Network &amp; Skills with Our Events
-          </div>
+          </h1>
           <p className={`mx-auto mt-6 max-w-2xl text-gray-600 ${HERO_BODY_TEXT_CLASS}`} style={HERO_BODY_TEXT_STYLE}>
             Join our workshops and family events designed to help parents and children learn, connect, and grow together.
           </p>
@@ -226,12 +230,18 @@ export default async function EventsPage() {
                 </div>
 
                 <div className="flex w-full flex-col gap-2.5 px-1 md:w-[160px] md:px-0">
-                  <Link
-                    href={event.ticketHref}
-                    className="inline-flex w-full items-center justify-center rounded-full bg-[#025545] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#012f23]"
-                  >
-                    Book a slot
-                  </Link>
+                  {event.ended ? (
+                    <span className="inline-flex w-full items-center justify-center rounded-full bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-500">
+                      Event ended
+                    </span>
+                  ) : (
+                    <Link
+                      href={event.ticketHref}
+                      className="inline-flex w-full items-center justify-center rounded-full bg-[#025545] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#012f23]"
+                    >
+                      Book a slot
+                    </Link>
+                  )}
                   <Link
                     href={event.detailsHref}
                     className="inline-flex w-full items-center justify-center text-sm font-semibold text-[#025545] transition-colors hover:text-[#012f23]"
@@ -260,7 +270,7 @@ export default async function EventsPage() {
               Building emotionally safer homes for every family
           </h3>
             <p className={`mx-auto mt-2 max-w-2xl text-gray-600 ${HERO_BODY_TEXT_CLASS}`} style={HERO_BODY_TEXT_STYLE}>
-              At MyKoott, we design practical workshops where parents and children learn together, understand
+              At Koott, we design practical workshops where parents and children learn together, understand
               emotions better, and build stronger day-to-day communication with confidence.
             </p>
           </section>
@@ -399,7 +409,7 @@ export default async function EventsPage() {
                 <p className={`px-1 pb-5 text-gray-600 ${HERO_BODY_TEXT_CLASS}`} style={HERO_BODY_TEXT_STYLE}>
                   Visit{" "}
                   <Link href="/blog" className="font-medium text-[#025545] underline underline-offset-2 hover:text-[#012f23]">
-                    The MyKoott Blog
+                    The Koott Blog
                   </Link>{" "}
                   for expert-written guides, family stories, and practical tips that complement what we cover in live events.
                 </p>

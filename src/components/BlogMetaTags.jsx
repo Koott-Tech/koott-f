@@ -40,11 +40,11 @@ const BlogMetaTags = ({ blog, siteUrl = 'https://koott.com' }) => {
     "image": featured_image_url ? `${siteUrl}${featured_image_url}` : `${siteUrl}/logo.png`,
     "author": {
       "@type": "Person",
-      "name": author_name || "MyKoott Team"
+      "name": author_name || "Koott Team"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "MyKoott",
+      "name": "Koott",
       "logo": {
         "@type": "ImageObject",
         "url": `${siteUrl}/logo.png`
@@ -68,7 +68,7 @@ const BlogMetaTags = ({ blog, siteUrl = 'https://koott.com' }) => {
       <meta name="title" content={metaTitle} />
       <meta name="description" content={metaDescription} />
       <meta name="keywords" content={keywords} />
-      <meta name="author" content={author_name || "MyKoott Team"} />
+      <meta name="author" content={author_name || "Koott Team"} />
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content="article" />
@@ -76,9 +76,9 @@ const BlogMetaTags = ({ blog, siteUrl = 'https://koott.com' }) => {
       <meta property="og:title" content={metaTitle} />
       <meta property="og:description" content={metaDescription} />
       <meta property="og:image" content={featured_image_url ? `${siteUrl}${featured_image_url}` : `${siteUrl}/logo.png`} />
-      <meta property="og:site_name" content="MyKoott" />
+      <meta property="og:site_name" content="Koott" />
       <meta property="og:locale" content="en_US" />
-      <meta property="article:author" content={author_name || "MyKoott Team"} />
+      <meta property="article:author" content={author_name || "Koott Team"} />
       <meta property="article:published_time" content={published_at} />
       <meta property="article:modified_time" content={published_at} />
       {categories?.map((category, index) => (
@@ -96,8 +96,9 @@ const BlogMetaTags = ({ blog, siteUrl = 'https://koott.com' }) => {
       <meta property="twitter:image" content={featured_image_url ? `${siteUrl}${featured_image_url}` : `${siteUrl}/logo.png`} />
 
       {/* Additional SEO Meta Tags */}
-      <meta name="robots" content="index, follow" />
-      <meta name="googlebot" content="index, follow" />
+      {/* Indexable only once the site launches (same flag as app/robots.js). */}
+      <meta name="robots" content={process.env.NEXT_PUBLIC_ALLOW_INDEXING === "true" ? "index, follow" : "noindex, nofollow"} />
+      <meta name="googlebot" content={process.env.NEXT_PUBLIC_ALLOW_INDEXING === "true" ? "index, follow" : "noindex, nofollow"} />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="theme-color" content="#4F46E5" />
       

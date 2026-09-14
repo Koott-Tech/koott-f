@@ -23,7 +23,8 @@ import {
   Layers,
   RefreshCw,
   Briefcase,
-  Ticket
+  Ticket,
+  PhoneCall
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -59,7 +60,7 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
-      const cmsPaths = ['/admin/blogs', '/admin/counselling', '/admin/assessments', '/admin/better-parenting', '/admin/careers', '/admin/events-cms'];
+      const cmsPaths = ['/admin/blogs', '/admin/counselling', '/admin/site-pages', '/admin/careers', '/admin/events-cms'];
       const isOnCmsPage = cmsPaths.some(path => currentPath.startsWith(path));
       if (isOnCmsPage) {
         setIsCmsMenuOpen(true);
@@ -79,18 +80,22 @@ export default function AdminLayout({ children }) {
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Bookings', href: '/admin/bookings', icon: Calendar },
     { name: 'Therapists', href: '/admin/therapists', icon: UserCheck },
+    { name: 'Therapist Groups', href: '/admin/therapist-groups', icon: Users },
+    { name: 'Leads', href: '/admin/leads', icon: PhoneCall },
     { name: 'Events', href: '/admin/events', icon: Ticket },
     { name: 'Assessment Sessions', href: '/admin/assessment-sessions', icon: Package },
     { name: 'Rescheduling', href: '/admin/rescheduling', icon: RefreshCw },
+    { name: 'Coupons', href: '/admin/coupons', icon: Ticket },
     {
       name: 'CMS',
       icon: Layers,
       hasSubmenu: true,
       submenu: [
         { name: 'Blogs', href: '/admin/blogs', icon: FileText },
-        { name: 'Counselling Pages', href: '/admin/counselling', icon: MessageSquare },
-        { name: 'Assessment Pages', href: '/admin/assessments', icon: FileText },
-        { name: 'Better Parenting', href: '/admin/better-parenting', icon: FileText },
+        // One universal page editor for every page (one design site-wide). The
+        // per-menu Assessment / Better Parenting editors were little.care leftovers;
+        // their routes still exist but are no longer in the menu.
+        { name: 'Pages', href: '/admin/counselling', icon: MessageSquare },
         { name: 'Careers', href: '/admin/careers', icon: Briefcase },
         { name: 'Event pages', href: '/admin/events-cms', icon: Ticket },
       ]
@@ -265,11 +270,11 @@ export default function AdminLayout({ children }) {
             <a 
               href="/admin"
               className="hover:opacity-80 transition-opacity cursor-pointer"
-              aria-label="MyKoott - Go to admin dashboard"
+              aria-label="Koott - Go to admin dashboard"
             >
               <img 
                 src="/logo.png"
-                alt="MyKoott"
+                alt="Koott"
                 width={120}
                 height={40}
                 className="object-contain"
@@ -377,7 +382,7 @@ export default function AdminLayout({ children }) {
               >
                 {isSidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
               </button>
-            <h6>MyKoott Admin Panel</h6>
+            <h6>Koott Admin Panel</h6>
             </div>
             <div className="flex items-center space-x-4">
               {user && (

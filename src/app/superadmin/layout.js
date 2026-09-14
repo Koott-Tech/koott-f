@@ -29,7 +29,8 @@ import {
   UserCircle,
   BookOpen,
   ClipboardList,
-  Ticket
+  Ticket,
+  PhoneCall
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -110,6 +111,8 @@ export default function SuperAdminLayout({ children }) {
       submenu: [
         { name: 'Dashboard', href: '/superadmin/admin', icon: BarChart3 },
         { name: 'Doctors', href: '/superadmin/admin/doctors', icon: UserCheck },
+        { name: 'Therapist Groups', href: '/superadmin/admin/therapist-groups', icon: Users },
+        { name: 'Leads', href: '/superadmin/admin/leads', icon: PhoneCall },
         { name: 'Users', href: '/superadmin/admin/users', icon: Users },
         { name: 'Bookings', href: '/superadmin/admin/bookings', icon: Calendar },
         { name: 'Events', href: '/superadmin/admin/events', icon: Ticket },
@@ -127,6 +130,7 @@ export default function SuperAdminLayout({ children }) {
         { name: 'Sessions', href: '/superadmin/finance/sessions', icon: Calendar },
         { name: 'Payouts', href: '/superadmin/finance/payouts', icon: Wallet },
         { name: 'Doctors', href: '/superadmin/finance/doctors', icon: UserCheck },
+        { name: 'Groups', href: '/superadmin/finance/groups', icon: Users },
         { name: 'Expenses', href: '/superadmin/finance/expenses', icon: Receipt },
         { name: 'Income', href: '/superadmin/finance/income', icon: TrendingUp },
       ]
@@ -326,11 +330,11 @@ export default function SuperAdminLayout({ children }) {
             <a 
               href="/superadmin"
               className="hover:opacity-80 transition-opacity cursor-pointer"
-              aria-label="MyKoott - Go to super admin dashboard"
+              aria-label="Koott - Go to super admin dashboard"
             >
               <img 
                 src="/logo.png"
-                alt="MyKoott"
+                alt="Koott"
                 width={120}
                 height={40}
                 className="object-contain"

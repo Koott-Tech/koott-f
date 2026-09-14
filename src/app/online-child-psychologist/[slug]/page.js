@@ -378,32 +378,76 @@ const TherapistProfileContent = ({ slug, packageId }) => {
     }
   };
 
+  // The package whose session length the calendar is cut for: the client's own package
+  // when booking a remaining session (the Sessions page sends every "book next session"
+  // here with ?package_id=), else the one picked on this page.
+  const slotPackageType = isBookingRemaining ? clientPackage?.package_type : selectedPackage?.package_type;
+
+  // Recut the calendar when that package — and so the session length — changes.
+  useEffect(() => {
+    if (selectedDoctor) fetchPsychologistAvailability(selectedDoctor.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slotPackageType]);
+
   // Fetch psychologist availability for a given month (defaults to currentDate)
   // When called from therapist profile, we pass withSync=true so backend
   // runs a Google Calendar sync for this psychologist before computing availability.
   const fetchPsychologistAvailability = async (psychologistId, baseDate = null) => {
     try {
       setLoadingAvailability(true);
-      
+
       // Use provided baseDate or fallback to currentDate
       const targetDate = baseDate instanceof Date ? baseDate : currentDate;
-      
+
       // Get month range using local formatting to avoid timezone issues
       const year = targetDate.getFullYear();
       const month = targetDate.getMonth();
-      
+
       // Format start date (first day of month)
       const startYear = year;
       const startMonth = String(month + 1).padStart(2, '0');
       const startDay = '01';
       const startDate = `${startYear}-${startMonth}-${startDay}`;
-      
+
       // Format end date (last day of month)
       const endYear = year;
       const endMonth = String(month + 1).padStart(2, '0');
       const endDay = String(new Date(year, month + 1, 0).getDate()).padStart(2, '0');
       const endDate = `${endYear}-${endMonth}-${endDay}`;
-      
+
+      // Standard packages use the session-length slots — individual 50 min, couple
+      // 1 h 20 min, psychiatry 15 / 30 min, 10-min break after each — the same free starts
+      // as /book and the server's check. They come back in the range endpoint's IST shape,
+      // so the local-time display and the booking conversion below work unchanged.
+      // Child-specialist (cs_*) packages, and psychiatrists still on old therapy packages,
+      // keep the hourly range.
+      const psychiatryMatch = /^psychiatry_(15|30)(_package_\d+)?$/.exec(slotPackageType || '');
+      const isStandard = slotPackageType && (
+        Boolean(psychiatryMatch)
+        || ((/^(individual|couple)(_package_\d+)?$/.test(slotPackageType) || /^package_\d+$/.test(slotPackageType))
+          && !String(selectedDoctor?.designation || '').toLowerCase().includes('psychiatrist'))
+      );
+      if (isStandard) {
+        const api = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+        const kind = psychiatryMatch
+          ? `psychiatry_${psychiatryMatch[1]}`
+          : slotPackageType.startsWith('couple') ? 'couple' : 'individual';
+        const res = await fetch(
+          `${api}/availability/public/psychologist/${psychologistId}/slots?startDate=${startDate}&endDate=${endDate}&type=${kind}`
+        );
+        if (!res.ok) throw new Error(`Slots request failed (${res.status})`);
+        const json = await res.json();
+        const availabilityObject = {};
+        ((json?.data ?? json)?.days || []).forEach((day) => {
+          const timeSlots = (day.slots || []).map((s) => ({ time: s.displayTime, displayTime: s.displayTime, available: true }));
+          availabilityObject[day.date] = {
+            date: day.date, timeSlots, totalSlots: timeSlots.length, availableSlots: timeSlots.length, blockedSlots: 0
+          };
+        });
+        setPsychologistAvailability(availabilityObject);
+        return;
+      }
+
       // Get psychologist availability range.
       // Pass withSync = true so backend performs an on-demand Google Calendar sync
       // for this psychologist before returning availability, ensuring external
@@ -1373,7 +1417,7 @@ const TherapistProfileContent = ({ slug, packageId }) => {
             key: paymentData.keyId,
             amount: paymentData.amountInPaise,
             currency: paymentData.currency || 'INR',
-            name: paymentData.name || 'MyKoott',
+            name: paymentData.name || 'Koott',
             description: paymentData.description,
             order_id: paymentData.orderId,
             prefill: paymentData.prefill || {},
@@ -1458,7 +1502,7 @@ const TherapistProfileContent = ({ slug, packageId }) => {
             console.error('❌ Razorpay payment failed:', response);
             let errorMessage =
               response.error?.reason === 'payment_risk_check_failed'
-                ? 'Payment was declined by the bank or payment security checks. This is not a booking error—try another card, UPI, or contact your bank. You can also reach MyKoott for help.'
+                ? 'Payment was declined by the bank or payment security checks. This is not a booking error—try another card, UPI, or contact your bank. You can also reach Koott for help.'
                 : response.error?.description || 'Payment failed. Please try again.';
             showError(errorMessage, 'Payment Failed');
             setIsBooking(false);

@@ -21,7 +21,7 @@ import {
   DEFAULT_PHONE_COUNTRY_VALUE,
   dialFromPhoneCountryValue,
 } from "@/data/phoneCountryCodes";
-import { mergeWorkshopEventCms } from "@/data/workshopEventPageCms";
+import { eventHasEnded, isImportedEventShape, mergeWorkshopEventCms } from "@/data/workshopEventPageCms";
 import {
   BLOG_TYPOGRAPHY_ROOT_CLASS,
   BLOG_TYPOGRAPHY_ROOT_CSS,
@@ -84,7 +84,7 @@ function HeroMiniPassTicket({ cms, targetId = "session-pass-ticket" }) {
     <button
       type="button"
       onClick={scrollToPass}
-      className="group relative w-full max-w-full overflow-hidden rounded-2xl border border-white/45 bg-white text-left shadow-[0_18px_44px_-14px_rgba(0,0,0,0.48)] ring-1 ring-[#025545]/12 transition-[transform,box-shadow] hover:shadow-[0_22px_50px_-14px_rgba(63,46,115,0.42)] active:scale-[0.997] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#025545]/40 sm:rounded-[1.35rem]"
+      className="group relative w-full max-w-full overflow-hidden rounded-2xl border border-white/45 bg-white text-left shadow-[0_18px_44px_-14px_rgba(0,0,0,0.48)] ring-1 ring-[#189E4F]/12 transition-[transform,box-shadow] hover:shadow-[0_22px_50px_-14px_rgba(1,47,35,0.42)] active:scale-[0.997] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#189E4F]/40 sm:rounded-[1.35rem]"
       aria-label={`View full pass below${b.title ? `: ${b.title}` : ""}`}
     >
       <span className="sr-only">
@@ -92,31 +92,33 @@ function HeroMiniPassTicket({ cms, targetId = "session-pass-ticket" }) {
         {b.subtitle ? ` ${b.subtitle}` : ""}
       </span>
       <div
-        className="pointer-events-none absolute right-0 top-0 h-12 w-12 bg-[#025545] sm:h-14 sm:w-14"
+        className="pointer-events-none absolute right-0 top-0 h-12 w-12 bg-[#189E4F] sm:h-14 sm:w-14"
         style={{ clipPath: "polygon(100% 0, 0 0, 100% 100%)" }}
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#025545] via-[#7b68b8] to-[#025545] sm:h-1.5"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#189E4F] via-[#189E4F] to-[#189E4F] sm:h-1.5"
         aria-hidden
       />
 
       <div className="relative flex w-full flex-col sm:flex-row sm:items-stretch">
         <div className="min-w-0 flex-1 px-5 pb-4 pt-4 sm:px-6 sm:pb-5 sm:pt-5 md:px-7 md:pb-6 md:pt-6">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-[#025545]/22 pb-3 sm:pb-3.5">
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#025545]/75 sm:text-[11px]">{b.passLabel}</span>
-            <span className="inline-flex max-w-[11rem] items-center gap-1 rounded-full border border-emerald-300/85 bg-emerald-50 px-2.5 py-1 text-[9px] font-semibold leading-tight text-emerald-800 sm:max-w-[13rem] sm:text-[10px]">
-              <Gift className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" aria-hidden />
-              <span className="line-clamp-1">{b.badgeText}</span>
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-[#189E4F]/22 pb-3 sm:pb-3.5">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#189E4F]/75 sm:text-[11px]">{b.passLabel}</span>
+            {b.badgeText ? (
+              <span className="inline-flex max-w-[11rem] items-center gap-1 rounded-full border border-emerald-300/85 bg-emerald-50 px-2.5 py-1 text-[9px] font-semibold leading-tight text-emerald-800 sm:max-w-[13rem] sm:text-[10px]">
+                <Gift className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" aria-hidden />
+                <span className="line-clamp-1">{b.badgeText}</span>
+              </span>
+            ) : null}
           </div>
 
           {detailRows.length > 0 ? (
             <div className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-3.5 sm:mt-4 sm:grid-cols-3 sm:gap-x-5 sm:gap-y-4">
               {detailRows.map((d) => (
                 <div key={d.label} className="min-w-0 text-left">
-                  <p className="text-[9px] font-semibold uppercase tracking-wide text-[#025545]/58 sm:text-[10px]">{d.label}</p>
-                  <p className={`mt-1 line-clamp-2 text-sm font-semibold leading-snug text-[#1a1428] sm:text-[0.9375rem] ${HERO_BODY_TEXT_CLASS}`} style={HERO_BODY_TEXT_STYLE}>
+                  <p className="text-[9px] font-semibold uppercase tracking-wide text-[#189E4F]/58 sm:text-[10px]">{d.label}</p>
+                  <p className={`mt-1 line-clamp-2 text-sm font-semibold leading-snug text-[#012F23] sm:text-[0.9375rem] ${HERO_BODY_TEXT_CLASS}`} style={HERO_BODY_TEXT_STYLE}>
                     {formatSessionBannerDetailDisplay(d.label, d.value)}
                   </p>
                 </div>
@@ -125,9 +127,9 @@ function HeroMiniPassTicket({ cms, targetId = "session-pass-ticket" }) {
           ) : null}
         </div>
 
-        <div className="flex items-center justify-center border-t border-dashed border-[#025545]/22 bg-[#f2fff1] px-5 py-3.5 sm:w-[5rem] sm:flex-none sm:flex-col sm:border-l sm:border-t-0 sm:px-4 sm:py-5 md:w-[6rem]">
+        <div className="flex items-center justify-center border-t border-dashed border-[#189E4F]/22 bg-[#F5FBF3] px-5 py-3.5 sm:w-[5rem] sm:flex-none sm:flex-col sm:border-l sm:border-t-0 sm:px-4 sm:py-5 md:w-[6rem]">
           <ChevronDown
-            className="h-7 w-7 shrink-0 text-[#025545] transition-transform group-hover:translate-y-1 sm:h-8 sm:w-8"
+            className="h-7 w-7 shrink-0 text-[#189E4F] transition-transform group-hover:translate-y-1 sm:h-8 sm:w-8"
             aria-hidden
           />
         </div>
@@ -137,33 +139,35 @@ function HeroMiniPassTicket({ cms, targetId = "session-pass-ticket" }) {
 }
 
 /** Full session ticket (page section below hero). */
-function SessionPassTicket({ cms, onRegister, titleId }) {
+function SessionPassTicket({ cms, onRegister, titleId, ended = false }) {
   const b = cms.sessionBanner;
   if (!b) return null;
 
   return (
     <section
       id="session-pass-ticket"
-      className="relative scroll-mt-24 overflow-hidden rounded-3xl border border-[#025545]/20 bg-white shadow-[0_18px_48px_-22px_rgba(63,46,115,0.45)] sm:scroll-mt-28"
+      className="relative scroll-mt-24 overflow-hidden rounded-3xl border border-[#189E4F]/20 bg-white shadow-[0_18px_48px_-22px_rgba(1,47,35,0.45)] sm:scroll-mt-28"
       aria-labelledby={titleId}
     >
       <div
-        className="pointer-events-none absolute right-0 top-0 h-16 w-16 bg-[#025545]"
+        className="pointer-events-none absolute right-0 top-0 h-16 w-16 bg-[#189E4F]"
         style={{ clipPath: "polygon(100% 0, 0 0, 100% 100%)" }}
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#025545] via-[#7b68b8] to-[#025545]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#189E4F] via-[#189E4F] to-[#189E4F]"
         aria-hidden
       />
 
       <div className="grid lg:grid-cols-1">
-        <div className="relative border-b border-[#025545]/15 bg-[#f4f1ff] p-4 lg:p-5 flex items-center justify-between">
-          <p className="text-[10px] font-semibold uppercase text-[#025545]/70">{b.passLabel}</p>
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/80 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
-            <Gift className="h-3 w-3 shrink-0" aria-hidden />
-            {b.badgeText}
-          </div>
+        <div className="relative border-b border-[#189E4F]/15 bg-[#EAF9E4] p-4 lg:p-5 flex items-center justify-between">
+          <p className="text-[10px] font-semibold uppercase text-[#189E4F]/70">{b.passLabel}</p>
+          {b.badgeText ? (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/80 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+              <Gift className="h-3 w-3 shrink-0" aria-hidden />
+              {b.badgeText}
+            </div>
+          ) : null}
         </div>
 
         <div className="p-6 sm:p-7">
@@ -174,30 +178,41 @@ function SessionPassTicket({ cms, onRegister, titleId }) {
           >
             {b.title}
           </h2>
-          <p className={`mt-2 text-gray-600 ${HERO_BODY_TEXT_CLASS}`} style={HERO_BODY_TEXT_STYLE}>
-            {b.subtitle}
-          </p>
+          {b.subtitle ? (
+            <p className={`mt-2 text-gray-600 ${HERO_BODY_TEXT_CLASS}`} style={HERO_BODY_TEXT_STYLE}>
+              {b.subtitle}
+            </p>
+          ) : null}
 
-          <div className="mt-5 grid gap-0 rounded-2xl border border-[#025545]/14 bg-white sm:grid-cols-3">
+          <div className="mt-5 grid gap-0 rounded-2xl border border-[#189E4F]/14 bg-white sm:grid-cols-3">
             {(b.details || []).slice(0, 3).map((d, i) => (
               <div
                 key={d.label}
-                className={`p-4 sm:border-[#025545]/12 ${i < 2 ? "sm:border-r" : ""} ${i > 0 ? "border-t sm:border-t-0" : ""}`}
+                className={`p-4 sm:border-[#189E4F]/12 ${i < 2 ? "sm:border-r" : ""} ${i > 0 ? "border-t sm:border-t-0" : ""}`}
               >
-                <p className="text-[10px] font-semibold uppercase text-[#025545]/60">{d.label}</p>
+                <p className="text-[10px] font-semibold uppercase text-[#189E4F]/60">{d.label}</p>
                 <p className="mt-1 text-sm font-semibold text-[#012f23]">{formatSessionBannerDetailDisplay(d.label, d.value)}</p>
               </div>
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={onRegister}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#025545] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#025545]/25 transition-all hover:bg-[#012f23] hover:shadow-xl hover:shadow-[#025545]/30 sm:w-auto"
-          >
-            {b.ctaText}
-            <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
-          </button>
+          {ended ? (
+            <p className="mt-6 text-sm font-medium text-gray-600">
+              This event has ended.{" "}
+              <Link href="/event-list" className="font-semibold text-[#189E4F] underline underline-offset-2">
+                See upcoming workshops
+              </Link>
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={onRegister}
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#189E4F] px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#189E4F]/25 transition-all hover:bg-[#12813F] hover:shadow-xl hover:shadow-[#189E4F]/30 sm:w-auto"
+            >
+              {b.ctaText}
+              <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+            </button>
+          )}
         </div>
       </div>
     </section>
@@ -214,6 +229,11 @@ export default function WorkshopEventPageClient({
   onPreviewSectionClick,
 } = {}) {
   const cms = mergeWorkshopEventCms(cmsPartial);
+  // Imported events carry their own "About the event"; editor-built events show it only
+  // when they set whatIsThis themselves (the defaults are another event's sample copy).
+  const aboutText = (isImportedEventShape(cmsPartial) || cmsPartial?.whatIsThis?.body)
+    ? String(cms.whatIsThis?.body || "").trim()
+    : "";
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -236,6 +256,8 @@ export default function WorkshopEventPageClient({
     [previewMode, onPreviewSectionClick]
   );
   const [registerPhase, setRegisterPhase] = useState("form");
+  // Past events keep their page but stop taking registrations (the editor preview always shows the button).
+  const ended = !previewMode && eventHasEnded([cms.time, cms.date, cms.ticketCard?.datetimeLine].filter(Boolean).join(" "));
 
   const openRegisterModal = useCallback((e) => {
     e?.preventDefault?.();
@@ -323,7 +345,7 @@ export default function WorkshopEventPageClient({
 
   return (
     <div
-      className={`bg-white ${BLOG_TYPOGRAPHY_ROOT_CLASS} ${BLOG_LETTER_SPACING_CLASS} ${
+      className={`kwe-page bg-white ${BLOG_TYPOGRAPHY_ROOT_CLASS} ${BLOG_LETTER_SPACING_CLASS} ${
         previewMode ? "relative min-h-0" : "min-h-screen"
       }`}
     >
@@ -332,7 +354,7 @@ export default function WorkshopEventPageClient({
           Live preview — scroll to review the full page. Save in the editor to publish.
         </div>
       ) : null}
-      <style dangerouslySetInnerHTML={{ __html: BLOG_TYPOGRAPHY_ROOT_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: BLOG_TYPOGRAPHY_ROOT_CSS + KOOTT_EVENT_CSS }} />
       {/* Hero — full viewport on site; bounded height in CMS preview so the builder scroll works */}
       <section className={heroSectionClass}>
         <Image
@@ -367,18 +389,16 @@ export default function WorkshopEventPageClient({
               <p className={`text-xs font-semibold uppercase text-white/80 ${BLOG_UI_LINE_HEIGHT_CLASS}`}>
                 {cms.hero.eyebrow}
               </p>
-              <div
+              <h1
                 className={`mt-3 text-white ${HERO_DISPLAY_HEADING_CLASS} ${
                   previewMode
                     ? "break-words [overflow-wrap:anywhere] text-[30px] leading-[1.08] sm:text-[38px] md:text-[46px] lg:text-[52px]"
                     : ""
                 }`}
-                role="heading"
-                aria-level={1}
                 style={HERO_DISPLAY_HEADING_STYLE}
               >
                 {cms.hero.title}
-              </div>
+              </h1>
               <p
                 className={`mt-4 text-white/90 ${previewMode ? "break-words [overflow-wrap:anywhere] text-[14px] leading-[1.55] sm:text-[15px]" : ""} ${HERO_BODY_TEXT_CLASS}`}
                 style={HERO_BODY_TEXT_STYLE}
@@ -386,16 +406,22 @@ export default function WorkshopEventPageClient({
                 {cms.hero.body}
               </p>
               <div className={`flex flex-wrap gap-3 ${previewMode ? "mt-6" : "mt-8"}`}>
-                <button
-                  type="button"
-                  onClick={openRegisterModal}
-                  className={`inline-flex items-center gap-2 rounded-full bg-white font-semibold text-[#025545] shadow-lg hover:bg-gray-50 transition-colors ${
-                    previewMode ? "px-4 py-2 text-xs sm:px-5 sm:py-2.5 sm:text-sm" : "px-5 py-2.5 text-sm"
-                  }`}
-                >
-                  Register
-                  <ArrowRight className="h-4 w-4" />
-                </button>
+                {ended ? (
+                  <span className="inline-flex items-center rounded-full bg-white/85 px-5 py-2.5 text-sm font-semibold text-gray-600">
+                    Event ended
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={openRegisterModal}
+                    className={`inline-flex items-center gap-2 rounded-full bg-white font-semibold text-[#189E4F] shadow-lg hover:bg-gray-50 transition-colors ${
+                      previewMode ? "px-4 py-2 text-xs sm:px-5 sm:py-2.5 sm:text-sm" : "px-5 py-2.5 text-sm"
+                    }`}
+                  >
+                    Register
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
                 <Link
                   href="/events"
                   className={`inline-flex items-center rounded-full border border-white/40 bg-white/10 font-medium text-white backdrop-blur-sm hover:bg-white/20 transition-colors ${
@@ -440,18 +466,18 @@ export default function WorkshopEventPageClient({
                 {cms.topic && (
                   <div className="w-full text-center mb-2">
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">{cms.topic}</h2>
-                    {cms.speaker && <p className="text-lg text-[#025545] font-medium mt-1">By {cms.speaker}</p>}
+                    {cms.speaker && <p className="text-lg text-[#189E4F] font-medium mt-1">By {cms.speaker}</p>}
                   </div>
                 )}
                 {cms.date && (
                   <div className="flex items-center gap-2 text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
-                    <Calendar className="h-5 w-5 text-[#025545]" />
+                    <Calendar className="h-5 w-5 text-[#189E4F]" />
                     <span className="font-medium">{cms.date}</span>
                   </div>
                 )}
                 {cms.time && (
                   <div className="flex items-center gap-2 text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-gray-200">
-                    <Clock className="h-5 w-5 text-[#025545]" />
+                    <Clock className="h-5 w-5 text-[#189E4F]" />
                     <span className="font-medium">{cms.time}</span>
                   </div>
                 )}
@@ -467,8 +493,19 @@ export default function WorkshopEventPageClient({
 
 
 
+        {aboutText ? (
+          <section
+            className="kwe-about mx-auto max-w-3xl"
+            onClick={previewMode ? (e) => jumpToEditorSection("what-is-this", e) : undefined}
+          >
+            <p className="kwe-eyebrow">{cms.whatIsThis?.eyebrow || "About the event"}</p>
+            <div role="heading" aria-level={2} className="kwe-h2">{cms.whatIsThis?.title || "What is this?"}</div>
+            {aboutText.split(/\n\s*\n/).map((p, i) => <p key={i} className="kwe-p">{p}</p>)}
+          </section>
+        ) : null}
+
         <div onClick={previewMode ? (e) => jumpToEditorSection("session-banner", e) : undefined}>
-          <SessionPassTicket cms={cms} onRegister={openRegisterModal} titleId="ticket-heading" />
+          <SessionPassTicket cms={cms} onRegister={openRegisterModal} titleId="ticket-heading" ended={ended} />
         </div>
 
 
@@ -550,7 +587,7 @@ export default function WorkshopEventPageClient({
                             required
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-[15px] leading-snug text-gray-900 outline-none ring-[#025545]/20 focus:border-[#025545] focus:ring-2 sm:text-sm"
+                            className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-[15px] leading-snug text-gray-900 outline-none ring-[#189E4F]/20 focus:border-[#189E4F] focus:ring-2 sm:text-sm"
                             placeholder="As on your email / phone"
                           />
                         </div>,
@@ -566,7 +603,7 @@ export default function WorkshopEventPageClient({
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-[15px] leading-snug text-gray-900 outline-none ring-[#025545]/20 focus:border-[#025545] focus:ring-2 sm:text-sm"
+                            className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-[15px] leading-snug text-gray-900 outline-none ring-[#189E4F]/20 focus:border-[#189E4F] focus:ring-2 sm:text-sm"
                             placeholder="you@example.com"
                           />
                         </div>,
@@ -577,7 +614,7 @@ export default function WorkshopEventPageClient({
                               name="countryCode"
                               value={phoneCountryValue}
                               onChange={(e) => setPhoneCountryValue(e.target.value)}
-                              className="min-w-[11.5rem] max-w-[min(52vw,14rem)] shrink-0 rounded-xl border border-gray-200 bg-white px-2.5 py-3 text-[15px] text-gray-900 outline-none focus:border-[#025545] focus:ring-2 ring-[#025545]/20 sm:min-w-[13rem] sm:max-w-[15rem] sm:text-sm"
+                              className="min-w-[11.5rem] max-w-[min(52vw,14rem)] shrink-0 rounded-xl border border-gray-200 bg-white px-2.5 py-3 text-[15px] text-gray-900 outline-none focus:border-[#189E4F] focus:ring-2 ring-[#189E4F]/20 sm:min-w-[13rem] sm:max-w-[15rem] sm:text-sm"
                               aria-label="Country code"
                             >
                               {PHONE_COUNTRY_OPTIONS.map((c) => (
@@ -594,7 +631,7 @@ export default function WorkshopEventPageClient({
                               required
                               value={phone}
                               onChange={(e) => setPhone(e.target.value.replace(/[^\d+\s-]/g, ""))}
-                              className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-[15px] leading-snug text-gray-900 outline-none ring-[#025545]/20 focus:border-[#025545] focus:ring-2 sm:text-sm"
+                              className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-[15px] leading-snug text-gray-900 outline-none ring-[#189E4F]/20 focus:border-[#189E4F] focus:ring-2 sm:text-sm"
                               placeholder="WhatsApp number (10 digits)"
                             />
                           </div>
@@ -629,7 +666,7 @@ export default function WorkshopEventPageClient({
                         <button
                           type="submit"
                           disabled={status === "loading"}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#025545] px-4 py-3.5 text-[15px] font-semibold text-white shadow-md hover:bg-[#012f23] disabled:opacity-60 transition-colors sm:text-sm"
+                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#189E4F] px-4 py-3.5 text-[15px] font-semibold text-white shadow-md hover:bg-[#12813F] disabled:opacity-60 transition-colors sm:text-sm"
                         >
                           {status === "loading" ? (
                             <>
@@ -672,7 +709,7 @@ export default function WorkshopEventPageClient({
                     <button
                       type="button"
                       onClick={closeRegisterModal}
-                      className="mt-9 w-full rounded-xl bg-[#025545] px-4 py-3.5 text-[15px] font-semibold text-white shadow-md hover:bg-[#012f23] transition-colors sm:text-sm"
+                      className="mt-9 w-full rounded-xl bg-[#189E4F] px-4 py-3.5 text-[15px] font-semibold text-white shadow-md hover:bg-[#12813F] transition-colors sm:text-sm"
                     >
                       Close
                     </button>
@@ -687,3 +724,17 @@ export default function WorkshopEventPageClient({
     </div>
   );
 }
+
+/* Koott type on the event page: Work Sans headings, Mulish text, no negative
+   tracking. The shared blog tokens this page grew up with set DM Sans inline and
+   -0.7px !important on every descendant, so this layer needs !important too. */
+const KOOTT_EVENT_CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=Mulish:wght@400;500;600;700&display=swap');
+.kwe-page.blog-typography-root,.kwe-page.blog-typography-root *{letter-spacing:0!important;}
+.kwe-page [role="heading"],.kwe-page h1,.kwe-page h2,.kwe-page h3{font-family:'Work Sans',system-ui,sans-serif!important;}
+.kwe-page p,.kwe-page li,.kwe-page a,.kwe-page button,.kwe-page label,.kwe-page input,.kwe-page select{font-family:'Mulish',system-ui,sans-serif!important;}
+.kwe-eyebrow{display:inline-block;background:#EAF9E4;color:#012F23!important;border-radius:6px;padding:5px 12px;font-size:13px!important;margin:0 0 14px;}
+.kwe-h2{font-size:30px!important;font-weight:600!important;line-height:1.25!important;color:#012F23;margin:0 0 14px;}
+.kwe-p{font-size:17px!important;line-height:1.65!important;color:#3B3B3B!important;margin:0 0 14px;white-space:pre-line;}
+@media (max-width:640px){.kwe-h2{font-size:24px!important;}.kwe-p{font-size:16px!important;}}
+`;

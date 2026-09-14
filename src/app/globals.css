@@ -1,4 +1,7 @@
 /* never edit the this global css file*/
+/* Exception, by request: heading and paragraph sizes now come from the type
+   scale variables below. To change a size for one heading, set the variable
+   (--h1-size ... --h6-size, --p-size) rather than adding another !important. */
 
 
 /* Fonts moved to layout.js for better loading control and CLS prevention */
@@ -64,145 +67,82 @@ body {
   padding: 0; /* Remove default padding */
 }
 
+/* ── Type scale ──────────────────────────────────────────────────────────────
+   One size per level, set once, here. Each level is a variable that scales
+   smoothly with the window: it matches the old desktop sizes (60/48/36/30/24/18)
+   on a laptop and the old phone sizes (28/24/20/18/16/14) on a 390px phone, and
+   interpolates in between. Tablets used to get a 60px h1 above a 32px h2, then
+   the h1 dropped straight to 28px at 767px.
+
+   The rules stay !important on purpose: about 230 headings and 780 paragraphs
+   in the codebase carry Tailwind size classes (text-2xl, md:text-4xl, ...) that
+   this file has always overridden, and letting them through at once would
+   resize the admin, finance and legacy pages without anyone choosing to.
+
+   SPECIAL CASES — one heading or sentence that needs its own size — change the
+   variable instead of fighting the rule. Custom properties cascade normally, so
+   no !important is needed:
+
+     .hero-title { --h1-size: 44px; }            (a class on the element)
+     <h2 style={{ '--h2-size': '32px' }}>       (inline, for a one-off)
+     .pricing h3 { --h3-size: 22px; }            (a whole section)
+
+   Line-heights are unitless ratios so they scale with the size. The old rem
+   values fell below the font size on phones (a 28px h1 on a 19.2px line), which
+   made any heading that wrapped overlap itself. */
+:root {
+  --h1-size: clamp(28px, 0.9rem + 4vw, 60px);
+  --h2-size: clamp(24px, 0.75rem + 3.2vw, 48px);
+  --h3-size: clamp(20px, 0.7rem + 2.2vw, 36px);
+  --h4-size: clamp(18px, 0.7rem + 1.6vw, 30px);
+  --h5-size: clamp(16px, 0.7rem + 0.95vw, 24px);
+  --h6-size: clamp(14px, 0.7rem + 0.45vw, 18px);
+
+  --h1-lh: 1.1;
+  --h2-lh: 1.15;
+  --h3-lh: 1.2;
+  --h4-lh: 1.25;
+  --h5-lh: 1.3;
+  --h6-lh: 1.35;
+
+  --heading-tracking: -0.65px;
+
+  --p-size: 16px;
+  --p-lh: 1.5;
+}
+
 /* Headings use DM Sans from Google Fonts */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'DM Sans' !important;
+  letter-spacing: var(--heading-tracking) !important;
 }
 
-/* Universal H1 styling per request */
-h1 {
-  font-size: 60px !important;
-  line-height: 3.75rem !important;
-  letter-spacing: -0.65px !important;
-}
+h1 { font-size: var(--h1-size) !important; line-height: var(--h1-lh) !important; }
+h2 { font-size: var(--h2-size) !important; line-height: var(--h2-lh) !important; }
+h3 { font-size: var(--h3-size) !important; line-height: var(--h3-lh) !important; }
+h4 { font-size: var(--h4-size) !important; line-height: var(--h4-lh) !important; }
+h5 { font-size: var(--h5-size) !important; line-height: var(--h5-lh) !important; }
+h6 { font-size: var(--h6-size) !important; line-height: var(--h6-lh) !important; }
 
-/* Universal H2 styling per request */
-h2 {
-  font-size: 48px !important;
-  line-height: 3rem !important;
-  letter-spacing: -0.65px !important;
-}
-
-h3 {
-  font-size: 36px !important;
-  line-height: 2.25rem !important;
-  letter-spacing: -0.65px !important;
-  
-}
-
-
-h4 {
-  font-size: 30px !important;
-  line-height: 1.875rem !important;
-  letter-spacing: -0.65px !important;
-}
-
-h5 {
-  font-size: 24px !important;
-  line-height: 1.5rem !important;
-  letter-spacing: -0.65px !important;
-}
-
-h6 {
-  font-size: 18px !important;
-  line-height: 1.25rem !important;
-  letter-spacing: -0.65px !important;
-}
-
-/* Tablet responsive overrides (768px - 1023px)
-   Note: we intentionally do NOT override h1 here so tablet hero uses the same
-   heading size as laptop/desktop. */
-@media (min-width: 768px) and (max-width: 1023px) {
-  /* CMS hero section specific tablet line-height override */
-  .cms-hero-title {
-    line-height: 1.2 !important;
-  }
-  
-  h2 {
-    font-size: 32px !important;
-    line-height: 2rem !important;
-  }
-  
-  h3 {
-    font-size: 28px !important;
-    line-height: 1.75rem !important;
-  }
-  
-  h4 {
-    font-size: 24px !important;
-    line-height: 1.5rem !important;
-  }
-  
-  h5 {
-    font-size: 20px !important;
-    line-height: 1.25rem !important;
-  }
-  
-  h6 {
-    font-size: 18px !important;
-    line-height: 1.25rem !important;
-  }
-}
-
-/* Laptop responsive overrides (1024px and above) */
-@media (min-width: 1024px) {
-  /* CMS hero section specific laptop line-height override */
-  .cms-hero-title {
-    line-height: 1.2 !important;
-  }
-}
-
-/* Mobile responsive overrides to prevent layout shift */
-@media (max-width: 767px) {
-  h1 {
-    font-size: 28px !important;
-    line-height: 1.2rem !important;
-  }
-  
-  /* CMS hero section specific mobile line-height override */
-  .cms-hero-title {
-    line-height: 2rem !important;
-  }
-  
-  h2 {
-    font-size: 24px !important;
-    line-height: 1.2rem !important;
-  }
-  
-  h3 {
-    font-size: 20px !important;
-    line-height: 1.2rem !important;
-  }
-  
-  h4 {
-    font-size: 18px !important;
-    line-height: 1.2rem !important;
-  }
-  
-  h5 {
-    font-size: 16px !important;
-    line-height: 1.2rem !important;
-  }
-  
-  h6 {
-    font-size: 14px  !important;
-    line-height: 1.2rem !important;
-  }
+/* CMS hero titles keep their own looser line-height at every width. */
+.cms-hero-title {
+  line-height: 1.2 !important;
 }
 
 /* Paragraphs use Work Sans */
 p {
   font-family: 'Work Sans' !important;
-  font-size: 16px !important;
-  line-height: 1.5rem ;
+  font-size: var(--p-size) !important;
+  line-height: var(--p-lh);
   letter-spacing: -0.50px !important;
 }
 
-/* Paragraph size classes - like headings but for paragraphs */
+/* Paragraph size classes - like headings but for paragraphs.
+   line-height was 1rem on 16px text, so wrapped lines touched. */
 .p2 {
   font-family: 'Work Sans' !important;
-  font-size: 16px !important;
-  line-height: 1rem !important;
+  font-size: var(--p-size) !important;
+  line-height: 1.5 !important;
   letter-spacing: -0.80px !important;
   font-weight: 300 !important;
 }

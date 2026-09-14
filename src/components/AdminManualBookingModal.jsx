@@ -304,12 +304,13 @@ export default function AdminManualBookingModal({
     console.log('🔍 Loading states changed:', { isLoading, isLoadingData });
   }, [isLoading, isLoadingData]);
 
-  // Fetch psychologist availability when psychologist changes or month changes
+  // Fetch psychologist availability when psychologist, month or session type changes
+  // (couple and individual sessions have different free starts).
   useEffect(() => {
     if (psychologistId) {
       fetchPsychologistAvailability();
     }
-  }, [psychologistId, currentDate]);
+  }, [psychologistId, currentDate, sessionType]);
 
   useEffect(() => {
     if (psychologistId) {
@@ -514,10 +515,12 @@ export default function AdminManualBookingModal({
 
       console.log('📅 [ADMIN BOOKING] Fetching availability range:', startDate, 'to', endDate);
 
+      // Free starts are cut by session length: individual 50 min, couple 1 h 20 min.
       const response = await adminApi.getPsychologistAvailabilityForReschedule(
-        psychologistId, 
-        startDate, 
-        endDate
+        psychologistId,
+        startDate,
+        endDate,
+        { type: String(sessionType || '').includes('couple') ? 'couple' : 'individual' }
       );
 
       console.log('📦 [ADMIN BOOKING] Availability response:', {

@@ -10,9 +10,9 @@
     letter-spacing: -0.3px !important;
 }
 
+/* The page H1: size comes from the global --h1-size scale. */
 .title {
-    font-size: 22px !important;
-    line-height: 1.6rem !important;
+    line-height: 1.15em !important;
     font-weight: 600 !important;
     letter-spacing: -0.35px !important;
     text-transform: uppercase;

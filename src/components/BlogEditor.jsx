@@ -26,6 +26,7 @@ import {
   Smile,
 } from 'lucide-react';
 import DocumentStyleEditor, { getDefaultToolbarState } from '@/components/DocumentStyleEditor';
+import { BlogPreviewButton } from '@/components/BlogPreviewOverlay';
 import { normalizeImageUrl } from '@/utils/urlNormalizer';
 import styles from './BlogEditor.module.css';
 
@@ -259,13 +260,19 @@ const BlogEditor = forwardRef(function BlogEditor({
                   </div>
                   <div className={styles.settingsSection}>
                     <label className={styles.settingsLabel}>Category</label>
+                    {/* The blog page filters on these names (case-insensitive),
+                        so suggest the ones the site already uses. */}
                     <input
                       id="bec-category-input"
                       type="text"
+                      list="bec-category-options"
                       className={styles.settingsInput}
                       placeholder="Add category"
                       onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
                     />
+                    <datalist id="bec-category-options">
+                      {BLOG_CATEGORIES.filter((c) => c !== 'All Posts').map((c) => <option key={c} value={c} />)}
+                    </datalist>
                     <button type="button" onClick={addCategory} className={styles.addBtn}>Add</button>
                     <div className={styles.tagChipWrap}>
                       {(blog.categories || []).map((cat) => (
@@ -480,7 +487,19 @@ const BlogEditor = forwardRef(function BlogEditor({
               </div>
               </div>
                 </div>
-                <div className={styles.unifiedHeaderRight}>{headerRight}</div>
+                <div className={styles.unifiedHeaderRight}>
+                  {/* Renders the post in the public article design, from the
+                      editor's current document — drafts included. */}
+                  <BlogPreviewButton
+                    getPost={() => ({
+                      ...blog,
+                      content: editorRef.current?.getContent?.() ?? blog.content,
+                      featured_image_url: featuredImagePreview || blog.featured_image_url || null,
+                      created_at: blog.published_at || blog.created_at || new Date().toISOString(),
+                    })}
+                  />
+                  {headerRight}
+                </div>
               </div>
             </header>
 

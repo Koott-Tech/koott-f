@@ -1,9 +1,9 @@
-import Blog from "../../components/Blog";
+import BlogListing from '@/components/BlogListing';
+import { buildMetadata, PAGE_SEO } from '@/lib/seo';
+
+export const metadata = buildMetadata(PAGE_SEO.blog);
 
 export default function BlogPage() {
-  return (
-    <main>
-      <Blog />
-    </main>
-  );
+  return <BlogListing />;
 }
+

@@ -1,5 +1,6 @@
 import HeroSection from '@/components/HeroSection';
 import LogosStrip from '@/components/LogosStrip';
+import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
 import HowItWorks from '@/components/HowItWorks';
 import BlogTeaser from '@/components/BlogTeaser';
 import BenefitsSection from '@/components/BenefitsSection';
@@ -12,6 +13,7 @@ import HelpFaq from '@/components/HelpFaq';
 import CounsellingNotFound from '@/components/CounsellingNotFound';
 import ScrollToTop from '@/components/ScrollToTop';
 import TherapistCarousel from '@/components/TherapistCarousel';
+import { ResumeBooking } from '@/components/ResumeBookingCard';
 import { normalizeImageUrl, normalizeImageUrlWithSize } from '@/utils/urlNormalizer';
 import Image from "next/image";
 
@@ -31,11 +33,11 @@ const EXCLUDED = new Set([
 // Fallback metadata for when API fails
 const FALLBACK_META = {
   'depression': {
-    title: 'Depression Counseling - MyKoott',
+    title: 'Depression Counseling - Koott',
     description: 'Compassionate, evidence-based counseling to support children experiencing depression.'
   },
   'anxiety-sadness': {
-    title: 'Anxiety, Sadness or Low mood - MyKoott',
+    title: 'Anxiety, Sadness or Low mood - Koott',
     description: 'Professional support for children experiencing anxiety, sadness, or low mood.'
   },
 };
@@ -61,7 +63,7 @@ export async function generateMetadata({ params, searchParams }) {
           const title =
             service.seo_title ||
             service.hero_title ||
-            `${slug?.replace(/[-_]/g, ' ')} - MyKoott`;
+            `${slug?.replace(/[-_]/g, ' ')} - Koott`;
           const description =
             service.seo_description ||
             service.hero_subtext ||
@@ -76,14 +78,14 @@ export async function generateMetadata({ params, searchParams }) {
               title,
               description,
               type: 'website',
-              siteName: 'MyKoott',
+              siteName: 'Koott',
               url: `https://www.koott.in/counselling/${slug}`,
               images: [
                 {
                   url: ogImage,
                   width: 1200,
                   height: 630,
-                  alt: 'MyKoott logo',
+                  alt: 'Koott logo',
                 },
               ],
             },
@@ -107,7 +109,7 @@ export async function generateMetadata({ params, searchParams }) {
   
   // Fallback to static metadata if API fails
   const meta = FALLBACK_META[slug] || {
-    title: `${slug?.replace(/[-_]/g, ' ') || 'Counseling'} - MyKoott`,
+    title: `${slug?.replace(/[-_]/g, ' ') || 'Counseling'} - Koott`,
     description: 'Specialized counseling services for children and families.'
   };
   return meta;
@@ -158,7 +160,9 @@ async function fetchPublicTherapists(limit = 6) {
       const psychologists = data?.data?.psychologists || data?.message?.psychologists || data?.psychologists || [];
       if (Array.isArray(psychologists)) {
         const sanitized = removeAssessmentSpecialist(psychologists);
-        return sanitized.slice(0, limit);
+        // Soonest-available therapists first.
+        const order = await fetchTherapistOrder('default', { cache: 'no-store' });
+        return applyTherapistOrder(sanitized, order).slice(0, limit);
       }
     }
   } catch (error) {
@@ -187,6 +191,14 @@ export default async function CounsellingDynamicPage({ params, searchParams }) {
   
   if (!serviceData) {
     return <CounsellingNotFound slug={slug} />;
+  }
+
+  // Pages with `content` are the redesigned condition pages, served at /<slug>
+  // (ConditionPageTemplate) and edited in ConditionPageEditor — send visitors
+  // there instead of rendering the retired design. Draft previews stay here.
+  if (serviceData.content && !isPreview) {
+    const { redirect } = await import('next/navigation');
+    redirect(`/${slug}`);
   }
 
   // Fetch therapists (6 cards)
@@ -230,6 +242,7 @@ export default async function CounsellingDynamicPage({ params, searchParams }) {
             </h2>
           </div>
         </div>
+        <ResumeBooking className="mb-6 max-w-md" />
         <TherapistCarousel therapists={displayTherapists} />
 
         {/* Desktop/tablet grid */}

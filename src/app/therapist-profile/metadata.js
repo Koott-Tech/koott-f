@@ -1,11 +1,11 @@
 export const metadata = {
-  title: "Child Psychologist Profile | MyKoott",
+  title: "Psychologist Profile | Koott",
   description:
-    "View details of a MyKoott child psychologist, including experience, specialization, and available online counseling slots.",
+    "View a Koott psychologist’s experience, specialisation and available online counselling slots.",
   openGraph: {
-    title: "Child Psychologist Profile | MyKoott",
+    title: "Psychologist Profile | Koott",
     description:
-      "View details of a MyKoott child psychologist, including experience, specialization, and available online counseling slots.",
+      "View a Koott psychologist’s experience, specialisation and available online counselling slots.",
     type: "profile",
     url: "https://www.koott.in/therapist-profile",
     images: [
@@ -13,15 +13,15 @@ export const metadata = {
         url: "https://www.koott.in/logo.png",
         width: 1200,
         height: 630,
-        alt: "MyKoott logo",
+        alt: "Koott logo",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Child Psychologist Profile | MyKoott",
+    title: "Psychologist Profile | Koott",
     description:
-      "View details of a MyKoott child psychologist, including experience, specialization, and available online counseling slots.",
+      "View a Koott psychologist’s experience, specialisation and available online counselling slots.",
     images: ["https://www.koott.in/logo.png"],
   },
   alternates: {

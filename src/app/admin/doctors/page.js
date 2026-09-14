@@ -15,7 +15,8 @@ import {
   GripVertical,
   MoreVertical,
   Check,
-  ClipboardList
+  ClipboardList,
+  IndianRupee
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -26,6 +27,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { adminApi } from '@/lib/backendApi';
 import DoctorModal from '@/components/DoctorModal';
+import WorkingHoursModal from '@/components/admin/WorkingHoursModal';
+import PsychiatryPricingModal from '@/components/admin/PsychiatryPricingModal';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { normalizeImageUrl } from '@/utils/urlNormalizer';
@@ -155,6 +158,8 @@ export default function DoctorsPage() {
   const [doctors, setDoctors] = useState([]);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState(null);
+  const [hoursFor, setHoursFor] = useState(null); // { id, name } — working-hours editor
+  const [pricingFor, setPricingFor] = useState(null); // { id, name } — psychiatry pricing editor
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSpecialty, setFilterSpecialty] = useState('all');
@@ -682,6 +687,28 @@ export default function DoctorsPage() {
                     <ClipboardList className="h-4 w-4 mr-2" />
                     View Booking Details
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setHoursFor({ id: doctor.id, name: `${doctor.first_name || ''} ${doctor.last_name || ''}`.trim() });
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Clock className="h-4 w-4 mr-2" />
+                    Working hours
+                  </DropdownMenuItem>
+                  {/psychiatr/i.test(doctor.designation || '') && (
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPricingFor({ id: doctor.id, name: `${doctor.first_name || ''} ${doctor.last_name || ''}`.trim() });
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <IndianRupee className="h-4 w-4 mr-2" />
+                      Psychiatry pricing
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditDoctor(doctor); }} className="cursor-pointer">
                     <Edit className="h-4 w-4 mr-2" />
@@ -727,6 +754,22 @@ export default function DoctorsPage() {
             </div>
           )}
         </div>
+      )}
+
+      {hoursFor && (
+        <WorkingHoursModal
+          psychologistId={hoursFor.id}
+          name={hoursFor.name}
+          onClose={() => setHoursFor(null)}
+        />
+      )}
+
+      {pricingFor && (
+        <PsychiatryPricingModal
+          psychologistId={pricingFor.id}
+          name={pricingFor.name}
+          onClose={() => setPricingFor(null)}
+        />
       )}
 
       {/* Doctor Modal */}

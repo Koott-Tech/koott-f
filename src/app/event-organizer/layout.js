@@ -143,7 +143,7 @@ export default function EventOrganizerLayout({ children }) {
         <div className="flex flex-col h-full w-full">
           <div className="p-6 border-b border-gray-200">
             <a href="/event-organizer" className="hover:opacity-80 transition-opacity">
-              <img src="/logo.png" alt="MyKoott" width={120} height={40} className="object-contain" />
+              <img src="/logo.png" alt="Koott" width={120} height={40} className="object-contain" />
             </a>
           </div>
 

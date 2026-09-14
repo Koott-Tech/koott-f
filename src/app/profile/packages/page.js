@@ -184,8 +184,7 @@ export default function PackagesPage() {
                       <span className="font-medium">Total Amount:</span> {formatCurrency(pkg.total_amount, pkg.currency)}
                     </p>
                     <span className="text-gray-500 text-sm px-3 py-2 bg-gray-100 rounded-lg">
-                      {pkg.remaining_sessions > 0 && hasBookedSessionsForPackage(pkg.id) ? 'Complete booked sessions first' : 
-                       pkg.remaining_sessions > 0 ? `${pkg.remaining_sessions} session${pkg.remaining_sessions !== 1 ? 's' : ''} remaining` :
+                      {pkg.remaining_sessions > 0 ?`${pkg.remaining_sessions} session${pkg.remaining_sessions !== 1 ? 's' : ''} remaining` :
                        'No sessions remaining'}
                     </span>
                   </div>

@@ -16,6 +16,7 @@ import { formatCurrency } from '../../lib/utils';
 // import { isClientContactComplete, getIncompleteContactFields } from '../../lib/contactValidation'; // Removed - contact details collected during signup
 // import ContactCompletionWarning from '../../components/ContactCompletionWarning'; // Removed - no longer needed
 import AuthModal from '@/components/AuthModal';
+import CouponField from '@/components/CouponField';
 import ChildSpecSessionSelect, {
   DEFAULT_CHILD_SPEC_FU_TIER,
 } from '@/components/ChildSpecSessionSelect';
@@ -202,6 +203,9 @@ function BookingLoadingAnimation() {
 
 // Separate component that uses useSearchParams
 const TherapistProfileContent = () => {
+  /* Coupon applied before payment. Only the CODE is sent on; the server
+     revalidates it and computes the discount, so this cannot alter the charge. */
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const doctorParam = searchParams.get('doctor');
@@ -1282,7 +1286,10 @@ const TherapistProfileContent = () => {
         sessionType: sessionType,
         clientName: `${clientProfile?.first_name || ''} ${clientProfile?.last_name || ''}`,
         clientEmail: user?.email || clientProfile?.email || `${clientId}@placeholder.koott.in`,
-        clientPhone: clientProfile?.phone_number
+        clientPhone: clientProfile?.phone_number,
+        // Server-side validated; a bad or expired code fails the order rather
+        // than silently charging full price.
+        ...(appliedCoupon?.code ? { couponCode: appliedCoupon.code } : {})
       };
 
       console.log('🔍 Creating payment order with data:', paymentData);
@@ -1320,7 +1327,7 @@ const TherapistProfileContent = () => {
             key: paymentData.keyId,
             amount: paymentData.amountInPaise,
             currency: paymentData.currency || 'INR',
-            name: paymentData.name || 'MyKoott',
+            name: paymentData.name || 'Koott',
             description: paymentData.description,
             order_id: paymentData.orderId,
             prefill: paymentData.prefill || {},
@@ -1788,7 +1795,7 @@ const TherapistProfileContent = () => {
     if (!selectedDoctor) return;
 
     const name = selectedDoctor.name || `${selectedDoctor.first_name || ''} ${selectedDoctor.last_name || ''}`.trim();
-    const title = `${name} | Child Psychologist | MyKoott`;
+    const title = `${name} | Psychologist | Koott`;
     
     // Build description from psychologist details
     const parts = [];
@@ -1831,7 +1838,7 @@ const TherapistProfileContent = () => {
       parts.push(shortDesc);
     }
     
-    const description = parts.join(' • ') || `Book an online session with ${name}, an experienced child psychologist at MyKoott.`;
+    const description = parts.join(' • ') || `Book an online session with ${name}, an experienced Malayali psychologist at Koott.`;
     
     // Normalize image URL for Open Graph
     const normalizeImageUrl = (url) => {
@@ -2815,6 +2822,17 @@ const TherapistProfileContent = () => {
                   <p className="text-yellow-800 text-xs text-center">
                     Please select: {missingFields.join(', ')}
                   </p>
+                </div>
+              )}
+
+              {/* Coupon — sits directly above the pay action */}
+              {selectedPackage && !isBookingRemaining && (
+                <div className="mt-4">
+                  <CouponField
+                    amount={Number(selectedPackage?.price) || Number(selectedDoctor?.price) || 0}
+                    disabled={isBooking}
+                    onApply={setAppliedCoupon}
+                  />
                 </div>
               )}
 

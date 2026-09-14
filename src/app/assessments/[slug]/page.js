@@ -1,12 +1,14 @@
 import HeroSection from '@/components/HeroSection';
 import LogosStrip from '@/components/LogosStrip';
 import HelpFaq from '@/components/HelpFaq';
+import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
 import ScrollToTop from '@/components/ScrollToTop';
 import HowItWorks from '@/components/HowItWorks';
 import BenefitsSection from '@/components/BenefitsSection';
 import TherapyTypesSplit from '@/components/TherapyTypesSplit';
 import AssessmentInfoCard from '@/components/AssessmentInfoCard';
 import TherapistCarousel from '@/components/TherapistCarousel';
+import { ResumeBooking } from '@/components/ResumeBookingCard';
 import InfoCards from '@/components/InfoCards';
 import Reviews from '@/components/Reviews';
 import VideosShowcase from '@/components/VideosShowcase';
@@ -30,7 +32,7 @@ export async function generateMetadata({ params, searchParams }) {
       const title =
         data.seo_title ||
         data.hero_title ||
-        (slug ? `${slug.replace(/[-_]/g, ' ')} - MyKoott` : 'Assessment');
+        (slug ? `${slug.replace(/[-_]/g, ' ')} - Koott` : 'Assessment');
       const description =
         data.seo_description ||
         data.hero_subtext ||
@@ -45,14 +47,14 @@ export async function generateMetadata({ params, searchParams }) {
           title,
           description,
           type: 'website',
-          siteName: 'MyKoott',
+          siteName: 'Koott',
           url: `https://www.koott.in/assessments/${slug}`,
           images: [
             {
               url: ogImage,
               width: 1200,
               height: 630,
-              alt: 'MyKoott logo',
+              alt: 'Koott logo',
             },
           ],
         },
@@ -72,8 +74,8 @@ export async function generateMetadata({ params, searchParams }) {
   }
 
   const fallbackTitle =
-    (slug && `${slug.replace(/[-_]/g, ' ')} - MyKoott`) ||
-    'Assessment - MyKoott';
+    (slug && `${slug.replace(/[-_]/g, ' ')} - Koott`) ||
+    'Assessment - Koott';
 
   return {
     title: fallbackTitle,
@@ -154,7 +156,7 @@ async function fetchPublicTherapists(limit = 6) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
     // Use ISR with revalidation for better performance
-    const response = await fetch(`${baseUrl}/public/psychologists?limit=${limit}`, {
+    const response = await fetch(`${baseUrl}/public/psychologists`, {
       next: { revalidate: 300 } // Revalidate every 5 minutes (psychologists change less frequently)
     });
 
@@ -162,7 +164,9 @@ async function fetchPublicTherapists(limit = 6) {
       const json = await response.json();
       const psychologists = json?.data?.psychologists || json?.message?.psychologists || json?.psychologists || [];
       if (Array.isArray(psychologists)) {
-        return psychologists.slice(0, limit);
+        // Soonest-available therapists first (the full list is ordered, then trimmed).
+        const order = await fetchTherapistOrder('default', { cache: 'no-store' });
+        return applyTherapistOrder(psychologists, order).slice(0, limit);
       }
     }
   } catch (error) {
@@ -240,6 +244,7 @@ export default async function AssessmentDynamicPage({ params, searchParams }) {
         />
       </div>
 
+      <ResumeBooking className="mx-auto max-w-4xl px-4 sm:px-6 mt-8 md:mt-12 [&>article]:max-w-md" />
       <div className="mx-auto max-w-4xl px-4 sm:px-6 mt-8 md:mt-12 hidden md:block">
         <TherapistCarousel therapists={therapists} />
       </div>

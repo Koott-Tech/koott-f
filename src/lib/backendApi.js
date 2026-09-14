@@ -322,8 +322,12 @@ async function apiRequest(endpoint, options = {}) {
     }
   };
 
-  // Retry logic with exponential backoff
-  const makeRequestWithRetry = async (authToken, maxRetries = 2) => {
+  // Retry logic with exponential backoff — read requests only. A POST/PUT/DELETE that
+  // failed with a 5xx or timed out may still have worked on the server (a Razorpay order,
+  // a booking, a payment record), so repeating it could create duplicates.
+  const method = String(options.method || 'GET').toUpperCase();
+  const retryable = method === 'GET' || method === 'HEAD';
+  const makeRequestWithRetry = async (authToken, maxRetries = retryable ? 2 : 0) => {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         const response = await makeRequest(authToken, attempt);
@@ -1103,8 +1107,78 @@ export const adminApi = {
   },
 
   // Get psychologist availability for reschedule
-  async getPsychologistAvailabilityForReschedule(psychologistId, startDate, endDate) {
-    return apiRequest(`/admin/psychologists/${psychologistId}/availability?startDate=${startDate}&endDate=${endDate}`);
+  // `type` ('individual' | 'couple') cuts the free starts by session length;
+  // `excludeSessionId` frees the slot of the session being rescheduled.
+  // Weekly working hours per therapist (IST) — slots are cut from these
+  async getWorkingHours(psychologistId) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/working-hours`);
+  },
+
+  async saveWorkingHours(psychologistId, workingHours) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/working-hours`, {
+      method: 'PUT',
+      body: JSON.stringify({ workingHours }),
+    });
+  },
+
+  // Psychiatrist consultation pricing: { price15, price30, bundles: [{ sessions, price }] }
+  async getPsychiatryPricing(psychologistId) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/psychiatry-pricing`);
+  },
+
+  async savePsychiatryPricing(psychologistId, pricing) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/psychiatry-pricing`, {
+      method: 'PUT',
+      body: JSON.stringify(pricing),
+    });
+  },
+
+  // Therapist groups (A, B, C …) — internal, one group per therapist
+  async getTherapistGroups() {
+    return apiRequest('/admin/therapist-groups');
+  },
+
+  async createTherapistGroup(group) {
+    return apiRequest('/admin/therapist-groups', { method: 'POST', body: JSON.stringify(group) });
+  },
+
+  async updateTherapistGroup(groupId, group) {
+    return apiRequest(`/admin/therapist-groups/${groupId}`, { method: 'PUT', body: JSON.stringify(group) });
+  },
+
+  async deleteTherapistGroup(groupId) {
+    return apiRequest(`/admin/therapist-groups/${groupId}`, { method: 'DELETE' });
+  },
+
+  // Booking-page card order: { pattern: [groupId, …], repeat } — response includes a preview
+  async getListingPattern() {
+    return apiRequest('/admin/therapist-listing-pattern');
+  },
+
+  async saveListingPattern(pattern, repeat = true) {
+    return apiRequest('/admin/therapist-listing-pattern', {
+      method: 'PUT',
+      body: JSON.stringify({ pattern, repeat }),
+    });
+  },
+
+  // Booking-flow leads: numbers verified by WhatsApp code, booked or not
+  async getBookingLeads({ status = 'all', q = '' } = {}) {
+    const params = new URLSearchParams({ status });
+    if (q) params.set('q', q);
+    return apiRequest(`/admin/booking-leads?${params}`);
+  },
+
+  async setTherapistGroup(psychologistId, groupId) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/therapist-group`, {
+      method: 'PUT',
+      body: JSON.stringify({ groupId: groupId || null }),
+    });
+  },
+
+  async getPsychologistAvailabilityForReschedule(psychologistId, startDate, endDate, { type, excludeSessionId } = {}) {
+    const extra = `${type ? `&type=${type}` : ''}${excludeSessionId ? `&excludeSessionId=${excludeSessionId}` : ''}`;
+    return apiRequest(`/admin/psychologists/${psychologistId}/availability?startDate=${startDate}&endDate=${endDate}${extra}`);
   },
 
   // Get all reschedule requests
@@ -1953,6 +2027,17 @@ export const bookingsApi = {
 
 // Finance API
 export const financeApi = {
+  // Therapist groups (internal) — read-only; admins manage them via adminApi
+  async getTherapistGroups() {
+    return apiRequest('/therapist-groups');
+  },
+
+  async getTherapistGroupsReport(params = {}) {
+    const q = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => { if (v) q.append(k, v); });
+    return apiRequest(`/therapist-groups/report?${q}`);
+  },
+
   // Dashboard
   async getDashboard(params = {}) {
     const queryParams = new URLSearchParams();
@@ -2276,6 +2361,14 @@ export const backendApi = {
     });
   },
   
+  // Generic PATCH method (used by the coupon admin toggle)
+  async patch(endpoint, data) {
+    return apiRequest(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(data ?? {}),
+    });
+  },
+
   // Generic DELETE method for backward compatibility
   async delete(endpoint) {
     return apiRequest(endpoint, {

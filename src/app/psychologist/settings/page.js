@@ -154,7 +154,7 @@ export default function PsychologistSettings() {
         console.error('Error fetching Google events:', error);
       }
       
-      // 2. Fetch MyKoott sessions (your platform bookings)
+      // 2. Fetch Koott sessions (your platform bookings)
       let koottEvents = [];
       try {
         const sessionsData = await psychologistApi.getSessions();
@@ -173,7 +173,7 @@ export default function PsychologistSettings() {
             endDateTime.setHours(endDateTime.getHours() + 1);
             
             return {
-              summary: `MyKoott - ${session.client_name || 'Client'}`,
+              summary: `Koott - ${session.client_name || 'Client'}`,
               start: {
                 dateTime: `${session.scheduled_date}T${session.scheduled_time}`
               },
@@ -189,7 +189,7 @@ export default function PsychologistSettings() {
             };
           });
       } catch (error) {
-        console.error('Error fetching MyKoott sessions:', error);
+        console.error('Error fetching Koott sessions:', error);
       }
       
       // Combine both sources
@@ -210,45 +210,31 @@ export default function PsychologistSettings() {
     }
   };
   
-  const handleConnectGoogleCalendar = () => {
-  setCalendarError(null);
-
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.trim();
-  const redirectUri = (process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI?.trim() ||
-    `${window.location.origin}/auth/google-calendar/callback`);
-
-  if (!clientId) {
-    setCalendarError(
-      'Google Calendar integration is not configured. Please contact support.'
-    );
-    console.error('Google Calendar connect failed: NEXT_PUBLIC_GOOGLE_CLIENT_ID is missing');
-    return;
-  }
-
-  if (!redirectUri) {
-    setCalendarError(
-      'Google Calendar redirect URL is not configured. Please contact support.'
-    );
-    console.error('Google Calendar connect failed: redirect URI is missing');
-    return;
-  }
-    const scope = 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events';
-    
-    console.log('🔍 Google Calendar Connection Debug:');
-    console.log('📋 Scope being requested:', scope);
-    console.log('🔗 Client ID:', clientId);
-    console.log('🔗 Redirect URI:', redirectUri);
-    
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-    `client_id=${encodeURIComponent(clientId)}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&response_type=code` +
-      `&scope=${encodeURIComponent(scope)}` +
-      `&access_type=offline` +
-      `&prompt=consent`;
-    
-    console.log('🔗 Full Auth URL:', authUrl);
-    window.location.href = authUrl;
+  // The Google sign-in URL comes from the backend, built with the same OAuth client
+  // that later exchanges the code (/google-calendar/connect). Building it here with
+  // NEXT_PUBLIC_GOOGLE_CLIENT_ID broke the flow: that client is a different Google
+  // project (Google reports it deleted) and NEXT_PUBLIC_GOOGLE_REDIRECT_URI points at
+  // the site-login callback, not /auth/google-calendar/callback.
+  const handleConnectGoogleCalendar = async () => {
+    setCalendarError(null);
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001/api';
+      const base = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
+      const redirectUri = `${window.location.origin}/auth/google-calendar/callback`;
+      const response = await fetch(
+        `${base}/psychologists/google-calendar/auth-url?redirect_uri=${encodeURIComponent(redirectUri)}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data?.data?.url) {
+        setCalendarError(data?.message || 'Google Calendar integration is not configured. Please contact support.');
+        return;
+      }
+      window.location.href = data.data.url;
+    } catch (error) {
+      console.error('Google Calendar connect failed:', error);
+      setCalendarError('Could not start the Google Calendar connection. Please try again.');
+    }
   };
   
   const handleDisconnectGoogleCalendar = async () => {
@@ -344,7 +330,7 @@ export default function PsychologistSettings() {
   };
   
   const getEventColor = (summary, source) => {
-    // MyKoott events are always green
+    // Koott events are always green
     if (source === 'koott') {
       return 'bg-green-100 border-green-400 text-green-900';
     }
@@ -710,7 +696,7 @@ export default function PsychologistSettings() {
               <div className="flex items-start">
                 <div className="flex-1">
                   <p className="text-sm text-gray-700 mb-4">
-                    Connect your Google Calendar to automatically prevent double bookings. When you have sessions booked on other platforms (BetterHelp, Talkspace, etc.), those time slots will be automatically blocked on MyKoott.
+                    Connect your Google Calendar to automatically prevent double bookings. When you have sessions booked on other platforms (BetterHelp, Talkspace, etc.), those time slots will be automatically blocked on Koott.
                   </p>
                   
                   {isCalendarConnected ? (
@@ -928,7 +914,7 @@ export default function PsychologistSettings() {
                                       ? 'bg-green-200 text-green-900' 
                                       : 'bg-white/50'
                                   }`}>
-                                    {event.source === 'koott' ? 'MyKoott' : 'External'}
+                                    {event.source === 'koott' ? 'Koott' : 'External'}
                                   </span>
                                 </div>
                               </div>

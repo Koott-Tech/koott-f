@@ -3,6 +3,13 @@ import { SUMMER_WORKSHOP_2026_HERO_IMAGE } from "@/data/summerWorkshop2026Assets
 /**
  * Default CMS tree for workshop-style event pages (/events/[slug]).
  * Stored in Supabase `event_pages.cms_data`; merged on read so partial JSON is safe.
+ *
+ * Two stored shapes exist:
+ *   - the workshop shape this file describes (written by the admin event editor);
+ *   - the shape the Wix import wrote for the live events — { title, summary,
+ *     body, date, schedule, venue, image }. mergeWorkshopEventCms() maps that
+ *     onto the workshop shape and drops the default sample sections (speakers,
+ *     reviews, prices…) so an imported event never shows another event's copy.
  */
 
 function deepMerge(base, over) {
@@ -19,10 +26,11 @@ function deepMerge(base, over) {
 
 export function getWorkshopEventPageDefaults() {
   return {
+    // Registration API key — functional, not display copy; do not rename.
     registerEventSlug: "MyKoott-summer-workshops-2026",
     /** Single join link for this event (e.g. Google Meet). Sent in registration email + WhatsApp; set in admin CMS. */
     sessionJoinUrl: "",
-    
+
     // Core event details
     topic: "",
     speaker: "",
@@ -30,28 +38,28 @@ export function getWorkshopEventPageDefaults() {
     time: "",
     method: "Online", // Online, Offline, Hybrid
     posterUrl: "",
-    
+
     heroImageUrl: SUMMER_WORKSHOP_2026_HERO_IMAGE,
     heroImageAlt:
-      "Children and family learning together at home — MyKoott Summer Workshops",
+      "Children and family learning together at home — Koott Summer Workshops",
     hero: {
-      eyebrow: "MyKoott Summer Workshops 2026",
+      eyebrow: "Koott Summer Workshops 2026",
       title: "Not just workshops — spaces where children and parents learn, feel, and grow together.",
       body: "Join our first interactive session on expressing emotions at home. Free for this edition; register to save your spot.",
     },
     /** Controls card content on /events listing page. */
     eventListCard: {
       category: "Family Workshop",
-      title: "MyKoott Summer Workshop 2026",
+      title: "Koott Summer Workshop 2026",
       description:
         "Interactive parent-child session focused on expressing emotions at home, communication tools, and practical weekly habits.",
-      organizer: "MyKoott",
+      organizer: "Koott",
       scheduleText: "Sat, 18 April 2026 at 11:00 AM IST",
       imageUrl: SUMMER_WORKSHOP_2026_HERO_IMAGE,
     },
     ticketCard: {
       admitLabel: "ADMIT ONE",
-      seriesLine: "MyKoott · Summer 2026",
+      seriesLine: "Koott · Summer 2026",
       sessionTitle: "Expressing Big Emotions at Home",
       datetimeLine: "Sat, 18 April 2026 · 11:00 AM IST · Online",
       sessionPassLabel: "Session pass",
@@ -211,8 +219,116 @@ function scrubRegisterModalSubtitle(registerModal) {
   return registerModal;
 }
 
+/** Is this the { title, summary, body, date, schedule, venue, image } shape the Wix import wrote? */
+export function isImportedEventShape(stored) {
+  if (!stored || typeof stored !== "object") return false;
+  const workshopKeys = ["topic", "hero", "sessionBanner", "ticketCard", "whatIsThis"];
+  return Boolean(stored.title || stored.summary || stored.schedule)
+    && !workshopKeys.some((k) => k in stored);
+}
+
+const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+
+/**
+ * True once the event's day is over (end of that day, IST). Reads the first dated
+ * value in `text`: "07 Mar 2025, 7:00 pm – 8:00 pm", "Apr 12, 2025", "2025-04-12".
+ * Text without a year ("Sat, 12 Apr") is treated as not ended.
+ */
+export function eventHasEnded(text, now = new Date()) {
+  const s = String(text || "");
+  let y;
+  let m;
+  let d;
+  let hit = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (hit) {
+    [y, m, d] = [+hit[1], +hit[2] - 1, +hit[3]];
+  } else if ((hit = s.match(/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\.?,?\s+(\d{4})/))) {
+    [d, m, y] = [+hit[1], MONTHS[hit[2].toLowerCase()], +hit[3]];
+  } else if ((hit = s.match(/([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})/))) {
+    [m, d, y] = [MONTHS[hit[1].toLowerCase()], +hit[2], +hit[3]];
+  }
+  if (y == null || m == null || !d) return false;
+  const endOfDayIst = Date.UTC(y, m, d, 23, 59, 59) - 330 * 60000;
+  return now.getTime() > endOfDayIst;
+}
+
+/** Wix image URLs carry a resize/blur suffix (…/v1/fill/w_49,…blur_2…); keep the original. */
+export function wixOriginal(url) {
+  if (!url || typeof url !== "string") return "";
+  return url.replace(/(\/media\/[^/]+~mv2\.\w+)\/v1\/.*$/i, "$1");
+}
+
+/** The "## About the event" part of an imported markdown body, as plain paragraphs. */
+function aboutFromBody(body) {
+  const text = String(body || "");
+  const m = text.match(/##\s*About the event\s*\n([\s\S]*?)(\n##\s|$)/i);
+  const chunk = (m ? m[1] : "").trim();
+  return chunk.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean).join("\n\n");
+}
+
+/**
+ * Map an imported event onto the workshop shape: its own title, summary, date,
+ * time, venue and image everywhere they show, and none of the default sample
+ * content (speakers, reviews, prices, age badge, outcomes).
+ */
+function fromImportedEvent(stored) {
+  const title = stored.title || "";
+  const image = wixOriginal(stored.image);
+  const venue = stored.venue || "Online";
+  const about = aboutFromBody(stored.body);
+  const d = getWorkshopEventPageDefaults();
+  return {
+    topic: title,
+    speaker: "",
+    date: stored.date || "",
+    time: stored.schedule || "",
+    method: venue,
+    posterUrl: "",
+    heroImageUrl: image || d.heroImageUrl,
+    heroImageAlt: title,
+    hero: { eyebrow: "Koott Workshop", title, body: stored.summary || "" },
+    eventListCard: {
+      category: "Workshop",
+      title,
+      description: stored.summary || "",
+      organizer: "Koott",
+      scheduleText: stored.schedule || stored.date || "",
+      imageUrl: image || d.eventListCard.imageUrl,
+    },
+    ticketCard: {
+      ...d.ticketCard,
+      seriesLine: "Koott Workshop",
+      sessionTitle: title,
+      datetimeLine: [stored.schedule || stored.date, venue].filter(Boolean).join(" · "),
+      priceLabel: "",
+      registerCta: "Register",
+    },
+    whatIsThis: { eyebrow: "About the event", title: "What is this?", body: about || stored.summary || "", bullets: [] },
+    speakers: { ...d.speakers, items: [] },
+    whyItMatters: { ...d.whyItMatters, body: "", outcomeCards: [] },
+    whoCanJoin: { ...d.whoCanJoin, badge: "", columns: [] },
+    sessionBanner: {
+      passLabel: "Session pass",
+      strikePrice: "",
+      priceLarge: "",
+      badgeText: "",
+      title,
+      subtitle: stored.summary || "",
+      details: [
+        { label: "Date", value: stored.date || "" },
+        { label: "Time", value: stored.schedule || "" },
+        { label: "Format", value: venue },
+      ].filter((x) => x.value),
+      ctaText: "Register",
+    },
+    takeBack: { ...d.takeBack, body: "", items: [] },
+    reviews: { ...d.reviews, items: [] },
+  };
+}
+
 export function mergeWorkshopEventCms(partial) {
-  const merged = deepMerge(getWorkshopEventPageDefaults(), partial || {});
+  const source = isImportedEventShape(partial) ? fromImportedEvent(partial) : (partial || {});
+  const merged = deepMerge(getWorkshopEventPageDefaults(), source);
   if (merged.registerModal) {
     merged.registerModal = scrubRegisterModalSubtitle(merged.registerModal);
   }
@@ -223,19 +339,19 @@ export function mergeWorkshopEventCms(partial) {
     if (merged.sessionBanner) merged.sessionBanner.title = merged.topic;
     if (merged.eventListCard) merged.eventListCard.title = merged.topic;
   }
-  
+
   if (merged.date || merged.time) {
     if (merged.sessionBanner && merged.sessionBanner.details) {
       const details = [...merged.sessionBanner.details];
       const dIdx = details.findIndex(d => String(d.label).toLowerCase().includes('date'));
       if (dIdx !== -1 && merged.date) details[dIdx].value = merged.date;
-      
+
       const tIdx = details.findIndex(d => String(d.label).toLowerCase().includes('time'));
       if (tIdx !== -1 && merged.time) details[tIdx].value = merged.time;
 
       const fIdx = details.findIndex(d => String(d.label).toLowerCase().includes('format'));
       if (fIdx !== -1 && merged.method) details[fIdx].value = merged.method;
-      
+
       merged.sessionBanner.details = details;
     }
     if (merged.eventListCard) {
@@ -248,7 +364,7 @@ export function mergeWorkshopEventCms(partial) {
     if (!merged.heroImageUrl || merged.heroImageUrl === defaultHero) {
       merged.heroImageUrl = merged.posterUrl;
     }
-    
+
     const defaultCard = getWorkshopEventPageDefaults().eventListCard.imageUrl;
     if (merged.eventListCard && (!merged.eventListCard.imageUrl || merged.eventListCard.imageUrl === defaultCard)) {
       merged.eventListCard.imageUrl = merged.posterUrl;

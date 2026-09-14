@@ -114,10 +114,15 @@ export default function AdminRescheduleModal({
       console.log('Fetching availability for psychologist:', session.psychologist_id);
       console.log('Date range:', startDate, 'to', endDate);
       
+      // Free starts for this session's length (individual 50 min, couple 1 h 20 min,
+      // 10-min breaks), with this session's own slot counted as free.
+      const kind = String(session.session_type || session.package?.package_type || '').toLowerCase().includes('couple')
+        ? 'couple' : 'individual';
       const response = await adminApi.getPsychologistAvailabilityForReschedule(
-        session.psychologist_id, 
-        startDate, 
-        endDate
+        session.psychologist_id,
+        startDate,
+        endDate,
+        { type: kind, excludeSessionId: session.id }
       );
       
       if (response.success) {
@@ -454,6 +459,40 @@ export default function AdminRescheduleModal({
                     <div className="text-sm text-gray-400 py-8">Select a date first.</div>
                   ) : (
                     <div className="space-y-4">
+                      {/* Free starts for this session's length (IST). Admins can still
+                          set any time below; the server blocks only overlaps. */}
+                      {(() => {
+                        const free = psychologistAvailability[selectedDate]?.available_slots || [];
+                        return (
+                          <div>
+                            <div className="text-xs font-medium text-gray-600 mb-2">
+                              Free starts (IST · {durationMinutes} min + 10 min break)
+                            </div>
+                            {free.length ? (
+                              <div className="flex flex-wrap gap-2">
+                                {free.map((label) => {
+                                  const hhmm = convertTo24Hour(label).slice(0, 5);
+                                  return (
+                                    <button
+                                      key={label} type="button"
+                                      onClick={() => setSelectedTime(hhmm)}
+                                      className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${
+                                        selectedTime === hhmm
+                                          ? 'bg-[#025545] text-white border-[#025545]'
+                                          : 'bg-white text-gray-800 border-gray-200 hover:border-[#025545]'
+                                      }`}
+                                    >
+                                      {label}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <div className="text-xs text-gray-400">No free starts in the therapist&apos;s hours that day.</div>
+                            )}
+                          </div>
+                        );
+                      })()}
                       <div className="grid grid-cols-3 gap-3">
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-1">Hour</label>

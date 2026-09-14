@@ -5,16 +5,23 @@ function backendOrigin() {
 }
 
 export default async function sitemap() {
+  // Nothing is listed until launch (same NEXT_PUBLIC_ALLOW_INDEXING flag as app/robots.js).
+  if (process.env.NEXT_PUBLIC_ALLOW_INDEXING !== 'true') return [];
+
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.koott.in";
 
   const staticRoutes = [
-    "", 
-    "/about", 
-    "/online-child-psychologist", 
+    "",
+    // Routes ported from koott.in — listed at their canonical URL so the
+    // aliases (/about, /career, /contact-us) are not submitted twice.
+    "/about-us",
+    "/book-malayali-psychologists",
+    "/get-in-touch",
+    "/jobs",
+    "/online-child-psychologist",
     "/blog",
     "/faq",
-    "/career",
     "/events",
     "/events/MyKoott-summer-workshops-2026",
     "/therapy-agreement", 
@@ -41,6 +48,7 @@ export default async function sitemap() {
         data?.data?.assessments ||
         data?.data?.pages ||
         data?.data?.blogs ||
+        data?.data?.careers ||
         data?.message?.services ||
         data?.message?.assessments ||
         data?.message?.pages ||
@@ -49,6 +57,7 @@ export default async function sitemap() {
         data?.assessments ||
         data?.pages ||
         data?.blogs ||
+        data?.careers ||
         data?.data ||
         [];
       return (items || [])
@@ -88,11 +97,12 @@ export default async function sitemap() {
     }
   }
 
-  const [counsellingSlugs, assessmentSlugs, parentingSlugs, blogSlugs, psychologistSlugs] = await Promise.all([
+  const [counsellingSlugs, assessmentSlugs, parentingSlugs, blogSlugs, careerSlugs, psychologistSlugs] = await Promise.all([
     fetchSlugs("/api/counselling"),
     fetchSlugs("/api/assessments"),
     fetchSlugs("/api/better-parenting"),
     fetchSlugs("/api/blogs"),
+    fetchSlugs("/api/careers"),
     fetchPsychologists(),
   ]);
 
@@ -119,6 +129,13 @@ export default async function sitemap() {
       url: `${baseUrl}/blog/${slug}`,
       changeFrequency: "weekly",
       priority: 0.7,
+      lastModified: new Date(),
+    })),
+    // Job detail pages, submitted at their canonical /jobs/<slug> URL.
+    ...careerSlugs.map((slug) => ({
+      url: `${baseUrl}/jobs/${slug}`,
+      changeFrequency: "weekly",
+      priority: 0.6,
       lastModified: new Date(),
     })),
     ...psychologistSlugs.map((slug) => ({

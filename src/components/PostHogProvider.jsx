@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import posthog from 'posthog-js'
 
@@ -90,9 +90,6 @@ if (typeof window !== 'undefined') {
 }
 
 export function PostHogProvider({ children }) {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
   useEffect(() => {
     // Initialize PostHog only on client side
     if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
@@ -216,6 +213,22 @@ export function PostHogProvider({ children }) {
     }
   }, [])
 
+  // useSearchParams needs a Suspense boundary. It wraps this tiny tracker only — a
+  // boundary around the whole app made every notFound() page answer 200 instead of 404.
+  return (
+    <>
+      {children}
+      <Suspense fallback={null}>
+        <PostHogPageviews />
+      </Suspense>
+    </>
+  )
+}
+
+function PostHogPageviews() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   useEffect(() => {
     // Track pageviews on route changes
     if (pathname && typeof window !== 'undefined') {
@@ -243,5 +256,5 @@ export function PostHogProvider({ children }) {
     }
   }, [pathname, searchParams])
 
-  return children
+  return null
 }

@@ -201,7 +201,8 @@ function SlidingSuccessAnimation({ onComplete }) {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
-    // After 1.2 seconds (checkmark animation completes), start moving to top
+    // Short on purpose: the booking details are ready, so don't hold them back.
+    // After 0.6 s (checkmark drawn), start moving to top
     const timer = setTimeout(() => {
       setIsMoving(true);
       // Fade out background immediately when moving starts
@@ -213,8 +214,8 @@ function SlidingSuccessAnimation({ onComplete }) {
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
         onComplete();
-      }, 600); // Duration of slide animation
-    }, 1200);
+      }, 400); // Duration of slide animation
+    }, 600);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
@@ -274,7 +275,7 @@ function SlidingSuccessAnimation({ onComplete }) {
           zIndex: 9999
         }}
         transition={{
-          duration: isMobile ? 0.4 : 0.6, // Faster on mobile
+          duration: 0.4, // matches the 400 ms before onComplete
           ease: [0.4, 0, 0.2, 1] // Custom easing for smooth slide
         }}
         style={{
@@ -369,10 +370,10 @@ function PaymentSuccessContent() {
     // Check scroll position frequently during animation phase
     const scrollCheck = setInterval(preventScroll, 50);
     
-    // Keep locked until animation completes (about 2-3 seconds)
+    // Keep locked until the (1 s) success animation completes
     const unlockTimer = setTimeout(() => {
       clearInterval(scrollCheck);
-    }, 3000);
+    }, 1200);
     
     return () => {
       clearInterval(scrollCheck);
@@ -1307,31 +1308,69 @@ function PaymentSuccessContent() {
   if (error) {
     const supportEmail = 'hey@koott.com';
     const supportPhone = '+91 95390 07766';
+    // Paid but the booking isn't visible yet reads differently from a real failure.
+    const stillConfirming = /longer than expected|payment was successful|completed (some time ago|earlier)|check your sessions/i.test(error);
+    const message = error.replace(/\s*Please try again\.?\s*/gi, ' ').trim() || 'Payment failed.';
+    const reference = paymentData?.orderId || paymentData?.paymentId;
+    // Text is set in divs: globals.css forces its own size on every h1/p (!important).
     return (
-      <div className="w-full max-w-md mx-auto rounded-2xl border border-slate-200 bg-white shadow-xl p-8 text-center mt-24 px-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-600 mb-6">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <p className="text-slate-600 text-sm mb-4">Oops... {error.replace(/\s*Please try again\.?\s*/gi, ' ').trim() || 'Payment failed.'}</p>
-          <p className="text-slate-700 text-sm mb-6 leading-relaxed">
-            Please immediately contact our team through mail or phone for assistance.
-          </p>
-          <div className="space-y-2 mb-6 text-sm">
-            <a href={`mailto:${supportEmail}`} className="block text-[#025545] font-medium hover:underline">
-              {supportEmail}
-            </a>
-            <a href={`tel:+919539007766`} className="block text-[#025545] font-medium hover:underline">
-              {supportPhone}
-            </a>
-          </div>
-          <button
-            onClick={() => router.push('/profile/sessions')}
-            className="w-full px-6 py-3 bg-[#025545] hover:bg-[#012f23] text-white font-medium rounded-lg transition-colors"
+      <div className="flex min-h-screen items-center justify-center px-6 pb-16 pt-28">
+        <div className="w-full max-w-lg text-center">
+          <span
+            className={`mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full ${
+              stillConfirming ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-500'
+            }`}
+            aria-hidden
           >
-            View Sessions
-          </button>
+            {stillConfirming ? (
+              <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5V12l3 2" />
+              </svg>
+            ) : (
+              <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" />
+                <path strokeLinecap="round" d="M12 7.5v5.5M12 16.5h.01" />
+              </svg>
+            )}
+          </span>
+
+          <div role="heading" aria-level={1} className="text-[26px] font-semibold leading-tight tracking-tight text-slate-900">
+            {stillConfirming ? "We're still confirming your booking" : 'Something went wrong'}
+          </div>
+          <div className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-slate-600">{message}</div>
+
+          <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+            <button
+              onClick={() => router.push('/profile/sessions')}
+              className="w-full rounded-lg bg-[#025545] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[#012f23] sm:w-auto"
+            >
+              View my sessions
+            </button>
+            <button
+              onClick={() => router.push('/')}
+              className="w-full rounded-lg px-6 py-3 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 sm:w-auto"
+            >
+              Back to home
+            </button>
+          </div>
+
+          {/* Support as a quiet note, not a box */}
+          <div className="mx-auto mt-12 max-w-md border-t border-slate-100 pt-6 text-xs leading-relaxed text-slate-500">
+            {stillConfirming
+              ? "If you were charged and don't see your session in a few minutes, "
+              : 'If money was deducted from your account, '}
+            write to{' '}
+            <a href={`mailto:${supportEmail}`} className="font-medium text-[#025545] hover:underline">{supportEmail}</a>
+            {' '}or call{' '}
+            <a href="tel:+919539007766" className="whitespace-nowrap font-medium text-[#025545] hover:underline">{supportPhone}</a>
+            {reference ? (
+              <>
+                {' '}with reference <span className="whitespace-nowrap font-mono text-slate-600">{reference}</span>.
+              </>
+            ) : '.'}
+          </div>
+        </div>
       </div>
     );
   }

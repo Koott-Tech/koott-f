@@ -3,6 +3,20 @@
 import { Component } from 'react';
 import { AlertCircle, RefreshCw, Home } from 'lucide-react';
 
+/**
+ * Next signals notFound() and redirect() by throwing. Those are control flow,
+ * not failures: swallowing them leaves the framework unable to set the status,
+ * so a missing page renders this boundary's fallback with HTTP 200 — a soft 404
+ * that search engines happily index. They are identified by `digest`.
+ */
+const isNextControlFlow = (error) => {
+  const digest = error?.digest;
+  if (typeof digest === 'string'
+      && (digest === 'NEXT_NOT_FOUND' || digest.startsWith('NEXT_REDIRECT'))) return true;
+  const message = typeof error?.message === 'string' ? error.message : '';
+  return message === 'NEXT_NOT_FOUND' || message.startsWith('NEXT_REDIRECT');
+};
+
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -10,10 +24,13 @@ class ErrorBoundary extends Component {
   }
 
   static getDerivedStateFromError(error) {
+    // Let notFound()/redirect() travel on to Next untouched.
+    if (isNextControlFlow(error)) throw error;
     return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
+    if (isNextControlFlow(error)) throw error;
     console.error('Page Error Caught by ErrorBoundary:', error, errorInfo);
     this.setState({
       error,

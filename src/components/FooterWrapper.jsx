@@ -1,33 +1,26 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import Footer from './Footer';
+// KoottFooter is the cloned koott.in footer. The previous Koott footer is kept
+// in Footer.jsx, unused, so the swap is easy to reverse.
+import KoottFooter from './KoottFooter';
 
 export default function FooterWrapper() {
   const pathname = usePathname();
-  
-  // Don't show footer on admin, superadmin, finance, staff, psychologist, and client dashboard pages
-  // Note: /online-child-psychologist (listing page) should show footer, only /psychologist (dashboard) should hide it
-  const shouldHideFooter = pathname.startsWith('/admin') || 
-                            pathname.startsWith('/superadmin') || 
-                            pathname.startsWith('/finance') || 
-                            pathname.startsWith('/staff') || 
-                            pathname.startsWith('/profile') ||
-                            (pathname.startsWith('/psychologist') && !pathname.startsWith('/online-child-psychologist'));
-  
-  if (shouldHideFooter) {
-    return null;
-  }
-  
-  // Check if we're on the home page
-  const isHomePage = pathname === '/';
-  
-  // Check if we're on a CMS page (counselling only; assessments and better-parenting removed)
-  const isCmsPage = pathname.startsWith('/counselling/');
-  
-  // Check if we're on a therapist/psychologist profile page (no gap above footer)
-  const isTherapistProfile = pathname.startsWith('/therapist-profile') || pathname.startsWith('/online-child-psychologist');
-  
-  return <Footer isHomePage={isHomePage} isCmsPage={isCmsPage} isTherapistProfile={isTherapistProfile} />;
-}
 
+  // Dashboards render their own chrome; the marketing footer does not belong there.
+  // /online-child-psychologist is the public listing, so only the /psychologist
+  // dashboard is excluded by that prefix.
+  const hide =
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/superadmin') ||
+    pathname.startsWith('/finance') ||
+    pathname.startsWith('/staff') ||
+    pathname.startsWith('/profile') ||
+    pathname.startsWith('/event-organizer') ||
+    (pathname.startsWith('/psychologist') && !pathname.startsWith('/online-child-psychologist'));
+
+  if (hide) return null;
+
+  return <KoottFooter />;
+}

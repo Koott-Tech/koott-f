@@ -64,13 +64,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     
     if (psychologist) {
       const name = psychologist.name || `${psychologist.first_name || ''} ${psychologist.last_name || ''}`.trim();
-      const title = `${name} | Child Psychologist | MyKoott`;
+      const title = `${name} | Psychologist | Koott`;
       
       // Get description from psychologist data or use default
       const description = psychologist.bio || 
                          psychologist.description || 
                          psychologist.short_bio ||
-                         `Book an online session with ${name}, an experienced child psychologist at MyKoott. Professional counseling and therapy for children.`;
+                         `Book an online session with ${name}, an experienced Malayali psychologist at Koott. Private online counselling in Malayalam.`;
       
       // Same image as page: profile_picture_url || cover_image_url, then normalizeImageUrl → absolute for OG
       const rawImageUrl = psychologist.profile_picture_url || psychologist.cover_image_url;
@@ -85,7 +85,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
           title,
           description,
           type: 'profile',
-          siteName: 'MyKoott',
+          siteName: 'Koott',
           url,
           images: [
             {
@@ -113,31 +113,31 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   
   // Fallback metadata
   const fallbackTitle = slug 
-    ? `${slug.replace(/[-_]/g, ' ')} - Child Psychologist | MyKoott`
-    : 'Child Psychologist | MyKoott';
+    ? `${slug.replace(/[-_]/g, ' ')} - Psychologist | Koott`
+    : 'Psychologist | Koott';
   
   return {
     title: fallbackTitle,
-    description: 'Book an online session with an experienced child psychologist at MyKoott. Professional counseling and therapy for children.',
+    description: 'Book an online session with an experienced Malayali psychologist at Koott. Private online counselling in Malayalam.',
     openGraph: {
       title: fallbackTitle,
-      description: 'Book an online session with an experienced child psychologist at MyKoott. Professional counseling and therapy for children.',
+      description: 'Book an online session with an experienced Malayali psychologist at Koott. Private online counselling in Malayalam.',
       type: 'profile',
-      siteName: 'MyKoott',
+      siteName: 'Koott',
       url: `https://www.koott.in/online-child-psychologist/${slug}`,
       images: [
         {
           url: 'https://www.koott.in/logo.png',
           width: 1200,
           height: 630,
-          alt: 'MyKoott',
+          alt: 'Koott',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
       title: fallbackTitle,
-      description: 'Book an online session with an experienced child psychologist at MyKoott. Professional counseling and therapy for children.',
+      description: 'Book an online session with an experienced Malayali psychologist at Koott. Private online counselling in Malayalam.',
       images: ['https://www.koott.in/logo.png'],
     },
     alternates: {

@@ -1,5 +1,6 @@
 import BlogTeaser from '@/components/BlogTeaser';
 import HeroSection from '@/components/HeroSection';
+import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
 import { normalizeImageUrl, normalizeImageUrlWithSize } from '@/utils/urlNormalizer';
 import LogosStrip from '@/components/LogosStrip';
 import HelpFaq from '@/components/HelpFaq';
@@ -11,6 +12,7 @@ import InfoCards from '@/components/InfoCards';
 import VideosShowcase from '@/components/VideosShowcase';
 import Reviews from '@/components/Reviews';
 import TherapistCarousel from '@/components/TherapistCarousel';
+import { ResumeBooking } from '@/components/ResumeBookingCard';
 import Image from "next/image";
 
 const removeAssessmentSpecialist = (docs = []) => {
@@ -36,8 +38,8 @@ export async function generateMetadata({ params, searchParams }) {
         data.seo_title ||
         data.hero_title ||
         (slug
-          ? `${slug.replace(/[-_]/g, ' ')} - Better Parenting | MyKoott`
-          : 'Better Parenting - MyKoott');
+          ? `${slug.replace(/[-_]/g, ' ')} - Better Parenting | Koott`
+          : 'Better Parenting - Koott');
       const description =
         data.seo_description ||
         data.hero_subtext ||
@@ -52,14 +54,14 @@ export async function generateMetadata({ params, searchParams }) {
           title,
           description,
           type: 'website',
-          siteName: 'MyKoott',
+          siteName: 'Koott',
           url: `https://www.koott.in/better-parenting/${slug}`,
           images: [
             {
               url: ogImage,
               width: 1200,
               height: 630,
-              alt: 'MyKoott logo',
+              alt: 'Koott logo',
             },
           ],
         },
@@ -83,8 +85,8 @@ export async function generateMetadata({ params, searchParams }) {
       `${slug.replace(
         /[-_]/g,
         ' ',
-      )} - Better Parenting | MyKoott`) ||
-    'Better Parenting - MyKoott';
+      )} - Better Parenting | Koott`) ||
+    'Better Parenting - Koott';
 
   return {
     title: fallbackTitle,
@@ -136,7 +138,9 @@ async function fetchPublicTherapists(limit = 6) {
       const psychologists = json?.data?.psychologists || json?.message?.psychologists || json?.psychologists || [];
       if (Array.isArray(psychologists)) {
         const sanitized = removeAssessmentSpecialist(psychologists);
-        return sanitized.slice(0, limit);
+        // Soonest-available therapists first.
+        const order = await fetchTherapistOrder('default', { cache: 'no-store' });
+        return applyTherapistOrder(sanitized, order).slice(0, limit);
       }
     }
   } catch (error) {
@@ -213,6 +217,7 @@ export default async function BetterParentingDynamicPage({ params, searchParams 
             </h2>
           </div>
         </div>
+        <ResumeBooking className="mb-6 max-w-md" />
         <TherapistCarousel therapists={displayTherapists} />
 
         {/* Desktop/tablet grid */}

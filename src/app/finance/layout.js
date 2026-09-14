@@ -108,6 +108,7 @@ export default function FinanceLayout({ children }) {
     { name: 'Dashboard', href: '/finance', icon: BarChart3 },
     { name: 'Sessions', href: '/finance/sessions', icon: Calendar },
     { name: 'Doctors', href: '/finance/doctors', icon: Users },
+    { name: 'Groups', href: '/finance/groups', icon: Users },
     { name: 'Users', href: '/finance/users', icon: Users },
     { name: 'Expenses', href: '/finance/expenses', icon: Receipt },
     { name: 'Income', href: '/finance/income', icon: DollarSign },

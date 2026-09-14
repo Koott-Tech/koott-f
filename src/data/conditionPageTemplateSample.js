@@ -39,8 +39,67 @@ export const conditionPageTemplateSample = {
     eyebrow: 'We made it easy for you to choose.',
     title: 'Experienced Malayali Therapists for Sample Condition.',
     filters: ['Specialist', 'Concern'],
-    // Cards are populated at runtime from /api/public/psychologists.
-    placeholderCount: 3,
+    // In production these come from /api/public/psychologists; the shape below is
+    // what the card expects. `photo` may be null — the card falls back to a tinted
+    // block so a missing image never breaks the layout.
+    items: [
+      {
+        name: 'Sreelakshmi N',
+        role: 'Consultant Psychologist',
+        experience: '3+ years of experience',
+        languages: 'English and Malayalam',
+        priceFrom: 'Starting from INR999',
+        bio: 'A Consultant Psychologist with a Master’s in Psychology, she supports emotional, behavioral, academic, and family concerns through a compassionate, client-centered approach, helping individuals build resilience and improve overall well-being.',
+        availabilityLabel: 'Next Availability',
+        availability: 'Available in 47 min',
+        modes: ['audio', 'video'],
+        photo: null,
+        profileHref: '#',
+        bookHref: '#',
+      },
+      {
+        name: 'Dr. Thaniya K Leela',
+        role: 'Consultant Psychologist | PhD',
+        experience: '7+ years of experience',
+        languages: 'Malayalam & English',
+        priceFrom: 'Starting from INR2299',
+        bio: 'With a Ph.D. in Psychology and M.Phil. (UiB, Norway), she supports adolescents, women, parents, and couples through life’s challenges. Using a trauma-informed approach, she fosters healing, resilience, and growth in a safe, supportive space.',
+        availabilityLabel: 'Next Availability',
+        availability: 'Available in 2 hr 15 min',
+        modes: ['audio', 'video'],
+        photo: null,
+        profileHref: '#',
+        bookHref: '#',
+      },
+      {
+        name: 'Aparna Menon',
+        role: 'Clinical Psychologist | M.Phil',
+        experience: '5+ years of experience',
+        languages: 'Malayalam, English & Tamil',
+        priceFrom: 'Starting from INR1499',
+        bio: 'A Clinical Psychologist working with anxiety, depression and burnout, she blends CBT with mindfulness-based practice to help clients understand their patterns and build steadier day-to-day routines.',
+        availabilityLabel: 'Next Availability',
+        availability: 'Available tomorrow, 10:00',
+        modes: ['audio', 'video'],
+        photo: null,
+        profileHref: '#',
+        bookHref: '#',
+      },
+      {
+        name: 'Rahul Varghese',
+        role: 'Psychotherapist',
+        experience: '4+ years of experience',
+        languages: 'English and Malayalam',
+        priceFrom: 'Starting from INR899',
+        bio: 'A Psychotherapist focused on men’s mental health, relationships and work stress, offering a direct, practical style of therapy with clear goals agreed session by session.',
+        availabilityLabel: 'Next Availability',
+        availability: 'Available in 25 min',
+        modes: ['audio', 'video'],
+        photo: null,
+        profileHref: '#',
+        bookHref: '#',
+      },
+    ],
   },
 
   howItWorks: {
@@ -78,17 +137,35 @@ export const conditionPageTemplateSample = {
 
   reviews: {
     eyebrow: 'Reviews',
-    title: '4.9 in Google reviews, touched more than a million human lives.',
+    title: '4.9 in Google reviews, Touched more than a million human lives.',
+    // `source` drives the badge top-right: google | whatsapp | zoho. Supply
+    // `sourceLogo` / `avatar` image URLs to replace the text mark and tint block.
     items: [
-      { quote: 'Placeholder client review. Two or three sentences in the client’s own words about what changed for them.', name: 'Client A' },
-      { quote: 'Placeholder client review. Two or three sentences in the client’s own words about what changed for them.', name: 'Client B' },
-      { quote: 'Placeholder client review. Two or three sentences in the client’s own words about what changed for them.', name: 'Client C' },
-      { quote: 'Placeholder client review. Two or three sentences in the client’s own words about what changed for them.', name: 'Client D' },
+      {
+        quote: 'Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.',
+        name: 'Divya Menon', age: '37 years', source: 'zoho', sourceLogo: null, avatar: null,
+      },
+      {
+        quote: 'Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.',
+        name: 'Jithin Mohan', age: '36 years', source: 'whatsapp', sourceLogo: null, avatar: null,
+      },
+      {
+        quote: 'There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.',
+        name: 'Fathima Noora', age: '26 years', source: 'google', sourceLogo: null, avatar: null,
+      },
+      {
+        quote: 'There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.',
+        name: 'Praveen', age: '32 years', source: 'zoho', sourceLogo: null, avatar: null,
+      },
+      {
+        quote: 'Online counselling helped me regain control when everything felt overwhelming. My therapist helped me track small improvements week by week.',
+        name: 'Anjali R', age: '29 years', source: 'google', sourceLogo: null, avatar: null,
+      },
     ],
   },
 
   ctaBand: {
-    text: 'Placeholder call to action encouraging the reader to take the first step today.',
+    text: 'Take the first step today—connect with a licensed therapist in Kerala to improve your wellbeing and build a stronger, healthier life.',
     cta: { label: 'Book Now', href: '/counselling' },
   },
 

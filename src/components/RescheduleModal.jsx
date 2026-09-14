@@ -2,9 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Clock, Calendar } from 'lucide-react';
-import { publicApi, clientApi } from '../lib/backendApi';
+import { clientApi } from '../lib/backendApi';
+import { clientTimeZone, fetchSlots, ymd, zoneLabel } from '../lib/sessionSlots';
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+
+/** Couple sessions (1 h 20 min) and individual ones (50 min) have different free starts. */
+const sessionKindOf = (s) => (
+  String(s?.package?.package_type || s?.package_type || s?.session_type || '').toLowerCase().includes('couple')
+    ? 'couple' : 'individual'
+);
 
 export default function RescheduleModal({ isOpen, onClose, session, onRescheduleSuccess }) {
+  const tz = clientTimeZone();
   // Calendar state - EXACT same as therapist profile
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -250,50 +260,31 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
     }
   };
 
-  // Fetch regular psychologist availability
+  // Fetch regular psychologist availability — the same free starts as the
+  // booking flow: cut by this session's length (individual 50 min, couple
+  // 1 h 20 min, 10-min break after each) and shown in the client's own time
+  // zone. Each slot keeps its IST date/time, which is what gets saved.
   const fetchRegularPsychologistAvailability = async () => {
     try {
-      // Get current month dates - EXACT same logic
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
-      
-      // Format start date (first day of month)
-      const startYear = year;
-      const startMonth = String(month + 1).padStart(2, '0');
-      const startDay = '01';
-      const startDate = `${startYear}-${startMonth}-${startDay}`;
-      
-      // Format end date (last day of month)
-      const endYear = year;
-      const endMonth = String(month + 1).padStart(2, '0');
-      const endDay = String(new Date(year, month + 1, 0).getDate()).padStart(2, '0');
-      const endDate = `${endYear}-${endMonth}-${endDay}`;
-      
-      console.log('Fetching availability for psychologist:', session.psychologist_id);
-      console.log('Date range:', startDate, 'to', endDate);
-      
-      // Use the exact same API call as therapist profile
-      // Pass withSync = true to get latest blocked slots (same as therapist profile)
-      const response = await publicApi.getPsychologistAvailabilityRange(
-        session.psychologist_id, 
-        startDate, 
-        endDate,
-        true // withSync - ensures blocked slots are included
+      const map = await fetchSlots(
+        API, session.psychologist_id,
+        ymd(new Date(year, month, 1)), ymd(new Date(year, month + 1, 0)),
+        sessionKindOf(session), tz,
       );
-      
-      if (response.success) {
-        // Convert array to object with date keys - same as therapist profile
-        const availabilityObject = {};
-        response.data.data.forEach(dayAvailability => {
-          availabilityObject[dayAvailability.date] = dayAvailability;
-        });
-        
-        setPsychologistAvailability(availabilityObject);
-        console.log('Availability loaded:', availabilityObject);
-      } else {
-        console.error('Failed to fetch availability:', response);
-        setError('Failed to load availability');
-      }
+
+      const availabilityObject = {};
+      Object.entries(map).forEach(([key, slots]) => {
+        availabilityObject[key] = {
+          date: key,
+          availableSlots: slots.length,
+          timeSlots: slots.map((s) => ({
+            available: true, displayTime: s.label, time: s.time, istDate: s.date, startsAt: s.startsAt,
+          })),
+        };
+      });
+      setPsychologistAvailability(availabilityObject);
     } catch (error) {
       console.error('Error fetching availability:', error);
       setError('Failed to load availability');
@@ -374,9 +365,15 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
     setError(null);
 
     try {
+      // Regular sessions: the slot carries its IST date and time — what gets saved
+      // (the label shown is in the client's own zone). Free assessments are IST already.
+      const localKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
+      const picked = session.session_type === 'free_assessment'
+        ? null
+        : (psychologistAvailability[localKey]?.timeSlots || []).find((s) => s.displayTime === selectedTime);
       const rescheduleData = {
-        new_date: `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`,
-        new_time: selectedTime,
+        new_date: picked ? picked.istDate : localKey,
+        new_time: picked ? picked.time : selectedTime,
         psychologist_id: session.psychologist_id,
         reason: rescheduleReason || undefined
       };
@@ -631,7 +628,7 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
               <div>
                 <div className="mb-3 sm:mb-4 flex items-center justify-between">
                   <h6 className="text-xs sm:text-sm font-semibold text-gray-900">
-                  Select New Time (IST)
+                  {session.session_type === 'free_assessment' ? 'Select New Time (IST)' : `Select New Time · ${zoneLabel(tz)}`}
                   </h6>
                   {selectedDate && (
                     <p className="text-[10px] sm:text-xs text-gray-500">

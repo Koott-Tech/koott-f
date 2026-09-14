@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2, RefreshCw, UserCheck, Mail, Phone, Edit2, X, Check, AlertCircle, User, Plus, Filter } from 'lucide-react';
+import { Loader2, RefreshCw, UserCheck, Mail, Phone, Edit2, X, Check, AlertCircle, User, Plus, Filter, Clock } from 'lucide-react';
+import WorkingHoursModal from '@/components/admin/WorkingHoursModal';
 import { adminApi } from '@/lib/backendApi';
 import { useNotification } from '@/contexts/NotificationContext';
 import DoctorModal from '@/components/DoctorModal';
@@ -267,6 +268,7 @@ export default function TherapistsPage() {
   const [statsMeta, setStatsMeta] = useState(null);
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);
+  const [hoursFor, setHoursFor] = useState(null); // { id, name } — working-hours editor
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [dateRange, setDateRange] = useState(() => istCalendarMonthBounds(new Date()));
 
@@ -529,6 +531,16 @@ export default function TherapistsPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {isLinked && (
+                    <button
+                      type="button"
+                      onClick={() => setHoursFor({ id: row.psychologist.id, name: row.name })}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md transition-colors text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      <Clock className="h-4 w-4" />
+                      Working hours
+                    </button>
+                  )}
                   <button
                     onClick={() => setEditing(row)}
                     className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md transition-colors text-sm font-medium ${
@@ -560,6 +572,14 @@ export default function TherapistsPage() {
             setEditing(null);
             load({ silent: true });
           }}
+        />
+      )}
+
+      {hoursFor && (
+        <WorkingHoursModal
+          psychologistId={hoursFor.id}
+          name={hoursFor.name}
+          onClose={() => setHoursFor(null)}
         />
       )}
 

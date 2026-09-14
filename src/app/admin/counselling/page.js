@@ -139,16 +139,42 @@ export default function CounsellingAdminPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h5 className="font-bold text-gray-900">Counselling Services</h5>
-          <p className="text-gray-600 mt-2">Manage counselling service pages and content</p>
+          <h5 className="font-bold text-gray-900">Pages</h5>
+          <p className="text-gray-600 mt-2">Every page on the site, edited with one editor and one design</p>
         </div>
         <button
           onClick={() => router.push('/admin/counselling/create')}
           className="bg-[#189e4f] text-white px-6 py-3 rounded-lg hover:bg-[#189e4f] transition-colors duration-200"
         >
-          Create New Service
+          New page
         </button>
       </div>
+
+      {/* The site's fixed pages — same editor style (form + live preview),
+          stored in site-config and merged over each page's built-in copy. */}
+      <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+        <p className="text-sm font-semibold text-gray-900 mb-3">Site pages</p>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {[
+            ['home', 'Home', '/'],
+            ['about', 'About us', '/about-us'],
+            ['faq', 'FAQ', '/faq'],
+            ['pricing', 'Plans & pricing', '/plans-pricing'],
+            ['footer', 'Footer', 'on every page'],
+          ].map(([key, label, where]) => (
+            <button
+              key={key}
+              onClick={() => router.push(`/admin/site-pages/${key}`)}
+              className="text-left border border-gray-200 rounded-lg px-4 py-3 hover:border-[#189e4f] hover:bg-[#F5FBF3] transition-colors"
+            >
+              <span className="block text-sm font-medium text-gray-900">{label}</span>
+              <span className="block text-xs text-gray-500 mt-0.5">{where}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-sm font-semibold text-gray-900 mb-3">Content pages</p>
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
@@ -228,7 +254,8 @@ export default function CounsellingAdminPage() {
                           {service.hero_title || 'Untitled Service'}
                         </div>
                         <div className="text-sm text-gray-500">
-                          /counselling/{service.slug}
+                          {/* Pages with `content` render at /<slug> in the new design */}
+                          {service.content ? `/${service.slug}` : `/counselling/${service.slug}`}
                         </div>
                       </div>
                     </td>
@@ -252,7 +279,7 @@ export default function CounsellingAdminPage() {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => window.open(`/counselling/${service.slug}`, '_blank')} className="cursor-pointer">
+                          <DropdownMenuItem onClick={() => window.open(service.content ? `/${service.slug}` : `/counselling/${service.slug}`, '_blank')} className="cursor-pointer">
                             <Eye className="h-4 w-4 mr-2" />
                             View
                           </DropdownMenuItem>

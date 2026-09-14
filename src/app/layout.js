@@ -4,6 +4,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import HeaderWrapper from "@/components/HeaderWrapper";
+import { fetchConditionMenu } from "@/lib/conditionMenu";
+import FooterWrapper from "@/components/FooterWrapper";
 import ConditionalProviders from "@/components/ConditionalProviders";
 import ConditionalPadding from "@/components/ConditionalPadding";
 import WhatsAppWidgetWrapper from "@/components/WhatsAppWidgetWrapper";
@@ -17,47 +19,52 @@ const siteUrl = (
   "https://www.koott.in"
 ).replace(/\/+$/, "");
 
+const SITE_TITLE = "Online Counselling in Malayalam | Koott";
+const SITE_DESCRIPTION =
+  "Struggling with stress, anxiety, relationship issues, or low mood? Talk to experienced Malayali psychologists at Koott. Private online counselling in Malayalam.";
+
+// Search indexing stays off until launch — set NEXT_PUBLIC_ALLOW_INDEXING=true
+// on the production deploy (app/robots.js reads the same flag).
+const allowIndexing = process.env.NEXT_PUBLIC_ALLOW_INDEXING === "true";
+
 export const metadata = {
   metadataBase: new URL(`${siteUrl}/`),
   title: {
-    default: "India's Trusted Child Psychologist | Online Child Counseling",
-    template: "%s | MyKoott"
+    default: SITE_TITLE,
+    template: "%s | Koott"
   },
-  description:
-    "Connect with experienced child psychologists for safe, supportive online child counseling. Help your child manage anxiety, behavior, or school stress from the comfort of home.",
+  description: SITE_DESCRIPTION,
   icons: {
     icon: [{ url: "/logo.png", type: "image/png", sizes: "32x32" }],
     apple: [{ url: "/logo.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "India's Trusted Child Psychologist | Online Child Counseling",
-    description:
-      "Connect with experienced child psychologists for safe, supportive online child counseling. Help your child manage anxiety, behavior, or school stress from the comfort of home.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: "website",
-    siteName: "MyKoott",
+    siteName: "Koott",
     url: "/",
     images: [
       {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "MyKoott",
+        alt: "Koott",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "India's Trusted Child Psychologist | Online Child Counseling",
-    description:
-      "Connect with experienced child psychologists for safe, supportive online child counseling. Help your child manage anxiety, behavior, or school stress from the comfort of home.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [`${siteUrl}/logo.png`],
   },
   robots: {
-    index: false,
-    follow: false,
+    index: allowIndexing,
+    follow: allowIndexing,
     googleBot: {
-      index: false,
-      follow: false,
+      index: allowIndexing,
+      follow: allowIndexing,
       "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
@@ -75,7 +82,10 @@ export const viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  // Header condition menu in the first HTML, so its headings show before any script
+  // runs (cached 5 min; [] if the API is slow or down — the browser then fills it in).
+  const conditionMenu = await fetchConditionMenu();
   return (
     <html lang="en">
       <head>
@@ -112,9 +122,12 @@ export default function RootLayout({ children }) {
                 if (typeof window === 'undefined') return;
                 
                 const LOADER_ID = 'initial-loader';
-                const body = document.body;
-                const loader = document.getElementById(LOADER_ID);
-                const MIN_DISPLAY_TIME = 700; // Minimum 0.7 second display time
+                // This runs in <head>, before <body> and the loader exist — both are
+                // looked up again when the loader is hidden.
+                let body = document.body;
+                let loader = document.getElementById(LOADER_ID);
+                // No minimum: the loader only covers the time the page really needs.
+                const MIN_DISPLAY_TIME = 0;
                 let showTime = null; // Track when loader was shown
                 
                 // Show loader immediately on every page load/refresh with smooth fade in
@@ -137,6 +150,8 @@ export default function RootLayout({ children }) {
                 
                 // Function to hide loader with smooth fade out (respects minimum display time)
                 function hideLoader() {
+                  body = document.body;
+                  loader = document.getElementById(LOADER_ID);
                   if (!showTime) {
                     // If showTime wasn't set, wait full minimum time
                     showTime = Date.now();
@@ -148,54 +163,36 @@ export default function RootLayout({ children }) {
                   const remaining = Math.max(0, MIN_DISPLAY_TIME - elapsed);
                   
                   setTimeout(function() {
-                    if (loader && body && body.classList) {
-                    // Start fade out
-                    loader.style.opacity = '0';
-                    // Wait for transition to complete before hiding
-                    setTimeout(() => {
-                        if (loader && body && body.classList) {
-                      loader.style.pointerEvents = 'none';
-                      loader.style.visibility = 'hidden';
+                    // The 'loaded' class fades the loader out (CSS, 300 ms). No inline
+                    // styles: they'd differ from the server HTML and trip hydration.
+                    if (body && body.classList) {
                       body.classList.add('loaded');
-                        }
-                      }, 300); // Match the CSS transition duration
-                  }
+                    }
                   }, remaining);
                 }
                 
                 // Show loader immediately
                 showLoader();
                 
-                // Wait for page to be fully loaded, but ensure minimum display time
-                if (document.readyState === 'complete') {
-                  // Page already loaded, but ensure minimum display time
-                  hideLoader();
-                } else if (document.readyState === 'interactive') {
-                  // DOM is ready, wait for all resources
-                  window.addEventListener('load', hideLoader, { once: true });
-                } else {
-                  // Still loading, wait for window load event
-                  window.addEventListener('load', hideLoader, { once: true });
-                  
-                  // Fallback: hide after 5 seconds if load event doesn't fire
+                // Hide as soon as the page's HTML is ready — the server-rendered content
+                // is already there. (Waiting for window 'load' held the loader until every
+                // image and font had downloaded.)
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', hideLoader, { once: true });
+                  // Fallback in case DOMContentLoaded never reaches us
                   setTimeout(function() {
                     if (body && body.classList && !body.classList.contains('loaded')) {
                       hideLoader();
                     }
-                  }, 5000);
+                  }, 3000);
+                } else {
+                  hideLoader();
                 }
-                
-                // Handle browser back/forward navigation
+
+                // Back/forward from the browser cache is instant — never show the loader there.
                 window.addEventListener('pageshow', function(event) {
-                  // If page was loaded from cache (back/forward), show loader briefly
-                  if (event.persisted) {
-                    showLoader();
-                    // Hide when ready, but ensure minimum display time
-                    if (document.readyState === 'complete') {
-                      hideLoader();
-                    } else {
-                      window.addEventListener('load', hideLoader, { once: true });
-                    }
+                  if (event.persisted && document.body) {
+                    document.body.classList.add('loaded');
                   }
                 });
               })();
@@ -296,9 +293,8 @@ export default function RootLayout({ children }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "MedicalBusiness",
-              name: "MyKoott",
-              description:
-                "Connect with experienced child psychologists for safe, supportive online child counseling. Help your child manage anxiety, behavior, or school stress from the comfort of home.",
+              name: "Koott",
+              description: SITE_DESCRIPTION,
               url: siteUrl,
               logo: {
                 "@type": "ImageObject",
@@ -314,10 +310,11 @@ export default function RootLayout({ children }) {
                 addressCountry: "IN",
               },
               medicalSpecialty: [
-                "Child Psychology",
-                "Child Counseling",
-                "Parent Support",
+                "Psychology",
+                "Counselling",
+                "Psychotherapy",
               ],
+              availableLanguage: ["Malayalam", "English"],
               serviceType: "Online Therapy",
               areaServed: "Worldwide",
             }),
@@ -334,18 +331,19 @@ export default function RootLayout({ children }) {
         <Suspense fallback={null}>
           <PageLoadingOverlay />
         </Suspense>
+        {/* No page-wide <Suspense> here: it made every notFound() page stream a
+            200. PostHogProvider keeps its own small boundary for useSearchParams. */}
         <ErrorBoundary>
-          <Suspense fallback={null}>
-            <PostHogProvider>
-              <ConditionalProviders>
-                <HeaderWrapper />
-                <ConditionalPadding>
-                  {children}
-                </ConditionalPadding>
-                <WhatsAppWidgetWrapper />
-              </ConditionalProviders>
-            </PostHogProvider>
-          </Suspense>
+          <PostHogProvider>
+            <ConditionalProviders>
+              <HeaderWrapper conditionMenu={conditionMenu} />
+              <ConditionalPadding>
+                {children}
+              </ConditionalPadding>
+              <FooterWrapper />
+              <WhatsAppWidgetWrapper />
+            </ConditionalProviders>
+          </PostHogProvider>
         </ErrorBoundary>
         <SpeedInsights />
         <Analytics />

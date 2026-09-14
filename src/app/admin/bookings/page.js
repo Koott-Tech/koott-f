@@ -944,7 +944,7 @@ export default function BookingsPage() {
   };
 
   // Packages tab now uses the normal session table (filtered by session_type=package server-side)
-  // so it matches MyKoott Discovery's Package filter behavior. The old aggregated packages view is retired.
+  // so it matches Koott Discovery's Package filter behavior. The old aggregated packages view is retired.
   const showPackagesView = false;
   const isLoadingView = isLoading;
 
@@ -975,7 +975,7 @@ export default function BookingsPage() {
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-1 max-w-xl">
-            MyKoott sessions and packages. Manage your internal therapy sessions here.
+            Koott sessions and packages. Manage your internal therapy sessions here.
           </p>
         </div>
         <div className="mt-2 sm:mt-0 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
