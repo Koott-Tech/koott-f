@@ -39,6 +39,11 @@ yarn-error.log*
 # Scratch files
 scratch/
 
+# Local backup copies of pages/components (kept on disk, never committed)
+.backup/
+*.mykoott-backup.js
+*.before-*.jsx
+
 # Vercel
 .vercel
 
