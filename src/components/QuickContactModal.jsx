@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import CustomSelect from "@/components/CustomSelect";
 
 export default function QuickContactModal({ open, onClose, onSaved }) {
   const { login, token, user, isRemembered } = useAuth();
@@ -151,10 +152,11 @@ export default function QuickContactModal({ open, onClose, onSaved }) {
             className="w-full rounded-md border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-[#025545]"
           />
           <div className="flex gap-2">
-            <select
+            <CustomSelect
+              aria-label="Country code"
               value={countryCode}
               onChange={(e)=>setCountryCode(e.target.value)}
-              className="w-28 rounded-md border border-gray-300 px-3 py-2 bg-gray-50 outline-none focus:ring-2 focus:ring-[#025545]"
+              className="w-28 shrink-0 rounded-md border border-gray-300 px-3 py-2 bg-gray-50"
             >
               <option value="+91">🇮🇳 +91</option>
               <option value="+1">🇺🇸 +1</option>
@@ -166,7 +168,7 @@ export default function QuickContactModal({ open, onClose, onSaved }) {
               <option value="+81">🇯🇵 +81</option>
               <option value="+971">🇦🇪 +971</option>
               <option value="+966">🇸🇦 +966</option>
-            </select>
+            </CustomSelect>
             <input
               value={phone}
               onChange={(e)=>setPhone(e.target.value.replace(/[^\d]/g, ""))}

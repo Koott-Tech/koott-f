@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { clientApi, authApi } from "../../../lib/backendApi";
+import CustomSelect from "../../../components/CustomSelect";
 
 export default function ProfilePage() {
   const { user, token, login, hasRole, isLoading: authLoading, isRemembered } = useAuth();
@@ -266,14 +267,12 @@ export default function ProfilePage() {
             Phone Number <span className="text-red-500">*</span>
           </label>
           <div className="flex">
-            <select
+            <CustomSelect
               name="country_code"
+              aria-label="Country code"
               value={profileForm.country_code}
               onChange={handleProfileInputChange}
-              className="border border-gray-300 rounded-l-md px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2"
-              style={{ '--tw-ring-color': '#025545' }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#025545'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(63, 46, 115, 0.2)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = ''; }}
+              className="shrink-0 border border-gray-300 rounded-l-md px-3 py-2 bg-gray-50"
             >
               <option value="+91">🇮🇳 +91</option>
               <option value="+1">🇺🇸 +1</option>
@@ -285,7 +284,7 @@ export default function ProfilePage() {
               <option value="+971">🇦🇪 +971</option>
               <option value="+966">🇸🇦 +966</option>
               <option value="+65">🇸🇬 +65</option>
-            </select>
+            </CustomSelect>
             <input
               type="tel"
               name="phone_number"

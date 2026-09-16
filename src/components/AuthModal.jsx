@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { authApi } from "@/lib/backendApi";
 import { validatePassword } from "@/utils/passwordValidation";
+import CustomSelect from "@/components/CustomSelect";
 // import { isClientContactComplete } from "@/lib/contactValidation"; // Removed - contact details collected during signup
 // import GoogleSignIn from "@/components/GoogleSignIn"; // Commented out - users login with email/password only
 
@@ -639,10 +640,11 @@ export default function AuthModal({
                   </div>
                   
                   <div className="relative flex gap-2">
-                    <select
+                    <CustomSelect
+                      aria-label="Country code"
                       value={signup.countryCode}
                       onChange={(e)=>setSignup(s=>({...s, countryCode: e.target.value}))}
-                      className="rounded-md border border-gray-300 px-2 py-2 outline-none focus:ring-2 focus:ring-[#025545] text-sm"
+                      className="rounded-md border border-gray-300 bg-white px-2 py-2 text-sm"
                       style={{ width: '100px', flexShrink: 0 }}
                     >
                       <option value="+91">🇮🇳 +91</option>
@@ -691,7 +693,7 @@ export default function AuthModal({
                       <option value="+856">🇱🇦 +856</option>
                       <option value="+673">🇧🇳 +673</option>
                       <option value="+670">🇹🇱 +670</option>
-                    </select>
+                    </CustomSelect>
                     <div className="relative flex-1">
                       <input 
                         type="tel" 

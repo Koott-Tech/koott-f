@@ -20,6 +20,7 @@
  */
 
 import { useState } from 'react';
+import CustomSelect from '@/components/CustomSelect';
 
 const BANNER = 'https://static.wixstatic.com/media/11062b_4d7e8926f2754d96b1473dda3a8f8171~mv2.jpg';
 
@@ -171,18 +172,14 @@ export default function ContactPage() {
             </div>
             <div className="kct2-field">
               <label className="kct2-label" htmlFor="c-reason">Choose an option *</label>
-              <select id="c-reason" className="kct2-input kct2-select" required value={form.reason} onChange={set('reason')}>
-                <option value="" disabled></option>
-                {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
-              </select>
+              <CustomSelect id="c-reason" className="kct2-input kct2-select" required value={form.reason} onChange={set('reason')}
+                placeholder="Select a reason" options={REASONS} />
             </div>
 
             <div className="kct2-field">
               <label className="kct2-label" htmlFor="c-position">Position (If Career)</label>
-              <select id="c-position" className="kct2-input kct2-select" value={form.position} onChange={set('position')}>
-                <option value="" disabled></option>
-                {POSITIONS.map((p) => <option key={p} value={p}>{p}</option>)}
-              </select>
+              <CustomSelect id="c-position" className="kct2-input kct2-select" value={form.position} onChange={set('position')}
+                placeholder="Select a position" options={POSITIONS} />
             </div>
             <div className="kct2-field">
               <label className="kct2-label kct2-label--hidden" htmlFor="c-file">Attachment</label>

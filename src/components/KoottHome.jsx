@@ -1,6 +1,7 @@
 'use client';
 
 import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
+import CustomSelect from '@/components/CustomSelect';
 
 /**
  * KoottHome — the home page from "Koott Website Sep-26 (3).pdf".
@@ -75,20 +76,21 @@ const SparkleTrio = () => (
 );
 
 /**
- * One of the two working filters over the therapist list. A native <select>
- * rather than a custom menu: it keeps keyboard and screen-reader behaviour and
- * the mobile picker for free. The chevron from the design sits on top of it.
+ * One of the two working filters over the therapist list — the shared custom
+ * dropdown, with the empty option ("Speciality" / "Need") as "show all".
  */
 const FilterSelect = ({ label, value, options, onChange, format }) => (
-  <span className="kh2-filter">
-    <select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)}>
-      <option value="">{label}</option>
-      {options.map((o) => (
-        <option key={o} value={o}>{format ? format(o) : o.charAt(0).toUpperCase() + o.slice(1)}</option>
-      ))}
-    </select>
-    <Chevron />
-  </span>
+  <CustomSelect
+    className="kh2-filter"
+    aria-label={label}
+    placeholder={label}
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    options={[
+      { value: '', label },
+      ...options.map((o) => ({ value: o, label: format ? format(o) : o.charAt(0).toUpperCase() + o.slice(1) })),
+    ]}
+  />
 );
 
 const Tick = () => (
@@ -1207,18 +1209,9 @@ const CSS = `
      control height. */
   background:#fff;border:1px solid var(--line);border-radius:12px;padding:0 18px;cursor:pointer;
   font-family:var(--text)!important;font-size:15px!important;letter-spacing:0!important;color:var(--body)!important;
-  position:relative;min-height:37px;justify-content:flex-end;
+  position:relative;min-height:37px;
 }
-/* The native control carries the value; the wrapper carries the design. It is
-   stretched over the whole pill so a click anywhere on the control opens it,
-   not just on the words. */
-.kh2-filter select{
-  position:absolute;inset:0;width:100%;height:100%;
-  appearance:none;-webkit-appearance:none;background:none;border:0;outline:none;cursor:pointer;
-  padding:0 42px 0 18px;margin:0;
-  font-family:var(--text)!important;font-size:15px!important;letter-spacing:0!important;color:var(--body)!important;
-}
-.kh2-filter svg{position:relative;flex:none;pointer-events:none;}
+.kh2-filter:hover,.kh2-filter.is-open{border-color:var(--green);}
 
 /* ── Filters popover ────────────────────────────────────────────────────────
    The icon button opens a real filter sheet rather than more dropdowns:
@@ -1848,7 +1841,7 @@ const CSS = `
   /* filters: Speciality and Needs share a row, the Filters button goes icon-only */
   .kh2-filters{flex-wrap:nowrap;gap:8px;}
   .kh2-filter{flex:1 1 0;min-width:0;padding:0 12px;gap:6px;}
-  .kh2-filter select{padding:0 32px 0 12px;font-size:14px!important;}
+  .kh2-filter{font-size:14px!important;}
   .kh2-filter-anchor{margin-left:0;flex:none;}
   .kh2-filter-icon{font-size:0!important;padding:0 10px;gap:0;}
   .kh2-filter-count{font-size:11px!important;margin-left:4px;}
@@ -1911,8 +1904,7 @@ const CSS = `
 
 /* The narrowest phones (320px): keep Speciality and Needs on one line. */
 @media (max-width:360px){
-  .kh2-filter select{padding:0 24px 0 10px!important;font-size:13px!important;}
-  .kh2-filter{padding:0 10px!important;}
+  .kh2-filter{padding:0 10px!important;font-size:13px!important;}
 }
 
 /* Short phones (iPhone SE and the like): the same hero on tighter spacing so

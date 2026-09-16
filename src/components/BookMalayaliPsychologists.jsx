@@ -21,6 +21,7 @@ import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
 import TherapistCard, { THERAPIST_CARD_CSS } from '@/components/TherapistCard';
 import { therapistSlug } from '@/components/TherapistProfile';
 import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
+import CustomSelect from '@/components/CustomSelect';
 
 const ALL = 'All';
 
@@ -113,16 +114,14 @@ export default function BookMalayaliPsychologists() {
         <div className="ktl-filters">
           <label className="ktl-field">
             <span className="ktl-label">Specialist</span>
-            <select className="ktl-select" value={specialist} onChange={(e) => setSpecialist(e.target.value)}>
-              {specialists.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
+            <CustomSelect className="ktl-select" aria-label="Specialist" value={specialist} onChange={(e) => setSpecialist(e.target.value)}
+              options={specialists} />
           </label>
 
           <label className="ktl-field">
             <span className="ktl-label">Concern</span>
-            <select className="ktl-select" value={concern} onChange={(e) => setConcern(e.target.value)}>
-              {concerns.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <CustomSelect className="ktl-select" aria-label="Concern" value={concern} onChange={(e) => setConcern(e.target.value)}
+              options={concerns} />
           </label>
         </div>
       </section>

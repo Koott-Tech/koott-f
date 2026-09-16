@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomSelect from "@/components/CustomSelect";
 import {
   Calendar,
   Clock,
@@ -610,19 +611,14 @@ export default function WorkshopEventPageClient({
                         <div>
                           <span className="block text-xs font-semibold text-gray-800 uppercase">WhatsApp number</span>
                           <div className="mt-2 flex gap-2.5">
-                            <select
+                            <CustomSelect
                               name="countryCode"
                               value={phoneCountryValue}
                               onChange={(e) => setPhoneCountryValue(e.target.value)}
-                              className="min-w-[11.5rem] max-w-[min(52vw,14rem)] shrink-0 rounded-xl border border-gray-200 bg-white px-2.5 py-3 text-[15px] text-gray-900 outline-none focus:border-[#189E4F] focus:ring-2 ring-[#189E4F]/20 sm:min-w-[13rem] sm:max-w-[15rem] sm:text-sm"
+                              className="min-w-[11.5rem] max-w-[min(52vw,14rem)] shrink-0 rounded-xl border border-gray-200 bg-white px-2.5 py-3 text-[15px] text-gray-900 sm:min-w-[13rem] sm:max-w-[15rem] sm:text-sm"
                               aria-label="Country code"
-                            >
-                              {PHONE_COUNTRY_OPTIONS.map((c) => (
-                                <option key={c.value} value={c.value}>
-                                  {c.label}
-                                </option>
-                              ))}
-                            </select>
+                              options={PHONE_COUNTRY_OPTIONS}
+                            />
                             <input
                               id="modal-phone"
                               name="phone"

@@ -215,6 +215,44 @@ button {
   cursor: pointer !important;
 }
 
+/* Native dropdowns (dashboards, editors): one neat look instead of the browser
+   default — custom chevron, soft border, green focus ring. Client-facing pages
+   use components/CustomSelect.jsx instead. Selects that draw their own arrow
+   (appearance-none) are left alone. */
+select:not([multiple]):not([size]):not(.appearance-none) {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23189E4F' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 0.7rem;
+  padding-right: 2.25rem !important;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+select:not([multiple]):not(.appearance-none):hover:not(:disabled) {
+  border-color: #189E4F;
+}
+select:not(.appearance-none):focus {
+  outline: none;
+  border-color: #189E4F;
+  box-shadow: 0 0 0 3px rgba(24, 158, 79, 0.18);
+}
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+select option {
+  color: #2b2b2b;
+  background: #fff;
+}
+select option:checked {
+  background: #eef8f1;
+  color: #107a3b;
+}
+
 /* Prevent layout shifts (CLS) */
 img {
   max-width: 100%;
