@@ -362,7 +362,7 @@ export default function SitePageEditor({ pageId, onBack }) {
 }
 
 const CSS = `
-.spe{background:#F4F6F5;min-height:100vh;color:#111;font-family:'Mulish',system-ui,sans-serif;}
+.spe{background:#F4F6F5;min-height:100vh;color:#111;font-family:'Inter',system-ui,sans-serif;}
 .spe-bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:12px 20px;background:#fff;border-bottom:1px solid #E2E8E4;}
 .spe-bar-l{display:flex;align-items:center;gap:14px;min-width:0;}

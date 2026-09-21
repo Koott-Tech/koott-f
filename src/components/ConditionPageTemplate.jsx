@@ -20,11 +20,11 @@ import { ResumeBooking } from './ResumeBookingCard';
  *   CTA bands linear-gradient(180deg,#F0FFEC,#D4FFC2), radius 7px
  *   content   980px column
  *
- * Avenir is a licensed Wix font and cannot be served here; Mulish is loaded as
+ * Avenir is a licensed Wix font and cannot be served here; Inter is loaded as
  * the metric-and-tone substitute. Everything else is the real thing.
  *
  * Styles are scoped to .kct and marked !important because globals.css (marked
- * "never edit") forces DM Sans / 48px on h2, Work Sans / 16px on p, etc.
+ * "never edit") forces Poppins / 48px on h2, Inter / 16px on p, etc.
  * Content comes entirely from `data` — see src/data/conditionPageTemplateSample.js.
  */
 
@@ -428,7 +428,7 @@ export default function ConditionPageTemplate({ data }) {
 /* ------------------------------------------------------------------------ */
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .kct{
   --ink:#100E0E;
@@ -439,8 +439,8 @@ const CSS = `
   --deep2:#29653D;
   --icon:#189E4F;
   --line:rgba(38,34,34,.13);
-  --sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
   --band:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
   /* The site header (components/Header.jsx) is position:fixed and h-16, so it
      occupies no space in flow — without this the hero's first 64px render

@@ -335,9 +335,9 @@ const CSS = `
   --k-cta:#493D3D;
   --k-price:#6E3206;
   --k-band:#F2FCF7;
-  --k-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --k-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
-  --k-quick:'Quicksand',ui-sans-serif,system-ui,sans-serif;
+  --k-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --k-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-quick:'Poppins',ui-sans-serif,system-ui,sans-serif;
   display:block;background:#fff;color:var(--k-ink);font-family:var(--k-body)!important;
 }
 .khb *{box-sizing:border-box;}

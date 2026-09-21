@@ -13,10 +13,10 @@
  * condition pages:
  *   ink #100E0E · accent #3D985C · button #4FAB69 → hover #025545
  *   bands #FFF / #F5FFF6 / #FBFFF9 · cards radius 10px, 1px rgba(38,34,34,.13)
- *   headings Work Sans · body Mulish (standing in for Avenir, a licensed Wix face)
+ *   headings Inter · body Inter (standing in for Avenir, a licensed Wix face)
  *
  * Styles are scoped to .kst and marked !important because globals.css (marked
- * "never edit") forces DM Sans / 48px on h2, Work Sans / 16px on p, and so on.
+ * "never edit") forces Poppins / 48px on h2, Inter / 16px on p, and so on.
  */
 
 const BOOK_HREF = '/book-malayali-psychologists';
@@ -84,8 +84,8 @@ export default function StaticPageTemplate({ page }) {
 const CSS = `
 .kst{
   --ink:#100E0E; --accent:#3D985C; --btn:#4FAB69; --btn-hover:#025545; --deep:#29653D;
-  --sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --body:'Mulish',ui-sans-serif,system-ui,sans-serif;
+  --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --body:'Inter',ui-sans-serif,system-ui,sans-serif;
   background:#fff;
 }
 .kst *{box-sizing:border-box;}

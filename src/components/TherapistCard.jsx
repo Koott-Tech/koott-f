@@ -31,10 +31,11 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { Award, IndianRupee, Languages, Pause, Play } from 'lucide-react';
+import { Pause, Play } from 'lucide-react';
 
-/* Voice-message waveform proportions (as in WhatsApp / iMessage): 3px rounded bars, 2px apart. */
-const BAR_WIDTH = 3;
+/* Voice-message waveform proportions (as in WhatsApp / iMessage): fine 2px
+   rounded bars, 2px apart — quiet enough to sit under the intro text. */
+const BAR_WIDTH = 2;
 const BAR_GAP = 2;
 /* The bar heights of the little equaliser, so it looks like speech rather than
    a sine wave. They animate while playing and hold still when paused. */
@@ -43,6 +44,9 @@ const BAR_HEIGHTS = [
   58, 84, 96, 66, 42, 54, 80, 60, 38, 46, 74, 90, 68, 44, 32, 52,
   86, 72, 48, 64, 94, 76, 50, 40, 60, 82, 66, 42, 56, 70, 46, 34,
 ];
+
+/* Other languages named on the card before the rest become a "+". */
+const OTHER_LANGS = 2;
 
 const titleCase = (s) => String(s).replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 const initialsOf = (name) => String(name || '').trim().split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase();
@@ -82,7 +86,12 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
   const price = priceOf(t);
   const tags = tagsOf(t);
   const langs = langsOf(t);
-  const others = langs.filter((l) => !/^english$/i.test(l));
+  /* Malayalam leads the tile — it is what people come to Koott for; the other
+     languages sit on the line below, and a "+" stands in for any that do not fit. */
+  const lead = langs.find((l) => /^malayalam$/i.test(l)) || langs[0] || 'Malayalam';
+  const others = langs.filter((l) => l !== lead);
+  const shown = others.slice(0, OTHER_LANGS);
+  const moreLangs = others.length - shown.length;
 
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -102,6 +111,37 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  /* The marquee's speed is a constant ~26px a second, so the drift reads the
+     same whether a therapist has four specialisations or twelve. Measured from
+     one copy of the list (half the track).
+     `tagsReps` is how many times the list is repeated inside ONE copy: a short
+     list (three chips in a 440px card) would otherwise run out mid-card and leave
+     a blank stretch before the loop came round, so it is repeated until one copy
+     is at least as wide as the card. Two such copies make the seamless -50% loop. */
+  const tagsRef = useRef(null);
+  const [tagsSeconds, setTagsSeconds] = useState(20);
+  const [tagsReps, setTagsReps] = useState(1);
+  const [tagsPaused, setTagsPaused] = useState(false);
+  useEffect(() => {
+    const el = tagsRef.current;
+    if (!el) return undefined;
+    const measure = () => {
+      const half = el.scrollWidth / 2;
+      if (half > 0) setTagsSeconds(Math.max(8, half / 26));
+      const wrap = el.parentElement;
+      const one = half / tagsReps; // one pass of the list, whatever it is repeated to
+      if (one > 0 && wrap?.clientWidth) {
+        setTagsReps((reps) => Math.max(1, Math.min(12, Math.ceil(wrap.clientWidth / one))) || reps);
+      }
+    };
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    if (el.parentElement) ro.observe(el.parentElement);
+    return () => ro.disconnect();
+  }, [tags.length, tagsReps]);
 
   /* PLACEHOLDER while therapists have no recorded intro: the bar moves for 30s
      so the design can be seen whole. With t.voiceUrl set it plays the real
@@ -168,24 +208,44 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
       </div>
 
       {tags.length > 0 && (
+        // The chips travel end to end without stopping. The list is written
+        // twice and the track slides exactly half its width, so the second copy
+        // stands where the first began and the loop has no seam. The duration
+        // comes from the measured width, so a therapist with four tags drifts
+        // at the same speed as one with twelve.
         <div className="ktc-tags-wrap">
-          <div className="ktc-tags">
-            {tags.map((tag) => <span key={tag} className="ktc-chip">{tag}</span>)}
+          <div
+            ref={tagsRef}
+            className="ktc-tags"
+            style={{ animationDuration: `${tagsSeconds}s` }}
+            onMouseEnter={() => setTagsPaused(true)}
+            onMouseLeave={() => setTagsPaused(false)}
+            data-paused={tagsPaused ? 'true' : 'false'}
+          >
+            {[0, 1].map((copy) => (
+              <span key={copy} className="ktc-tags-set" aria-hidden={copy === 1}>
+                {Array.from({ length: tagsReps }, (_, rep) => tags.map((tag) => (
+                  <span key={`${rep}-${tag}`} className="ktc-chip">{tag}</span>
+                )))}
+              </span>
+            ))}
           </div>
         </div>
       )}
 
       <div className="ktc-stats">
         <div className="ktc-stat">
-          <p className="ktc-stat-v"><Award size={12} />{years > 0 ? `${years} yrs` : '—'}</p>
+          <p className="ktc-stat-v">{years > 0 ? `${years} yrs` : '—'}</p>
           <p className="ktc-stat-l">Experience</p>
         </div>
         <div className="ktc-stat">
-          <p className="ktc-stat-v"><Languages size={12} /><span>{langs[0] || 'English'}</span></p>
-          <p className="ktc-stat-l" title={others.join(', ')}>{others.join(', ') || '—'}</p>
+          <p className="ktc-stat-v"><span>{lead}</span></p>
+          <p className="ktc-stat-l" title={others.join(', ')}>
+            {shown.join(', ') || '—'}{moreLangs > 0 && ` +${moreLangs}`}
+          </p>
         </div>
         <div className="ktc-stat">
-          <p className="ktc-stat-v"><IndianRupee size={11} />{price > 0 ? price.toLocaleString('en-IN') : '—'}</p>
+          <p className="ktc-stat-v">{price > 0 ? `₹${price.toLocaleString('en-IN')}` : '—'}</p>
           <p className="ktc-stat-l">Per session</p>
         </div>
       </div>
@@ -213,7 +273,7 @@ export const THERAPIST_CARD_CSS = `
   /* the tint behind the intro panel and the three tiles */
   --ktc-bg:#F8FDF6;
   --ktc-surface:#FFFFFF;
-  --ktc-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
+  --ktc-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
   display:flex;flex-direction:column;position:relative;min-width:0;container-type:inline-size;
   background:var(--ktc-surface);border:1.5px solid var(--ktc-line);border-radius:20px;padding:20px;
   transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
@@ -275,12 +335,12 @@ export const THERAPIST_CARD_CSS = `
    Paused rather than removed, so it never jumps into place. */
 .ktc-bars{flex:1;min-width:0;overflow:hidden;display:flex;align-items:center;justify-content:flex-start;gap:2px;height:22px;}
 .ktc-bar{
-  flex:none;width:3px;border-radius:999px;background:#CFE0D4;transform-origin:center;
-  animation:ktc-bar-move .9s ease-in-out infinite alternate;animation-play-state:paused;
+  flex:none;width:2px;border-radius:999px;background:#DCE7DE;transform-origin:center;
+  animation:ktc-bar-move 1s ease-in-out infinite alternate;animation-play-state:paused;
 }
 .ktc-bars.is-playing .ktc-bar{animation-play-state:running;}
-.ktc-bar.is-past{background:var(--ktc-primary);}
-@keyframes ktc-bar-move{from{transform:scaleY(.45);}to{transform:scaleY(1);}}
+.ktc-bar.is-past{background:rgba(27,105,48,.55);}
+@keyframes ktc-bar-move{from{transform:scaleY(.62);}to{transform:scaleY(1);}}
 @media (prefers-reduced-motion:reduce){.ktc-bars.is-playing .ktc-bar{animation-play-state:paused;}}
 .ktc-view{
   flex:none;border:1px solid var(--ktc-line);background:var(--ktc-surface);border-radius:999px;padding:5px 10px;
@@ -290,14 +350,25 @@ export const THERAPIST_CARD_CSS = `
 }
 .ktc-view:hover{border-color:var(--ktc-primary);background:var(--ktc-primary-soft);}
 
-/* concerns run off the edge under a fade rather than wrapping the card taller */
-.ktc-tags-wrap{position:relative;margin-bottom:16px;}
-.ktc-tags-wrap::after{
-  content:"";position:absolute;top:0;right:0;bottom:2px;width:32px;pointer-events:none;
-  background:linear-gradient(to right,transparent,var(--ktc-surface));
+/* The specialisations drift past continuously, softening away at both edges so
+   chips enter and leave rather than being cut against the card. */
+.ktc-tags-wrap{
+  position:relative;margin-bottom:16px;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);
+  mask-image:linear-gradient(to right,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);
 }
-.ktc-tags{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-ms-overflow-style:none;}
-.ktc-tags::-webkit-scrollbar{display:none;}
+.ktc-tags{
+  display:flex;width:max-content;padding-bottom:2px;
+  animation:ktc-tag-marquee linear infinite;
+}
+.ktc-tags[data-paused="true"]{animation-play-state:paused;}
+/* One copy of the list; two of them sit side by side inside the track. */
+.ktc-tags-set{display:flex;gap:6px;padding-right:6px;}
+@keyframes ktc-tag-marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@media (prefers-reduced-motion:reduce){
+  .ktc-tags{animation:none;width:100%;overflow-x:auto;scrollbar-width:none;}
+  .ktc-tags::-webkit-scrollbar{display:none;}
+}
 .ktc-chip{
   flex:none;white-space:nowrap;border:1px solid var(--ktc-line);background:var(--ktc-surface);
   border-radius:999px;padding:4px 10px;

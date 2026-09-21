@@ -98,7 +98,7 @@ const CSS = `
 .ksu{
   position:relative;width:100%;max-width:420px;background:#fff;border-radius:18px;
   padding:30px 26px 24px;text-align:center;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);
-  animation:ksu-pop .2s ease;font-family:'Mulish',system-ui,sans-serif!important;
+  animation:ksu-pop .2s ease;font-family:'Inter',system-ui,sans-serif!important;
 }
 .ksu *{box-sizing:border-box;}
 .ksu-close{
@@ -111,7 +111,7 @@ const CSS = `
   background:#FFF6E0;color:#B45309;margin-bottom:14px;
 }
 .ksu-title{
-  font-family:'Work Sans',system-ui,sans-serif!important;font-size:21px;font-weight:600;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:21px;font-weight:600;
   line-height:1.3;letter-spacing:0;color:#111;
 }
 .ksu-text{margin-top:8px;font-size:15px;line-height:1.55;letter-spacing:0;color:#4B5563;}
@@ -125,7 +125,7 @@ const CSS = `
 .ksu-actions{margin-top:20px;display:flex;flex-direction:column;gap:8px;}
 .ksu-primary,.ksu-secondary{
   height:46px;border-radius:10px;cursor:pointer;
-  font-family:'Mulish',system-ui,sans-serif!important;font-size:15px;font-weight:600;letter-spacing:0;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:15px;font-weight:600;letter-spacing:0;
 }
 .ksu-primary{border:0;background:#189E4F;color:#fff;}
 .ksu-primary:hover{background:#0F6B35;}

@@ -227,7 +227,7 @@ export default function TherapyTypesSplit({ therapyType = "individual", cmsData 
                 fontWeight: 500,
                 textTransform: 'none',
                 letterSpacing: 'normal',
-                    fontFamily: "'Work Sans', Arial, sans-serif",
+                    fontFamily: "'Inter', Arial, sans-serif",
                     width: 'auto',
                     maxWidth: '80%'
               }}

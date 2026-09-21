@@ -119,8 +119,8 @@ export default async function EventListPage() {
 const CSS = `
 .kev{
   --ink:#100E0E; --accent:#3D985C; --btn:#4FAB69; --btn-hover:#025545; --deep:#29653D;
-  --sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --body:'Mulish',ui-sans-serif,system-ui,sans-serif;
+  --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --body:'Inter',ui-sans-serif,system-ui,sans-serif;
   background:#fff;
 }
 .kev *{box-sizing:border-box;}

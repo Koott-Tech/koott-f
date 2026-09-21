@@ -153,7 +153,7 @@ export default function KoottFooter({ config } = {}) {
             <Link href="/" className="kf-logo" aria-label="Koott home">
               {/* Green wordmark on a square canvas: the box crops the padding,
                   the filter renders it white against the dark band. */}
-              <img src="/logo.png" alt="Koott" width={280} height={280} />
+              <img src="/main-logo.png" alt="Koott" width={280} height={280} />
             </Link>
 
             <p className="kf-co">{cfg.brand.company}</p>
@@ -232,7 +232,7 @@ const CSS = `
 .kf{
   --kf-line:rgba(255,255,255,.14);
   background:#012F23;color:#E6F0EA;
-  font-family:'Mulish','Avenir',system-ui,sans-serif;
+  font-family:'Inter','Avenir',system-ui,sans-serif;
 }
 /* Same 1180px column and 24px gutter as the page sections (.kh2-in), so the
    footer lines up with everything above it. Inside that, spacing and type are
@@ -254,9 +254,11 @@ const CSS = `
 .kf-brand{grid-column:1;grid-row:1;}
 .kf-join{grid-column:4;grid-row:2;}
 
-.kf-logo{display:block;width:132px;height:44px;overflow:hidden;margin:0 0 16px;}
+.kf-logo{display:block;width:148px;height:46px;overflow:hidden;margin:0 0 16px;}
 .kf-logo img{
-  width:210px;height:210px;max-width:none;display:block;margin:-84px 0 0 -38px;
+  /* The same 180px scale the header uses, so the wordmark is identical in both
+     — 134px wide — and inset the same 4px from the column edge. */
+  width:180px;height:180px;max-width:none;display:block;margin:-67px 0 0 -24px;
   filter:brightness(0) invert(1);
 }
 .kf-co{font-size:14px!important;font-weight:700!important;letter-spacing:0!important;color:#fff!important;margin:0 0 6px;}

@@ -153,10 +153,10 @@ export default function AboutPage({ content: override } = {}) {
 }
 
 /* Scoped to .kab and !important throughout, because globals.css (marked
-   "never edit") forces DM Sans / 60px on h1, 48px on h2, Work Sans / 16px on p,
+   "never edit") forces Poppins / 60px on h1, 48px on h2, Inter / 16px on p,
    and letter-spacing on span, li and a. */
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700&family=Work+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .kab{
   --k-ink:#100E0E;
@@ -164,8 +164,8 @@ const CSS = `
   --k-green:#4FAB69;
   --k-green-hover:#025545;
   --k-band:#E8FEDF;
-  --k-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --k-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --k-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
   /* Header.jsx is position:fixed and h-16, so it reserves no space in flow. */
   padding-top:64px;
   display:block;background:#fff;color:var(--k-ink);font-family:var(--k-body)!important;

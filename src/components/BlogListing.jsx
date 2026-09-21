@@ -10,11 +10,11 @@
  *   newsletter    label avenir 14/400 · input + a #6B5D57 "Join us!" button
  *   card cover    454x255
  *   card meta     avenir 12/400
- *   card title    brandon-grot-w01-light 26/400  → Jost stands in
+ *   card title    brandon-grot-w01-light 26/400  → Poppins stands in
  *   card excerpt  avenir 16/400, 1.5em
  *
- * Brandon Grotesque and Avenir are licensed Wix faces. Jost is the closest free
- * geometric grotesque to Brandon; Mulish continues to stand in for Avenir.
+ * Brandon Grotesque and Avenir are licensed Wix faces. Poppins is the closest free
+ * geometric grotesque to Brandon; Inter continues to stand in for Avenir.
  *
  * Content is CMS-driven: it reads /api/blogs and only falls back to
  * data/blogSampleData.js while the CMS has no published posts.
@@ -192,10 +192,10 @@ export default function BlogListing({ initialCategory, extraSlugs, heading }) {
 }
 
 /* Scoped to .kbl and !important throughout, because globals.css (marked
-   "never edit") forces DM Sans / 60px on h1, Work Sans / 16px on p, and
+   "never edit") forces Poppins / 60px on h1, Inter / 16px on p, and
    letter-spacing on span, a and button. */
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700&family=Mulish:wght@300;400;500;600;700&family=Work+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .kbl{
   --k-ink:#100E0E;
@@ -203,9 +203,9 @@ const CSS = `
   --k-accent:#3D985C;
   --k-join:#6B5D57;
   --k-line:rgba(38,34,34,.16);
-  --k-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --k-display:'Jost','Brandon Grotesque',ui-sans-serif,system-ui,sans-serif;
-  --k-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --k-display:'Poppins','Brandon Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --k-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
   padding-top:64px;              /* Header.jsx is fixed and h-16 */
   display:block;background:#fff;color:var(--k-ink);font-family:var(--k-body)!important;
 }

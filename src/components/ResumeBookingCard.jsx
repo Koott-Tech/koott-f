@@ -125,15 +125,21 @@ export default function ResumeBookingCard({
   const lost = slotState === 'passed' ? draft.previousSlot : draft.slot; // the time that no longer stands
   let dateText = draft.slot ? dateOf(draft.slot.startsAt) : '—';
   let timeText = draft.slot ? timeOf(draft.slot.startsAt) : '—';
-  let warn = false;
-  if (slotState === 'passed') {
+  const warn = slotState === 'passed' || slotState === 'taken';
+  /* The held time is gone (it passed, or someone else took it). Rather than a red
+     "No longer available", the card offers the therapist's next free slot in green —
+     the popup behind "Choose a new time" confirms it. */
+  const next = warn ? suggestion : null;
+  if (next) {
+    dateText = dateOf(next.startsAt);
+    timeText = timeOf(next.startsAt);
+  } else if (slotState === 'passed') {
     dateText = 'Time passed';
     timeText = 'Pick a new time';
-    warn = true;
   } else if (slotState === 'taken') {
     timeText = 'No longer available';
-    warn = true;
   }
+  const tone = next ? 'is-next' : 'is-warn';
 
   return (
     <article className="krb" aria-label="Resume your booking">
@@ -172,11 +178,14 @@ export default function ResumeBookingCard({
           </div>
           <div>
             <dt>Date</dt>
-            <dd className={slotState === 'passed' ? 'is-warn' : ''}><Icon name="calendar" /><span>{dateText}</span></dd>
+            <dd className={next || slotState === 'passed' ? tone : ''}>
+              <Icon name="calendar" />
+              <span>{dateText}{next && <span className="krb-sub">Next slot</span>}</span>
+            </dd>
           </div>
           <div>
             <dt>Time</dt>
-            <dd className={warn ? 'is-warn' : ''}><Icon name="clock" /><span>{timeText}</span></dd>
+            <dd className={warn ? tone : ''}><Icon name="clock" /><span>{timeText}</span></dd>
           </div>
         </dl>
         {warn ? (
@@ -225,8 +234,8 @@ export const RESUME_CARD_CSS = `
   --krb-green:#4FAB69;
   --krb-green-hover:#025545;
   --krb-band:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
-  --krb-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --krb-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --krb-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --krb-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
   display:flex;flex-direction:column;background:#fff;text-align:left;
   border:1px solid #BFE9AE;border-radius:8px;padding:10px;
   box-shadow:0 10px 28px -18px rgba(41,101,61,.45);
@@ -280,6 +289,7 @@ export const RESUME_CARD_CSS = `
 .krb-grid dd svg{flex:none;margin-top:1px;color:#399F5F;}
 .krb-grid dd > span{min-width:0;}
 .krb-grid dd.is-warn{color:#B45309;font-weight:600;}
+.krb-grid dd.is-next{color:#1B6930;font-weight:600;}
 .krb-sub{display:block;margin-top:2px;font-size:12px;color:#8A8F8A;}
 .krb-cta{
   margin-top:auto;display:flex;align-items:center;justify-content:center;height:44px;border-radius:10px;

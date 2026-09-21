@@ -134,7 +134,7 @@ export default function HomeHero() {
 }
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Quicksand:wght@400;500;600;700&family=Mulish:wght@300;400;500;600;700&family=Work+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .khh{
   --k-ink:#100E0E;
@@ -142,9 +142,9 @@ const CSS = `
   --k-cta:#493D3D;
   --k-accent:#3D985C;
   --k-display:'Poppins',ui-sans-serif,system-ui,sans-serif;
-  --k-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --k-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
-  --k-quick:'Quicksand',ui-sans-serif,system-ui,sans-serif;
+  --k-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --k-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-quick:'Poppins',ui-sans-serif,system-ui,sans-serif;
   position:relative;display:block;height:791px;overflow:hidden;
   background:linear-gradient(90deg,#EFE8E0 0%,#EDE6DD 38%,#E9E4DA 55%,#DCE3D4 100%);
   font-family:var(--k-body)!important;

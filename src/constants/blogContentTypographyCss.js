@@ -7,7 +7,7 @@
 export function getBlogDocumentEditorTypographyCss(sel) {
   return `
           ${sel} {
-            font-family: 'Work Sans', Arial, Helvetica, sans-serif !important;
+            font-family: 'Inter', Arial, Helvetica, sans-serif !important;
             letter-spacing: -0.7px !important;
             color: #171717 !important;
             text-align: justify !important;
@@ -27,7 +27,7 @@ export function getBlogDocumentEditorTypographyCss(sel) {
           }
           /* Margins match BlogPost .blog-content .document-editor headings (more specific than .blog-content h*) */
           ${sel} h1 {
-            font-family: 'DM Sans', Arial, Helvetica, sans-serif !important;
+            font-family: 'Poppins', Arial, Helvetica, sans-serif !important;
             font-size: 2.5rem !important;
             line-height: 60px !important;
             font-weight: 700 !important;
@@ -37,7 +37,7 @@ export function getBlogDocumentEditorTypographyCss(sel) {
             display: block !important;
           }
           ${sel} h2 {
-            font-family: 'DM Sans', Arial, Helvetica, sans-serif !important;
+            font-family: 'Poppins', Arial, Helvetica, sans-serif !important;
             font-size: 2rem !important;
             line-height: 1.25 !important;
             font-weight: 700 !important;
@@ -47,7 +47,7 @@ export function getBlogDocumentEditorTypographyCss(sel) {
             display: block !important;
           }
           ${sel} h3 {
-            font-family: 'DM Sans', Arial, Helvetica, sans-serif !important;
+            font-family: 'Poppins', Arial, Helvetica, sans-serif !important;
             font-size: 1.75rem !important;
             line-height: 1.25 !important;
             font-weight: 600 !important;
@@ -57,7 +57,7 @@ export function getBlogDocumentEditorTypographyCss(sel) {
             display: block !important;
           }
           ${sel} h4 {
-            font-family: 'DM Sans', Arial, Helvetica, sans-serif !important;
+            font-family: 'Poppins', Arial, Helvetica, sans-serif !important;
             font-size: 1.5rem !important;
             line-height: 1.25 !important;
             font-weight: 600 !important;
@@ -67,7 +67,7 @@ export function getBlogDocumentEditorTypographyCss(sel) {
             display: block !important;
           }
           ${sel} h5 {
-            font-family: 'DM Sans', Arial, Helvetica, sans-serif !important;
+            font-family: 'Poppins', Arial, Helvetica, sans-serif !important;
             font-size: 1.25rem !important;
             line-height: 1.25 !important;
             font-weight: 600 !important;
@@ -77,7 +77,7 @@ export function getBlogDocumentEditorTypographyCss(sel) {
             display: block !important;
           }
           ${sel} h6 {
-            font-family: 'DM Sans', Arial, Helvetica, sans-serif !important;
+            font-family: 'Poppins', Arial, Helvetica, sans-serif !important;
             font-size: 1.125rem !important;
             line-height: 1.25 !important;
             font-weight: 600 !important;

@@ -101,7 +101,7 @@ export default function ServiceLanding({
 
 const CSS = `
 .sl{--green:#189E4F;--green-d:#12813F;--deep:#012F23;--tint:#F5FBF3;--line:rgba(1,47,35,.12);
-  background:#fff;color:#171717;font-family:'Mulish',system-ui,sans-serif;}
+  background:#fff;color:#171717;font-family:'Inter',system-ui,sans-serif;}
 .sl-in{max-width:980px;margin:0 auto;padding:0 24px;}
 .sl-hero{padding:120px 0 72px;background:linear-gradient(180deg,var(--tint),#fff);}
 .sl-eyebrow{
@@ -110,7 +110,7 @@ const CSS = `
 }
 .sl-h1{
   /* size from the global --h1-size scale */
-  font-family:'Work Sans',system-ui,sans-serif!important;font-weight:600!important;
+  font-family:'Inter',system-ui,sans-serif!important;font-weight:600!important;
   line-height:1.15em!important;letter-spacing:-.01em!important;color:var(--deep)!important;margin:0 0 16px;max-width:760px;
 }
 .sl-lead{font-size:17px!important;line-height:1.65em!important;letter-spacing:0!important;color:#3B3B3B!important;margin:0 0 28px;max-width:640px;}
@@ -127,13 +127,13 @@ const CSS = `
 .sl-sec{padding:72px 0;}
 .sl-sec--tint{background:var(--tint);}
 .sl-h2{
-  font-family:'Work Sans',system-ui,sans-serif!important;font-size:30px!important;font-weight:600!important;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:30px!important;font-weight:600!important;
   letter-spacing:0!important;color:var(--deep)!important;margin:0 0 24px;
 }
 .sl-points{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
 .sl-point{border:1px solid var(--line);border-radius:14px;padding:24px;background:#fff;}
 .sl-point-t{
-  font-family:'Work Sans',system-ui,sans-serif!important;font-size:19px!important;font-weight:600!important;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:19px!important;font-weight:600!important;
   letter-spacing:0!important;color:var(--deep)!important;margin:0 0 10px;line-height:1.3em!important;
 }
 .sl-point-b{font-size:15px!important;line-height:1.6em!important;letter-spacing:0!important;color:#3B3B3B!important;margin:0;}

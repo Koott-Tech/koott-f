@@ -214,10 +214,10 @@ export default function ContactPage() {
 }
 
 /* Scoped to .kct2 and !important throughout, because globals.css (marked
-   "never edit") forces DM Sans on headings, Work Sans / 16px on p, and
+   "never edit") forces Poppins on headings, Inter / 16px on p, and
    letter-spacing on span, a and button. */
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700&family=Work+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .kct2{
   --k-ink:#100E0E;
@@ -229,8 +229,8 @@ const CSS = `
   --k-green-hover:#025545;
   --k-fill:#F2FCF7;
   --k-line:#EFEFF4;
-  --k-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --k-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --k-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
   padding-top:64px;               /* Header.jsx is fixed and h-16 */
   display:block;background:#fff;color:var(--k-ink);font-family:var(--k-body)!important;
 }

@@ -6,7 +6,7 @@
  * Measured off the live page (article column 740 wide):
  *   category nav  avenir 15/400, above the article
  *   meta row      28px avatar + avenir 14/400 "author · date · N min read"
- *   title         brandon-grot-w01-light 40/400, 1.25em  → Jost stands in
+ *   title         brandon-grot-w01-light 40/400, 1.25em  → Poppins stands in
  *   cover         740x416
  *   lede          avenir 18/400 ITALIC, 1.5em
  *   body          avenir 18/400, 1.5em
@@ -227,14 +227,14 @@ export default function BlogArticle({ slug, post: givenPost, preview = false }) 
 }
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700&family=Mulish:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 .kba{
   --k-ink:#100E0E;
   --k-accent:#3D985C;
   --k-line:rgba(38,34,34,.16);
-  --k-display:'Jost','Brandon Grotesque',ui-sans-serif,system-ui,sans-serif;
-  --k-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-display:'Poppins','Brandon Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --k-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
   padding-top:64px;              /* Header.jsx is fixed and h-16 */
   display:block;background:#fff;color:var(--k-ink);font-family:var(--k-body)!important;
 }

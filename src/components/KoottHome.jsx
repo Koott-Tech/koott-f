@@ -21,9 +21,9 @@ import CustomSelect from '@/components/CustomSelect';
  *   step card     #F7FFF5 -> #F3FFF2         care card   #EFFFEA
  *   services panel #F9FFF8                   feature card #FAFCF9
  *
- * Headings are Work Sans, body copy Mulish (standing in for Avenir, a licensed
+ * Headings are Inter, body copy Inter (standing in for Avenir, a licensed
  * Wix face). Everything is scoped to .kh2 and marked !important because
- * globals.css (marked "never edit") forces DM Sans and 60/48/36px on h1–h3.
+ * globals.css (marked "never edit") forces Poppins and 60/48/36px on h1–h3.
  *
  * Live data where we have it: therapists come from /api/public/psychologists and
  * posts from /api/blogs, both falling back to the design's own placeholders so
@@ -1213,8 +1213,8 @@ const CSS = `
   --deep:#012F23; --header:#063327; --green:#189E4F; --green-d:#12813F;
   --band:#D5FFC4; --band-t:#E6FFDE; --tint:#F9FFF8; --ink:#000; --body:#3B3B3B; --muted:#6B7280;
   --line:rgba(38,34,34,.13); --page:#FFFFFF;
-  --sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --text:'Mulish',ui-sans-serif,system-ui,sans-serif;
+  --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --text:'Inter',ui-sans-serif,system-ui,sans-serif;
   background:var(--page);
 }
 .kh2 *{box-sizing:border-box;}
@@ -1405,19 +1405,28 @@ const CSS = `
   background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 18px;
   box-shadow:0 6px 22px rgba(16,14,14,.07);
 }
-/* The card being replaced sits underneath and is covered as the new one lands. */
-.kh2-badge.is-out{z-index:1;}
+/* A deck, not a crossfade: the card being replaced drops back and shrinks — as
+   if being pushed under the pile — while the next one rises over it. Without
+   this the two cards sat in exactly the same place and only the words seemed to
+   change. */
+.kh2-badge.is-out{z-index:1;animation:kh2-card-under .55s cubic-bezier(.4,0,.2,1) both;}
+@keyframes kh2-card-under{
+  0%{opacity:1;transform:none;box-shadow:0 6px 22px rgba(16,14,14,.07);}
+  55%{opacity:.55;transform:translateY(7px) scale(.955);}
+  100%{opacity:0;transform:translateY(11px) scale(.94);box-shadow:0 2px 8px rgba(16,14,14,.04);}
+}
 .kh2-badge.is-in{z-index:2;animation:kh2-card-in .55s cubic-bezier(.22,.7,.3,1) both;}
 /* Opacity reaches 1 by 35%, while the card is still low and clear of the copy
    underneath. Fading the whole way up would leave both cards' text readable at
    once, which looked like a rendering fault. */
 @keyframes kh2-card-in{
-  0%{opacity:0;transform:translateY(26px) scale(.97);box-shadow:0 2px 8px rgba(16,14,14,.05);}
-  35%{opacity:1;transform:translateY(15px) scale(.985);}
+  0%{opacity:0;transform:translateY(30px) scale(.93);box-shadow:0 2px 8px rgba(16,14,14,.05);}
+  40%{opacity:1;transform:translateY(13px) scale(.975);}
   100%{opacity:1;transform:none;box-shadow:0 6px 22px rgba(16,14,14,.07);}
 }
 @media (prefers-reduced-motion:reduce){
   .kh2-badge.is-in{animation:kh2-fade-in .45s ease both;}
+  .kh2-badge.is-out{animation:kh2-fade-out .45s ease both;}
 }
 .kh2-badge-i{font-size:22px;line-height:1.2;align-self:flex-start;}
 .kh2-badge-t{
@@ -2078,12 +2087,12 @@ const CSS = `
   .kh2-hero-in{margin-bottom:0!important;}
   .kh2-badge-wrap{
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
-    width:auto!important;margin:auto 44px 40px!important;
+    width:auto!important;margin:auto 58px 40px!important;
   }
   /* margin-top:auto drops the card to the foot of the hero, just above the
      plant clip; the gap under the buttons keeps a floor on short screens */
   .kh2-hero-in{padding-bottom:28px!important;}
-  /* a smaller stat card on phones: narrower (44px in from each side), shorter,
+  /* a smaller stat card on phones: narrower (58px in from each side), shorter,
      with type a step down */
   .kh2-badge-deck{height:78px;}
   .kh2-badge{gap:12px;padding:12px 18px;border-radius:10px;}
@@ -2267,9 +2276,14 @@ const CSS = `
 @keyframes kh2-word-in-m{from{opacity:0;transform:translate3d(0,14px,0);}to{opacity:1;transform:translate3d(0,0,0);}}
 @keyframes kh2-word-out-m{from{opacity:1;transform:translate3d(0,0,0);}to{opacity:0;transform:translate3d(0,-10px,0);}}
 @keyframes kh2-card-in-m{
-  0%{opacity:0;transform:translate3d(0,22px,0);}
-  35%{opacity:1;transform:translate3d(0,12px,0);}
-  100%{opacity:1;transform:translate3d(0,0,0);}
+  0%{opacity:0;transform:translate3d(0,26px,0) scale(.93);}
+  40%{opacity:1;transform:translate3d(0,11px,0) scale(.975);}
+  100%{opacity:1;transform:translate3d(0,0,0) scale(1);}
+}
+@keyframes kh2-card-under-m{
+  0%{opacity:1;transform:translate3d(0,0,0) scale(1);}
+  55%{opacity:.55;transform:translate3d(0,6px,0) scale(.955);}
+  100%{opacity:0;transform:translate3d(0,10px,0) scale(.94);}
 }
 @keyframes kh2-fade-out{from{opacity:1;}to{opacity:0;}}
 @media (max-width:640px){
@@ -2278,6 +2292,7 @@ const CSS = `
   .kh2-h1-word.is-in{animation:kh2-word-in-m .45s .3s cubic-bezier(0,0,.2,1) both;}
   .kh2-h1-word.is-in.is-first{animation-delay:0s;}
   .kh2-badge.is-in{will-change:transform,opacity;animation:kh2-card-in-m .6s cubic-bezier(.22,.7,.3,1) both;}
+  .kh2-badge.is-out{will-change:transform,opacity;animation:kh2-card-under-m .6s cubic-bezier(.4,0,.2,1) both;}
 }
 @media (max-width:640px) and (prefers-reduced-motion:reduce){
   .kh2-h1-word.is-out{animation:kh2-fade-out .28s ease-in both;}

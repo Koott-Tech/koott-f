@@ -53,7 +53,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Work Sans' !important;
+  font-family: var(--font-body) !important;
   font-weight: 400;
   font-kerning: normal;
   font-feature-settings: 'kern' 1;
@@ -111,9 +111,23 @@ body {
   --p-lh: 1.5;
 }
 
-/* Headings use DM Sans from Google Fonts */
+/* ── Font families ───────────────────────────────────────────────────────────
+   Two faces site-wide: Poppins on every heading, Inter on everything else.
+   Both are loaded in layout.js. */
+:root {
+  --font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Every h1-h6 is Poppins, whatever a component's own CSS says. The :not(#_)
+   lifts this above the class rules in the scoped component styles (.bf-h1,
+   .ktc-name, ...), which are !important too and would otherwise win on
+   specificity; #_ matches nothing, so the selector still means "any heading". */
+h1:not(#_), h2:not(#_), h3:not(#_), h4:not(#_), h5:not(#_), h6:not(#_) {
+  font-family: var(--font-heading) !important;
+}
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'DM Sans' !important;
+  font-family: var(--font-heading) !important;
   letter-spacing: var(--heading-tracking) !important;
 }
 
@@ -129,9 +143,9 @@ h6 { font-size: var(--h6-size) !important; line-height: var(--h6-lh) !important;
   line-height: 1.2 !important;
 }
 
-/* Paragraphs use Work Sans */
+/* Paragraphs use Inter */
 p {
-  font-family: 'Work Sans' !important;
+  font-family: var(--font-body) !important;
   font-size: var(--p-size) !important;
   line-height: var(--p-lh);
   letter-spacing: -0.50px !important;
@@ -140,7 +154,7 @@ p {
 /* Paragraph size classes - like headings but for paragraphs.
    line-height was 1rem on 16px text, so wrapped lines touched. */
 .p2 {
-  font-family: 'Work Sans' !important;
+  font-family: var(--font-body) !important;
   font-size: var(--p-size) !important;
   line-height: 1.5 !important;
   letter-spacing: -0.80px !important;
@@ -158,9 +172,9 @@ p {
 }
 
 
-/* Specific override for Hero h1 - uses DM Sans */
+/* Specific override for Hero h1 - uses Poppins */
 .hero-title {
-  font-family: 'DM Sans' !important;
+  font-family: var(--font-heading) !important;
   color: #025545 !important;
 }
 
@@ -170,7 +184,7 @@ a { font-family: inherit; font-feature-settings: 'kern' 1; font-variant-ligature
 
 /* Hero badge text override */
 .hero-badge-text {
-  font-family: 'Work Sans' !important;
+  font-family: 'Inter' !important;
   font-size: 12px !important;
   font-weight: 400 !important;
   letter-spacing: -0.50px !important;
@@ -178,7 +192,7 @@ a { font-family: inherit; font-feature-settings: 'kern' 1; font-variant-ligature
 
 /* Header navigation menu items */
 .header-nav-item {
-  font-family: 'Work Sans' !important;
+  font-family: 'Inter' !important;
   letter-spacing: -0.40px !important;
 }
 

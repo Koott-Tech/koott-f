@@ -173,15 +173,15 @@ export default function BookMalayaliPsychologists() {
 }
 
 /* Scoped to .ktl and marked !important for the same reason the condition
-   template is: globals.css forces DM Sans / 48px on headings and Work Sans /
+   template is: globals.css forces Poppins / 48px on headings and Inter /
    16px on p, with letter-spacing on span, li, a and button. */
 const LISTING_CSS = `
 .ktl{
   --ktl-ink:#100E0E;
   --ktl-deep:#012F23;
   --ktl-accent:#3D985C;
-  --ktl-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --ktl-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --ktl-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --ktl-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
   /* Header.jsx is position:fixed and h-16, so it reserves no space in flow. */
   padding-top:64px;
   /* Always at least one full screen (header space included), so the footer never
@@ -191,7 +191,7 @@ const LISTING_CSS = `
   font-family:var(--ktl-body)!important;
 }
 .ktl *{box-sizing:border-box;}
-.ktl-head{max-width:1020px;margin:0 auto;padding:44px 20px 0;text-align:center;}
+.ktl-head{max-width:1180px;margin:0 auto;padding:44px 20px 0;text-align:center;}
 .ktl-h1{
   /* size from the global --h1-size scale */
   font-family:var(--ktl-sans)!important;font-weight:500!important;
@@ -220,7 +220,7 @@ const LISTING_CSS = `
 .ktl-select:hover{border-color:var(--ktl-accent);}
 .ktl-select:focus-visible{outline:none;border-color:var(--ktl-accent);box-shadow:0 0 0 3px rgba(61,152,92,.18);}
 
-.ktl-body{max-width:1020px;margin:0 auto;padding:32px 20px 72px;}
+.ktl-body{max-width:1180px;margin:0 auto;padding:32px 20px 72px;}
 /* While the list loads, keep a full screen under the heading for the cards, so the
    footer sits well below the fold instead of right at its edge. */
 .ktl-body.is-loading{min-height:100vh;min-height:100dvh;}
@@ -232,7 +232,12 @@ const LISTING_CSS = `
   font-family:var(--ktl-body)!important;font-size:15px!important;font-weight:400!important;
   letter-spacing:0!important;color:var(--ktl-ink)!important;text-align:center;margin:48px 0;
 }
-.ktl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+/* Three across on a laptop — the cards sit at ~366px, the same width they take
+   on the home page's grid, so a therapist looks identical on both. */
+.ktl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+@media (max-width:1100px){
+  .ktl-grid{grid-template-columns:repeat(2,1fr);}
+}
 
 @media (max-width:900px){
   .ktl-grid{grid-template-columns:1fr;}

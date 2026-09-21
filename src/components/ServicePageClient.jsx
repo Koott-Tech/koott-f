@@ -13,6 +13,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import TherapistProfile, { therapistSlug } from '@/components/TherapistProfile';
+import LogoLoader from '@/components/LogoLoader';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
@@ -59,12 +60,13 @@ export default function ServicePageClient() {
       paddingTop: 63, boxSizing: 'border-box',
       minHeight: state.status === 'loading' ? 'calc(100vh + 160px)' : '100vh',
     }}>
+      {/* The site's logo loader covers the wait instead of a line of text. */}
+      <LogoLoader active={state.status === 'loading'} />
       <div style={{
         maxWidth: 720, margin: '0 auto', padding: '120px 24px', textAlign: 'center',
-        fontFamily: 'Mulish, system-ui, sans-serif', color: '#100E0E',
+        fontFamily: 'Inter, system-ui, sans-serif', color: '#100E0E',
       }}
       >
-        {state.status === 'loading' && <p>Loading profile…</p>}
         {state.status === 'missing' && <p>We could not find that therapist.</p>}
         {state.status === 'error' && <p>We could not load this profile just now. Please try again.</p>}
       </div>

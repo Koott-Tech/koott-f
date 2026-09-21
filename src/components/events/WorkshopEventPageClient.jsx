@@ -721,14 +721,14 @@ export default function WorkshopEventPageClient({
   );
 }
 
-/* Koott type on the event page: Work Sans headings, Mulish text, no negative
-   tracking. The shared blog tokens this page grew up with set DM Sans inline and
+/* Koott type on the event page: Inter headings, Inter text, no negative
+   tracking. The shared blog tokens this page grew up with set Poppins inline and
    -0.7px !important on every descendant, so this layer needs !important too. */
 const KOOTT_EVENT_CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=Mulish:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 .kwe-page.blog-typography-root,.kwe-page.blog-typography-root *{letter-spacing:0!important;}
-.kwe-page [role="heading"],.kwe-page h1,.kwe-page h2,.kwe-page h3{font-family:'Work Sans',system-ui,sans-serif!important;}
-.kwe-page p,.kwe-page li,.kwe-page a,.kwe-page button,.kwe-page label,.kwe-page input,.kwe-page select{font-family:'Mulish',system-ui,sans-serif!important;}
+.kwe-page [role="heading"],.kwe-page h1,.kwe-page h2,.kwe-page h3{font-family:'Inter',system-ui,sans-serif!important;}
+.kwe-page p,.kwe-page li,.kwe-page a,.kwe-page button,.kwe-page label,.kwe-page input,.kwe-page select{font-family:'Inter',system-ui,sans-serif!important;}
 .kwe-eyebrow{display:inline-block;background:#EAF9E4;color:#012F23!important;border-radius:6px;padding:5px 12px;font-size:13px!important;margin:0 0 14px;}
 .kwe-h2{font-size:30px!important;font-weight:600!important;line-height:1.25!important;color:#012F23;margin:0 0 14px;}
 .kwe-p{font-size:17px!important;line-height:1.65!important;color:#3B3B3B!important;margin:0 0 14px;white-space:pre-line;}

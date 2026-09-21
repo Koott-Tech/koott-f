@@ -18,7 +18,7 @@ export const BLOG_TYPOGRAPHY_ROOT_CSS = `
 }
 `.trim();
 
-/** Same tokens as blog — use on `/events` and event detail pages for matching DM Sans / Work Sans + tracking. */
+/** Same tokens as blog — use on `/events` and event detail pages for matching Poppins / Inter + tracking. */
 export const EVENTS_TYPOGRAPHY_ROOT_CLASS = BLOG_TYPOGRAPHY_ROOT_CLASS;
 export const EVENTS_TYPOGRAPHY_ROOT_CSS = BLOG_TYPOGRAPHY_ROOT_CSS;
 
@@ -41,7 +41,7 @@ export const HERO_DISPLAY_HEADING_CLASS =
   `font-semibold text-[32px] leading-[1.1] ${BLOG_LETTER_SPACING_CLASS} md:text-[60px] md:leading-[1.1]`;
 
 export const HERO_DISPLAY_HEADING_STYLE = {
-  fontFamily: "'DM Sans', Arial, Helvetica, sans-serif",
+  fontFamily: "'Poppins', Arial, Helvetica, sans-serif",
   fontWeight: 600,
   letterSpacing: '-0.7px',
 };
@@ -51,7 +51,7 @@ export const BLOG_FEATURED_TITLE_CLASS =
   `font-semibold text-[26px] leading-[1.2] ${BLOG_LETTER_SPACING_CLASS} md:text-[30px] md:leading-[1.15] lg:text-[34px] lg:leading-[1.1]`;
 
 export const BLOG_FEATURED_TITLE_STYLE = {
-  fontFamily: "'DM Sans', Arial, Helvetica, sans-serif",
+  fontFamily: "'Poppins', Arial, Helvetica, sans-serif",
   fontWeight: 600,
   letterSpacing: '-0.7px',
 };
@@ -61,7 +61,7 @@ export const BLOG_CARD_TITLE_CLASS =
   `mt-2 font-semibold text-gray-900 text-left break-words line-clamp-2 ${BLOG_LETTER_SPACING_CLASS} text-[15px] md:text-[16px] ${BLOG_UI_LINE_HEIGHT_CLASS}`;
 
 export const BLOG_CARD_TITLE_STYLE = {
-  fontFamily: "'DM Sans', Arial, Helvetica, sans-serif",
+  fontFamily: "'Poppins', Arial, Helvetica, sans-serif",
   fontWeight: 600,
   letterSpacing: '-0.7px',
 };
@@ -71,7 +71,7 @@ export const BLOG_SECTION_HEADING_CLASS =
   `font-semibold text-[22px] leading-[1.2] ${BLOG_LETTER_SPACING_CLASS} md:text-[24px] md:leading-[1.15] text-gray-900 mb-6`;
 
 export const BLOG_SECTION_HEADING_STYLE = {
-  fontFamily: "'DM Sans', Arial, Helvetica, sans-serif",
+  fontFamily: "'Poppins', Arial, Helvetica, sans-serif",
   fontWeight: 600,
   letterSpacing: '-0.7px',
 };
@@ -80,7 +80,7 @@ export const BLOG_SECTION_HEADING_STYLE = {
 export const HERO_BODY_TEXT_CLASS = `hero-description text-base md:text-lg ${BLOG_BODY_LINE_HEIGHT_CLASS} ${BLOG_LETTER_SPACING_CLASS}`;
 
 export const HERO_BODY_TEXT_STYLE = {
-  fontFamily: "'Work Sans', Arial, Helvetica, sans-serif",
+  fontFamily: "'Inter', Arial, Helvetica, sans-serif",
   letterSpacing: '-0.7px',
   lineHeight: '24px',
 };

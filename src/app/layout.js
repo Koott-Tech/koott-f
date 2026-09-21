@@ -35,8 +35,13 @@ export const metadata = {
   },
   description: SITE_DESCRIPTION,
   icons: {
-    icon: [{ url: "/logo.png", type: "image/png", sizes: "32x32" }],
-    apple: [{ url: "/logo.png", sizes: "180x180", type: "image/png" }],
+    /* Sized from public/favicon.png (4500px, 605KB — far too heavy to serve as
+       a tab icon). The 512 is for Android home screens and PWA installs. */
+    icon: [
+      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/favicon-180.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: SITE_TITLE,
@@ -90,7 +95,8 @@ export default async function RootLayout({ children }) {
     <html lang="en">
       <head>
         {/* Favicon */}
-        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/favicon-180.png" sizes="180x180" />
         {/* DNS Prefetch and Preconnect for faster API connections (especially for international users) */}
         {process.env.NEXT_PUBLIC_BACKEND_URL && (
           <>
@@ -109,10 +115,10 @@ export default async function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* Load fonts - Varela Round loaded first as it's render-blocking, others can load async */}
         <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         {/* Preload logo for instant loading screen display */}
-        <link rel="preload" as="image" href="/logo.png" />
+        <link rel="preload" as="image" href="/main-logo.png" />
         {/* CRITICAL: Script to manage loader - runs only on client side to prevent hydration mismatch */}
         <script
           dangerouslySetInnerHTML={{
@@ -266,10 +272,13 @@ export default async function RootLayout({ children }) {
               width: 720px;
               height: 237px;
               margin: 0 auto;
-              background-image: url('/logo.png');
-              background-size: contain;
+              /* The file is a 500px square with the wordmark inset; these
+                 numbers scale and offset it so the wordmark itself fills the
+                 720x237 box instead of sitting small inside all that padding. */
+              background-image: url('/main-logo.png');
+              background-size: 968px 971px;
               background-repeat: no-repeat;
-              background-position: center;
+              background-position: -151px -365px;
               animation: pulseScale 2s ease-in-out infinite;
             }
             @keyframes pulseScale {

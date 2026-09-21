@@ -156,7 +156,7 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
                     line-height: 1.2 !important;
                     letter-spacing: normal !important;
                     margin: 0 0 1.5rem 0 !important; /* Add bottom margin to increase space below heading */
-                    font-family: 'Work Sans', Arial, Helvetica, sans-serif !important;
+                    font-family: 'Inter', Arial, Helvetica, sans-serif !important;
                 }
                 /* Override h2 submenu items (footer) - text-base font-normal */
                 h2.footer-submenu-item,
@@ -166,7 +166,7 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
                     line-height: 1.2 !important;
                     letter-spacing: normal !important;
                     margin: 0 !important;
-                    font-family: 'Work Sans', Arial, Helvetica, sans-serif !important;
+                    font-family: 'Inter', Arial, Helvetica, sans-serif !important;
                 }
                 /* Override h2 individual menu items (footer) - text-sm */
                 h2.footer-individual-menu-item,
@@ -176,7 +176,7 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
                     line-height: 1.2 !important;
                     letter-spacing: normal !important;
                     margin: 0 0 0.75rem 0 !important; /* Increased bottom margin for more spacing between items */
-                    font-family: 'Work Sans', Arial, Helvetica, sans-serif !important;
+                    font-family: 'Inter', Arial, Helvetica, sans-serif !important;
                 }
                 .footer-individual-menu-item:last-child {
                     margin-bottom: 0 !important; /* Remove margin from last item */

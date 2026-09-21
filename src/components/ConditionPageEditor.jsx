@@ -372,7 +372,7 @@ export default function ConditionPageEditor({
 
 const CSS = `
 .cpe{--g:#189E4F;--gd:#12813F;--deep:#012F23;--line:#E2E8E4;background:#F4F6F5;min-height:100vh;color:#111;
-  font-family:'Mulish',system-ui,sans-serif;}
+  font-family:'Inter',system-ui,sans-serif;}
 .cpe-bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:12px 20px;background:#fff;border-bottom:1px solid var(--line);}
 .cpe-bar-l{display:flex;align-items:center;gap:14px;min-width:0;}

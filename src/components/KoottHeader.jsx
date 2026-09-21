@@ -6,7 +6,7 @@
  * Measured off the live site at 1265px wide (home and inner pages are identical):
  *   band      63px tall, pinned, solid #063327 (the design; live Wix uses a
  *             translucent brown wash instead)
- *   nav       13px / 400 / uppercase, white, Avenir → Mulish stands in
+ *   nav       13px / 400 / uppercase, white, Avenir → Inter stands in
  *   items     INDIVIDUAL ⌄ · RELATIONSHIP ⌄ · SEXUAL & INTIMACY ⌄ · THERAPISTS
  *   SIGN IN   109x30 pill, transparent fill, 1px white border, radius 15px
  *             (was BOOK NOW); once signed in, an account pill takes its place:
@@ -67,7 +67,36 @@ export default function KoottHeader({ conditionMenu } = {}) {
   const [openCat, setOpenCat] = useState(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Fades away as the page moves down and returns the moment it moves back up.
+  const [hidden, setHidden] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+
+  /* The header steps aside while reading and comes back the instant you scroll
+     up — the usual "read now, navigate when you ask" behaviour. It stays put
+     near the top of the page and whenever a menu is open, so it can never
+     vanish from under an open dropdown. Reads are batched into a frame, so a
+     long scroll does no layout work per event. */
+  useEffect(() => {
+    if (openCat || userMenuOpen || mobileOpen) { setHidden(false); return undefined; }
+    const TOP_SAFE = 90;     // always visible this near the top
+    const NUDGE = 6;         // ignore jitter and rubber-banding
+    let last = window.scrollY;
+    let frame = 0;
+    const read = () => {
+      frame = 0;
+      const y = window.scrollY;
+      const moved = y - last;
+      if (Math.abs(moved) > NUDGE) {
+        setHidden(y > TOP_SAFE && moved > 0);
+        last = y;
+      } else if (y <= TOP_SAFE) {
+        setHidden(false);
+      }
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(read); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(frame); };
+  }, [openCat, userMenuOpen, mobileOpen]);
 
   // Close everything on navigation.
   useEffect(() => {
@@ -126,13 +155,13 @@ export default function KoottHeader({ conditionMenu } = {}) {
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <header className="kh">
+      <header className={`kh ${hidden ? 'is-hidden' : ''}`}>
         <div className="kh-in">
           <Link href="/" className="kh-logo" aria-label="Koott home">
             {/* public/logo.png is the green wordmark centred in a square with wide
                 margins. The box crops that padding away and the filter renders it
                 white, matching the live 143x56 mark on the dark band. */}
-            <img src="/logo.png" alt="Koott" width={210} height={210} />
+            <img src="/main-logo.png" alt="Koott" width={210} height={210} />
           </Link>
 
           {/* ---- desktop nav ---- */}
@@ -253,7 +282,18 @@ const CSS = `
      translucent brown over the page instead; the design's opaque band is what
      this follows, and it keeps the white nav legible over any hero. */
   background:#063327;
-  font-family:'Mulish',ui-sans-serif,system-ui,sans-serif;
+  font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+  /* Slow enough to read as the header stepping aside rather than blinking. */
+  transition:opacity .4s ease, transform .4s ease, visibility .4s;
+}
+.kh.is-hidden{
+  opacity:0;transform:translateY(-8px);
+  /* Not just transparent: an invisible header must not swallow clicks. */
+  pointer-events:none;visibility:hidden;
+}
+@media (prefers-reduced-motion:reduce){
+  .kh{transition:none;}
+  .kh.is-hidden{transform:none;}
 }
 .kh *{box-sizing:border-box;}
 .kh-in{
@@ -262,8 +302,14 @@ const CSS = `
 }
 .kh-logo{position:relative;flex:none;display:block;width:148px;height:46px;overflow:hidden;}
 .kh-logo img{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:210px;height:210px;max-width:none;
+  position:absolute;left:50%;top:50%;
+  /* The wordmark fills 74.4% of this square and sits 2.8% right of its centre,
+     so the image is sized for the crop and nudged back left — at 210px the
+     mark ran 156px wide in a 148px window and lost its last letter. The extra
+     3px lines its left edge up with the footer's mark, which sits 4px inside
+     its own box above the address column. */
+  transform:translate(calc(-50% - 8px),-50%);
+  width:180px;height:180px;max-width:none;
   /* Green wordmark -> flat white, the treatment the live header uses. */
   filter:brightness(0) invert(1);
 }
@@ -326,7 +372,7 @@ const CSS = `
    h1-h6 to 60/48/36px with !important, which beats inline styles — so those
    labels are spans, and their size is pinned here rather than left to inherit. */
 .kcm-label{
-  font-family:'Mulish',ui-sans-serif,system-ui,sans-serif!important;
+  font-family:'Inter',ui-sans-serif,system-ui,sans-serif!important;
   letter-spacing:.02em!important;
   line-height:1.2!important;
   margin:0!important;
@@ -409,7 +455,8 @@ const CSS = `
   /* Shrink the crop box, never the image — the image is absolutely sized and
      centred inside it, so resizing the image alone distorts the wordmark. */
   .kh-logo{width:112px;height:38px;}
-  .kh-logo img{width:170px;height:170px;}
+  /* 112px window: 112/0.744 = 150px square, nudged the same 2.8% left. */
+  .kh-logo img{width:140px;height:140px;transform:translate(calc(-50% - 6px),-50%);}
 }
 @media (max-width:360px){
   .kh-book{width:84px;font-size:11.5px!important;}

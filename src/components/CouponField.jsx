@@ -111,7 +111,7 @@ export default function CouponField({ amount, onApply, disabled = false }) {
 const CSS = `
 .kcp{
   border:1px solid #DFFFD2;border-radius:10px;padding:14px 16px;background:#FBFFF9;
-  font-family:'Mulish',ui-sans-serif,system-ui,sans-serif;
+  font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
 }
 .kcp--on{background:#F2FCF7;border-color:rgba(61,152,92,.4);}
 .kcp *{box-sizing:border-box;}
