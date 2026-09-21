@@ -1,6 +1,8 @@
 'use client';
 
 import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
+import TherapistCard, { THERAPIST_CARD_CSS, cardFields } from '@/components/TherapistCard';
+import { whenLabel } from '@/lib/nextAvailable';
 import CustomSelect from '@/components/CustomSelect';
 
 /**
@@ -271,7 +273,14 @@ function useTherapists(limit = 3) {
         const json = await res.json();
         const d = json?.data ?? json?.message ?? json;
         const list = d?.psychologists || (Array.isArray(d) ? d : []);
-        if (!off && Array.isArray(list)) setRows(applyTherapistOrder(list, order).slice(0, limit));
+        // The same order answer carries each therapist's next free start, so the
+        // cards show it without a single extra request.
+        if (!off && Array.isArray(list)) {
+          setRows(applyTherapistOrder(list, order).slice(0, limit).map((p) => ({
+            ...p,
+            nextAvailable: whenLabel(order?.nextAt?.get(String(p.id))),
+          })));
+        }
       } catch (_) { /* keep the design's placeholder cards */ }
     })();
     return () => { off = true; };
@@ -460,6 +469,7 @@ export default function KoottHome({ content } = {}) {
   return (
     <main className="kh2">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: THERAPIST_CARD_CSS }} />
 
       {/* ══ hero ══════════════════════════════════════════════════════════ */}
       <section className="kh2-hero">
@@ -685,43 +695,16 @@ export default function KoottHome({ content } = {}) {
                 />
               </>
             )}
+            {/* The same card the listing and the condition pages use. The
+                artboard's placeholder therapists have no row behind them, so
+                they get no availability lookup and no invented times. */}
             {cards.map((t, i) => (
-              <article key={t.id || t.name || i} className={`kh2-tcard ${i === 1 ? 'is-plain' : ''}`}>
-                <div className="kh2-tcard-head">
-                  <div>
-                    <h3 className="kh2-tcard-n">{t.name}</h3>
-                    <p className="kh2-tcard-r">{t.designation || t.specialization || 'Consultant Psychologist'}</p>
-                    <Link href={profileHref(t)} className="kh2-viewprofile">View Profile</Link>
-                  </div>
-                  {t.cover_image_url || t.profile_picture_url ? (
-                    // Remote therapist photos; a plain img avoids next/image host config.
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img className="kh2-tcard-img" src={t.cover_image_url || t.profile_picture_url} alt={t.name} />
-                  ) : <span className="kh2-tcard-img is-blank" aria-hidden />}
-                </div>
-
-                <ul className="kh2-tcard-meta">
-                  <li><span aria-hidden>👤</span> Therapy hours: {t.experience_years ? `${t.experience_years * 30}+hrs (${t.experience_years}yrs)` : '250+hrs (8yrs)'}</li>
-                  <li><span aria-hidden>₹</span> Starting from: ₹{t.individual_session_price || t.price || 2299}</li>
-                </ul>
-
-                <div className="kh2-wave" aria-hidden>
-                  <span className="kh2-wave-play">▶</span>
-                  <span className="kh2-wave-bars" />
-                </div>
-
-                <p className="kh2-tcard-bio">
-                  {t.bio || 'M Phil & PhD scholar and university topper, specializes in individual, relationship & complex disorders.'}
-                </p>
-
-                <div className="kh2-tcard-foot">
-                  <div>
-                    <p className="kh2-avail-l">Next Availablity</p>
-                    <p className="kh2-avail-v">Tomorrow (09:00) (10:00) (11:00)</p>
-                  </div>
-                  <Link href={bookingHref(t)} className="kh2-btn kh2-btn--sm">Book Now</Link>
-                </div>
-              </article>
+              <TherapistCard
+                key={t.id || t.name || i}
+                t={{ ...cardFields(t), availability: t.nextAvailable }}
+                profileHref={profileHref(t)}
+                bookHref={bookingHref(t)}
+              />
             ))}
           </div>
 

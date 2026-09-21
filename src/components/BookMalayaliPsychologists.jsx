@@ -22,6 +22,7 @@ import TherapistCard, { THERAPIST_CARD_CSS } from '@/components/TherapistCard';
 import { therapistSlug } from '@/components/TherapistProfile';
 import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
 import CustomSelect from '@/components/CustomSelect';
+import { whenLabel } from '@/lib/nextAvailable';
 
 const ALL = 'All';
 
@@ -34,8 +35,11 @@ function toCard(p) {
     slug: therapistSlug(p),
     name: p.name || `${p.first_name || ''} ${p.last_name || ''}`.trim(),
     role: p.designation || '',
+    // Numbers, not sentences: the card sets its own tiles ("7 yrs", "₹1,499").
+    years,
+    price: Number(p.price) || 0,
+    languages: ['English', 'Malayalam'],
     experience: years > 0 ? `${years}+ years of experience` : '',
-    languages: 'English and Malayalam',
     priceFrom: p.price ? `Starting from INR${p.price}` : '',
     bio: p.short_description || p.description || '',
     modes: ['audio', 'video'],
@@ -67,13 +71,11 @@ export default function BookMalayaliPsychologists() {
           || (Array.isArray(res?.data) ? res.data : null)
           || (Array.isArray(res) ? res : []);
         if (cancelled) return;
-        // Next free slot, shown on the card in the visitor's own time zone.
-        const nextLabel = (iso) => (iso
-          ? new Date(iso).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })
-          : '');
+        // The order endpoint already carries each therapist's next free start,
+        // so the cards need no slot requests of their own.
         setTherapists(applyTherapistOrder(rows.map(toCard), order).map((t) => ({
           ...t,
-          availability: nextLabel(order?.nextAt.get(String(t.id))),
+          availability: whenLabel(order?.nextAt?.get(String(t.id))),
         })));
         setStatus('ready');
       } catch (err) {

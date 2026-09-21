@@ -1,91 +1,180 @@
 'use client';
 
 /**
- * TherapistCard — the therapist card used on the condition-page template and on
- * the /book-malayali-psychologists listing.
+ * TherapistCard — built to the card in "LittleCareLanding (1).jsx" (repo root),
+ * used on /book-malayali-psychologists and on the condition-page template.
  *
- * Measured off the live page koott.in/book-malayali-psychologists:
- *   card    480x394, 1px #DFFFD2 border at radius 8, 10px padding
- *   photo   128x150 at radius 15
- *   name    Work Sans 20/400 #262222 · role Avenir 15/700
- *   book    121x40 at radius 10, #4FAB69
- * The tinted panel behind the bio and footer follows the Koott design comps.
+ * Top to bottom, as the artboard has it:
+ *   avatar · name · credential
+ *   tinted panel: two lines of intro, the voice-intro row, View profile
+ *   the therapist's concerns as chips, scrolled sideways under a fade
+ *   three tiles: years, languages, price per session
+ *   footer: next available, and Book now
  *
- * Self-contained on purpose: it declares its own custom properties on .ktc so it
- * renders identically inside .kct (the condition template) or on a bare page.
- * `availability` is optional — the public list endpoint does not return it, and
- * the footer collapses to just the button when it is absent.
+ * The artboard's purple is swapped for Koott's green, the same mapping the
+ * profile page uses (#1B6930 over #F1FBF3, ink #1C1C1E on #E5E5EA lines).
+ *
+ * TWO THINGS TO KNOW:
+ *   · The voice-intro player is a PLACEHOLDER. Koott stores no audio for
+ *     therapists, so pressing play runs a timer and nothing is heard — it is in
+ *     the design and was kept deliberately until real intros exist. Give the
+ *     card `t.voiceUrl` and it will play that instead (see playVoice below).
+ *   · "Next available" comes in on `t.availability`, already formatted. The
+ *     page fetches it for all its therapists at once (lib/nextAvailable.js);
+ *     the card never asks on its own, which is what made a seven-card listing
+ *     fire seven slow slot requests. No answer, no footer line — nothing is
+ *     invented.
+ *
+ * `t` accepts both shapes: the structured fields the listing now sends (years,
+ * price, tags) and the older strings the CMS pages hold (experience, priceFrom,
+ * languages), so neither call site had to change at once.
  */
 
-const ModeIcon = ({ name }) =>
-  name === 'audio' ? (
-    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#29653D" strokeWidth="1.9"
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
-      <rect x="9" y="2" width="6" height="11" rx="3" />
-      <path d="M5 10a7 7 0 0 0 14 0M12 17v4" />
-    </svg>
-  ) : (
-    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#29653D" strokeWidth="1.9"
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
-      <rect x="2" y="7" width="13" height="10" rx="2.5" />
-      <path d="M15 11l6-3v8l-6-3z" />
-    </svg>
-  );
+import { useEffect, useRef, useState } from 'react';
+import { Award, IndianRupee, Languages, Pause, Play } from 'lucide-react';
 
-/* viewBox padded 4 units per side so the circle's edge is not shaved at 13px. */
-const ARROW = { vb: '16 16 168 168', d: 'M100 20c-44.184 0-80 35.817-80 80.001C20 144.184 55.817 180 100 180s80-35.817 80-79.999S144.183 20 100 20zm28.726 82.946l-4.492 4.492-33.758 33.758a4.164 4.164 0 0 1-5.89 0l-1.547-1.547a4.167 4.167 0 0 1 0-5.891l30.812-30.812a4.165 4.165 0 0 0 0-5.891L83.038 66.243a4.167 4.167 0 0 1 0-5.891l1.547-1.547a4.164 4.164 0 0 1 5.89 0l33.758 33.758 4.492 4.492a4.164 4.164 0 0 1 .001 5.891z' };
+/* The bar heights of the little equaliser, so it looks like speech rather than
+   a sine wave. They animate while playing and hold still when paused. */
+const BAR_HEIGHTS = [38, 62, 100, 74, 46, 88, 58, 96, 70, 42, 80, 54, 92, 64, 36, 76, 50, 84, 60, 40];
+
+const titleCase = (s) => String(s).replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+const initialsOf = (name) => String(name || '').trim().split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase();
+
+/** "7+ years of experience" -> 7, for cards still sending the old string. */
+const yearsOf = (t) => (Number.isFinite(t.years) ? t.years : parseInt(String(t.experience || '').replace(/\D/g, ''), 10) || 0);
+/** "Starting from INR1499" -> 1499. */
+const priceOf = (t) => (Number.isFinite(t.price) ? t.price : parseInt(String(t.priceFrom || '').replace(/\D/g, ''), 10) || 0);
+const tagsOf = (t) => (t.tags || t.concerns || []).map(titleCase);
+const langsOf = (t) => (Array.isArray(t.languages) ? t.languages : String(t.languages || 'English and Malayalam').split(/,| and /).map((l) => l.trim()).filter(Boolean));
+
+/**
+ * An API psychologist row -> the fields this card reads. Shared so the home
+ * page, the listing and the condition pages all describe a therapist the same
+ * way; callers add their own extras (the listing keeps slug and filters).
+ */
+export const cardFields = (p) => {
+  const years = Number(p.experience_years) || 0;
+  return {
+    id: p.id,
+    name: p.name || `${p.first_name || ''} ${p.last_name || ''}`.trim(),
+    role: p.designation || p.specialization || '',
+    photo: p.cover_image_url || p.profile_picture_url || null,
+    bio: p.short_description || p.description || p.bio || '',
+    years,
+    price: Number(p.individual_session_price || p.price) || 0,
+    languages: Array.isArray(p.languages) && p.languages.length ? p.languages : ['English', 'Malayalam'],
+    tags: Array.isArray(p.area_of_expertise) ? p.area_of_expertise : [],
+  };
+};
 
 export default function TherapistCard({ t, profileHref, bookHref }) {
   const href = profileHref ?? t.profileHref ?? '#';
   const book = bookHref ?? t.bookHref ?? href;
+  const years = yearsOf(t);
+  const price = priceOf(t);
+  const tags = tagsOf(t);
+  const langs = langsOf(t);
+  const others = langs.filter((l) => !/^english$/i.test(l));
+
+  const [playing, setPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const audioRef = useRef(null);
+
+  /* PLACEHOLDER while therapists have no recorded intro: the bar moves for 30s
+     so the design can be seen whole. With t.voiceUrl set it plays the real
+     file and follows it instead. */
+  const duration = t.voiceDuration || 30;
+  useEffect(() => {
+    if (!playing || t.voiceUrl) return undefined;
+    const started = Date.now();
+    const id = setInterval(() => {
+      const pct = Math.min(100, ((Date.now() - started) / (duration * 1000)) * 100);
+      setProgress(pct);
+      if (pct >= 100) { clearInterval(id); setPlaying(false); setProgress(0); }
+    }, 150);
+    return () => clearInterval(id);
+  }, [playing, duration, t.voiceUrl]);
+
+  const playVoice = () => {
+    if (!t.voiceUrl) { setPlaying((p) => !p); return; }
+    const el = audioRef.current;
+    if (!el) return;
+    if (playing) { el.pause(); setPlaying(false); } else { el.play().then(() => setPlaying(true)).catch(() => {}); }
+  };
+
+  const elapsed = Math.round((progress / 100) * duration);
+  const clock = (s) => `0:${String(s).padStart(2, '0')}`;
+  const availability = t.availability || null;
 
   return (
     <article className="ktc">
       <div className="ktc-head">
-        <a href={href} className="ktc-photo">
-          {t.photo && <img src={t.photo} alt={t.name} loading="lazy" />}
-          <span className="ktc-view">
-            VIEW PROFILE
-            <svg viewBox={ARROW.vb} width="13" height="13" aria-hidden focusable="false">
-              <path d={ARROW.d} fill="#FFFFFF" />
-            </svg>
-          </span>
+        <a href={href} className="ktc-avatar" aria-label={`View ${t.name}'s profile`}>
+          {t.photo
+            // eslint-disable-next-line @next/next/no-img-element
+            ? <img src={t.photo} alt={t.name} loading="lazy" />
+            : <span className="ktc-initials" aria-hidden>{initialsOf(t.name)}</span>}
         </a>
-
-        <div className="ktc-meta">
-          <div className="ktc-topline">
-            <div>
-              <h3 className="ktc-name">{t.name}</h3>
-              {t.role && <p className="ktc-role">{t.role}</p>}
-            </div>
-            {t.modes?.length > 0 && (
-              <div className="ktc-modes">
-                {t.modes.map((m) => (
-                  <span key={m} className="ktc-mode" title={`${m} session`}>
-                    <ModeIcon name={m} />
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {t.experience && <p className="ktc-exp">{t.experience}</p>}
-          {t.languages && <p className="ktc-line">{t.languages}</p>}
-          {t.priceFrom && <p className="ktc-line">{t.priceFrom}</p>}
+        <div className="ktc-who">
+          <p className="ktc-name">{t.name}</p>
+          {t.role && <p className="ktc-role">{t.role}</p>}
         </div>
       </div>
 
       <div className="ktc-panel">
         {t.bio && <p className="ktc-bio">{t.bio}</p>}
-        <div className="ktc-foot">
-          {t.availability ? (
-            <div>
-              <p className="ktc-avail-label">{t.availabilityLabel || 'Next Availability'}</p>
-              <p className="ktc-avail">{t.availability}</p>
-            </div>
-          ) : <span />}
-          <a href={book} className="ktc-book">Book Now</a>
+        <div className="ktc-voice">
+          <button type="button" className="ktc-play" onClick={playVoice} aria-label={playing ? 'Pause intro' : 'Play intro'}>
+            {playing ? <Pause size={13} /> : <Play size={13} style={{ marginLeft: 1 }} />}
+          </button>
+          {/* The bars are always here — one line with the play button — and only
+              come alive while something is playing. */}
+          <span className={`ktc-bars ${playing ? 'is-playing' : ''}`} aria-hidden>
+            {BAR_HEIGHTS.map((h, i) => (
+              <i
+                key={i}
+                className={`ktc-bar${playing && (i / BAR_HEIGHTS.length) * 100 <= progress ? ' is-past' : ''}`}
+                style={{ height: `${h}%`, animationDelay: `${i * 60}ms` }}
+              />
+            ))}
+          </span>
+          {playing && <span className="ktc-voice-time">{clock(elapsed)} / {clock(duration)}</span>}
+          <a href={href} className="ktc-view">View profile</a>
+          {t.voiceUrl && <audio ref={audioRef} src={t.voiceUrl} onEnded={() => setPlaying(false)} preload="none" />}
         </div>
+      </div>
+
+      {tags.length > 0 && (
+        <div className="ktc-tags-wrap">
+          <div className="ktc-tags">
+            {tags.map((tag) => <span key={tag} className="ktc-chip">{tag}</span>)}
+          </div>
+        </div>
+      )}
+
+      <div className="ktc-stats">
+        <div className="ktc-stat">
+          <p className="ktc-stat-v"><Award size={12} />{years > 0 ? `${years} yrs` : '—'}</p>
+          <p className="ktc-stat-l">Experience</p>
+        </div>
+        <div className="ktc-stat">
+          <p className="ktc-stat-v"><Languages size={12} /><span>{langs[0] || 'English'}</span></p>
+          <p className="ktc-stat-l" title={others.join(', ')}>{others.join(', ') || '—'}</p>
+        </div>
+        <div className="ktc-stat">
+          <p className="ktc-stat-v"><IndianRupee size={11} />{price > 0 ? price.toLocaleString('en-IN') : '—'}</p>
+          <p className="ktc-stat-l">Per session</p>
+        </div>
+      </div>
+
+      <div className="ktc-foot">
+        {availability ? (
+          <div>
+            <p className="ktc-avail-l">{t.availabilityLabel || 'Next available'}</p>
+            <p className="ktc-avail">{availability}</p>
+          </div>
+        ) : <span />}
+        <a href={book} className="ktc-book">Book now</a>
       </div>
     </article>
   );
@@ -93,91 +182,137 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
 
 export const THERAPIST_CARD_CSS = `
 .ktc{
-  --ktc-ink:#100E0E;
-  --ktc-green:#4FAB69;
-  --ktc-green-hover:#025545;
-  --ktc-accent:#3D985C;
-  --ktc-deep2:#29653D;
-  --ktc-band:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+  --ktc-primary:#1B6930;
+  --ktc-primary-soft:#F1FBF3;
+  --ktc-ink:#1C1C1E;
+  --ktc-ink-soft:#6C6C70;
+  --ktc-line:#E5E5EA;
+  /* the tint behind the intro panel and the three tiles */
+  --ktc-bg:#F8FDF6;
+  --ktc-surface:#FFFFFF;
   --ktc-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --ktc-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
-  display:flex;flex-direction:column;background:#fff;
-  border:1px solid #DFFFD2;border-radius:8px;padding:10px;
+  display:flex;flex-direction:column;position:relative;
+  background:var(--ktc-surface);border:1.5px solid var(--ktc-line);border-radius:20px;padding:20px;
+  transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
+.ktc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(30,43,35,.06);}
 .ktc *{box-sizing:border-box;}
-.ktc-head{display:flex;gap:14px;align-items:flex-start;}
 
-.ktc-photo{
-  position:relative;flex:none;width:128px;height:150px;
-  border-radius:15px;background:var(--ktc-band);overflow:hidden;display:block;
+.ktc-head{display:flex;align-items:center;gap:16px;margin:4px 0 12px;}
+.ktc-avatar{
+  width:64px;height:64px;border-radius:999px;overflow:hidden;flex:none;display:block;
+  background:var(--ktc-primary-soft);border:1px solid var(--ktc-line);
+  transition:transform .15s ease;
 }
-.ktc-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-.ktc-view{
-  position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
-  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
-  padding:5px 9px;border-radius:999px;background:var(--ktc-accent);
-  font-family:var(--ktc-sans)!important;font-size:8px;font-weight:500;
-  letter-spacing:.04em;color:#fff!important;text-decoration:none;
+.ktc-avatar:hover{transform:scale(1.04);}
+.ktc-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.ktc-initials{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--ktc-sans)!important;font-size:20px!important;font-weight:600!important;
+  color:var(--ktc-primary)!important;letter-spacing:0!important;
 }
-.ktc-photo:hover .ktc-view{background:var(--ktc-green-hover);}
-
-.ktc-meta{flex:1;min-width:0;}
-.ktc-topline{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
-.ktc-modes{display:flex;gap:3px;flex:none;}
-.ktc-mode{
-  width:25px;height:25px;border-radius:50%;display:inline-flex;
-  align-items:center;justify-content:center;
-  border:1px solid rgba(61,152,92,.5);background:#fff;
-}
+.ktc-who{min-width:0;}
 .ktc-name{
-  font-family:var(--ktc-sans)!important;font-size:20px!important;font-weight:400!important;
-  line-height:1.2em!important;letter-spacing:0!important;color:#262222!important;margin:0;
+  font-family:var(--ktc-sans)!important;font-size:16px!important;font-weight:600!important;
+  color:var(--ktc-ink)!important;margin:0;letter-spacing:0!important;line-height:1.3em!important;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .ktc-role{
-  font-family:var(--ktc-body)!important;font-size:15px!important;font-weight:700!important;
-  line-height:1.2em!important;letter-spacing:0!important;color:#262222!important;margin:6px 0 0;
-}
-.ktc-exp{
-  font-family:var(--ktc-body)!important;font-size:15px!important;font-weight:700!important;
-  line-height:1.2em!important;letter-spacing:0!important;color:var(--ktc-ink)!important;margin:24px 0 0;
-}
-.ktc-line{
-  font-family:var(--ktc-body)!important;font-size:15px!important;font-weight:400!important;
-  line-height:1.4em!important;letter-spacing:0!important;color:var(--ktc-ink)!important;margin:7px 0 0;
+  font-family:var(--ktc-sans)!important;font-size:12px!important;font-weight:400!important;
+  color:var(--ktc-ink-soft)!important;margin:4px 0 0;letter-spacing:0!important;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
-.ktc-panel{
-  display:flex;flex-direction:column;flex:1;
-  margin:18px 0 0;padding:16px 18px;border-radius:10px;background:var(--ktc-band);
-}
+.ktc-panel{background:var(--ktc-bg);border-radius:16px;padding:12px;margin-bottom:16px;}
 .ktc-bio{
-  font-family:var(--ktc-body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:1.48em!important;letter-spacing:0!important;color:#262222!important;margin:0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-family:var(--ktc-sans)!important;font-size:13px!important;line-height:1.5em!important;
+  color:var(--ktc-ink-soft)!important;margin:0 0 12px;letter-spacing:0!important;
 }
-.ktc-foot{
-  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
-  margin-top:auto;padding-top:24px;
+/* one line, everything centred on the same axis as the play button */
+.ktc-voice{display:flex;align-items:center;gap:10px;}
+.ktc-play{
+  width:32px;height:32px;border-radius:999px;flex:none;display:flex;align-items:center;justify-content:center;
+  background:var(--ktc-surface);border:1.5px solid var(--ktc-primary);color:var(--ktc-primary);
+  cursor:pointer;box-shadow:0 2px 8px -3px rgba(27,105,48,.25);transition:background .15s ease,color .15s ease;
 }
-.ktc-avail-label{
-  font-family:var(--ktc-body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:1.2em!important;letter-spacing:0!important;color:var(--ktc-ink)!important;margin:0;
+.ktc-play:hover{background:var(--ktc-primary);color:#fff;}
+.ktc-voice-label{
+  flex:none;font-family:var(--ktc-sans)!important;font-size:12.5px!important;font-weight:600!important;
+  color:var(--ktc-ink-soft)!important;letter-spacing:0!important;white-space:nowrap;
 }
-.ktc-avail{
-  font-family:var(--ktc-body)!important;font-size:15px!important;font-weight:700!important;
-  line-height:1.2em!important;letter-spacing:0!important;color:#399F5F!important;margin:4px 0 0;
+.ktc-voice-time{flex:none;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace!important;font-size:10.5px!important;color:var(--ktc-ink-soft)!important;letter-spacing:0!important;}
+/* an equaliser rather than a progress line: bars already played hold the green,
+   the rest sit pale, and every bar breathes while it is playing */
+/* The equaliser sits in the row at all times: pale and still when nothing is
+   playing, moving once it is, with the bars already heard holding the green.
+   Paused rather than removed, so it never jumps into place. */
+.ktc-bars{flex:1;min-width:60px;display:flex;align-items:center;gap:2px;height:20px;}
+.ktc-bar{
+  flex:1;min-width:2px;border-radius:999px;background:#CFE0D4;transform-origin:center;
+  animation:ktc-bar-move .9s ease-in-out infinite alternate;animation-play-state:paused;
 }
-.ktc-book{
-  flex:none;display:inline-flex;align-items:center;justify-content:center;
-  width:121px;height:40px;border-radius:10px;
-  background:var(--ktc-green);color:#fff!important;text-decoration:none;
-  font-family:var(--ktc-sans)!important;font-size:15px;font-weight:400;
-  transition:background-color .2s ease;
+.ktc-bars.is-playing .ktc-bar{animation-play-state:running;}
+.ktc-bar.is-past{background:var(--ktc-primary);}
+@keyframes ktc-bar-move{from{transform:scaleY(.45);}to{transform:scaleY(1);}}
+@media (prefers-reduced-motion:reduce){.ktc-bars.is-playing .ktc-bar{animation-play-state:paused;}}
+.ktc-view{
+  flex:none;border:1px solid var(--ktc-line);background:var(--ktc-surface);border-radius:999px;padding:5px 10px;
+  font-family:var(--ktc-sans)!important;font-size:11.5px!important;font-weight:500!important;
+  color:var(--ktc-primary)!important;text-decoration:none;letter-spacing:0!important;
+  transition:border-color .15s ease, background .15s ease;
 }
-.ktc-book:hover{background:var(--ktc-green-hover);}
+.ktc-view:hover{border-color:var(--ktc-primary);background:var(--ktc-primary-soft);}
 
-@media (max-width:560px){
-  .ktc-panel{margin:14px 0 0;padding:14px 15px;}
-  .ktc-foot{flex-direction:column;align-items:stretch;gap:12px;}
-  .ktc-book{width:100%;}
+/* concerns run off the edge under a fade rather than wrapping the card taller */
+.ktc-tags-wrap{position:relative;margin-bottom:16px;}
+.ktc-tags-wrap::after{
+  content:"";position:absolute;top:0;right:0;bottom:2px;width:32px;pointer-events:none;
+  background:linear-gradient(to right,transparent,var(--ktc-surface));
+}
+.ktc-tags{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-ms-overflow-style:none;}
+.ktc-tags::-webkit-scrollbar{display:none;}
+.ktc-chip{
+  flex:none;white-space:nowrap;border:1px solid var(--ktc-line);background:var(--ktc-surface);
+  border-radius:999px;padding:4px 10px;
+  font-family:var(--ktc-sans)!important;font-size:11.5px!important;font-weight:500!important;
+  color:var(--ktc-ink)!important;letter-spacing:0!important;
+}
+
+.ktc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.ktc-stat{background:var(--ktc-bg);border-radius:14px;padding:10px;text-align:center;min-width:0;}
+.ktc-stat-v{
+  display:flex;align-items:center;justify-content:center;gap:4px;margin:0;
+  font-family:var(--ktc-sans)!important;font-size:14px!important;font-weight:600!important;
+  color:var(--ktc-ink)!important;letter-spacing:0!important;
+}
+.ktc-stat-v svg{flex:none;color:var(--ktc-primary);}
+.ktc-stat-v span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ktc-stat-l{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-family:var(--ktc-sans)!important;font-size:11px!important;font-weight:400!important;
+  color:var(--ktc-ink-soft)!important;margin:2px 0 0;letter-spacing:0!important;line-height:1.35em!important;
+}
+
+.ktc-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:auto;padding-top:12px;border-top:1px solid var(--ktc-line);
+}
+.ktc-avail-l{font-family:var(--ktc-sans)!important;font-size:11px!important;color:var(--ktc-ink-soft)!important;margin:0;letter-spacing:0!important;}
+.ktc-avail{font-family:var(--ktc-sans)!important;font-size:14px!important;font-weight:600!important;color:var(--ktc-ink)!important;margin:2px 0 0;letter-spacing:0!important;}
+.ktc-book{
+  flex:none;display:inline-flex;align-items:center;gap:6px;
+  background:var(--ktc-primary);color:#fff!important;border-radius:12px;padding:10px 16px;text-decoration:none;
+  font-family:var(--ktc-sans)!important;font-size:14px!important;font-weight:600!important;letter-spacing:0!important;
+  transition:background .15s ease;
+}
+.ktc-book:hover{background:#155424;}
+
+@media (max-width:520px){
+  .ktc{padding:16px;}
+  .ktc-avatar{width:56px;height:56px;}
+  .ktc-stats{gap:6px;}
+  .ktc-stat{padding:8px 6px;}
+  .ktc-book{padding:10px 13px;}
 }
 `;
