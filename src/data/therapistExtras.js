@@ -31,6 +31,18 @@ export const DEFAULT_FAQS = [
   },
 ];
 
+/**
+ * DUMMY — placeholder reels so the section can be seen on every profile while
+ * the real ones are gathered. They point at Koott's own Instagram and carry no
+ * thumbnail, so the cards show the gradient. Replace with each therapist's own
+ * reels (or delete this and the fallback in extrasFor) before launch.
+ */
+export const DEMO_REELS = [
+  { href: 'https://www.instagram.com/koott.in/', caption: 'Naming what you feel' },
+  { href: 'https://www.instagram.com/koott.in/', caption: 'A 2-minute reset' },
+  { href: 'https://www.instagram.com/koott.in/', caption: 'When sleep will not come' },
+];
+
 /** slug -> { faqs?, reels? } */
 export const THERAPIST_EXTRAS = {
   // DEMO profiles. Removed alongside the rows themselves; see
@@ -62,6 +74,10 @@ export const THERAPIST_EXTRAS = {
   },
 };
 
-export const extrasFor = (slug) => THERAPIST_EXTRAS[slug] || {};
+/** Anything written for this therapist, with the dummy reels as a fallback. */
+export const extrasFor = (slug) => {
+  const own = THERAPIST_EXTRAS[slug] || {};
+  return { ...own, reels: own.reels || DEMO_REELS };
+};
 
 export default THERAPIST_EXTRAS;

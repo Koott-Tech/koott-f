@@ -108,36 +108,115 @@ const Stars = () => (
 const SOURCE = { google: 'G', whatsapp: '✆', zoho: 'Z' };
 
 /**
- * The leafy border the design runs along the foot of the hero — layered bushes
- * with a few flower stems, mirrored on the right. Drawn rather than shipped as
- * an image so it scales with the section and costs nothing to load.
+ * The looped clip along the foot of the hero — one wide band, with a taller cut
+ * for phones. It is decoration, so it plays silent and inline with no controls.
+ *
+ * The element mounts only once the client knows which cut applies, so a phone
+ * never downloads the desktop file and vice versa; the band's height is
+ * reserved in CSS, so nothing jumps while it loads. Anyone who asks for less
+ * motion gets the first frame, held still.
  */
-const Foliage = ({ side }) => (
-  <svg
-    className={`kh2-foliage-svg is-${side}`}
-    viewBox="0 0 420 190" preserveAspectRatio="none" aria-hidden focusable="false"
-  >
-    <g opacity=".95">
-      {/* back bushes */}
-      <path fill="#BFE8A8" d="M0 190V96c26-30 52-14 66 6 12-26 44-34 62-10 16-20 44-16 54 8 14-18 40-12 46 10 12-16 34-10 40 12 10-14 28-6 32 12v56z" />
-      {/* mid bushes */}
-      <path fill="#8FD97F" d="M0 190v-56c22-24 46-12 58 6 12-22 40-28 56-8 14-16 38-12 46 8 12-14 30-8 36 10 10-12 26-4 30 10v30z" />
-      {/* front bushes */}
-      <path fill="#5FC469" d="M0 190v-34c20-18 42-8 54 8 12-16 34-20 48-6 12-12 32-8 40 6 10-10 26-4 30 8v18z" />
-    </g>
-    {/* flower stems */}
-    <g stroke="#4FAE5C" strokeWidth="2.4" fill="none" strokeLinecap="round">
-      <path d="M96 190v-60" /><path d="M96 152c-14-6-18-18-16-26 10 0 20 10 16 26z" fill="#8FD97F" stroke="none" />
-      <path d="M150 190v-46" />
-      <path d="M262 190v-54" />
-    </g>
-    <g>
-      <circle cx="96" cy="122" r="11" fill="#F0A8C8" /><circle cx="96" cy="122" r="4" fill="#FBE38A" />
-      <circle cx="150" cy="136" r="9" fill="#F6B9D3" /><circle cx="150" cy="136" r="3.4" fill="#FBE38A" />
-      <circle cx="262" cy="128" r="8" fill="#F5A35F" /><circle cx="262" cy="128" r="3" fill="#FBE38A" />
-    </g>
-  </svg>
-);
+/* Two copies of the clip this viewport needs; the second is served from cache,
+   so it costs no download. They are React elements, not hand-written HTML:
+   anything written into the band by hand is wiped on every re-render of the
+   hero, which happens constantly because the badge deck above rotates on a
+   timer. The band itself carries the still frame as its background, so the
+   greenery is painted with no JavaScript and no video decoded. */
+const CUTS = {
+  desk: { src: '/hero-calm-desktop.webm', poster: '/hero-calm-desktop.webp' },
+  mob: { src: '/hero-calm-mobile.webm', poster: '/hero-calm-mobile.webp' },
+};
+const HANDOVER = 0.12;   // seconds of overlap before a clip reaches its end
+
+const HeroClip = () => {
+  const [cut, setCut] = useState(null);   // null until the viewport is known
+  const [still, setStill] = useState(false);
+  const a = useRef(null);
+  const b = useRef(null);
+
+  useEffect(() => {
+    const phone = window.matchMedia('(max-width:640px)');
+    const calm = window.matchMedia('(prefers-reduced-motion:reduce)');
+    const read = () => { setCut(phone.matches ? 'mob' : 'desk'); setStill(calm.matches); };
+    read();
+    phone.addEventListener('change', read);
+    calm.addEventListener('change', read);
+    return () => { phone.removeEventListener('change', read); calm.removeEventListener('change', read); };
+  }, []);
+
+  /* A native loop paints nothing for a frame while the decoder wraps, and that
+     reads as a flash. So the spare copy starts a breath before the front one
+     ends and takes the front; the spent one rewinds and waits its turn.
+     Something is always mid-frame, so there is no gap to see. */
+  useEffect(() => {
+    let front = a.current;
+    let back = b.current;
+    if (!cut || !front || !back) return undefined;
+    if (still) { front.pause(); back.pause(); front.currentTime = 0; return undefined; }
+    let busy = false;
+    let raf = 0;
+
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+      if (busy || !front.duration || front.paused) return;
+      if (front.duration - front.currentTime > HANDOVER) return;
+      busy = true;
+      back.currentTime = 0;
+      Promise.resolve(back.play())
+        .then(() => {
+          back.classList.remove('is-buffer');
+          front.classList.add('is-buffer');
+          front.pause();
+          const spent = front; front = back; back = spent;
+          busy = false;
+        })
+        .catch(() => { busy = false; });
+    };
+
+    // rAF is frozen while the tab is in the background, so a clip can reach its
+    // end with no handover waiting. Rewind it there, and again on the way back,
+    // so nobody returns to a stalled frame.
+    const rescue = (e) => { e.target.currentTime = 0; if (e.target === front) Promise.resolve(front.play()).catch(() => {}); };
+    const wake = () => { if (!document.hidden && front.paused) Promise.resolve(front.play()).catch(() => {}); };
+    const one = a.current; const two = b.current;
+    one.addEventListener('ended', rescue);
+    two.addEventListener('ended', rescue);
+    document.addEventListener('visibilitychange', wake);
+
+    Promise.resolve(front.play()).catch(() => {});
+    raf = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      one.removeEventListener('ended', rescue);
+      two.removeEventListener('ended', rescue);
+      document.removeEventListener('visibilitychange', wake);
+    };
+  }, [cut, still]);
+
+  const clip = cut ? CUTS[cut] : null;
+  return (
+    <span className={`kh2-clips is-${cut || 'desk'}`}>
+      {clip && [null, 'is-buffer'].map((extra, i) => (
+        <video
+          key={`${cut}-${i}`}
+          ref={i === 0 ? a : b}
+          className={`kh2-clip ${extra || ''}`}
+          src={clip.src}
+          poster={clip.poster}
+          // The front clip carries autoplay too, for browsers that start a
+          // muted video on its own but refuse a scripted play().
+          autoPlay={i === 0}
+          muted
+          playsInline
+          preload="auto"
+          aria-hidden
+          tabIndex={-1}
+        />
+      ))}
+    </span>
+  );
+};
 
 /** One card in the hero deck. `incoming` is the one animating in on top. */
 const BadgeCard = ({ card, incoming = false }) => (
@@ -432,13 +511,12 @@ export default function KoottHome({ content } = {}) {
           </Link>
         </div>
 
-        {/* Illustrated foliage runs along the foot of the hero, left and right.
-            The badge is positioned inside this band rather than pulled up with a
-            negative margin — a margin shortened the section, so the greenery
-            overflowed and was clipped by the hero's overflow:hidden. */}
+        {/* The looped clip runs along the foot of the hero. The badge is
+            positioned inside this band rather than pulled up with a negative
+            margin — a margin shortened the section, so the band overflowed and
+            was clipped by the hero's overflow:hidden. */}
         <div className="kh2-foliage">
-          <Foliage side="left" />
-          <Foliage side="right" />
+          <HeroClip />
 
           {/* The design draws this as a small stack: a second card, inset on both
               sides, peeks out about 9px below the one carrying the copy.
@@ -1152,14 +1230,32 @@ const CSS = `
   font-family:var(--text)!important;font-size:16px!important;font-weight:600!important;letter-spacing:0!important;
 }
 .kh2-book:hover{background:var(--green-d);}
-/* Illustrated foliage runs along the foot of the hero on both sides. */
+/* The looped clip runs along the foot of the hero, full width. */
 /* margin-top:auto eats the slack; the floor for the gap is the margin-bottom
    on .kh2-hero-in, kept there so the badge (absolute, offset from this box)
-   is not pushed off the greenery. */
-.kh2-foliage{position:relative;height:clamp(148px,20vh,190px);margin-top:auto;pointer-events:none;}
-.kh2-foliage-svg{position:absolute;bottom:0;width:34%;max-width:430px;height:100%;}
-.kh2-foliage-svg.is-left{left:0;}
-.kh2-foliage-svg.is-right{right:0;transform:scaleX(-1);}
+   is not pushed off the band. */
+.kh2-foliage{position:relative;min-height:clamp(148px,20vh,190px);margin-top:auto;pointer-events:none;}
+/* Full width at the clip's own 8:1, so nothing is cropped off the top and no
+   gap is left at the sides. height:auto lets the band grow on a wide monitor
+   rather than the frame being scaled up and trimmed; bottom:-1px keeps a
+   hairline off the section edge. The clip's own top row is near-white, which
+   is the hero's background, so the band has no visible seam. */
+/* The band is its own layer: frame one of the clip is its background, so the
+   greenery is painted from the first response, before any video exists or any
+   script runs. Its aspect ratio is the clip's, so the height follows the width
+   exactly — nothing is cropped off the top, nothing is left white at the sides.
+   bottom:-1px keeps a hairline off the section edge. Stills are 21KB and 15KB. */
+.kh2-clips{
+  position:absolute;left:0;right:0;bottom:-1px;width:100%;aspect-ratio:1808/226;
+  background:url('/hero-calm-desktop.webp') center bottom / 100% 100% no-repeat;
+  pointer-events:none;
+}
+.kh2-clips.is-mob{aspect-ratio:750/200;background-image:url('/hero-calm-mobile.webp');}
+.kh2-clip{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill;}
+/* The copy waiting its turn. Hidden with opacity, never display:none, because a
+   browser will not keep an undisplayed video decoding — and a stalled decoder
+   is the flash we are removing. */
+.kh2-clip.is-buffer{opacity:0;}
 /* Floats near the top of the greenery band, well clear of the section edge, and
    above the bushes rather than sitting down among them. */
 .kh2-badge-wrap{position:absolute;top:clamp(22px,4.2vh,52px);left:0;right:0;width:330px;margin:0 auto;z-index:3;}
@@ -1781,15 +1877,16 @@ const CSS = `
     font-family:var(--text)!important;font-size:15px!important;font-weight:600!important;letter-spacing:0!important;
   }
 
-  /* The comp puts the stat card just under the CTA with the plants pinned to
-     the foot of the screen. display:contents dissolves the foliage band, so the
-     card joins the hero's flow after the CTA while the two plant drawings stay
-     absolutely positioned — now against the hero itself — at the bottom. */
+  /* The comp puts the stat card just under the CTA with the clip pinned to the
+     foot of the screen. display:contents dissolves the band, so the card joins
+     the hero's flow after the CTA while the clip stays absolutely positioned —
+     now against the hero itself — at the bottom. */
   .kh2-foliage{display:contents;}
-  /* plants hug the foot of the hero; padding-bottom reserves their height so a
-     short phone grows the hero instead of drawing plants over the card */
-  .kh2-hero{padding-bottom:clamp(76px,14svh,120px)!important;}
-  .kh2-foliage-svg{height:clamp(76px,14svh,120px)!important;bottom:0;width:46%!important;}
+  /* the clip hugs the foot of the hero; padding-bottom reserves exactly the
+     height the phone cut takes at full width (750x200, so width / 3.75) — the
+     card is never drawn over, and the frame is never trimmed */
+  .kh2-hero{padding-bottom:calc(100vw / 3.75)!important;}
+  .kh2-clips{aspect-ratio:750/200;background-image:url('/hero-calm-mobile.webp');}
   .kh2-hero-in{margin-bottom:0!important;}
   .kh2-badge-wrap{
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;

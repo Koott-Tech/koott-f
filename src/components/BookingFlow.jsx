@@ -357,7 +357,12 @@ export default function BookingFlow({ slug }) {
     setSlot({ date: d, time: t, startsAt });
     setDay(key);
     setMonth(new Date(local.getFullYear(), local.getMonth(), 1));
-    setStep(2);
+    // The profile widget can also carry the plan: then only "About yourself" is
+    // left to ask. The plan itself is matched once this therapist's packages load,
+    // and the step falls back to 2 if that plan has since been withdrawn.
+    const planId = p.get('plan');
+    if (planId) setPendingPlanId(planId);
+    setStep(planId ? 3 : 2);
   }, [tz, slug]);
 
   /* ----------------------------- load ----------------------------------- */
