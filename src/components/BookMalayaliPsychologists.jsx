@@ -18,7 +18,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { publicApi } from '@/lib/backendApi';
 import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
-import TherapistCard, { THERAPIST_CARD_CSS } from '@/components/TherapistCard';
+import TherapistCard, { THERAPIST_CARD_CSS, introOf } from '@/components/TherapistCard';
 import { therapistSlug } from '@/components/TherapistProfile';
 import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
 import CustomSelect from '@/components/CustomSelect';
@@ -41,7 +41,7 @@ function toCard(p) {
     languages: ['English', 'Malayalam'],
     experience: years > 0 ? `${years}+ years of experience` : '',
     priceFrom: p.price ? `Starting from INR${p.price}` : '',
-    bio: p.card_intro || '',
+    bio: introOf(p),
     modes: ['audio', 'video'],
     photo: p.cover_image_url || null,
     specialist: p.specialist_category || null,

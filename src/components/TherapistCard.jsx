@@ -63,6 +63,25 @@ const langsOf = (t) => (Array.isArray(t.languages) ? t.languages : String(t.lang
  * page, the listing and the condition pages all describe a therapist the same
  * way; callers add their own extras (the listing keeps slug and filters).
  */
+/**
+ * The card's intro line. `card_intro` is the one written for the card (migration
+ * 0003), but it is blank on every therapist an admin has not filled in yet, and an
+ * older backend does not return the column at all — either way the card came out
+ * with no intro. The profile's own description stands in, cut to a sentence or two
+ * since the card only shows three lines of it.
+ */
+export const introOf = (p) => {
+  const own = String(p.card_intro || '').trim();
+  if (own) return own;
+  const fallback = String(p.short_description || p.description || '').trim();
+  if (!fallback) return '';
+  // Whole sentences up to ~220 characters, so the clamp never cuts mid-word.
+  if (fallback.length <= 220) return fallback;
+  const cut = fallback.slice(0, 220);
+  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
+  return end > 80 ? cut.slice(0, end + 1) : `${cut.slice(0, cut.lastIndexOf(' '))}…`;
+};
+
 export const cardFields = (p) => {
   const years = Number(p.experience_years) || 0;
   return {
@@ -70,8 +89,7 @@ export const cardFields = (p) => {
     name: p.name || `${p.first_name || ''} ${p.last_name || ''}`.trim(),
     role: p.designation || p.specialization || '',
     photo: p.cover_image_url || p.profile_picture_url || null,
-    // The card's own short intro (psychologists.card_intro), never the profile's About.
-    bio: p.card_intro || '',
+    bio: introOf(p),
     years,
     price: Number(p.individual_session_price || p.price) || 0,
     languages: Array.isArray(p.languages) && p.languages.length ? p.languages : ['English', 'Malayalam'],
