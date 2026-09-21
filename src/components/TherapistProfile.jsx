@@ -1016,17 +1016,21 @@ body:has(.lp){overflow-x:clip!important;}
    as you scroll, so a therapist with two reels or ten looks right either way. */
 .lp-reels{
   display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;padding-bottom:6px;margin-bottom:-6px;
-  scrollbar-width:thin;scrollbar-color:var(--line) transparent;
+  -webkit-overflow-scrolling:touch;
+  /* No scrollbar at any width — the cards running off the edge are the cue that
+     the row swipes, and the fade below makes that read. */
+  scrollbar-width:none;-ms-overflow-style:none;
+  /* Both edges dissolve, so a card leaves the row softly instead of being
+     sliced off against the card border. */
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 26px,#000 calc(100% - 26px),transparent 100%);
+  mask-image:linear-gradient(to right,transparent 0,#000 26px,#000 calc(100% - 26px),transparent 100%);
   /* Run the row to the card's own edges so a card leaves the view at the edge
      instead of being cut short against the padding. The padding is given back
      inside, and scroll-padding keeps the first card in line with the heading. */
   margin-left:calc(var(--pad) * -1);margin-right:calc(var(--pad) * -1);
   padding-left:var(--pad);padding-right:var(--pad);scroll-padding-left:var(--pad);
 }
-.lp-reels::-webkit-scrollbar{height:6px;}
-.lp-reels::-webkit-scrollbar-track{background:transparent;}
-.lp-reels::-webkit-scrollbar-thumb{background:var(--line);border-radius:10px;}
+.lp-reels::-webkit-scrollbar{display:none;}
 .lp-reel{
   position:relative;border-radius:16px;overflow:hidden;aspect-ratio:3/4.3;display:block;
   flex:0 0 auto;width:62%;max-width:230px;scroll-snap-align:start;
@@ -1108,8 +1112,7 @@ body:has(.lp){overflow-x:clip!important;}
   .lp-h--desk{display:none;}
   /* swiped, so the scrollbar goes and the swipe stops at the ends rather than
      dragging the page sideways with it */
-  .lp-reels{gap:10px;scrollbar-width:none;overscroll-behavior-x:contain;}
-  .lp-reels::-webkit-scrollbar{display:none;}
+  .lp-reels{gap:10px;overscroll-behavior-x:contain;}
   .lp-reel{width:72%;max-width:210px;}
   .lp-tab,.lp-media-tab{min-height:44px;}
 }

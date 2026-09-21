@@ -173,6 +173,9 @@ export default function BookingFlow({ slug }) {
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [otpBusy, setOtpBusy] = useState(false);
+  // 6 for a real WhatsApp code; a reserved test number answers with its own
+  // shorter one (PHONE_OTP_TEST_NUMBERS on the backend — temporary).
+  const [otpLen, setOtpLen] = useState(6);
   const [otpErr, setOtpErr] = useState('');
   const [otpNote, setOtpNote] = useState('');
   const [resendIn, setResendIn] = useState(0);
@@ -225,7 +228,9 @@ export default function BookingFlow({ slug }) {
       setOtpSent(true);
       setOtpCode('');
       setResendIn(d.resendAfter || 30);
-      // Local testing only (PHONE_OTP_DEV_ECHO) — before the WhatsApp template is approved.
+      // Local testing only (PHONE_OTP_DEV_ECHO / PHONE_OTP_TEST_NUMBERS) —
+      // before the WhatsApp template is approved.
+      setOtpLen(d.devCode ? String(d.devCode).length : 6);
       if (d.devCode) setOtpNote(`Test mode — WhatsApp not sent. Your code is ${d.devCode}.`);
     } catch (e) {
       setOtpErr(e.message);
@@ -236,7 +241,7 @@ export default function BookingFlow({ slug }) {
   };
 
   const verifyOtp = async (code = otpCode) => {
-    if (code.length !== 6) return;
+    if (code.length !== otpLen) return;
     setOtpBusy(true); setOtpErr('');
     try {
       const d = await postOtp('verify', { phone: otpPhone, code, psychologistId: therapist?.id });
@@ -794,14 +799,14 @@ export default function BookingFlow({ slug }) {
                   </p>
                   <input
                     className="bf-code" value={otpCode} inputMode="numeric" autoComplete="one-time-code"
-                    maxLength={6} aria-label="6-digit code" placeholder="••••••" autoFocus
+                    maxLength={otpLen} aria-label={`${otpLen}-digit code`} placeholder={'•'.repeat(otpLen)} autoFocus
                     onChange={(e) => {
-                      const code = e.target.value.replace(/\D/g, '').slice(0, 6);
+                      const code = e.target.value.replace(/\D/g, '').slice(0, otpLen);
                       setOtpCode(code);
-                      if (code.length === 6) verifyOtp(code);
+                      if (code.length === otpLen) verifyOtp(code);
                     }}
                   />
-                  <button type="button" className="bf-next" disabled={otpBusy || otpCode.length !== 6} onClick={() => verifyOtp()}>
+                  <button type="button" className="bf-next" disabled={otpBusy || otpCode.length !== otpLen} onClick={() => verifyOtp()}>
                     {otpBusy ? 'Checking…' : 'Verify and continue'}
                   </button>
                   <p className="bf-otp-resend">
