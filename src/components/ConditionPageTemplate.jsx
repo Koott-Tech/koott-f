@@ -822,6 +822,8 @@ const CSS = `
   .kct-h1{font-size:20px!important;}
   .kct-h2{font-size:20px!important;}
   .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-stats,.kct-therapists,.kct-why-grid{grid-template-columns:1fr;}
+  /* therapist cards run 12px from the screen edge rather than the 20px gutter */
+  .kct-therapists{margin-left:-8px;margin-right:-8px;gap:16px;}
   .kct-band{flex-direction:column;text-align:center;}
   .kct-band-art{display:none;}
   .kct-faq-head{flex-direction:column;align-items:flex-start;gap:8px;}

@@ -47,6 +47,7 @@ function EditTherapistModal({ therapist, onClose, onSaved }) {
     area_of_expertise: therapist.psychologist?.area_of_expertise || '',
     experience_years: therapist.psychologist?.experience_years || '',
     description: therapist.psychologist?.description || '',
+    card_intro: therapist.psychologist?.card_intro || '',
   });
 
   const handleSave = async (e) => {
@@ -65,6 +66,7 @@ function EditTherapistModal({ therapist, onClose, onSaved }) {
           area_of_expertise: formData.area_of_expertise,
           experience_years: formData.experience_years ? parseInt(formData.experience_years) : null,
           description: formData.description,
+          card_intro: formData.card_intro.trim() || null,
         };
         if (showPasswordReset && newPassword.trim()) {
           payload.password = newPassword.trim();
@@ -81,6 +83,7 @@ function EditTherapistModal({ therapist, onClose, onSaved }) {
           area_of_expertise: formData.area_of_expertise,
           experience_years: formData.experience_years ? parseInt(formData.experience_years) : null,
           description: formData.description,
+          card_intro: formData.card_intro.trim() || null,
         });
       }
 
@@ -190,7 +193,20 @@ function EditTherapistModal({ therapist, onClose, onSaved }) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-700">Description / Bio</label>
+            <label className="text-xs font-medium text-gray-700">Card intro</label>
+            <textarea
+              rows={3}
+              maxLength={220}
+              value={formData.card_intro}
+              onChange={(e) => setFormData({ ...formData, card_intro: e.target.value })}
+              placeholder="A short intro for the therapist card. Up to 3 lines are shown."
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-[#025545] focus:ring-2 focus:ring-[#025545]/10 outline-none"
+            />
+            <p className="text-[11px] text-gray-500">{formData.card_intro.length}/220 · shown on listing cards only, not the profile page</p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-gray-700">About (profile page)</label>
             <textarea
               rows={3}
               value={formData.description}

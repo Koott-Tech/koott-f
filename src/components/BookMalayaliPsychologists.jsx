@@ -41,7 +41,7 @@ function toCard(p) {
     languages: ['English', 'Malayalam'],
     experience: years > 0 ? `${years}+ years of experience` : '',
     priceFrom: p.price ? `Starting from INR${p.price}` : '',
-    bio: p.short_description || p.description || '',
+    bio: p.card_intro || '',
     modes: ['audio', 'video'],
     photo: p.cover_image_url || null,
     specialist: p.specialist_category || null,
@@ -237,8 +237,12 @@ const LISTING_CSS = `
 @media (max-width:900px){
   .ktl-grid{grid-template-columns:1fr;}
 }
+/* phones: the two filters share one row, each half of a narrower strip */
 @media (max-width:640px){
-  .ktl-select{width:100%;}
-  .ktl-field{width:100%;}
+  .ktl-filters{flex-wrap:nowrap;gap:10px;max-width:340px;margin-left:auto;margin-right:auto;}
+  .ktl-field{flex:1 1 0;min-width:0;}
+  /* cards run 12px from the screen edge rather than the page's 20px gutter */
+  .ktl-grid{margin-left:-8px;margin-right:-8px;gap:16px;}
+  .ktl-select{width:100%;height:38px;padding:0 30px 0 12px;font-size:13px;border-radius:12px;background-position:right 12px center;}
 }
 `;

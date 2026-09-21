@@ -234,13 +234,22 @@ const CSS = `
   background:#012F23;color:#E6F0EA;
   font-family:'Mulish','Avenir',system-ui,sans-serif;
 }
-.kf-in{max-width:1180px;margin:0 auto;padding:54px 24px 34px;}
+/* Same 1180px column and 24px gutter as the page sections (.kh2-in), so the
+   footer lines up with everything above it. Inside that, spacing and type are
+   fluid (clamp against the viewport) rather than fixed, so the layout grows and
+   shrinks with the window instead of holding still until a breakpoint snaps. */
+.kf-in{
+  max-width:1180px;margin:0 auto;
+  padding:clamp(40px,4.5vw,60px) 24px clamp(26px,2.6vw,36px);
+}
 
 /* brand | EXPERTS | CONDITIONS | SERVICES on row one, ABOUT KOOTT | OUR TERMS |
-   (conditions continues) | JOIN US on row two. */
+   (conditions continues) | JOIN US on row two. minmax(0,…) lets a column give
+   way to a long unbroken label instead of pushing the grid wider than the page. */
 .kf-grid{
-  display:grid;grid-template-columns:1.35fr 1fr 1.15fr 1fr;
-  column-gap:30px;row-gap:34px;align-items:start;
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);
+  column-gap:clamp(18px,2.6vw,40px);row-gap:clamp(26px,2.8vw,38px);align-items:start;
 }
 .kf-brand{grid-column:1;grid-row:1;}
 .kf-join{grid-column:4;grid-row:2;}
@@ -268,13 +277,15 @@ const CSS = `
 }
 .kf-list{list-style:none!important;margin:0;padding:0;}
 .kf-list li{display:block!important;margin:0 0 9px;}
+/* 14.5px on a wide screen easing to 13px near the tablet switch, so the four
+   columns keep their labels on one line for as long as there is room. */
 .kf-link{
-  text-decoration:none;font-size:14px!important;letter-spacing:0!important;color:#E6F0EA!important;
-  line-height:1.4em!important;
+  text-decoration:none;font-size:clamp(13px,.45vw + 8.5px,14.5px)!important;letter-spacing:0!important;
+  color:#E6F0EA!important;line-height:1.4em!important;
 }
 .kf-link:hover{color:#fff!important;text-decoration:underline;}
 /* The second row's links are set in caps in the artboard. */
-.kf-col.is-small .kf-link{font-size:12.5px!important;letter-spacing:.02em!important;text-transform:uppercase;}
+.kf-col.is-small .kf-link{font-size:clamp(11.5px,.35vw + 8px,12.5px)!important;letter-spacing:.02em!important;text-transform:uppercase;}
 
 /* Photo card with the JOIN US pill; a tinted panel until we have the team shot. */
 .kf-join{display:flex;justify-content:flex-end;align-items:flex-start;}
@@ -307,28 +318,27 @@ const CSS = `
 .kf-sitemap:hover{color:#fff!important;}
 .kf-marks{display:flex;gap:14px;color:#BFD7C9;}
 
+/* Tablet: three columns, packed so no row is left half empty.
+     brand (2 cols)            | JOIN US
+     EXPERTS    | SERVICES     | ABOUT KOOTT
+     CONDITIONS (2 cols, two-column list) | OUR TERMS
+   The old two-column version gave the brand, the join card and the socials a
+   whole row each, which is where its 1,700px of height went. DOM order is
+   brand, EXPERTS, CONDITIONS, SERVICES, ABOUT, TERMS, JOIN — hence the order values. */
 @media (max-width:1000px){
-  /* Two columns and ordinary flow — the explicit placement above only makes
-     sense on the four-column desktop grid. */
-  .kf-grid{grid-template-columns:1fr 1fr;}
+  .kf-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
   .kf-grid > *{grid-column:auto!important;grid-row:auto!important;}
-  .kf-brand,.kf-join,.kf-col.is-wide{grid-column:1 / -1!important;}
-  /* Pair the short lists: EXPERTS beside SERVICES, then the wide CONDITIONS
-     row, then ABOUT beside TERMS. DOM order is brand, EXPERTS, CONDITIONS,
-     SERVICES, ABOUT, TERMS, JOIN, which left the long list beside a short one. */
-  .kf-grid > :nth-child(1){order:0;}
-  .kf-grid > :nth-child(2){order:1;}
-  .kf-grid > :nth-child(4){order:2;}
-  .kf-grid > :nth-child(3){order:3;}
-  .kf-grid > :nth-child(5){order:4;}
-  .kf-grid > :nth-child(6){order:5;}
-  .kf-grid > :nth-child(7){order:6;}
-  .kf-col.is-wide .kf-list{columns:2;column-gap:18px;}
+  .kf-grid > :nth-child(1){order:0;grid-column:1 / span 2!important;}  /* brand */
+  .kf-grid > :nth-child(7){order:1;}                                   /* JOIN US */
+  .kf-grid > :nth-child(2){order:2;}                                   /* EXPERTS */
+  .kf-grid > :nth-child(4){order:3;}                                   /* SERVICES */
+  .kf-grid > :nth-child(5){order:4;}                                   /* ABOUT */
+  .kf-grid > :nth-child(3){order:5;grid-column:1 / span 2!important;}  /* CONDITIONS */
+  .kf-grid > :nth-child(6){order:6;}                                   /* TERMS */
+  .kf-col.is-wide .kf-list{columns:2;column-gap:clamp(16px,3vw,30px);}
   .kf-col.is-wide .kf-list li{break-inside:avoid;}
-  .kf-join{justify-content:flex-start;}
-  .kf-bot{flex-direction:column;}
-  .kf-bot-r{align-items:flex-start;}
-  .kf-social{justify-content:flex-start;}
+  .kf-join{justify-content:flex-end;align-self:center;}
+  .kf-join-card{max-width:220px;height:100px;}
 }
 /* Touch sizes on tablet and phone: every link, contact line and social icon gets
    a row tall enough to tap without hitting its neighbour. */
@@ -336,21 +346,42 @@ const CSS = `
   .kf-list li{margin:0;}
   .kf-link{display:inline-flex;align-items:center;min-height:36px;}
   .kf-contact{min-height:36px;margin-top:6px;}
-  .kf-social{gap:6px;margin-left:-10px;}
+  /* 44px tap targets around 17px icons: pull the row out by the padding so the
+     icons themselves sit flush with the content edge (right on tablet). */
+  .kf-social{gap:6px;margin-right:-13px;}
   .kf-social a{width:44px;height:44px;align-items:center;justify-content:center;border-radius:50%;}
   .kf-social a:hover{background:rgba(255,255,255,.08);}
   .kf-sitemap{display:inline-flex;align-items:center;min-height:36px;}
 }
+/* Phone: two columns.
+     brand (full)
+     EXPERTS    | SERVICES
+     CONDITIONS (full, two-column list)
+     ABOUT KOOTT | OUR TERMS
+     JOIN US (full width)
+   then socials and the legal strip stacked. */
 @media (max-width:640px){
-  .kf-grid{grid-template-columns:1fr 1fr;column-gap:18px;row-gap:24px;}
+  .kf-grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;row-gap:24px;}
+  .kf-grid > :nth-child(1){order:0;grid-column:1 / -1!important;}  /* brand */
+  .kf-grid > :nth-child(2){order:1;}                               /* EXPERTS */
+  .kf-grid > :nth-child(4){order:2;}                               /* SERVICES */
+  .kf-grid > :nth-child(3){order:3;grid-column:1 / -1!important;}  /* CONDITIONS */
+  .kf-grid > :nth-child(5){order:4;}                               /* ABOUT */
+  .kf-grid > :nth-child(6){order:5;}                               /* TERMS */
+  .kf-grid > :nth-child(7){order:6;grid-column:1 / -1!important;}  /* JOIN US */
+  .kf-join{justify-content:stretch;align-self:auto;}
+  .kf-join-card{max-width:none;}
+  .kf-social{justify-content:flex-start;margin-right:0;margin-left:-13px;}
+  .kf-bot{flex-direction:column;gap:18px;}
+  .kf-bot-r{flex-direction:row;align-items:center;justify-content:space-between;width:100%;}
 
   .kf-link{font-size:14px!important;}
   /* The second row's caps were 11.5px — too small to read or tap on a phone. */
   .kf-col.is-small .kf-link{font-size:12.5px!important;letter-spacing:.03em!important;}
   .kf-h{margin-bottom:6px;}
-  .kf-join{justify-content:flex-start;}
-  .kf-join-card{max-width:260px;height:96px;}
-  .kf-in{padding:40px 20px 28px;padding-bottom:max(28px, env(safe-area-inset-bottom));}
+  .kf-join-card{height:96px;}
+  /* 22px sides: the page's own content edge on a phone, so the footer lines up. */
+  .kf-in{padding:40px 22px 28px;padding-bottom:max(28px, env(safe-area-inset-bottom));}
   .kf-crisis,.kf-help,.kf-copy{font-size:13px!important;}
 }
 `;

@@ -1,207 +1,23 @@
 "use client";
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function WhatsAppWidget() {
   // Fixed offset from bottom and right (same for mobile and desktop)
   const BOTTOM_OFFSET = 40; // Fixed 40px from bottom on all devices (moved up from 20px)
   const RIGHT_OFFSET = 20; // Fixed 20px from right on all devices
 
-  const [position, setPosition] = useState({ x: null, y: null }); // null means use right/bottom CSS
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [wasDragged, setWasDragged] = useState(false);
-  const [isPositioned, setIsPositioned] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const widgetRef = useRef(null);
-
-  // Set initial position to bottom right after mount with fixed offset
-  useEffect(() => {
-    if (typeof window !== 'undefined' && widgetRef.current && !isPositioned) {
-      const widget = widgetRef.current;
-      const rect = widget.getBoundingClientRect();
-      const x = window.innerWidth - rect.width - RIGHT_OFFSET;
-      const y = window.innerHeight - rect.height - BOTTOM_OFFSET;
-      setPosition({ x, y });
-      setIsPositioned(true);
-    }
-  }, [isPositioned]);
-
-  // Handle window resize to keep widget in bounds with fixed offset
-  useEffect(() => {
-    if (!isPositioned) return;
-    
-    const handleResize = () => {
-      const widget = widgetRef.current;
-      if (widget && !isDragging && position.x !== null && position.y !== null) {
-        const maxX = window.innerWidth - widget.offsetWidth - RIGHT_OFFSET;
-        const maxY = window.innerHeight - widget.offsetHeight - BOTTOM_OFFSET;
-        setPosition(prev => ({
-          x: Math.min(Math.max(0, prev.x), maxX),
-          y: Math.min(Math.max(0, prev.y), maxY)
-        }));
-      }
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isDragging, isPositioned, position.x, position.y]);
-
-  // Handle mouse/touch events for dragging
-  const handleMouseDown = (e) => {
-    if (e.button !== 0) return; // Only handle left mouse button
-    
-    const widget = widgetRef.current;
-    if (!widget) return;
-
-    // Convert from right/bottom to left/top if not yet positioned
-    if (position.x === null || position.y === null) {
-      const rect = widget.getBoundingClientRect();
-      const x = rect.left;
-      const y = rect.top;
-      setPosition({ x, y });
-      setIsPositioned(true);
-    }
-
-    const rect = widget.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
-
-    setDragOffset({ x: offsetX, y: offsetY });
-    setIsDragging(true);
-    setWasDragged(false);
-    
-    e.preventDefault();
-  };
-
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    const widget = widgetRef.current;
-    if (!widget) return;
-
-    // Convert from right/bottom to left/top if not yet positioned
-    if (position.x === null || position.y === null) {
-      const rect = widget.getBoundingClientRect();
-      const x = rect.left;
-      const y = rect.top;
-      setPosition({ x, y });
-      setIsPositioned(true);
-    }
-
-    const rect = widget.getBoundingClientRect();
-    const offsetX = touch.clientX - rect.left;
-    const offsetY = touch.clientY - rect.top;
-
-    setDragOffset({ x: offsetX, y: offsetY });
-    setIsDragging(true);
-    setWasDragged(false);
-  };
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e) => {
-      const newX = e.clientX - dragOffset.x;
-      const newY = e.clientY - dragOffset.y;
-
-      // Keep widget within viewport bounds
-      const widget = widgetRef.current;
-      if (!widget) return;
-
-      const maxX = window.innerWidth - widget.offsetWidth - RIGHT_OFFSET;
-      const maxY = window.innerHeight - widget.offsetHeight - BOTTOM_OFFSET;
-
-      // Check if there was actual movement
-      const movedX = Math.abs(newX - position.x);
-      const movedY = Math.abs(newY - position.y);
-      if (movedX > 5 || movedY > 5) {
-        setWasDragged(true);
-      }
-
-      setPosition({
-        x: Math.max(0, Math.min(newX, maxX)),
-        y: Math.max(0, Math.min(newY, maxY))
-      });
-    };
-
-    const handleTouchMove = (e) => {
-      e.preventDefault(); // Prevent scrolling while dragging
-      const touch = e.touches[0];
-      const newX = touch.clientX - dragOffset.x;
-      const newY = touch.clientY - dragOffset.y;
-
-      const widget = widgetRef.current;
-      if (!widget) return;
-
-      const maxX = window.innerWidth - widget.offsetWidth - RIGHT_OFFSET;
-      const maxY = window.innerHeight - widget.offsetHeight - BOTTOM_OFFSET;
-
-      // Check if there was actual movement
-      const movedX = Math.abs(newX - position.x);
-      const movedY = Math.abs(newY - position.y);
-      if (movedX > 5 || movedY > 5) {
-        setWasDragged(true);
-      }
-
-      setPosition({
-        x: Math.max(0, Math.min(newX, maxX)),
-        y: Math.max(0, Math.min(newY, maxY))
-      });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      // Small delay to reset drag flag after click detection
-      setTimeout(() => {
-        setWasDragged(false);
-      }, 150);
-    };
-
-    const handleTouchEnd = () => {
-      setIsDragging(false);
-      setTimeout(() => {
-        setWasDragged(false);
-      }, 150);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd);
-
-      return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [isDragging, dragOffset, position]);
 
   // WhatsApp link with pre-filled message
   const whatsappUrl = "https://wa.me/919539007766?text=Hi%20Koott%2C%20I%27d%20like%20to%20know%20more%20about%20your%20services.";
 
-  // Use right/bottom if not positioned yet, otherwise use left/top for dragging
-  const positionStyle = position.x !== null && position.y !== null
-    ? {
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        right: 'auto',
-        bottom: 'auto'
-      }
-    : {
-        right: `${RIGHT_OFFSET}px`,
-        bottom: `${BOTTOM_OFFSET}px`,
-        left: 'auto',
-        top: 'auto'
-      };
-
-  const isTooltipVisible = isHovering && !isDragging;
+  const isTooltipVisible = isHovering;
 
   return (
     <>
       <style dangerouslySetInnerHTML={{
         __html: `
           .whatsapp-widget-container {
-            touch-action: none;
             -webkit-tap-highlight-color: transparent;
           }
           @media (max-width: 768px) {
@@ -292,42 +108,30 @@ export default function WhatsAppWidget() {
         `
       }} />
       <div
-        ref={widgetRef}
-        className="fixed z-50 cursor-move select-none whatsapp-widget-container"
+        className="fixed z-50 select-none whatsapp-widget-container"
         style={{
-          ...positionStyle,
-          transition: isDragging ? 'none' : 'left 0.2s ease-out, top 0.2s ease-out, right 0.2s ease-out, bottom 0.2s ease-out',
+          right: `${RIGHT_OFFSET}px`,
+          bottom: `${BOTTOM_OFFSET}px`,
           pointerEvents: 'auto'
         }}
-        onMouseDown={handleMouseDown}
-        onTouchStart={(e) => {
-          setIsHovering(false);
-          handleTouchStart(e);
-        }}
+        onTouchStart={() => setIsHovering(false)}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
         <div style={{ position: 'relative', display: 'inline-block' }}>
           <div className={`whatsapp-tooltip ${isTooltipVisible ? 'visible' : ''}`}>
-            Hi... I’m movable
+            Chat with us
           </div>
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-            className={`block w-14 h-14 rounded-full hover:shadow-xl transition-shadow duration-200 flex items-center justify-center whatsapp-widget-button ${!isDragging ? 'whatsapp-widget-wiggle' : ''}`}
+            className={`block w-14 h-14 rounded-full hover:shadow-xl transition-shadow duration-200 flex items-center justify-center whatsapp-widget-button whatsapp-widget-wiggle`}
           style={{
             backgroundColor: '#ffffff', // White background like header
             boxShadow: '0 10px 15px -3px rgba(63, 46, 115, 0.3), 0 4px 6px -2px rgba(63, 46, 115, 0.2), 0 0 20px rgba(63, 46, 115, 0.15)', // Same shadow color as "Get started" button (#025545) with more color
             WebkitTapHighlightColor: 'transparent',
             touchAction: 'manipulation'
-          }}
-          onClick={(e) => {
-            // Prevent click if widget was dragged
-            if (wasDragged) {
-              e.preventDefault();
-              e.stopPropagation();
-            }
           }}
         >
           <svg

@@ -24,17 +24,19 @@ export const HERO = {
    * The first line of the headline cycles through these; the second line stays
    * put. Written with full stops in the brief — dropped here because the line
    * runs straight into "all with Koott", where a full stop would read as a typo.
+   * Each must fit ONE line on a 320px phone (~276px at the 30px headline size),
+   * or the headline jumps a line every time it rotates.
    */
   rotatingTitles: [
     'Feel understood',
     'Feel less anxious',
-    'Improve relationships',
-    'Manage stress better',
+    'Heal relationships',
+    'Manage stress',
     'Gain better sleep',
   ],
   titleTail: 'all with Koott',
   title: ['Feel less anxious', 'all with Koott'],
-  subtitle: 'Online Therapy with Malayali Psychologists, Anytime!',
+  subtitle: 'Online Therapy with Malayali Psychologists, 24/7',
   searchPlaceholder: "Type in what's on your mind.\nWe'll help you find the right therapist for you.",
   concernCta: 'Find therapist by concern',
   bookCta: 'Book a slot now',
@@ -244,6 +246,8 @@ export const SERVICES = {
   // two the artboard states (₹749 therapy, ₹1699 psychiatry) — anything we do
   // not have a published price for says "on the booking page" rather than
   // inventing a number.
+  // Photos are free Unsplash-licence images (images.unsplash.com), cropped by
+  // the URL; swap `image` for a Koott photo whenever one exists.
   tabs: [
     'Kalyana Raman', 'Counselling', 'Psychiatry', 'Assessments',
     'Child & Teens', 'Better Parenting', "Women's Health", 'Therapy',
@@ -255,6 +259,8 @@ export const SERVICES = {
       bullets: ['Decisions are consistent and informed', 'Based on a full understanding of your needs'],
       price: 'Starting from ₹749 onwards',
       href: '/pre-marital-counselling',
+      image: 'https://images.unsplash.com/photo-1758691462743-f9fc9e430d39?auto=format&fit=crop&w=900&q=70',
+      imageAlt: 'A therapist talking with a client over a video call on a laptop',
     },
     {
       title: ['Counselling in', 'your own language'],
@@ -262,6 +268,8 @@ export const SERVICES = {
       bullets: ['Same therapist, session after session', 'Evening and weekend slots'],
       price: 'Starting from ₹749 onwards',
       href: '/book-malayali-psychologists',
+      image: 'https://images.unsplash.com/photo-1714976694810-85add1a29c96?auto=format&fit=crop&w=900&q=70',
+      imageAlt: 'A counsellor in conversation with a client',
     },
     {
       title: ['Psychiatry when', 'you need it'],
@@ -269,6 +277,8 @@ export const SERVICES = {
       bullets: ['Diagnosis, prescription and follow-up', 'Coordinated with your therapist'],
       price: 'Starting from ₹1699 onwards',
       href: '/book-malayali-psychologists',
+      image: 'https://images.unsplash.com/photo-1714976694525-71eb29a7c500?auto=format&fit=crop&w=900&q=70',
+      imageAlt: 'A client talking with a specialist on a sofa',
     },
     {
       title: ['Assessments that', 'point somewhere'],
@@ -276,6 +286,8 @@ export const SERVICES = {
       bullets: ['Administered by trained psychologists', 'A written report you can take with you'],
       price: 'Pricing on the booking page',
       href: '/assessments',
+      image: 'https://images.unsplash.com/photo-1714976694609-6cf681844f18?auto=format&fit=crop&w=900&q=70',
+      imageAlt: 'A psychologist taking notes on a clipboard during a session',
     },
     {
       title: ['Care for children', 'and teenagers'],
@@ -283,6 +295,8 @@ export const SERVICES = {
       bullets: ['Child and adolescent psychologists', 'School, friendship and family concerns'],
       price: 'Starting from ₹749 onwards',
       href: '/online-child-psychologist',
+      image: 'https://images.unsplash.com/photo-1758273240331-745ccab011a2?auto=format&fit=crop&w=900&q=70',
+      imageAlt: 'A therapist talking with a young girl',
     },
     {
       title: ['Support for', 'parents'],
@@ -290,6 +304,8 @@ export const SERVICES = {
       bullets: ['Behaviour, boundaries and routines', 'Sessions for one parent or both'],
       price: 'Starting from ₹749 onwards',
       href: '/better-parenting',
+      image: 'https://images.unsplash.com/photo-1589169011402-8b2cbd1ee593?auto=format&fit=crop&w=900&q=70',
+      imageAlt: 'A mother holding her laughing child',
     },
     {
       title: ["Women's health", 'and wellbeing'],
@@ -297,6 +313,8 @@ export const SERVICES = {
       bullets: ['Fertility, pregnancy and postpartum', 'Confidential, judgement-free sessions'],
       price: 'Starting from ₹749 onwards',
       href: '/book-malayali-psychologists',
+      image: 'https://images.unsplash.com/photo-1739429942851-9083ee185d3d?auto=format&fit=crop&w=900&q=70',
+      imageAlt: 'A woman in a sari outdoors in soft light',
     },
     {
       title: ['Therapy that fits', 'your week'],
@@ -304,6 +322,8 @@ export const SERVICES = {
       bullets: ['Sessions on Google Meet, from anywhere', 'Packages of 3, 6 and 9 sessions'],
       price: 'Starting from ₹749 onwards',
       href: '/book-malayali-psychologists',
+      image: 'https://images.unsplash.com/photo-1600194992699-40f82661a55d?auto=format&fit=crop&w=900&q=70',
+      imageAlt: 'A woman smiling at her laptop at home',
     },
   ],
 };

@@ -8,7 +8,9 @@
  *             translucent brown wash instead)
  *   nav       13px / 400 / uppercase, white, Avenir → Mulish stands in
  *   items     INDIVIDUAL ⌄ · RELATIONSHIP ⌄ · SEXUAL & INTIMACY ⌄ · THERAPISTS
- *   BOOK NOW  109x30 pill, transparent fill, 1px white border, radius 15px
+ *   SIGN IN   109x30 pill, transparent fill, 1px white border, radius 15px
+ *             (was BOOK NOW); once signed in, an account pill takes its place:
+ *             initial avatar + caret on phones, avatar + name + caret wider up
  *   logo      143x56
  *   column    980px, matching the condition pages
  *
@@ -18,7 +20,7 @@
  * Responsive:
  *   ≥1024px   full nav (fits from ~930px; 1024 is tablet landscape)
  *   <1024px   burger + drawer; the drawer reuses the menu the header loaded
- *   ≤520px    smaller logo crop and BOOK NOW pill
+ *   ≤520px    smaller logo crop and SIGN IN pill
  * Icon buttons keep their drawn size but get a 44px touch target.
  *
  * One deliberate departure from the live site: koott.in is a Wix marketing site
@@ -49,10 +51,9 @@ const Caret = ({ open }) => (
   </svg>
 );
 
-const AccountIcon = () => (
-  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-    <circle cx="12" cy="8" r="3.6" />
-    <path d="M4.5 20a7.5 7.5 0 0 1 15 0" strokeLinecap="round" />
+const PillCaret = ({ open }) => (
+  <svg width="12" height="8" viewBox="0 0 12 8" aria-hidden focusable="false" className={`kh-pill-caret ${open ? 'is-open' : ''}`}>
+    <path d="M1.5 1.5L6 6l4.5-4.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -109,7 +110,11 @@ export default function KoottHeader({ conditionMenu } = {}) {
     return () => mq.removeEventListener?.('change', onChange);
   }, [mobileOpen]);
 
-  const displayName = user?.name || user?.first_name || user?.email?.split('@')[0] || 'Account';
+  const displayName = user?.name
+    || [user?.first_name, user?.last_name].filter(Boolean).join(' ')
+    || user?.email?.split('@')[0]
+    || 'Account';
+  const initial = (displayName.trim()[0] || 'A').toUpperCase();
 
   const onLogout = async () => {
     setUserMenuOpen(false);
@@ -161,14 +166,17 @@ export default function KoottHeader({ conditionMenu } = {}) {
           <div className="kh-right">
             {isAuthenticated() ? (
               <div className="kh-user">
+                {/* Initial + caret on phones; the name joins them from tablet up. */}
                 <button
                   type="button"
-                  className="kh-icon"
-                  aria-label="Account menu"
+                  className="kh-pill"
+                  aria-label={`Account menu for ${displayName}`}
                   aria-expanded={userMenuOpen}
                   onClick={() => setUserMenuOpen((v) => !v)}
                 >
-                  <AccountIcon />
+                  <span className="kh-avatar" aria-hidden>{initial}</span>
+                  <span className="kh-pill-name">{displayName}</span>
+                  <PillCaret open={userMenuOpen} />
                 </button>
                 {userMenuOpen && (
                   <div className="kh-usermenu">
@@ -182,17 +190,10 @@ export default function KoottHeader({ conditionMenu } = {}) {
                 )}
               </div>
             ) : (
-              <button
-                type="button"
-                className="kh-icon"
-                aria-label="Log in"
-                onClick={() => setShowAuth(true)}
-              >
-                <AccountIcon />
+              <button type="button" className="kh-book" onClick={() => setShowAuth(true)}>
+                SIGN IN
               </button>
             )}
-
-            <Link href={BOOK_HREF} className="kh-book">BOOK NOW</Link>
 
             <button
               type="button"
@@ -227,9 +228,8 @@ export default function KoottHeader({ conditionMenu } = {}) {
                     <button type="button" className="is-danger" onClick={onLogout}>Logout</button>
                   </>
                 ) : (
-                  <button type="button" onClick={() => { setMobileOpen(false); setShowAuth(true); }}>Login</button>
+                  <button type="button" onClick={() => { setMobileOpen(false); setShowAuth(true); }}>Sign in</button>
                 )}
-                <Link href={BOOK_HREF} className="kh-book is-wide" onClick={() => setMobileOpen(false)}>BOOK NOW</Link>
               </div>
             </div>
           </>
@@ -279,7 +279,7 @@ const CSS = `
   transition:opacity .16s ease;
 }
 .kh-link:hover{opacity:1;}
-.kh-link:focus-visible,.kh-icon:focus-visible,.kh-burger:focus-visible,.kh-book:focus-visible{
+.kh-link:focus-visible,.kh-burger:focus-visible,.kh-book:focus-visible{
   outline:2px solid #9BE7B4;outline-offset:3px;border-radius:6px;
 }
 .kh-link--plain{display:inline-flex;align-items:center;}
@@ -287,15 +287,8 @@ const CSS = `
 .kh-caret.is-open{transform:rotate(180deg);}
 
 .kh-right{display:flex;align-items:center;gap:6px;flex:none;}
-/* Drawn at 21px, tapped at 44px. */
-.kh-icon{
-  background:none;border:0;padding:0;cursor:pointer;color:#fff;opacity:.94;
-  display:inline-flex;align-items:center;justify-content:center;
-  width:44px;height:44px;border-radius:50%;
-}
-.kh-icon:hover{opacity:1;background:rgba(255,255,255,.08);}
 .kh-book{
-  display:inline-flex;align-items:center;justify-content:center;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
   width:109px;height:30px;border-radius:15px;margin-left:6px;
   border:1px solid #fff;background:transparent;
   font-family:inherit!important;font-size:13px!important;font-weight:400!important;
@@ -303,7 +296,31 @@ const CSS = `
   transition:background .18s ease,color .18s ease;
 }
 .kh-book:hover{background:#fff;color:#29653D!important;}
-.kh-book.is-wide{width:100%;height:46px;border-radius:23px;margin:4px 0 0;font-size:14px!important;}
+
+/* Signed-in account pill: white, soft grey rim, a warm initial avatar. */
+.kh-pill{
+  display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px 0 4px;margin-left:6px;
+  background:#fff;border:2px solid #E3E3E6;border-radius:999px;cursor:pointer;
+  font-family:inherit;color:#1C1C1E;transition:border-color .16s ease,box-shadow .16s ease;
+}
+.kh-pill:hover{border-color:#D0D0D5;box-shadow:0 2px 10px rgba(0,0,0,.12);}
+.kh-pill:focus-visible{outline:2px solid #9BE7B4;outline-offset:2px;}
+.kh-avatar{
+  width:30px;height:30px;border-radius:50%;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,#FFF3C4 0%,#FFE08A 55%,#FFD36B 100%);
+  font-size:13px;font-weight:700;line-height:1;color:#7A4A12;
+}
+.kh-pill-name{
+  max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:13px;font-weight:600;letter-spacing:0;color:#1C1C1E;
+}
+.kh-pill-caret{flex:none;color:#6C6C70;transition:transform .18s ease;}
+.kh-pill-caret.is-open{transform:rotate(180deg);}
+@media (max-width:640px){
+  .kh-pill{gap:6px;height:38px;padding:0 10px 0 3px;}
+  .kh-pill-name{display:none;}
+}
 
 /* Menu labels inside the dropdowns and the mobile drawer. globals.css sets
    h1-h6 to 60/48/36px with !important, which beats inline styles — so those
@@ -368,8 +385,6 @@ const CSS = `
   font-family:inherit;font-size:16px;color:#100E0E;
 }
 .kh-drawer-foot button.is-danger{color:#B3261E;}
-.kh-drawer-foot .kh-book{color:#100E0E!important;border-color:rgba(38,34,34,.4);}
-.kh-drawer-foot .kh-book:hover{background:#F5FFF6;color:#29653D!important;}
 
 /* Tablet (portrait) and down: burger + drawer. On a wide tablet the drawer is a
    right-hand panel rather than a full-width sheet. */

@@ -6,7 +6,7 @@
  *
  * Top to bottom, as the artboard has it:
  *   avatar · name · credential
- *   tinted panel: two lines of intro, the voice-intro row, View profile
+ *   tinted panel: up to three lines of card intro, the voice-intro row, View profile
  *   the therapist's concerns as chips, scrolled sideways under a fade
  *   three tiles: years, languages, price per session
  *   footer: next available, and Book now
@@ -33,9 +33,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Award, IndianRupee, Languages, Pause, Play } from 'lucide-react';
 
+/* Voice-message waveform proportions (as in WhatsApp / iMessage): 3px rounded bars, 2px apart. */
+const BAR_WIDTH = 3;
+const BAR_GAP = 2;
 /* The bar heights of the little equaliser, so it looks like speech rather than
    a sine wave. They animate while playing and hold still when paused. */
-const BAR_HEIGHTS = [38, 62, 100, 74, 46, 88, 58, 96, 70, 42, 80, 54, 92, 64, 36, 76, 50, 84, 60, 40];
+const BAR_HEIGHTS = [
+  30, 48, 72, 100, 64, 40, 56, 88, 70, 44, 34, 62, 92, 78, 50, 36,
+  58, 84, 96, 66, 42, 54, 80, 60, 38, 46, 74, 90, 68, 44, 32, 52,
+  86, 72, 48, 64, 94, 76, 50, 40, 60, 82, 66, 42, 56, 70, 46, 34,
+];
 
 const titleCase = (s) => String(s).replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 const initialsOf = (name) => String(name || '').trim().split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase();
@@ -59,7 +66,8 @@ export const cardFields = (p) => {
     name: p.name || `${p.first_name || ''} ${p.last_name || ''}`.trim(),
     role: p.designation || p.specialization || '',
     photo: p.cover_image_url || p.profile_picture_url || null,
-    bio: p.short_description || p.description || p.bio || '',
+    // The card's own short intro (psychologists.card_intro), never the profile's About.
+    bio: p.card_intro || '',
     years,
     price: Number(p.individual_session_price || p.price) || 0,
     languages: Array.isArray(p.languages) && p.languages.length ? p.languages : ['English', 'Malayalam'],
@@ -79,6 +87,21 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef(null);
+
+  /* As many 3px bars (2px apart) as the row has room for, so the waveform is
+     always full and the played colour reaches the right-hand end. */
+  const barsRef = useRef(null);
+  const [barCount, setBarCount] = useState(28);
+  useEffect(() => {
+    const el = barsRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(([entry]) => {
+      const n = Math.floor((entry.contentRect.width + BAR_GAP) / (BAR_WIDTH + BAR_GAP));
+      setBarCount(Math.max(8, n));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   /* PLACEHOLDER while therapists have no recorded intro: the bar moves for 30s
      so the design can be seen whole. With t.voiceUrl set it plays the real
@@ -129,12 +152,12 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
           </button>
           {/* The bars are always here — one line with the play button — and only
               come alive while something is playing. */}
-          <span className={`ktc-bars ${playing ? 'is-playing' : ''}`} aria-hidden>
-            {BAR_HEIGHTS.map((h, i) => (
+          <span ref={barsRef} className={`ktc-bars ${playing ? 'is-playing' : ''}`} aria-hidden>
+            {Array.from({ length: barCount }, (_, i) => (
               <i
                 key={i}
-                className={`ktc-bar${playing && (i / BAR_HEIGHTS.length) * 100 <= progress ? ' is-past' : ''}`}
-                style={{ height: `${h}%`, animationDelay: `${i * 60}ms` }}
+                className={`ktc-bar${playing && (i / barCount) * 100 <= progress ? ' is-past' : ''}`}
+                style={{ height: `${BAR_HEIGHTS[i % BAR_HEIGHTS.length]}%`, animationDelay: `${(i % 16) * 60}ms` }}
               />
             ))}
           </span>
@@ -191,11 +214,15 @@ export const THERAPIST_CARD_CSS = `
   --ktc-bg:#F8FDF6;
   --ktc-surface:#FFFFFF;
   --ktc-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  display:flex;flex-direction:column;position:relative;
+  display:flex;flex-direction:column;position:relative;min-width:0;container-type:inline-size;
   background:var(--ktc-surface);border:1.5px solid var(--ktc-line);border-radius:20px;padding:20px;
   transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
-.ktc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(30,43,35,.06);}
+/* lift on hover only where there is a real mouse — on phones a tap would leave it stuck */
+@media (hover:hover) and (pointer:fine){
+  .ktc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(30,43,35,.06);}
+  .ktc-avatar:hover{transform:scale(1.04);}
+}
 .ktc *{box-sizing:border-box;}
 
 .ktc-head{display:flex;align-items:center;gap:16px;margin:4px 0 12px;}
@@ -204,7 +231,6 @@ export const THERAPIST_CARD_CSS = `
   background:var(--ktc-primary-soft);border:1px solid var(--ktc-line);
   transition:transform .15s ease;
 }
-.ktc-avatar:hover{transform:scale(1.04);}
 .ktc-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
 .ktc-initials{
   width:100%;height:100%;display:flex;align-items:center;justify-content:center;
@@ -225,7 +251,7 @@ export const THERAPIST_CARD_CSS = `
 
 .ktc-panel{background:var(--ktc-bg);border-radius:16px;padding:12px;margin-bottom:16px;}
 .ktc-bio{
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
   font-family:var(--ktc-sans)!important;font-size:13px!important;line-height:1.5em!important;
   color:var(--ktc-ink-soft)!important;margin:0 0 12px;letter-spacing:0!important;
 }
@@ -247,9 +273,9 @@ export const THERAPIST_CARD_CSS = `
 /* The equaliser sits in the row at all times: pale and still when nothing is
    playing, moving once it is, with the bars already heard holding the green.
    Paused rather than removed, so it never jumps into place. */
-.ktc-bars{flex:1;min-width:60px;display:flex;align-items:center;gap:2px;height:20px;}
+.ktc-bars{flex:1;min-width:0;overflow:hidden;display:flex;align-items:center;justify-content:flex-start;gap:2px;height:22px;}
 .ktc-bar{
-  flex:1;min-width:2px;border-radius:999px;background:#CFE0D4;transform-origin:center;
+  flex:none;width:3px;border-radius:999px;background:#CFE0D4;transform-origin:center;
   animation:ktc-bar-move .9s ease-in-out infinite alternate;animation-play-state:paused;
 }
 .ktc-bars.is-playing .ktc-bar{animation-play-state:running;}
@@ -308,6 +334,20 @@ export const THERAPIST_CARD_CSS = `
 }
 .ktc-book:hover{background:#155424;}
 
+/* Sized by the card's own width, not the screen's: the same card sits in a
+   full-width list, a two-up grid and a swipe row on phones. */
+@container (max-width:320px){
+  .ktc-panel{padding:10px;}
+  .ktc-voice{gap:8px;}
+  .ktc-view{padding:5px 9px;font-size:11px!important;}
+  .ktc-stats{gap:6px;}
+  .ktc-stat{padding:8px 4px;}
+  .ktc-stat-v{font-size:13px!important;gap:3px;}
+  .ktc-stat-l{font-size:10.5px!important;}
+  .ktc-foot{gap:8px;}
+  .ktc-avail{font-size:13px!important;}
+  .ktc-book{padding:9px 12px;font-size:13px!important;}
+}
 @media (max-width:520px){
   .ktc{padding:16px;}
   .ktc-avatar{width:56px;height:56px;}

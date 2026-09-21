@@ -124,9 +124,15 @@ const SOURCE = { google: 'G', whatsapp: '✆', zoho: 'Z' };
    hero, which happens constantly because the badge deck above rotates on a
    timer. The band itself carries the still frame as its background, so the
    greenery is painted with no JavaScript and no video decoded. */
+/* H.264 MP4 first: every iPhone browser is WebKit, and WebKit would not play
+   the WebM — it is VP9 flagged alpha_mode=1, and Apple's WebKit has no VP9
+   alpha, so on iOS the band sat on its still frame. The alpha was never used
+   (every pixel of every frame is opaque), so a plain MP4 loses nothing; it is
+   hardware-decoded on every phone and about half the size. The WebM stays as
+   the fallback for a browser with no H.264. */
 const CUTS = {
-  desk: { src: '/hero-calm-desktop.webm', poster: '/hero-calm-desktop.webp' },
-  mob: { src: '/hero-calm-mobile.webm', poster: '/hero-calm-mobile.webp' },
+  desk: { mp4: '/hero-calm-desktop.mp4', webm: '/hero-calm-desktop.webm', poster: '/hero-calm-desktop.webp' },
+  mob: { mp4: '/hero-calm-mobile.mp4', webm: '/hero-calm-mobile.webm', poster: '/hero-calm-mobile.webp' },
 };
 const HANDOVER = 0.12;   // seconds of overlap before a clip reaches its end
 
@@ -204,7 +210,6 @@ const HeroClip = () => {
           key={`${cut}-${i}`}
           ref={i === 0 ? a : b}
           className={`kh2-clip ${extra || ''}`}
-          src={clip.src}
           poster={clip.poster}
           // The front clip carries autoplay too, for browsers that start a
           // muted video on its own but refuse a scripted play().
@@ -214,7 +219,10 @@ const HeroClip = () => {
           preload="auto"
           aria-hidden
           tabIndex={-1}
-        />
+        >
+          <source src={clip.mp4} type="video/mp4" />
+          <source src={clip.webm} type="video/webm" />
+        </video>
       ))}
     </span>
   );
@@ -330,6 +338,18 @@ const FALLBACK_THERAPISTS = [
   { name: 'Dr. Thaniya K Leela', designation: 'Consultant Psychologist' },
 ];
 
+/* Placeholder therapist portraits for the experts strip — the same DiceBear
+   "notionists" style the demo therapist rows use — until real photos exist. */
+const FACE_BGS = ['F1FBF3', 'E8F1FB', 'FCEADB', 'F6EFFB', 'EAF3E2', 'FBF3E1'];
+const EXPERT_FACES = [
+  ['Anjali Menon', 'Rahul Nair', 'Fathima Noora', 'Vishnu Prasad', 'Sneha Thomas', 'Arun Krishnan', 'Meera Pillai',
+    'Nikhil Varghese', 'Divya Raj', 'Aswin Kumar', 'Lakshmi Nair', 'Joel Mathew', 'Reshma Babu', 'Hari Shankar'],
+  ['Aparna Das', 'Sreejith Mohan', 'Nisha Joseph', 'Anand Menon', 'Gayathri Suresh', 'Faisal Rahman', 'Keerthi Varma',
+    'Midhun Jose', 'Ann Maria', 'Rohit Chandran', 'Swathi Krishna', 'Sanjay George', 'Neethu Paul', 'Akhil Ravi'],
+];
+const faceUrl = (seed, i) =>
+  `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${FACE_BGS[i % FACE_BGS.length]}&scale=110`;
+
 /* -------------------------------- page ---------------------------------- */
 
 export default function KoottHome({ content } = {}) {
@@ -343,7 +363,9 @@ export default function KoottHome({ content } = {}) {
   const therapists = useTherapists(60);
   const posts = usePosts(3);
 
-  const [titleIndex, setTitleIndex] = useState(0);
+  // `out` is the phrase leaving, kept mounted so phones can fade it away before
+  // the next one rises, rather than have it vanish; same shape as the badge deck.
+  const [title, setTitle] = useState({ cur: 0, out: null });
   // Both indices in one piece of state so the swap happens in a single update:
   // `cur` is the card landing on top, `out` the one it is covering.
   const [deck, setDeck] = useState({ cur: 0, out: null });
@@ -370,9 +392,72 @@ export default function KoottHome({ content } = {}) {
     if (card) el.scrollTo({ left: card.offsetLeft - el.offsetLeft - (el.clientWidth - card.clientWidth) / 2, behavior: 'smooth' });
   };
   const [openOffer, setOpenOffer] = useState(OFFERS.items[0].key);
+  // The laptop panel hands over like the hero headline: the previous entry is
+  // kept mounted just long enough to fade out, then the new one rises in.
+  // `offerTouched` stops the very first entry animating on page load.
+  const [prevOffer, setPrevOffer] = useState(null);
+  const [offerTouched, setOfferTouched] = useState(false);
+  // Once an entry has finished opening on a phone/tablet, glide the whole entry
+  // (its row and the body under it) to the middle of the screen below the
+  // 63px header. Taller than the screen: its row goes just under the header.
+  const centreOpenOffer = (rowEl) => {
+    const item = rowEl.closest('.kh2-offer-item') || rowEl;
+    const r = item.getBoundingClientRect();
+    const top = 63;
+    const room = window.innerHeight - top;
+    const want = r.height < room - 24 ? top + (room - r.height) / 2 : top + 12;
+    const delta = r.top - want;
+    if (Math.abs(delta) > 2) window.scrollBy({ top: delta, behavior: 'smooth' });
+  };
+  const pickOffer = (key, rowEl) => {
+    if (key === openOffer) return;
+    setPrevOffer(openOffer);
+    setOpenOffer(key);
+    setOfferTouched(true);
+    // Phones/tablets: the entry above may be collapsing as this one opens,
+    // which drags the tapped row up out from under the finger. Pin it for the
+    // length of the transition. (Chrome's own scroll anchoring may already do
+    // this; then the row never moves and the loop does nothing. Safari has no
+    // scroll anchoring.) 'instant' because <html> has scroll-behavior:smooth.
+    // Measured against the row's starting position, not the previous frame:
+    // scroll offsets are whole pixels, so frame-to-frame corrections each lose
+    // a fraction and the row crept 12px over one transition.
+    if (rowEl && window.matchMedia('(max-width:1000px)').matches) {
+      const start = performance.now();
+      const target = rowEl.getBoundingClientRect().top;
+      const hold = (t) => {
+        const drift = rowEl.getBoundingClientRect().top - target;
+        if (Math.abs(drift) >= 0.5) window.scrollBy({ top: drift, behavior: 'instant' });
+        if (t - start < 420) requestAnimationFrame(hold);
+      };
+      requestAnimationFrame(hold);
+      // After the .38s open (and the hold above) has settled.
+      setTimeout(() => centreOpenOffer(rowEl), 440);
+    }
+  };
   const [faqTab, setFaqTab] = useState(FAQ.tabs[0]);
   const [openFaq, setOpenFaq] = useState(null);
   const [serviceTab, setServiceTab] = useState(0);
+  // On phones the tab row scrolls sideways; keep the selected tab in view when
+  // a swipe or a dot changes it (scrolls only the row, never the page).
+  const serviceTabsRef = useRef(null);
+  useEffect(() => {
+    const row = serviceTabsRef.current;
+    const tab = row?.children[serviceTab];
+    if (!row || !tab || row.scrollWidth <= row.clientWidth) return;
+    const offset = tab.getBoundingClientRect().left - row.getBoundingClientRect().left + row.scrollLeft;
+    row.scrollTo({ left: offset - (row.clientWidth - tab.offsetWidth) / 2, behavior: 'smooth' });
+  }, [serviceTab]);
+  // Phones can swipe the services panels as well as tapping a tab or dot.
+  const serviceSwipe = useRef(null);
+  const onServiceTouchStart = (e) => { serviceSwipe.current = e.touches[0].clientX; };
+  const onServiceTouchEnd = (e) => {
+    if (serviceSwipe.current === null) return;
+    const dx = e.changedTouches[0].clientX - serviceSwipe.current;
+    serviceSwipe.current = null;
+    if (Math.abs(dx) < 40) return;
+    setServiceTab((t) => Math.min(SERVICES.panels.length - 1, Math.max(0, t + (dx < 0 ? 1 : -1))));
+  };
 
   const offer = useMemo(
     () => OFFERS.items.find((o) => o.key === openOffer) || OFFERS.items[0],
@@ -444,18 +529,18 @@ export default function KoottHome({ content } = {}) {
   } = useBookingDraft();
   const cards = matches.slice(0, bookingDraft ? 2 : 3);
 
-  // Rotate the headline and the stat card. Both held still for anyone who has
-  // asked the system for reduced motion — a looping animation is exactly what
-  // that setting means.
+  // Rotate the headline and the stat card — for everyone, including anyone who
+  // has asked the system for reduced motion. That setting is on for a lot of
+  // iPhones, and holding still there froze the hero on its first headline and
+  // first card, so those visitors never saw the other five of each. Reduced
+  // motion means no movement, not no change: the CSS swaps the slide-up for a
+  // plain fade under that preference (Apple's own guidance), and the looping
+  // clip — pure decoration — still holds its first frame.
   useEffect(() => {
-    const still = typeof window !== 'undefined'
-      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (still) return undefined;
-
     const timers = [];
     if (HERO.rotatingTitles.length > 1) {
       timers.push(setInterval(() => {
-        setTitleIndex((i) => (i + 1) % HERO.rotatingTitles.length);
+        setTitle(({ cur }) => ({ cur: (cur + 1) % HERO.rotatingTitles.length, out: cur }));
       }, 2600));
     }
     if (HERO.badges.length > 1) {
@@ -481,17 +566,32 @@ export default function KoottHome({ content } = {}) {
               {HERO.rotatingTitles.map((w) => (
                 <span key={w} className="kh2-h1-size" aria-hidden>{w}</span>
               ))}
-              <span className="kh2-h1-word" key={titleIndex}>
-                {HERO.rotatingTitles[titleIndex]}
+              {title.out !== null && (
+                <span className="kh2-h1-word is-out" key={`out-${title.out}`} aria-hidden>
+                  {HERO.rotatingTitles[title.out]}
+                </span>
+              )}
+              <span className={`kh2-h1-word is-in${title.out === null ? ' is-first' : ''}`} key={`in-${title.cur}`}>
+                {HERO.rotatingTitles[title.cur]}
               </span>
             </span>
             <span>{HERO.titleTail}</span>
           </h1>
           <p className="kh2-hero-sub">
-            {HERO.subtitle.replace(/Anytime!$/, '')}
-            {/Anytime!$/.test(HERO.subtitle) && <span className="kh2-hero-accent">Anytime!</span>}
+            {/* Whatever follows the last comma ("24/7") is set in green — keyed
+                to the punctuation rather than one word, so the accent survives
+                an edit in the admin Pages → Home editor. */}
+            {(() => {
+              const s = HERO.subtitle || '';
+              const cut = s.lastIndexOf(', ');
+              if (cut < 0) return s;
+              return <>{s.slice(0, cut + 2)}<span className="kh2-hero-accent">{s.slice(cut + 2)}</span></>;
+            })()}
           </p>
 
+          {/* On phones this is a pale green panel holding the text box and both
+              buttons; on desktop it dissolves (display:contents). */}
+          <div className="kh2-hero-panel">
           <div className="kh2-search">
             <div className="kh2-search-box">
               <textarea
@@ -502,7 +602,6 @@ export default function KoottHome({ content } = {}) {
               />
               <span className="kh2-search-spark" aria-hidden><SparkleTrio /></span>
             </div>
-            <Link href={BOOK} className="kh2-match">Find the match<Chevron dir="right" /></Link>
             <div className="kh2-search-row">
               <button type="button" className="kh2-concern">
                 {HERO.concernCta}<SparkleTrio />
@@ -513,12 +612,17 @@ export default function KoottHome({ content } = {}) {
             </div>
           </div>
 
-          <Link href={BOOK} className="kh2-consult">
-            Consult a Therapist Now
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
+          {/* phone only (hidden on desktop): the two hero actions side by side */}
+          <div className="kh2-hero-actions">
+            <Link href={BOOK} className="kh2-match">Find the match<Chevron dir="right" /></Link>
+            <Link href={BOOK} className="kh2-consult">
+              Consult now
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          </div>
+          </div>
         </div>
 
         {/* The looped clip runs along the foot of the hero. The badge is
@@ -791,7 +895,19 @@ export default function KoottHome({ content } = {}) {
 
           <div className="kh2-offers">
             <div className="kh2-offer-panel">
-              <OfferBody o={offer} />
+              {prevOffer && prevOffer !== openOffer && (
+                <div
+                  key={`out-${prevOffer}`}
+                  className="kh2-offer-body is-out"
+                  aria-hidden
+                  onAnimationEnd={() => setPrevOffer(null)}
+                >
+                  <OfferBody o={OFFERS.items.find((o) => o.key === prevOffer) || offer} />
+                </div>
+              )}
+              <div key={`in-${openOffer}`} className={`kh2-offer-body is-in${offerTouched ? '' : ' is-first'}`}>
+                <OfferBody o={offer} />
+              </div>
             </div>
 
             <div className="kh2-offer-list-col">
@@ -800,19 +916,25 @@ export default function KoottHome({ content } = {}) {
                   <button
                     type="button"
                     className={`kh2-offer-row ${o.key === openOffer ? 'is-on' : ''}`}
-                    onClick={() => setOpenOffer(o.key)}
+                    onClick={(e) => pickOffer(o.key, e.currentTarget)}
                     aria-expanded={o.key === openOffer}
                   >
                     <span>
                       <span className="kh2-offer-t">{o.title}</span>
                       <span className="kh2-offer-n">{o.note}</span>
                     </span>
-                    <Chevron dir={o.key === openOffer ? 'down' : 'right'} />
+                    {/* one arrow that turns, rather than two icons swapped */}
+                    <Chevron dir="right" className="kh2-offer-chev" />
                   </button>
-                  {/* phone only: the body opens under its own row */}
-                  {o.key === openOffer && (
-                    <div className="kh2-offer-inline"><OfferBody o={o} /></div>
-                  )}
+                  {/* Phones and tablets only: the body opens under its own row.
+                      Every body is always rendered so its height can animate
+                      (0fr → 1fr); closed ones are visibility:hidden, so their
+                      links are out of the tab order and the accessibility tree. */}
+                  <div className={`kh2-offer-inline${o.key === openOffer ? ' is-open' : ''}`}>
+                    <div className="kh2-offer-inline-in">
+                      <div className="kh2-offer-inline-body"><OfferBody o={o} /></div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -899,12 +1021,26 @@ export default function KoottHome({ content } = {}) {
           <p className="kh2-sub kh2-center">{EXPERTS.eyebrow}</p>
           <h2 className="kh2-h2 kh2-center">{EXPERTS.title}</h2>
 
+          {/* Two rows of faces running edge to edge without stopping, the second
+              the other way. Each row is drawn twice so the loop never shows a
+              seam: the track slides exactly one copy's width, then restarts. */}
           <div className="kh2-strip" aria-hidden>
-            {[0, 1].map((row) => (
-              <div key={row} className="kh2-strip-row">
-                {Array.from({ length: 14 }).map((_, i) => (
-                  <span key={i} className={`kh2-tile kh2-tile--${(i + row) % 5}`} />
-                ))}
+            {EXPERT_FACES.map((row, r) => (
+              <div key={r} className={`kh2-strip-row${r % 2 ? ' is-rev' : ''}`}>
+                <div className="kh2-strip-track">
+                  {[...row, ...row].map((seed, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={i}
+                      className="kh2-tile"
+                      src={faceUrl(seed, i)}
+                      alt=""
+                      loading="lazy"
+                      width={112}
+                      height={132}
+                    />
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -936,7 +1072,7 @@ export default function KoottHome({ content } = {}) {
           <span className="kh2-eyebrow kh2-eyebrow--c">{SERVICES.eyebrow}</span>
           <h2 className="kh2-h2 kh2-center">{SERVICES.title}</h2>
 
-          <div className="kh2-tabs kh2-tabs--scroll">
+          <div className="kh2-tabs kh2-tabs--scroll" ref={serviceTabsRef}>
             {SERVICES.tabs.map((t, i) => (
               <button key={t} type="button"
                 className={`kh2-tab ${i === serviceTab ? 'is-on' : ''}`}
@@ -947,10 +1083,13 @@ export default function KoottHome({ content } = {}) {
 
           {/* All eight panels sit on one track; the tab (or a dot) slides it
               along. The next panel peeks in from the right, as in the artboard. */}
-          <div className="kh2-slides" role="region" aria-label={SERVICES.title}>
+          <div
+            className="kh2-slides" role="region" aria-label={SERVICES.title}
+            onTouchStart={onServiceTouchStart} onTouchEnd={onServiceTouchEnd}
+          >
             <div
               className="kh2-track"
-              style={{ transform: `translateX(calc(${-serviceTab} * (var(--pw) + 24px)))` }}
+              style={{ transform: `translateX(calc(${-serviceTab} * (var(--pw) + var(--pg))))` }}
             >
               {SERVICES.panels.map((p, i) => (
                 <article
@@ -958,9 +1097,16 @@ export default function KoottHome({ content } = {}) {
                   className={`kh2-slide ${i === serviceTab ? 'is-on' : ''}`}
                   aria-hidden={i === serviceTab ? undefined : true}
                 >
-                  <div className="kh2-slide-media" aria-hidden>
-                    <span className="kh2-bubble">I&rsquo;m just a message away</span>
-                    <span className="kh2-pip" />
+                  <div className="kh2-slide-media">
+                    {p.image && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      // Off-screen sideways never counts as "near", so lazy panels
+                      // would blink in on switch; load this one and the next early.
+                      <img
+                        src={p.image} alt={p.imageAlt || ''} width={900} height={600}
+                        loading={i <= serviceTab + 1 ? 'eager' : 'lazy'}
+                      />
+                    )}
                   </div>
                   <div className="kh2-slide-body">
                     <h3 className="kh2-slide-t">
@@ -1097,8 +1243,10 @@ const CSS = `
   from{opacity:0;transform:translateY(18px);}
   to{opacity:1;transform:none;}
 }
+/* Reduced motion: the word still changes, it just fades in instead of rising. */
+@keyframes kh2-fade-in{from{opacity:0;}to{opacity:1;}}
 @media (prefers-reduced-motion:reduce){
-  .kh2-h1-word{animation:none;}
+  .kh2-h1-word{animation:kh2-fade-in .4s ease both;}
 }
 .kh2-h2{
   font-family:var(--sans)!important;font-size:31px!important;font-weight:600!important;
@@ -1196,7 +1344,8 @@ const CSS = `
 .kh2-search-input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(24,158,79,.14);}
 .kh2-search-row{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
 .kh2-search-box{position:relative;}
-.kh2-search-spark,.kh2-match,.kh2-consult{display:none;}
+.kh2-search-spark,.kh2-match,.kh2-consult,.kh2-hero-actions{display:none;}
+.kh2-hero-panel{display:contents;}
 .kh2-step-dots{display:none;}
 .kh2-offer-inline{display:none;}
 .kh2-concern{
@@ -1268,7 +1417,7 @@ const CSS = `
   100%{opacity:1;transform:none;box-shadow:0 6px 22px rgba(16,14,14,.07);}
 }
 @media (prefers-reduced-motion:reduce){
-  .kh2-badge.is-in{animation:none;}
+  .kh2-badge.is-in{animation:kh2-fade-in .45s ease both;}
 }
 .kh2-badge-i{font-size:22px;line-height:1.2;align-self:flex-start;}
 .kh2-badge-t{
@@ -1564,10 +1713,36 @@ const CSS = `
 }
 /* space-between so the four rows finish level with the panel beside them. */
 .kh2-offer-list-col{display:flex;flex-direction:column;justify-content:space-between;gap:14px;}
+/* width:100% — a <button> shrink-wraps its text rather than filling the column,
+   so the four rows came out 443 / 441 / 352 / 359px wide in a 505px column. */
 .kh2-offer-row{
   display:flex;align-items:flex-start;justify-content:space-between;gap:16px;text-align:left;
+  width:100%;box-sizing:border-box;
   background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px;cursor:pointer;
-  color:var(--body);transition:box-shadow .18s ease;
+  color:var(--body);transition:box-shadow .18s ease,border-color .2s ease,border-radius .25s ease;
+}
+.kh2-offer-chev{flex:none;transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.kh2-offer-row.is-on .kh2-offer-chev{transform:rotate(90deg);}
+
+/* Panel hand-over (laptop): the old entry fades up and out, then the new one
+   rises in — one after the other, never both on screen (the new entry's delay
+   is longer than the old one's exit). The leaving copy is laid over the panel's
+   padding box so the panel's height is set by the incoming entry alone.
+   Transform and opacity only, so the compositor runs it. */
+.kh2-offer-body{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;}
+.kh2-offer-body.is-out{
+  position:absolute;inset:34px 36px;pointer-events:none;
+  animation:kh2-offer-out .18s cubic-bezier(.4,0,1,1) both;
+}
+.kh2-offer-body.is-in{animation:kh2-offer-in .38s .2s cubic-bezier(0,0,.2,1) both;}
+.kh2-offer-body.is-first{animation:none;}
+@keyframes kh2-offer-out{from{opacity:1;transform:translate3d(0,0,0);}to{opacity:0;transform:translate3d(0,-6px,0);}}
+@keyframes kh2-offer-in{from{opacity:0;transform:translate3d(0,10px,0);}to{opacity:1;transform:translate3d(0,0,0);}}
+@media (prefers-reduced-motion:reduce){
+  .kh2-offer-body.is-out{animation:kh2-fade-out .16s ease-in both;}
+  .kh2-offer-body.is-in{animation:kh2-fade-in .26s .18s ease-out both;}
+  .kh2-offer-body.is-first{animation:none;}
+  .kh2-offer-chev{transition:none;}
 }
 .kh2-offer-row:hover{box-shadow:0 4px 18px rgba(16,14,14,.07);}
 .kh2-offer-row.is-on{border-color:#5EA277;}
@@ -1660,17 +1835,25 @@ const CSS = `
 .kh2-review-score{font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--body)!important;}
 
 /* ---- experts ---- */
-/* 73% of the content width, centred, as measured off the artboard. */
+/* No box: the rows run the full width of the window, past the content column,
+   with a soft fade at each edge. */
 .kh2-strip{
-  background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;
-  max-width:826px;margin:12px auto 16px;overflow:hidden;
+  width:100vw;margin:20px 0 32px calc(50% - 50vw);overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
 }
-.kh2-strip-row{display:flex;gap:8px;margin-bottom:8px;}
+.kh2-strip-row{overflow:hidden;margin-bottom:14px;}
 .kh2-strip-row:last-child{margin-bottom:0;}
-/* Small portrait crops, a touch taller than wide, as in the artboard. */
-.kh2-tile{flex:1;min-width:0;height:44px;border-radius:5px;background:#DCE7DE;}
-.kh2-tile--0{background:#D7E3D9;} .kh2-tile--1{background:#DCE6F0;} .kh2-tile--2{background:#F3EBD8;}
-.kh2-tile--3{background:#E7DEF0;} .kh2-tile--4{background:#E5DAD2;}
+/* The track holds the row twice; gap is on the tiles (margin) so both copies
+   are exactly the same width and -50% lands on the seam. */
+.kh2-strip-track{display:flex;width:max-content;animation:kh2-marquee 55s linear infinite;}
+.kh2-strip-row.is-rev .kh2-strip-track{animation-direction:reverse;animation-duration:62s;}
+/* Portrait tiles, a touch taller than wide. */
+.kh2-tile{
+  flex:none;display:block;width:112px;height:132px;margin-right:14px;
+  border-radius:14px;background:#EEF3EF;object-fit:cover;
+}
+@media (prefers-reduced-motion:reduce){.kh2-strip-track{animation:none;}}
 .kh2-feats{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;}
 /* Card ground is a hair off-white in the artboard (250,252,249), not pure. */
 .kh2-feat{background:#FAFCF9;border:1px solid rgba(1,47,35,.08);border-radius:12px;padding:16px 16px 18px;}
@@ -1708,11 +1891,12 @@ const CSS = `
 .kh2-slides{
   --cw:min(1132px, calc(100vw - 48px));
   --pw:calc(var(--cw) * .87);
+  --pg:24px;
   width:100vw;margin-left:calc(50% - 50vw);overflow:hidden;
   padding-left:max(24px, calc((100vw - 1180px) / 2 + 24px));
 }
 .kh2-track{
-  display:flex;gap:24px;will-change:transform;
+  display:flex;gap:var(--pg);will-change:transform;
   transition:transform .5s cubic-bezier(.22,.7,.3,1);
 }
 .kh2-slide{
@@ -1722,14 +1906,9 @@ const CSS = `
 }
 @media (prefers-reduced-motion:reduce){.kh2-track{transition:none;}}
 .kh2-slide-media{
-  position:relative;border-radius:50%;min-height:300px;
-  background:linear-gradient(160deg,#DCD3CB,#B9AFA7);
+  position:relative;border-radius:14px;min-height:300px;overflow:hidden;background:#E6EEE8;
 }
-.kh2-bubble{
-  position:absolute;left:6%;top:22%;background:#2563EB;color:#fff;border-radius:16px;padding:8px 14px;
-  font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;
-}
-.kh2-pip{position:absolute;left:8%;bottom:22%;width:104px;height:78px;border-radius:9px;background:#8E9AA5;border:2px solid #fff;}
+.kh2-slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
 .kh2-slide-t{
   font-family:var(--sans)!important;font-size:31px!important;font-weight:600!important;
   line-height:1.2em!important;letter-spacing:-.01em!important;color:var(--ink)!important;margin:0 0 18px;
@@ -1790,13 +1969,14 @@ const CSS = `
 /* Short screens (a 720px-tall laptop, say): the same layout on a tighter
    vertical grid, so every section still fits between the fixed header and the
    fold. Nothing is hidden or reflowed — only the air comes out. */
-@media (max-height:760px){
+/* Not on phones: there the address bar sliding in and out changes the height
+   mid-scroll, and crossing 760px would reflow the page under the finger. */
+@media (max-height:760px) and (min-width:641px){
   .kh2-sec{padding:104px 0;}
   .kh2-tcard-head{height:146px;}
   .kh2-tcard-meta{margin-top:12px;gap:11px;}
   .kh2-tcard-bio{margin-top:12px;}
   .kh2-tcard-foot{padding:12px 20px 14px;}
-  .kh2-tile{height:42px;}
   .kh2-feat{padding:13px;}
   .kh2-slide{padding:26px;}
   .kh2-care-card{padding:26px;}
@@ -1819,21 +1999,32 @@ const CSS = `
      A soft grey wash runs down from under the header. */
   .kh2-hero{
     background:linear-gradient(180deg,#EDEEED 0%,#FFFFFF 22%,#FFFFFF 100%);
-    padding-top:clamp(20px,6svh,88px)!important;
+    /* Sized from svh — the viewport with the address bar showing, which never
+       changes while scrolling. A max-height media query used to tighten this on
+       short phones, but the bar sliding away crossed its breakpoint mid-scroll
+       and the whole hero jumped. ~64px on an iPhone SE, ~92px on a 812px phone. */
+    padding-top:clamp(56px,calc(20svh - 70px),120px)!important;
     min-height:calc(100vh - 63px);
     min-height:calc(100svh - 63px);
     max-height:none;
   }
   .kh2-hero-in{text-align:left;padding:0 22px;}
   .kh2-h1{font-size:clamp(30px,8.6vw,36px)!important;line-height:1.14em!important;margin-bottom:clamp(6px,1.4svh,12px)!important;}
-  .kh2-hero-sub{font-size:15px!important;margin:0 0 clamp(10px,2.2svh,18px)!important;color:var(--body)!important;}
+  /* One line on every phone. At 15px the sentence is ~22.2px wide per px of
+     font (333px), so it wrapped on anything under ~390px — iPhone SE/mini,
+     360px Androids. 15px where it fits, otherwise scaled to the width left
+     inside the 22px side padding; 23.4 rather than 22.2 leaves ~5% slack, since
+     small sizes render a touch wider than straight scaling (320px missed by 2px
+     at 3%). Wrapping is still allowed, so a slow font load can
+     never clip "24/7" off the end. */
+  .kh2-hero-sub{font-size:min(15px, calc((100vw - 44px) / 23.4))!important;margin:0 0 clamp(10px,2.2svh,18px)!important;color:var(--body)!important;}
   .kh2-hero-accent{color:var(--green);}
 
   .kh2-search{
     max-width:none;margin:0;padding:0;background:transparent;box-shadow:none;border-radius:0;
   }
   .kh2-search-input{
-    min-height:0!important;height:64px;resize:none;padding:12px 52px 12px 12px!important;
+    min-height:0!important;height:clamp(68px,10svh,76px);resize:none;padding:12px 44px 12px 12px!important;
     border:1.5px solid #6FB8C6!important;border-radius:10px!important;
     font-size:13px!important;line-height:1.55em!important;
   }
@@ -1841,12 +2032,26 @@ const CSS = `
     display:block;position:absolute;right:12px;top:50%;transform:translateY(-50%);
     color:var(--green);line-height:0;pointer-events:none;
   }
-  .kh2-search-spark .kh2-trio{width:30px;height:30px;}
+  .kh2-search-spark .kh2-trio{width:22px;height:22px;}
   .kh2-search-row{display:none;}
 
-  /* white chip on a pale green panel that hangs under the text box */
+  /* the text box and both buttons sit together on a pale green panel, pulled
+     8px past the text column each side so the box keeps most of its width */
+  .kh2-hero-panel{
+    /* collapses into the subtitle's own margin (up to 18px): ~34px on a tall
+       phone, back to 18px on an iPhone SE so the plants stay on screen */
+    display:block;margin:clamp(18px,calc(12svh - 64px),34px) -8px 0;padding:12px;
+    background:#EEF8F0;border:1px solid rgba(24,158,79,.12);border-radius:16px;
+  }
+  .kh2-hero-panel .kh2-search-input{background:#fff!important;}
+  .kh2-hero-panel .kh2-hero-actions{margin-top:12px!important;}
+  /* "Find the match" and "Consult now" share one row under the text box,
+     at the same height */
+  .kh2-hero-actions{display:flex;align-items:stretch;gap:10px;margin-top:clamp(14px,calc(9svh - 45px),28px);}
+  /* equal halves, so the pair lines up with the text box's left and right edges */
+  .kh2-hero-actions > a{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;}
   .kh2-match{
-    display:inline-flex;align-items:center;gap:14px;margin-top:8px;padding:7px 12px;
+    display:inline-flex;align-items:center;gap:10px;padding:0 14px;min-height:44px;
     background:#fff;border:1px solid rgba(24,158,79,.12);border-radius:8px;
     box-shadow:0 6px 16px rgba(24,158,79,.10);text-decoration:none;
     font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--body)!important;
@@ -1854,7 +2059,7 @@ const CSS = `
   .kh2-match svg{width:14px;height:14px;color:var(--green);}
 
   .kh2-consult{
-    display:inline-flex;align-items:center;gap:10px;margin-top:clamp(14px,4.4svh,38px);padding:12px 16px;
+    display:inline-flex;align-items:center;gap:10px;padding:0 16px;min-height:44px;
     background:var(--green);color:#fff!important;border-radius:6px;text-decoration:none;
     box-shadow:0 2px 0 rgba(1,47,35,.18);
     font-family:var(--text)!important;font-size:15px!important;font-weight:600!important;letter-spacing:0!important;
@@ -1873,8 +2078,25 @@ const CSS = `
   .kh2-hero-in{margin-bottom:0!important;}
   .kh2-badge-wrap{
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
-    width:auto!important;margin:clamp(16px,6svh,58px) 22px 0!important;
+    width:auto!important;margin:auto 44px 40px!important;
   }
+  /* margin-top:auto drops the card to the foot of the hero, just above the
+     plant clip; the gap under the buttons keeps a floor on short screens */
+  .kh2-hero-in{padding-bottom:28px!important;}
+  /* a smaller stat card on phones: narrower (44px in from each side), shorter,
+     with type a step down */
+  .kh2-badge-deck{height:78px;}
+  .kh2-badge{gap:12px;padding:12px 18px;border-radius:10px;}
+  .kh2-badge-i{font-size:18px;}
+  .kh2-badge-t{font-size:14px!important;margin:0 0 1px;}
+  .kh2-badge-b{font-size:12px!important;line-height:1.4em!important;}
+  .kh2-badge-stack{left:14px;right:14px;bottom:-7px;border-radius:10px;}
+  /* The negative bottom margin lets the card sit over the top edge of the
+     greenery — the clip's top rows are near-white, and the desktop hero floats
+     its card over the band the same way. That is what buys the room for the
+     extra space above the headline and under the CTA without pushing the
+     plants below the fold on a typical iPhone. Only bites on short screens; a
+     tall phone has slack under the card and the card never reaches the band. */
   .kh2-h1{font-weight:700!important;}
   .kh2-h2{font-size:24px!important;}
   .kh2-h2--big{font-size:30px!important;}
@@ -1901,15 +2123,23 @@ const CSS = `
   }
   .kh2-step-dots button.is-on{width:20px;border-radius:999px;background:var(--green);}
 
-  /* Therapist cards, feature cards and posts: the same swipe row, so the
-     phone reads one card at a time instead of a 1,600px stack. */
-  .kh2-tgrid,.kh2-feats,.kh2-posts{
+  /* Posts: a swipe row, so the phone reads one card at a time instead of a
+     long stack. */
+  .kh2-posts{
     display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;
     gap:14px;margin-left:-22px;margin-right:-22px;padding:4px 22px 10px;
     scrollbar-width:none;
   }
-  .kh2-tgrid::-webkit-scrollbar,.kh2-feats::-webkit-scrollbar,.kh2-posts::-webkit-scrollbar{display:none;}
-  .kh2-tcard,.kh2-feat,.kh2-post{flex:0 0 84%;scroll-snap-align:center;}
+  .kh2-posts::-webkit-scrollbar{display:none;}
+  .kh2-tcard,.kh2-post{flex:0 0 84%;scroll-snap-align:center;}
+  /* The four "why Koott" boxes are mostly text: stacked at full width, each as
+     tall as its own copy, rather than cut off at the edge of a swipe row. */
+  .kh2-feats{display:grid!important;grid-template-columns:1fr!important;gap:12px;}
+  .kh2-feat{padding:16px 18px;}
+  .kh2-feat-t{font-size:19px!important;margin-bottom:10px;}
+  /* Therapist cards stack one under another above the "more" button, and run
+     12px from the screen edge (past the section's 24px gutter) for more room. */
+  .kh2-tgrid{display:grid!important;grid-template-columns:1fr!important;gap:16px;margin-left:-12px;margin-right:-12px;}
 
   /* therapist card: the fixed-height band clipped two-line names and roles
      in a narrow card — let it grow, with a floor so cards still line up */
@@ -1939,8 +2169,9 @@ const CSS = `
   .kh2-care-media{min-height:240px!important;}
 
   /* experts: seven portraits a row, not fourteen slivers */
-  .kh2-strip-row .kh2-tile:nth-child(n+8){display:none;}
-  .kh2-tile{height:40px;}
+  .kh2-strip{margin:16px 0 24px calc(50% - 50vw);}
+  .kh2-strip-row{margin-bottom:10px;}
+  .kh2-tile{width:84px;height:100px;margin-right:10px;border-radius:12px;}
   /* experts buttons stack; the pair in the closing arch stays side by side */
   .kh2-ctarow:not(.kh2-ctarow--c){flex-direction:column;align-items:stretch;}
   .kh2-ctarow:not(.kh2-ctarow--c) .kh2-btn,.kh2-ctarow:not(.kh2-ctarow--c) .kh2-outline{min-width:0;width:100%;}
@@ -1959,9 +2190,13 @@ const CSS = `
     min-width:0;width:auto;flex:0 1 auto;padding:9px 18px;font-size:14px!important;white-space:nowrap;
   }
 
-  /* services: a smaller portrait and title so the panel is not a full screen */
-  .kh2-slide{padding:20px!important;gap:16px!important;}
-  .kh2-slide-media{min-height:190px!important;}
+  /* services: one panel fills the width (16px from each screen edge), photo
+     on top at 16:10, then the copy — no neighbour squeezing it from the right */
+  .kh2-slides{--pw:calc(100vw - 32px);--pg:12px;padding-left:16px;}
+  .kh2-slide{padding:14px 14px 18px!important;gap:14px!important;}
+  .kh2-slide-media{min-height:0!important;aspect-ratio:16/10;}
+  .kh2-slide-body{padding:0 4px;}
+  .kh2-slide .kh2-btn--sm{width:100%;justify-content:center;}
   .kh2-slide-t{font-size:22px!important;margin-bottom:10px!important;}
   .kh2-slide-lead,.kh2-slide-l li{font-size:14.5px!important;}
 
@@ -1973,13 +2208,33 @@ const CSS = `
    the body opens under the row that was tapped. */
 @media (max-width:1000px){
   .kh2-offer-panel{display:none;}
+  /* Height animates open and shut: a one-row grid going 0fr → 1fr sizes
+     itself to the content, with no measuring in JavaScript. It used to mount
+     and unmount instantly, so the page jumped by the body's full height. */
   .kh2-offer-inline{
-    display:block;background:#fff;border:1px solid var(--line);border-top:0;
-    border-radius:0 0 12px 12px;padding:18px 18px 16px;margin-top:-12px;
+    display:grid;grid-template-rows:0fr;
+    transition:grid-template-rows .38s cubic-bezier(.4,0,.2,1);
   }
-  .kh2-offer-row.is-on{border-radius:12px 12px 0 0;}
+  .kh2-offer-inline.is-open{grid-template-rows:1fr;}
+  /* visibility waits for the close to finish, then takes the shut body out of
+     the tab order; opening flips it back at once. */
+  .kh2-offer-inline-in{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s .38s;}
+  .kh2-offer-inline.is-open .kh2-offer-inline-in{visibility:visible;transition-delay:0s;}
+  .kh2-offer-inline-body{
+    background:#fff;border:1px solid var(--line);border-top:0;
+    border-radius:0 0 12px 12px;padding:18px 18px 16px;
+    opacity:0;transform:translate3d(0,-6px,0);transition:opacity .22s ease,transform .3s ease;
+  }
+  .kh2-offer-inline.is-open .kh2-offer-inline-body{opacity:1;transform:none;transition-delay:.1s;border-color:#5EA277;}
+  /* The open row and its body read as one card: the row drops its bottom edge
+     and corners, the body carries on from there. (This replaces a -12px
+     overlap, which would have pulled every shut row up into the one above.) */
+  .kh2-offer-row.is-on{border-radius:12px 12px 0 0;border-bottom-color:transparent;}
   /* the row already names the service; the body's heading would repeat it */
   .kh2-offer-inline .kh2-offer-h{display:none;}
+}
+@media (max-width:1000px) and (prefers-reduced-motion:reduce){
+  .kh2-offer-inline,.kh2-offer-inline-body{transition:none;}
 }
 
 /* The narrowest phones (320px): keep Speciality and Needs on one line. */
@@ -1987,12 +2242,47 @@ const CSS = `
   .kh2-filter{padding:0 10px!important;font-size:13px!important;}
 }
 
-/* Short phones (iPhone SE and the like): the same hero on tighter spacing so
-   the plants still land on the first screen. */
-@media (max-width:640px) and (max-height:720px){
-  .kh2-hero{padding-top:18px!important;}
-  .kh2-consult{margin-top:16px!important;}
-  .kh2-badge-wrap{margin-top:18px!important;}
-  .kh2-search-input{height:56px!important;}
+/* Narrow phones (iPhone SE / mini, 360px Androids): the two-line placeholder
+   wraps to three here, and at the usual height its last line was cut off.
+   Three lines of 13px x 1.55 plus 24px of padding is ~85px. */
+@media (max-width:380px){
+  .kh2-search-input{height:86px!important;}
+}
+
+/* Desktop keeps its original behaviour: the leaving phrase is not drawn. */
+.kh2-h1-word.is-out{display:none;}
+
+/* Phones: smoother hero rotation. Two things stuttered. The old phrase vanished
+   a beat before the new one rose, which read as a blink — so on phones it now
+   drifts up and fades out first, and the new one rises in only once it is fully
+   gone. Strictly one after the other: the new phrase's delay (.3s) is longer
+   than the old one's exit (.28s), so the two are never on screen together —
+   a crossfade here overlapped two lines of large type, which read as a
+   collision rather than a hand-off. The very first phrase has nothing to wait
+   for, so it skips the delay (.is-first). And the card
+   animated box-shadow and scale: a shadow repaints on every frame and scaled
+   text re-rasterises, which is exactly what judders on a phone GPU — so here it
+   moves on transform and opacity alone, which the compositor runs off the main
+   thread. Last in the sheet so it outranks the earlier rules. */
+@keyframes kh2-word-in-m{from{opacity:0;transform:translate3d(0,14px,0);}to{opacity:1;transform:translate3d(0,0,0);}}
+@keyframes kh2-word-out-m{from{opacity:1;transform:translate3d(0,0,0);}to{opacity:0;transform:translate3d(0,-10px,0);}}
+@keyframes kh2-card-in-m{
+  0%{opacity:0;transform:translate3d(0,22px,0);}
+  35%{opacity:1;transform:translate3d(0,12px,0);}
+  100%{opacity:1;transform:translate3d(0,0,0);}
+}
+@keyframes kh2-fade-out{from{opacity:1;}to{opacity:0;}}
+@media (max-width:640px){
+  .kh2-h1-word{will-change:transform,opacity;backface-visibility:hidden;}
+  .kh2-h1-word.is-out{display:block;animation:kh2-word-out-m .28s cubic-bezier(.4,0,1,1) both;}
+  .kh2-h1-word.is-in{animation:kh2-word-in-m .45s .3s cubic-bezier(0,0,.2,1) both;}
+  .kh2-h1-word.is-in.is-first{animation-delay:0s;}
+  .kh2-badge.is-in{will-change:transform,opacity;animation:kh2-card-in-m .6s cubic-bezier(.22,.7,.3,1) both;}
+}
+@media (max-width:640px) and (prefers-reduced-motion:reduce){
+  .kh2-h1-word.is-out{animation:kh2-fade-out .28s ease-in both;}
+  .kh2-h1-word.is-in{animation:kh2-fade-in .4s .3s ease-out both;}
+  .kh2-h1-word.is-in.is-first{animation-delay:0s;}
+  .kh2-badge.is-in{animation:kh2-fade-in .45s ease both;}
 }
 `;
