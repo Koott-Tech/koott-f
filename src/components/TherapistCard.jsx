@@ -119,6 +119,21 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
      list (three chips in a 440px card) would otherwise run out mid-card and leave
      a blank stretch before the loop came round, so it is repeated until one copy
      is at least as wide as the card. Two such copies make the seamless -50% loop. */
+  /* Marks an intro that is cut off, so the fade only appears when there is
+     something to fade (see .ktc-bio[data-clamped]). */
+  const bioRef = useRef(null);
+  const [bioClamped, setBioClamped] = useState(false);
+  useEffect(() => {
+    const el = bioRef.current;
+    if (!el) return undefined;
+    const measure = () => setBioClamped(el.scrollHeight > el.clientHeight + 1);
+    measure();
+    if (typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [t.bio]);
+
   const tagsRef = useRef(null);
   const [tagsSeconds, setTagsSeconds] = useState(20);
   const [tagsReps, setTagsReps] = useState(1);
@@ -185,7 +200,7 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
       </div>
 
       <div className="ktc-panel">
-        {t.bio && <p className="ktc-bio">{t.bio}</p>}
+        {t.bio && <p ref={bioRef} className="ktc-bio" data-clamped={bioClamped ? 'true' : 'false'}>{t.bio}</p>}
         <div className="ktc-voice">
           <button type="button" className="ktc-play" onClick={playVoice} aria-label={playing ? 'Pause intro' : 'Play intro'}>
             {playing ? <Pause size={13} /> : <Play size={13} style={{ marginLeft: 1 }} />}
@@ -310,10 +325,22 @@ export const THERAPIST_CARD_CSS = `
 }
 
 .ktc-panel{background:var(--ktc-bg);border-radius:16px;padding:12px;margin-bottom:16px;}
+/* Three lines, clamped by height rather than -webkit-line-clamp: a -webkit-box
+   inside a container-query container (this card sets container-type) renders
+   blank on iOS Safari, which left phones with no intro at all. A plain
+   max-height cannot fail that way; the fade stands in for the ellipsis. */
 .ktc-bio{
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  position:relative;overflow:hidden;max-height:calc(13px * 1.5 * 3);
   font-family:var(--ktc-sans)!important;font-size:13px!important;line-height:1.5em!important;
   color:var(--ktc-ink-soft)!important;margin:0 0 12px;letter-spacing:0!important;
+}
+/* Fades the cut, but only on an intro that actually runs past the third line
+   (the card measures that and sets data-clamped) — otherwise the gradient would
+   sit over the end of a short intro. */
+.ktc-bio[data-clamped="true"]::after{
+  content:'';position:absolute;right:0;bottom:0;width:38%;height:1.5em;
+  background:linear-gradient(to right,rgba(248,253,246,0),var(--ktc-bg) 72%);
+  pointer-events:none;
 }
 /* one line, everything centred on the same axis as the play button */
 .ktc-voice{display:flex;align-items:center;gap:10px;}
