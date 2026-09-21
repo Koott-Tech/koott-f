@@ -73,10 +73,10 @@ export default function LoadingScreen({ message = "", isVisible = true }) {
         <div
           className="loading-logo"
           style={{
-            width: "720px",
-            height: "237px",
+            width: "180px",
+            height: "180px",
             margin: "0 auto",
-            backgroundImage: "url('/logo.png')",
+            backgroundImage: "url('/favicon-512.png')",
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
@@ -110,8 +110,8 @@ export default function LoadingScreen({ message = "", isVisible = true }) {
           }
           @media (max-width: 767px) {
             .loading-logo {
-              width: 500px !important;
-              height: 165px !important;
+              width: 128px !important;
+              height: 128px !important;
             }
           }
         `}

@@ -118,7 +118,7 @@ export default async function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         {/* Preload logo for instant loading screen display */}
-        <link rel="preload" as="image" href="/main-logo.png" />
+        <link rel="preload" as="image" href="/favicon-512.png" />
         {/* CRITICAL: Script to manage loader - runs only on client side to prevent hydration mismatch */}
         <script
           dangerouslySetInnerHTML={{
@@ -269,16 +269,15 @@ export default async function RootLayout({ children }) {
               transition: opacity 300ms ease-out !important;
             }
              #initial-loader .loading-logo {
-              width: 720px;
-              height: 237px;
+              /* The tab icon itself — one square mark, so it is the same thing
+                 people see in the browser tab and on a home screen. */
+              width: 180px;
+              height: 180px;
               margin: 0 auto;
-              /* The file is a 500px square with the wordmark inset; these
-                 numbers scale and offset it so the wordmark itself fills the
-                 720x237 box instead of sitting small inside all that padding. */
-              background-image: url('/main-logo.png');
-              background-size: 968px 971px;
+              background-image: url('/favicon-512.png');
+              background-size: contain;
               background-repeat: no-repeat;
-              background-position: -151px -365px;
+              background-position: center;
               animation: pulseScale 2s ease-in-out infinite;
             }
             @keyframes pulseScale {
@@ -288,8 +287,8 @@ export default async function RootLayout({ children }) {
             }
             @media (max-width: 767px) {
               #initial-loader .loading-logo {
-                width: 500px !important;
-                height: 165px !important;
+                width: 128px !important;
+                height: 128px !important;
               }
             }
           `,
