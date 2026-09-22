@@ -108,7 +108,7 @@ export default function PackagesPage() {
   }
 
   return (
-    <div className="bg-white p-6">
+    <div className="bg-white p-4 sm:p-6">
       <h5 className="text-gray-900 mb-6">My Packages</h5>
       {allPackages.length === 0 ? (
         <div className="text-center py-12">
@@ -129,10 +129,10 @@ export default function PackagesPage() {
         <div className="space-y-4">
           {clientPackages.map((pkg) => (
             <div key={pkg.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-              <div className="flex gap-4 items-start">
+              <div className="flex gap-3 sm:gap-4 items-start">
                 {/* Avatar - Left Side */}
                 {pkg.psychologist && (
-                  <div className="flex-shrink-0 w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
+                  <div className="flex-shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-gray-200">
                     {pkg.psychologist.cover_image_url ? (
                       <img 
                         src={normalizeImageUrl(pkg.psychologist.cover_image_url)}
@@ -148,7 +148,7 @@ export default function PackagesPage() {
                 )}
                 
                 {/* Package Details */}
-                <div className="flex-1 flex justify-between items-start">
+                <div className="min-w-0 flex-1 flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start">
                   <div>
                     {/* Doctor Name - First */}
                     {pkg.psychologist && (
@@ -179,7 +179,7 @@ export default function PackagesPage() {
                   </div>
                   
                   {/* Right Side - Total Amount and Package Status */}
-                  <div className="flex flex-col gap-2 ml-4 text-right">
+                  <div className="flex flex-col gap-2 sm:ml-4 sm:text-right">
                     <p className="text-sm text-gray-600">
                       <span className="font-medium">Total Amount:</span> {formatCurrency(pkg.total_amount, pkg.currency)}
                     </p>

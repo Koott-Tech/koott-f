@@ -147,7 +147,7 @@ export default function ReceiptsPage() {
   }
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white shadow rounded-lg p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div>
           <h5 className="text-gray-900 mb-2">Payment Receipts</h5>
@@ -163,9 +163,9 @@ export default function ReceiptsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-4 sm:gap-6">
           {receipts.map((receipt) => (
-            <div key={receipt.id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+            <div key={receipt.id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6">
               <div className="flex flex-col gap-4">
                 {/* Header Section */}
                 <div className="flex items-center gap-4">

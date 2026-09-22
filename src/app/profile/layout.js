@@ -23,9 +23,19 @@ import { useAuth } from '../../contexts/AuthContext';
 import LogoLoader from '@/components/LogoLoader';
 import { previewFromParams } from '@/lib/dashboardPreview';
 
-// The site header is fixed and reserves no space of its own.
+/**
+ * The site header is fixed and reserves no space of its own, hence the 63px.
+ * `position: relative` because these pages centre their loading state with
+ * `absolute inset-0`, which used to anchor to the old layout's content box.
+ * The width matches the dashboard's own 960px column plus its gutters, so the
+ * pages beside it do not run the full width of a large screen.
+ */
 const Shell = ({ children }) => (
-  <div style={{ paddingTop: 63, minHeight: 'calc(100vh - 63px)', background: '#fff' }}>{children}</div>
+  <div style={{ paddingTop: 63, minHeight: 'calc(100vh - 63px)', background: '#fff' }}>
+    <div style={{ position: 'relative', maxWidth: 1024, margin: '0 auto', minHeight: 'calc(100vh - 63px)' }}>
+      {children}
+    </div>
+  </div>
 );
 
 function ProfileGuard({ children }) {

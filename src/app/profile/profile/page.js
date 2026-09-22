@@ -219,7 +219,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white shadow rounded-lg p-4 sm:p-6">
       <h5 className="text-gray-900 mb-6">Profile</h5>
 
 
