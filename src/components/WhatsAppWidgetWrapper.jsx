@@ -12,6 +12,7 @@ export default function WhatsAppWidgetWrapper() {
     pathname.startsWith('/admin') ||
     pathname.startsWith('/superadmin') ||
     pathname.startsWith('/finance') ||
+    pathname.startsWith('/marketing') ||
     pathname.startsWith('/psychologist');
   
   if (shouldHide) {

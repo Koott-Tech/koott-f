@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { trackPopup } from "@/analytics";
 import { useAuth } from "@/contexts/AuthContext";
 import { authApi } from "@/lib/backendApi";
 import { validatePassword } from "@/utils/passwordValidation";
@@ -59,7 +60,15 @@ export default function AuthModal({
   const [signupPasswordValidation, setSignupPasswordValidation] = useState({ valid: false, unmetRequirements: [] });
   const [resetPasswordValidation, setResetPasswordValidation] = useState({ valid: false, unmetRequirements: [] });
 
+  // Analytics: shown → sign_in / sign_up, or dismissed without either.
+  const authActed = useRef(false);
+  useEffect(() => {
+    if (open) { authActed.current = false; trackPopup('auth_modal', 'shown'); }
+  }, [open]);
+
   const closeAndReset = useCallback(() => {
+    if (!authActed.current) trackPopup('auth_modal', 'dismissed');
+    authActed.current = true;
     setError("");
     setSuccessMessage("");
     setIsLoading(false);
@@ -129,7 +138,9 @@ export default function AuthModal({
       const token = data?.data?.token;
 
       // Pass remember preference - works for all roles
-      login(loggedInUser, token, { remember: rememberMe });
+      login(loggedInUser, token, { remember: rememberMe, method: 'email' });
+      authActed.current = true;
+      trackPopup('auth_modal', 'sign_in');
       // Call onAuthSuccess first, then check for pending booking
       try { 
         await onAuthSuccess?.(loggedInUser); 
@@ -187,6 +198,8 @@ export default function AuthModal({
             window.location.href = '/superadmin';
           } else if (loggedInUser?.role === 'event_organizer') {
             window.location.href = '/event-organizer';
+          } else if (loggedInUser?.role === 'marketing') {
+            window.location.href = '/marketing';
           } else {
             window.location.reload();
           }
@@ -281,7 +294,9 @@ export default function AuthModal({
         hasToken: !!data.data.token,
         userRole: data.data.user?.role
       });
-      login(data.data.user, data.data.token, { remember: rememberMe });
+      login(data.data.user, data.data.token, { remember: rememberMe, method: 'email' });
+      authActed.current = true;
+      trackPopup('auth_modal', 'sign_up');
       
       // Verify auth was stored
       setTimeout(() => {

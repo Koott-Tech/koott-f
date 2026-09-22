@@ -144,6 +144,10 @@ export default function KoottHeader({ conditionMenu } = {}) {
     || user?.email?.split('@')[0]
     || 'Account';
   const initial = (displayName.trim()[0] || 'A').toUpperCase();
+  const dashboardPath = ({
+    admin: '/admin', superadmin: '/superadmin', psychologist: '/psychologist', finance: '/finance',
+    event_organizer: '/event-organizer', marketing: '/marketing',
+  })[user?.role] || '/profile';
 
   const onLogout = async () => {
     setUserMenuOpen(false);
@@ -188,7 +192,7 @@ export default function KoottHeader({ conditionMenu } = {}) {
               </div>
             ))}
 
-            <Link href={BOOK_HREF} className="kh-link kh-link--plain">THERAPISTS</Link>
+            <Link href={BOOK_HREF} className="kh-link kh-link--plain" data-track="header_therapists">THERAPISTS</Link>
           </nav>
 
           {/* ---- right side ---- */}
@@ -211,7 +215,7 @@ export default function KoottHeader({ conditionMenu } = {}) {
                   <div className="kh-usermenu">
                     <p className="kh-uname">{displayName}</p>
                     {user?.email && <p className="kh-umail">{user.email}</p>}
-                    <button type="button" onClick={() => { setUserMenuOpen(false); router.push('/profile'); }}>
+                    <button type="button" onClick={() => { setUserMenuOpen(false); router.push(dashboardPath); }}>
                       Dashboard
                     </button>
                     <button type="button" className="is-danger" onClick={onLogout}>Logout</button>
@@ -219,7 +223,7 @@ export default function KoottHeader({ conditionMenu } = {}) {
                 )}
               </div>
             ) : (
-              <button type="button" className="kh-book" onClick={() => setShowAuth(true)}>
+              <button type="button" className="kh-book" data-track="header_sign_in" onClick={() => setShowAuth(true)}>
                 SIGN IN
               </button>
             )}
@@ -253,7 +257,7 @@ export default function KoottHeader({ conditionMenu } = {}) {
               <div className="kh-drawer-foot">
                 {isAuthenticated() ? (
                   <>
-                    <button type="button" onClick={() => { setMobileOpen(false); router.push('/profile'); }}>Dashboard</button>
+                    <button type="button" onClick={() => { setMobileOpen(false); router.push(dashboardPath); }}>Dashboard</button>
                     <button type="button" className="is-danger" onClick={onLogout}>Logout</button>
                   </>
                 ) : (

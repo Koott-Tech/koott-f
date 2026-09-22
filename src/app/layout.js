@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Suspense } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
 import HeaderWrapper from "@/components/HeaderWrapper";
 import { fetchConditionMenu } from "@/lib/conditionMenu";
@@ -12,6 +11,8 @@ import WhatsAppWidgetWrapper from "@/components/WhatsAppWidgetWrapper";
 import PageLoadingOverlay from "@/components/PageLoadingOverlay";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { PostHogProvider } from "@/components/PostHogProvider";
+import AnalyticsProvider from "@/components/analytics/AnalyticsProvider";
+import ThirdPartyAnalytics from "@/components/analytics/ThirdPartyAnalytics";
 
 const siteUrl = (
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -350,24 +351,13 @@ export default async function RootLayout({ children }) {
               </ConditionalPadding>
               <FooterWrapper />
               <WhatsAppWidgetWrapper />
+              <AnalyticsProvider />
             </ConditionalProviders>
           </PostHogProvider>
         </ErrorBoundary>
         <SpeedInsights />
-        <Analytics />
-        {/* Google Analytics - Load after interactive to prevent forced reflows */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-K7Z8F94Z80"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-K7Z8F94Z80');
-          `}
-        </Script>
+        {/* GA4 + Vercel Analytics: consent-gated, redacted URLs (components/analytics/ThirdPartyAnalytics) */}
+        <ThirdPartyAnalytics />
       </body>
     </html>
   );

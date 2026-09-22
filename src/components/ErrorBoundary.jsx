@@ -38,9 +38,10 @@ class ErrorBoundary extends Component {
     });
     
     // Log to error tracking service if available
+    // Only a code, never the error text (it can contain names or typed input).
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'exception', {
-        description: error.toString(),
+        description: 'render_error',
         fatal: false
       });
     }

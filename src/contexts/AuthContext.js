@@ -9,6 +9,7 @@ import {
   storeAuthData,
 } from '@/lib/authStorage';
 import { identifyUser, resetUser } from '@/lib/posthog';
+import { identifyVisitor } from '@/analytics';
 
 const AuthContext = createContext();
 
@@ -78,11 +79,10 @@ export function AuthProvider({ children }) {
         setUser(storedAuth.user);
         setIsRemembered(!!storedAuth.remember);
 
+        // PostHog: internal id only — never email or name
         const u = storedAuth.user;
-        const distinctId = u?.email || u?.id || u?.user_id;
-        if (distinctId) {
-          identifyUser(distinctId, { email: u?.email, role: u?.role, name: u?.name });
-        }
+        const distinctId = u?.id || u?.user_id;
+        if (distinctId) identifyUser(distinctId, { role: u?.role });
 
         console.log('✅ Auth session restored:', {
           hasToken: !!storedAuth.token,
@@ -183,14 +183,12 @@ export function AuthProvider({ children }) {
     setIsRemembered(!!rememberPreference);
     storeAuthData({ token: authToken, user: userData, remember: !!rememberPreference });
 
-    // PostHog: identify user so events are tied to this user
-    const distinctId = userData?.email || userData?.id || userData?.user_id;
-    if (distinctId) {
-      identifyUser(distinctId, {
-        email: userData?.email,
-        role: userData?.role,
-        name: userData?.name,
-      });
+    // PostHog: internal id only — never email or name
+    const distinctId = userData?.id || userData?.user_id;
+    if (distinctId) identifyUser(distinctId, { role: userData?.role });
+    // Koott analytics: link this visitor to the account (login / registration)
+    if (!userData?.role || userData.role === 'client') {
+      identifyVisitor(authToken, (options && typeof options === 'object' && options.method) || 'password');
     }
 
     console.log('✅ Login successful for role:', userData?.role || 'unknown', '- Remember Me:', !!rememberPreference);

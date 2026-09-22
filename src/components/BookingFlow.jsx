@@ -29,6 +29,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import { clearDraft, loadDraft, nearestFreeSlot, saveDraft } from '@/lib/bookingDraft';
 import SlotUnavailablePopup from '@/components/SlotUnavailablePopup';
+import { analyticsContext, track, trackPopup } from '@/analytics';
 import { therapistSlug } from '@/components/TherapistProfile';
 import {
   IST, SESSION_LENGTH_LABEL, clientTimeZone, dateLabel, dayKey, fetchSlots, fromYmd,
@@ -39,6 +40,9 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || API;
 
 const STEPS = ['type', 'when', 'plan', 'about', 'review'];
+// Analytics step ids (koott-backend/analytics/registry.js BOOKING_STEPS); 'phone' is the number check before step 0.
+const STEP_EVENT = ['type', 'time', 'plan', 'about', 'review'];
+const itemKindOf = (p) => (p && readType(p).sessions > 1 ? 'package' : 'session');
 const DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'];
@@ -244,7 +248,8 @@ export default function BookingFlow({ slug }) {
     if (code.length !== otpLen) return;
     setOtpBusy(true); setOtpErr('');
     try {
-      const d = await postOtp('verify', { phone: otpPhone, code, psychologistId: therapist?.id });
+      const d = await postOtp('verify', { phone: otpPhone, code, psychologistId: therapist?.id, analytics: analyticsContext() });
+      track('phone_verified', {}, { psychologistId: therapist?.id });
       // The number already belongs to a Koott client: sign them in and say so.
       if (d.found && d.auth?.token) {
         login(d.auth.user, d.auth.token, { remember: true });
@@ -255,6 +260,7 @@ export default function BookingFlow({ slug }) {
       try { sessionStorage.setItem(VERIFIED_KEY, JSON.stringify({ ...v, at: Date.now() })); } catch (_) { /* private mode */ }
     } catch (e) {
       setOtpErr(e.message);
+      track('booking_step_error', { step: 'phone', code: 'otp_failed' });
     } finally {
       setOtpBusy(false);
     }
@@ -286,7 +292,7 @@ export default function BookingFlow({ slug }) {
   // "About yourself" → review. A new visitor's account is created here from these
   // details and the verified number, and they are signed in; signed-in clients move on.
   const continueAbout = async () => {
-    if (isAuthenticated()) { setStep(4); return; }
+    if (isAuthenticated()) { track('details_completed', {}, { psychologistId: therapist?.id }); setStep(4); return; }
     if (!verified?.token) { forgetVerified(); return; }
     setAboutBusy(true); setAboutErr(''); setEmailTaken(false);
     try {
@@ -309,10 +315,12 @@ export default function BookingFlow({ slug }) {
         throw new Error(json.message || 'We could not save your details. Please try again.');
       }
       const auth = json.data?.auth;
-      if (auth?.token) login(auth.user, auth.token, { remember: true });
+      if (auth?.token) login(auth.user, auth.token, { remember: true, method: 'phone' });
+      track('details_completed', {}, { psychologistId: therapist?.id });
       setStep(4);
     } catch (e) {
       setAboutErr(e.message);
+      track('booking_step_error', { step: 'about', code: /already exists/i.test(e.message || '') ? 'email_exists' : 'save_failed' });
     } finally {
       setAboutBusy(false);
     }
@@ -580,6 +588,7 @@ export default function BookingFlow({ slug }) {
         clientAge: about.age || null,
         emergencyContact: about.emergency || null,
         clientTimeZone: tz, // confirmation email/WhatsApp show the time in this zone
+        analytics: analyticsContext(), // where this booking came from (frozen server-side)
       });
       if (order && order.success === false) throw new Error(order.message);
       const o = order?.data ?? order;
@@ -597,9 +606,12 @@ export default function BookingFlow({ slug }) {
         notes: o.notes || {},
         theme: { color: '#189E4F' },
         handler: (resp) => { clearDraft(); setPayStage('confirming'); finishPayment(resp); },
-        modal: { ondismiss: () => setPaying(false) },
+        modal: { ondismiss: () => { setPaying(false); track('payment_dismissed'); } },
       });
       rz.on('payment.failed', (resp) => {
+        // Razorpay's error code only — never its free-text description.
+        const reason = String(resp?.error?.reason || resp?.error?.code || 'unknown').toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 60);
+        track('payment_attempt_failed', { code: /^[a-z]/.test(reason) ? reason : 'unknown' });
         setPayErr(resp?.error?.description || 'The payment did not go through. Please try again.');
         setPaying(false);
         setPayStage(null);
@@ -610,8 +622,10 @@ export default function BookingFlow({ slug }) {
         }).catch(() => {});
       });
       rz.open();
+      track('payment_opened', { item_kind: itemKindOf(plan) }, { psychologistId: therapist.id, value: Number(plan.price) || 0 });
       setPayStage(null); // Razorpay's own window is up
     } catch (e) {
+      track('booking_step_error', { step: 'review', code: /slot/i.test(e?.message || '') ? 'slot_taken' : 'order_failed' });
       setPayErr(e?.message || 'We could not start the payment. Please try again.');
       setPaying(false);
       setPayStage(null);
@@ -619,6 +633,22 @@ export default function BookingFlow({ slug }) {
       if (/verify your mobile/i.test(e?.message || '')) forgetVerified();
     }
   }, [isAuthenticated, user, therapist, slot, plan, about, name, tz, verified, accountPhone]);
+
+  /* ----------------------------- analytics ------------------------------ */
+  // booking_started once the therapist is known; then one event per screen
+  // shown, and checkout_started on the review screen with its price.
+  useEffect(() => {
+    if (therapist?.id) track('booking_started', { mode: packageParam ? 'package' : 'new' }, { psychologistId: therapist.id });
+  }, [therapist?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!therapist?.id) return;
+    const name = needsPhone ? 'phone' : STEP_EVENT[step];
+    if (name) track('booking_step_viewed', { step: name }, { psychologistId: therapist.id });
+    if (!needsPhone && step === 4 && plan) {
+      track('checkout_started', { item_kind: itemKindOf(plan) }, { psychologistId: therapist.id, value: Number(plan.price) || 0 });
+    }
+  }, [step, needsPhone, therapist?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (slotNotice) trackPopup('slot_unavailable', 'shown'); }, [slotNotice]);
 
   // Package mode: session type and plan come from the client's package, there is nothing
   // to pay, and "About yourself" is skipped (they're signed in; details are on file).
@@ -848,9 +878,9 @@ export default function BookingFlow({ slug }) {
                 suggestDate={slotSuggestion ? dateLabel(slotSuggestion.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short' }) : ''}
                 suggestTime={slotSuggestion ? timeLabel(slotSuggestion.startsAt, tz) : ''}
                 searching={!slotSuggestion && daysBusy}
-                onTake={takeSuggestedSlot}
-                onSeeOthers={() => setSlotNotice('')}
-                onClose={() => setSlotNotice('')}
+                onTake={() => { trackPopup('slot_unavailable', 'take_suggestion'); takeSuggestedSlot(); }}
+                onSeeOthers={() => { trackPopup('slot_unavailable', 'pick_another'); setSlotNotice(''); }}
+                onClose={() => { trackPopup('slot_unavailable', 'dismissed'); setSlotNotice(''); }}
               />
             )}
             <div className="bf-when">
@@ -902,7 +932,7 @@ export default function BookingFlow({ slug }) {
                           key={s.startsAt} type="button"
                           className={`bf-slot ${slot?.startsAt === s.startsAt ? 'is-on' : ''}`}
                           // Picking a time is the answer to this step.
-                          onClick={() => { setSlot(s); setSlotNotice(''); setSlotSuggestion(null); setStep(pkgMode ? 4 : 2); }}
+                          onClick={() => { setSlot(s); setSlotNotice(''); setSlotSuggestion(null); track('slot_selected', {}, { psychologistId: therapist?.id }); setStep(pkgMode ? 4 : 2); }}
                         >
                           {s.label}
                         </button>
@@ -945,7 +975,7 @@ export default function BookingFlow({ slug }) {
                     key={p.id} type="button"
                     className={`bf-plan ${plan?.id === p.id ? 'is-on' : ''}`}
                     // Picking a plan is the answer to this step — no Continue.
-                    onClick={() => { setPlan(p); setStep(3); }}
+                    onClick={() => { setPlan(p); track('plan_selected', { item_kind: itemKindOf(p) }, { psychologistId: therapist?.id, value: Number(p.price) || 0 }); setStep(3); }}
                   >
                     <span className="bf-plan-n">
                       {isPsychiatrist

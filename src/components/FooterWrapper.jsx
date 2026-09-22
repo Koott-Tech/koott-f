@@ -15,6 +15,7 @@ export default function FooterWrapper() {
     pathname.startsWith('/admin') ||
     pathname.startsWith('/superadmin') ||
     pathname.startsWith('/finance') ||
+    pathname.startsWith('/marketing') ||
     pathname.startsWith('/staff') ||
     pathname.startsWith('/profile') ||
     pathname.startsWith('/event-organizer') ||

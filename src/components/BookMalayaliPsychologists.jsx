@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { track } from '@/analytics';
 import { publicApi } from '@/lib/backendApi';
 import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
 import TherapistCard, { THERAPIST_CARD_CSS, introOf } from '@/components/TherapistCard';
@@ -78,6 +79,7 @@ export default function BookMalayaliPsychologists() {
           availability: whenLabel(order?.nextAt?.get(String(t.id))),
         })));
         setStatus('ready');
+        track('counsellor_list_view', { count: rows.length });
       } catch (err) {
         console.error('[book-malayali-psychologists] load failed:', err);
         if (!cancelled) setStatus('error');
@@ -116,13 +118,13 @@ export default function BookMalayaliPsychologists() {
         <div className="ktl-filters">
           <label className="ktl-field">
             <span className="ktl-label">Specialist</span>
-            <CustomSelect className="ktl-select" aria-label="Specialist" value={specialist} onChange={(e) => setSpecialist(e.target.value)}
+            <CustomSelect className="ktl-select" aria-label="Specialist" value={specialist} onChange={(e) => { setSpecialist(e.target.value); if (e.target.value !== ALL) track('filter_applied', { filter: 'specialist', value: String(e.target.value) }); }}
               options={specialists} />
           </label>
 
           <label className="ktl-field">
             <span className="ktl-label">Concern</span>
-            <CustomSelect className="ktl-select" aria-label="Concern" value={concern} onChange={(e) => setConcern(e.target.value)}
+            <CustomSelect className="ktl-select" aria-label="Concern" value={concern} onChange={(e) => { setConcern(e.target.value); if (e.target.value !== ALL) track('filter_applied', { filter: 'concern', value: String(e.target.value) }); }}
               options={concerns} />
           </label>
         </div>

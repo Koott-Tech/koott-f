@@ -3,6 +3,8 @@
 import { Suspense, useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import posthog from 'posthog-js'
+import { getConsent, onConsent } from '@/analytics/consent'
+import { redactUrl, redactPath } from '@/analytics/redact'
 
 // Global error handler to suppress PostHog blocked requests
 if (typeof window !== 'undefined') {
@@ -89,10 +91,34 @@ if (typeof window !== 'undefined') {
   }
 }
 
+/**
+ * Nothing that identifies a page's condition or a person leaves for PostHog:
+ * URLs are redacted (condition pages → /topic), page titles dropped, element
+ * text masked, and session recording is off. PostHog only starts after the
+ * visitor accepts analytics cookies.
+ */
+function redactProperties(event) {
+  if (!event?.properties) return event
+  const p = event.properties
+  ;['$current_url', '$initial_current_url', '$prev_pageview_url'].forEach((k) => { if (p[k]) p[k] = redactUrl(p[k]) })
+  ;['$pathname', '$initial_pathname', '$prev_pageview_pathname'].forEach((k) => { if (p[k]) p[k] = redactPath(p[k]) })
+  ;['$referrer', '$initial_referrer'].forEach((k) => {
+    if (p[k] && p[k] !== '$direct') { try { p[k] = new URL(p[k]).origin } catch (_) { delete p[k] } }
+  })
+  delete p.title
+  delete p.$title
+  if (event.$set) { delete event.$set.email; delete event.$set.name }
+  if (event.$set_once) { delete event.$set_once.email; delete event.$set_once.name }
+  return event
+}
+
 export function PostHogProvider({ children }) {
   useEffect(() => {
-    // Initialize PostHog only on client side
-    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+    let started = false
+    const start = () => {
+    // Initialize PostHog only on client side, and only with analytics consent
+    if (!started && typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+      started = true
       // Extract backend domain(s) for tracing headers
       const getBackendDomains = () => {
         const domains = new Set() // Use Set to avoid duplicates
@@ -146,6 +172,12 @@ export function PostHogProvider({ children }) {
         capture_pageleave: true,
         // Autocapture: pageviews, clicks, form submissions, input changes (a, button, form, input, select, textarea, label)
         autocapture: true,
+        // Privacy: never collect element text or attributes, never record sessions,
+        // and redact URLs before anything is sent (see redactProperties above).
+        mask_all_text: true,
+        mask_all_element_attributes: true,
+        disable_session_recording: true,
+        before_send: redactProperties,
         // Enable tracing headers to send session ID on requests to backend
         ...(backendDomains.length > 0 && {
           __add_tracing_headers: backendDomains
@@ -211,6 +243,12 @@ export function PostHogProvider({ children }) {
         // Errors are already suppressed by global handlers
       }
     }
+    }
+    if (getConsent()?.analytics) start()
+    return onConsent((c) => {
+      if (c.analytics) { start(); if (posthog.__loaded) posthog.opt_in_capturing() }
+      else if (posthog.__loaded) posthog.opt_out_capturing()
+    })
   }, [])
 
   // useSearchParams needs a Suspense boundary. It wraps this tiny tracker only — a
@@ -240,6 +278,7 @@ function PostHogPageviews() {
             if (searchParams && searchParams.toString()) {
               url = url + `?${searchParams.toString()}`
             }
+            url = redactUrl(url)
             posthog.capture('$pageview', {
               $current_url: url,
             })

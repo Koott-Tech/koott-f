@@ -23,6 +23,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { track } from '@/analytics';
 import Link from 'next/link';
 import { DEFAULT_FAQS, extrasFor } from '@/data/therapistExtras';
 import {
@@ -133,6 +134,8 @@ export default function TherapistProfile({ therapist, bookHref }) {
   const timesInnerRef = useRef(null);
 
   // The list endpoint trims FAQs and education; the details one carries them.
+  useEffect(() => { if (t.id) track('counsellor_profile_view', {}, { psychologistId: t.id }); }, [t.id]);
+
   useEffect(() => {
     if (!t.id) return undefined;
     let off = false;

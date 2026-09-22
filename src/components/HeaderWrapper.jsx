@@ -13,6 +13,7 @@ export default function HeaderWrapper({ conditionMenu }) {
   const shouldHideCompletely = pathname.startsWith('/admin') || 
                                 pathname.startsWith('/superadmin') || 
                                 pathname.startsWith('/finance') ||
+                                pathname.startsWith('/marketing') ||
                                 pathname.startsWith('/event-organizer') ||
                                 (pathname.startsWith('/psychologist') && !pathname.startsWith('/online-child-psychologist'));
   

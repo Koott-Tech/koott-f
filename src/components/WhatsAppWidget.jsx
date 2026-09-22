@@ -1,5 +1,6 @@
 "use client";
 import { useState } from 'react';
+import { track } from '@/analytics';
 
 export default function WhatsAppWidget() {
   // Fixed offset from bottom and right (same for mobile and desktop)
@@ -124,6 +125,7 @@ export default function WhatsAppWidget() {
           </div>
         <a
           href={whatsappUrl}
+          onClick={() => track('contact_clicked', { method: 'whatsapp' })}
           target="_blank"
           rel="noopener noreferrer"
             className={`block w-14 h-14 rounded-full hover:shadow-xl transition-shadow duration-200 flex items-center justify-center whatsapp-widget-button whatsapp-widget-wiggle`}

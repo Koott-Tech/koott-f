@@ -32,6 +32,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
+import { track } from '@/analytics';
 
 /* Voice-message waveform proportions (as in WhatsApp / iMessage): fine 2px
    rounded bars, 2px apart — quiet enough to sit under the intro text. */
@@ -192,6 +193,7 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
   }, [playing, duration, t.voiceUrl]);
 
   const playVoice = () => {
+    if (!playing) track('voice_intro_played', {}, { psychologistId: t.id });
     if (!t.voiceUrl) { setPlaying((p) => !p); return; }
     const el = audioRef.current;
     if (!el) return;
@@ -205,7 +207,7 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
   return (
     <article className="ktc">
       <div className="ktc-head">
-        <a href={href} className="ktc-avatar" aria-label={`View ${t.name}'s profile`}>
+        <a href={href} className="ktc-avatar" data-track="card_avatar" aria-label={`View ${t.name}'s profile`}>
           {t.photo
             // eslint-disable-next-line @next/next/no-img-element
             ? <img src={t.photo} alt={t.name} loading="lazy" />
@@ -235,7 +237,7 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
             ))}
           </span>
           {playing && <span className="ktc-voice-time">{clock(elapsed)} / {clock(duration)}</span>}
-          <a href={href} className="ktc-view">View profile</a>
+          <a href={href} className="ktc-view" data-track="card_view_profile">View profile</a>
           {t.voiceUrl && <audio ref={audioRef} src={t.voiceUrl} onEnded={() => setPlaying(false)} preload="none" />}
         </div>
       </div>
@@ -290,7 +292,7 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
             <p className="ktc-avail">{availability}</p>
           </div>
         ) : <span />}
-        <a href={book} className="ktc-book">Book now</a>
+        <a href={book} className="ktc-book" data-track="card_book_now">Book now</a>
       </div>
     </article>
   );

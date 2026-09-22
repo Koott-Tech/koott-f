@@ -33,6 +33,7 @@ import CustomSelect from '@/components/CustomSelect';
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { track } from '@/analytics';
 import Link from 'next/link';
 import { therapistSlug } from '@/components/TherapistProfile';
 import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
@@ -361,6 +362,11 @@ export default function KoottHome({ content } = {}) {
     REVIEWS, EXPERTS, SERVICES, FAQ, BLOGS, FINAL_CTA,
   } = useSiteContent('site_home', HOME_DEFAULTS, content);
   const therapists = useTherapists(60);
+  // The home page's therapist cards count as a counsellor list view once loaded.
+  const listSeen = useRef(false);
+  useEffect(() => {
+    if (!listSeen.current && therapists.length) { listSeen.current = true; track('counsellor_list_view', { count: Math.min(therapists.length, 3) }); }
+  }, [therapists.length]);
   const posts = usePosts(3);
 
   // `out` is the phrase leaving, kept mounted so phones can fade it away before
@@ -595,7 +601,7 @@ export default function KoottHome({ content } = {}) {
           <div className="kh2-search">
             <div className="kh2-search-box">
               <textarea
-                className="kh2-search-input"
+                className="kh2-search-input ph-no-capture"
                 rows={3}
                 placeholder={HERO.searchPlaceholder}
                 aria-label="Tell us what's on your mind"
@@ -603,10 +609,10 @@ export default function KoottHome({ content } = {}) {
               <span className="kh2-search-spark" aria-hidden><SparkleTrio /></span>
             </div>
             <div className="kh2-search-row">
-              <button type="button" className="kh2-concern">
+              <button type="button" className="kh2-concern" data-track="hero_find_by_concern">
                 {HERO.concernCta}<SparkleTrio />
               </button>
-              <Link href={BOOK} className="kh2-book">
+              <Link href={BOOK} className="kh2-book" data-track="hero_book_slot">
                 {HERO.bookCta}<Chevron />
               </Link>
             </div>
@@ -614,8 +620,8 @@ export default function KoottHome({ content } = {}) {
 
           {/* phone only (hidden on desktop): the two hero actions side by side */}
           <div className="kh2-hero-actions">
-            <Link href={BOOK} className="kh2-match">Find the match<Chevron dir="right" /></Link>
-            <Link href={BOOK} className="kh2-consult">
+            <Link href={BOOK} className="kh2-match" data-track="hero_find_match">Find the match<Chevron dir="right" /></Link>
+            <Link href={BOOK} className="kh2-consult" data-track="hero_consult_now">
               Consult now
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -659,11 +665,11 @@ export default function KoottHome({ content } = {}) {
           <div className="kh2-filters">
             <FilterSelect
               label={THERAPISTS_SECTION.filters[0]}
-              value={speciality} options={specialityOptions} onChange={setSpeciality}
+              value={speciality} options={specialityOptions} onChange={(v) => { setSpeciality(v); if (v) track('filter_applied', { filter: 'speciality', value: String(v) }); }}
             />
             <FilterSelect
               label={THERAPISTS_SECTION.filters[1]}
-              value={need} options={needOptions} onChange={setNeed}
+              value={need} options={needOptions} onChange={(v) => { setNeed(v); if (v) track('filter_applied', { filter: 'need', value: String(v) }); }}
             />
             {activeCount > 0 && (
               <button type="button" className="kh2-filter-clear" onClick={clearAll}>Clear</button>
@@ -813,7 +819,7 @@ export default function KoottHome({ content } = {}) {
           </div>
 
           <div className="kh2-center">
-            <Link href={BOOK} className="kh2-more">{THERAPISTS_SECTION.moreLabel}<Chevron /></Link>
+            <Link href={BOOK} className="kh2-more" data-track="therapists_more">{THERAPISTS_SECTION.moreLabel}<Chevron /></Link>
           </div>
         </div>
       </section>
@@ -916,7 +922,7 @@ export default function KoottHome({ content } = {}) {
                   <button
                     type="button"
                     className={`kh2-offer-row ${o.key === openOffer ? 'is-on' : ''}`}
-                    onClick={(e) => pickOffer(o.key, e.currentTarget)}
+                    onClick={(e) => { track('ui_toggle', { element: 'offers_row', index: OFFERS.items.indexOf(o) }); pickOffer(o.key, e.currentTarget); }}
                     aria-expanded={o.key === openOffer}
                   >
                     <span>
@@ -1077,7 +1083,7 @@ export default function KoottHome({ content } = {}) {
               <button key={t} type="button"
                 className={`kh2-tab ${i === serviceTab ? 'is-on' : ''}`}
                 aria-pressed={i === serviceTab}
-                onClick={() => setServiceTab(i)}>{t}</button>
+                onClick={() => { track('ui_toggle', { element: 'services_tab', index: i }); setServiceTab(i); }}>{t}</button>
             ))}
           </div>
 
@@ -1149,7 +1155,7 @@ export default function KoottHome({ content } = {}) {
             {FAQ.tabs.map((t) => (
               <button key={t} type="button"
                 className={`kh2-tab ${t === faqTab ? 'is-on' : ''}`}
-                onClick={() => { setFaqTab(t); setOpenFaq(null); }}>{t}</button>
+                onClick={() => { track('ui_toggle', { element: 'faq_tab', index: FAQ.tabs.indexOf(t) }); setFaqTab(t); setOpenFaq(null); }}>{t}</button>
             ))}
           </div>
 
@@ -1158,7 +1164,7 @@ export default function KoottHome({ content } = {}) {
               <div key={f.q} className="kh2-faq-row">
                 <button type="button" className="kh2-faq-q"
                   aria-expanded={openFaq === i}
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}>
+                  onClick={() => { if (openFaq !== i) track('ui_toggle', { element: 'faq_question', index: i }); setOpenFaq(openFaq === i ? null : i); }}>
                   <span>{f.q}</span>
                   <span className="kh2-faq-plus" aria-hidden>{openFaq === i ? '−' : '+'}</span>
                 </button>
