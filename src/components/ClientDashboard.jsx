@@ -825,7 +825,7 @@ const CSS = `
 
 .cdb-preview{
   position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
-  z-index:30;display:flex;align-items:center;gap:6px;max-width:calc(100% - 24px);overflow-x:auto;
+  z-index:90;display:flex;align-items:center;gap:6px;max-width:calc(100% - 24px);overflow-x:auto;
   padding:6px 6px 6px 16px;background:var(--surface);border:1px solid var(--line);border-radius:999px;
   box-shadow:var(--shadow);white-space:nowrap
 }
@@ -833,7 +833,7 @@ const CSS = `
 .cdb-preview button{padding:8px 13px;border:0;border-radius:999px;background:none;font-size:14px!important;font-weight:600;color:var(--muted)}
 .cdb-preview button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
 .cdb-preview select{display:none;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
-.cdb-toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.cdb-toast{bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:95}
 .cdb button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 @media (max-width:900px){

@@ -74,7 +74,7 @@ export default function ConsentBanner() {
 }
 
 const CSS = `
-.kcb{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:80;display:flex;justify-content:center;pointer-events:none;font-family:'Work Sans',ui-sans-serif,system-ui,sans-serif}
+.kcb{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:80;display:flex;justify-content:center;pointer-events:none;font-family:'Inter',ui-sans-serif,system-ui,sans-serif}
 .kcb-in{pointer-events:auto;max-width:880px;width:100%;background:#fff;border:1px solid #DDE6DF;border-radius:16px;box-shadow:0 12px 40px rgba(6,51,39,.18);padding:16px 18px;display:flex;gap:18px;align-items:center}
 .kcb-copy{flex:1;min-width:0}
 .kcb-t{margin:0 0 4px!important;font-size:15px!important;font-weight:700!important;color:#16201A!important;letter-spacing:0!important}
