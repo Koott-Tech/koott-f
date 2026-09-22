@@ -77,14 +77,18 @@ const PREVIEWS = {
 function DashboardBody() {
   const { user, isLoading, hasRole } = useAuth();
   const router = useRouter();
-  const preview = PREVIEWS[useSearchParams().get('preview')] || null;
+  // ?preview with no value still opens the switch, on the first state.
+  const asked = useSearchParams().get('preview');
+  const previewState = asked === null ? '' : (PREVIEWS[asked] ? asked : 'new');
   const isClient = hasRole ? hasRole('client') : user?.role === 'client';
 
-  if (preview) {
+  if (previewState) {
     return (
       <div style={{ paddingTop: 63 }}>
         <ClientDashboard
-          fixture={preview}
+          fixture={PREVIEWS[previewState]}
+          previewState={previewState}
+          onPreviewChange={(next) => router.replace(`/dashboard?preview=${next}`, { scroll: false })}
           client={{ name: 'Faisal Vysam Purath', email: 'faisal@example.com', phone: '+91 98470 00000' }}
         />
       </div>

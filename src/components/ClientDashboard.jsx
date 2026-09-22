@@ -484,7 +484,27 @@ function HistoryRow({ session, open, onToggle, onRate }) {
  * `fixture` stands in for the API while a design is being checked — the prototype's
  * preview switch, kept (see /dashboard?preview=paid). Real use passes nothing.
  */
-export default function ClientDashboard({ client, fixture = null }) {
+const PREVIEW_STATES = [
+  ['new', 'New client'], ['awaiting', 'Awaiting payment'], ['paid', 'Paid'],
+  ['package', '3-session package'], ['multi', 'Multiple upcoming'], ['history', 'Completed'],
+];
+
+/** The prototype's state switch: pills on a wide screen, a select on a phone. */
+function PreviewSwitch({ state, onChange }) {
+  return (
+    <div className="cdb-preview" role="group" aria-label="Design preview">
+      <span>Preview</span>
+      {PREVIEW_STATES.map(([key, label]) => (
+        <button key={key} type="button" aria-pressed={state === key} onClick={() => onChange(key)}>{label}</button>
+      ))}
+      <select aria-label="Preview state" value={state} onChange={(e) => onChange(e.target.value)}>
+        {PREVIEW_STATES.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+      </select>
+    </div>
+  );
+}
+
+export default function ClientDashboard({ client, fixture = null, previewState = '', onPreviewChange = null }) {
   const [tab, setTab] = useState('upcoming');
   const [upcoming, setUpcoming] = useState([]);
   const [past, setPast] = useState([]);
@@ -613,6 +633,7 @@ export default function ClientDashboard({ client, fixture = null }) {
         </div>
         <div role="tabpanel">{body()}</div>
       </main>
+      {onPreviewChange && <PreviewSwitch state={previewState} onChange={onPreviewChange} />}
       <div className={`cdb-toast${toast ? ' cdb-on' : ''}`} role="status">{toast}</div>
     </div>
   );
@@ -741,13 +762,14 @@ const CSS = `
 .cdb-sec-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;margin:34px 0 12px}
 .cdb-sec-h h2{margin:0;font-size:20px!important;font-weight:650;letter-spacing:-.01em!important}
 .cdb-ulist{display:grid;gap:10px;margin:0;padding:0;list-style:none}
-.cdb-uc{display:flex;align-items:center;gap:16px;padding:14px 18px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
-.cdb-dtile{flex:none;width:52px;padding:8px 0;border-radius:14px;background:var(--stub);text-align:center;line-height:1.1}
-.cdb-dtile b{display:block;font-size:20px;font-weight:700}
-.cdb-dtile span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
-.cdb-uc-main{min-width:0;flex:1}
-.cdb-uc-main b{display:block;font-size:16px;font-weight:650;line-height:1.35}
+.cdb-uc{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:4px 16px;padding:16px 20px;border:1px solid var(--line);border-radius:20px;background:var(--surface)}
+.cdb-dtile{grid-row:1/span 2;display:grid;place-items:center;width:56px;height:60px;border-radius:14px;background:var(--mint);color:var(--mint-ink);line-height:1.1;text-align:center}
+.cdb-dtile b{display:block;font-size:22px;font-weight:700}
+.cdb-dtile span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.cdb-uc-main{min-width:0}
+.cdb-uc-main b{display:block;font-size:17px;font-weight:650;line-height:1.35}
 .cdb-uc-main small{display:block;color:var(--muted);font-size:14px}
+.cdb-uc .cdb-chip{padding:5px 14px;font-size:14px}
 
 .cdb-pk{padding:26px 28px}
 .cdb-pk-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 16px}
@@ -801,27 +823,60 @@ const CSS = `
   padding:12px 18px;border-radius:999px;background:#111;color:#fff;font-size:14px;transition:opacity .2s ease,transform .2s ease}
 .cdb-toast.cdb-on{opacity:1;transform:translate(-50%,0)}
 
-@media (max-width:860px){
-  .cdb-ticket{grid-template-columns:1fr}
-  .cdb-t-stub{border-left:0;border-top:2px dashed var(--dash)}
-  .cdb-t-stub::before,.cdb-t-stub::after{left:auto;top:-14px;bottom:auto}
-  .cdb-t-stub::before{left:-14px}
-  .cdb-t-stub::after{right:-14px;bottom:auto}
-  .cdb-two{grid-template-columns:1fr}
-  .cdb-assure{grid-template-columns:1fr}
-  .cdb-hrow{grid-template-columns:1fr auto;gap:8px 12px}
-  .cdb-hrow > span:nth-child(2){grid-column:1/-1}
+.cdb-preview{
+  position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  z-index:30;display:flex;align-items:center;gap:6px;max-width:calc(100% - 24px);overflow-x:auto;
+  padding:6px 6px 6px 16px;background:var(--surface);border:1px solid var(--line);border-radius:999px;
+  box-shadow:var(--shadow);white-space:nowrap
 }
-@media (max-width:640px){
-  .cdb-wrap{padding:24px 16px 90px}
+.cdb-preview span{color:var(--muted);font-size:13px}
+.cdb-preview button{padding:8px 13px;border:0;border-radius:999px;background:none;font-size:14px!important;font-weight:600;color:var(--muted)}
+.cdb-preview button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
+.cdb-preview select{display:none;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
+.cdb-toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.cdb button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+@media (max-width:900px){
+  .cdb-hrow{grid-template-columns:minmax(0,1fr) auto 24px;gap:8px 12px}
+  .cdb-hrow > span:nth-child(2){grid-column:1/-1;grid-row:2}
+}
+@media (max-width:720px){
+  .cdb-wrap{padding:24px 16px 120px}
   .cdb-pills{display:flex;width:100%}
-  .cdb-pills button{flex:1;justify-content:center;padding:12px 14px}
-  .cdb-t-main{padding:20px 18px}
-  .cdb-t-stub{padding:22px 18px}
-  .cdb-grid{grid-template-columns:1fr;gap:14px}
-  .cdb-panel,.cdb-pk{padding:20px 18px}
-  .cdb-uc{flex-wrap:wrap}
-  .cdb-btn{width:100%}
-  .cdb-cta .cdb-btn{width:100%}
+  .cdb-pills button{flex:1;justify-content:center;min-height:46px;padding:0 12px}
+  .cdb-find{margin-top:32px}
+  .cdb-assure{grid-template-columns:1fr;gap:18px}
+  .cdb-ticket{grid-template-columns:1fr}
+  .cdb-t-main{padding:26px 22px}
+  .cdb-t-stub{border-left:0;border-top:2px dashed var(--dash);padding:26px 22px}
+  .cdb-t-stub::before{top:-14px;left:-14px}
+  .cdb-t-stub::after{top:-14px;bottom:auto;left:auto;right:-14px}
+  .cdb-total{margin-top:24px}
+  .cdb-grid{gap:22px 16px}
+  .cdb-who .cdb-av{width:72px}
+  .cdb-two{grid-template-columns:1fr}
+  .cdb-panel,.cdb-pk{padding:22px 18px}
+  /* full-width, thumb-sized controls */
+  .cdb-cta .cdb-btn,.cdb-docrow .cdb-btn,.cdb-actions .cdb-btn{flex:1 1 100%;width:100%}
+  .cdb-btn.cdb-sm{min-height:46px}
+  .cdb-copy{min-height:44px}
+  .cdb-star svg{width:36px;height:36px}
+  /* the Coming up card folds: date tile on the left, everything else stacked */
+  .cdb-uc{grid-template-columns:auto minmax(0,1fr);padding:14px 16px}
+  .cdb-dtile{grid-row:1/span 2;align-self:start}
+  .cdb-uc .cdb-chip{grid-column:2;grid-row:2;justify-self:start;margin-top:4px}
+  .cdb-ses.cdb-done{flex-wrap:wrap}
+  .cdb-ses-r{width:100%;margin-left:0}
+  .cdb-preview button{display:none}
+  .cdb-preview select{display:block}
+  .cdb-preview{padding:6px}
 }
+@media (max-width:420px){
+  .cdb-preview span{display:none}
+  .cdb-preview{padding-left:6px}
+  .cdb-pills button{font-size:12px!important;padding:0 8px}
+  .cdb-t-main,.cdb-t-stub{padding:20px 16px}
+  .cdb-grid{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.cdb-toast{transition:none}}
 `;
