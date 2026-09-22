@@ -148,17 +148,6 @@ export default function KoottHeader({ conditionMenu } = {}) {
     admin: '/admin', superadmin: '/superadmin', psychologist: '/psychologist', finance: '/finance',
     event_organizer: '/event-organizer', marketing: '/marketing',
   })[user?.role] || '/profile/sessions';
-  /* The client area has no sidebar any more (the dashboard prototype has none),
-     so its pages live in this menu. */
-  const isClient = !user?.role || user.role === 'client';
-  const CLIENT_PAGES = [
-    ['/profile/sessions', 'Sessions'],
-    ['/profile/messages', 'Messages'],
-    ['/profile/profile', 'Profile'],
-    ['/profile/reports', 'Report'],
-    ['/profile/packages', 'Packages'],
-    ['/profile/receipts', 'Receipts'],
-  ];
 
   const onLogout = async () => {
     setUserMenuOpen(false);
@@ -226,22 +215,13 @@ export default function KoottHeader({ conditionMenu } = {}) {
                   <div className="kh-usermenu">
                     <p className="kh-uname">{displayName}</p>
                     {user?.email && <p className="kh-umail">{user.email}</p>}
-                    <button type="button" onClick={() => { setUserMenuOpen(false); router.push('/'); }}>Home</button>
-                    {isClient
-                      ? CLIENT_PAGES.map(([href, label]) => (
-                        <button
-                          key={href} type="button"
-                          aria-current={pathname === href ? 'page' : undefined}
-                          onClick={() => { setUserMenuOpen(false); router.push(href); }}
-                        >
-                          {label}
-                        </button>
-                      ))
-                      : (
-                        <button type="button" onClick={() => { setUserMenuOpen(false); router.push(dashboardPath); }}>
-                          Dashboard
-                        </button>
-                      )}
+                    <button
+                      type="button"
+                      aria-current={pathname === dashboardPath ? 'page' : undefined}
+                      onClick={() => { setUserMenuOpen(false); router.push(dashboardPath); }}
+                    >
+                      Dashboard
+                    </button>
                     <hr />
                     <button type="button" className="is-danger" onClick={onLogout}>Logout</button>
                   </div>
@@ -282,11 +262,7 @@ export default function KoottHeader({ conditionMenu } = {}) {
               <div className="kh-drawer-foot">
                 {isAuthenticated() ? (
                   <>
-                    {isClient
-                      ? CLIENT_PAGES.map(([href, label]) => (
-                        <button key={href} type="button" onClick={() => { setMobileOpen(false); router.push(href); }}>{label}</button>
-                      ))
-                      : <button type="button" onClick={() => { setMobileOpen(false); router.push(dashboardPath); }}>Dashboard</button>}
+                    <button type="button" onClick={() => { setMobileOpen(false); router.push(dashboardPath); }}>Dashboard</button>
                     <button type="button" className="is-danger" onClick={onLogout}>Logout</button>
                   </>
                 ) : (
