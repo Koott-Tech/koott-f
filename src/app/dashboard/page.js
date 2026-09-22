@@ -15,12 +15,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import ClientDashboard from '@/components/ClientDashboard';
 import LogoLoader from '@/components/LogoLoader';
 import AuthModal from '@/components/AuthModal';
-import { PREVIEWS, previewFromParams } from '@/lib/dashboardPreview';
+import { PREVIEWS, previewFromParams, showSwitch } from '@/lib/dashboardPreview';
 
 function DashboardBody() {
   const { user, isLoading, hasRole } = useAuth();
   const router = useRouter();
-  const previewState = previewFromParams(useSearchParams());
+  const params = useSearchParams();
+  const previewState = previewFromParams(params);
   const isClient = hasRole ? hasRole('client') : user?.role === 'client';
 
   if (previewState) {
@@ -29,7 +30,7 @@ function DashboardBody() {
         <ClientDashboard
           fixture={PREVIEWS[previewState]}
           previewState={previewState}
-          onPreviewChange={(next) => router.replace(`/dashboard?preview=${next}`, { scroll: false })}
+          onPreviewChange={(next) => router.replace(next ? `/dashboard?preview=${next}` : '/dashboard', { scroll: false })}
           client={{ name: 'Faisal Vysam Purath', email: 'faisal@example.com', phone: '+91 98470 00000' }}
         />
       </div>
@@ -63,6 +64,10 @@ function DashboardBody() {
   return (
     <div style={{ paddingTop: 63 }}>
       <ClientDashboard
+        previewState=""
+        onPreviewChange={showSwitch(params)
+          ? (next) => router.replace(next ? `/dashboard?preview=${next}` : '/dashboard', { scroll: false })
+          : null}
         client={{
           name: [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || user.name || user.email,
           email: user.email || profile.email,

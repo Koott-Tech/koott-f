@@ -19,12 +19,13 @@ import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import ClientDashboard from '@/components/ClientDashboard';
-import { PREVIEWS, previewFromParams } from '@/lib/dashboardPreview';
+import { PREVIEWS, previewFromParams, showSwitch } from '@/lib/dashboardPreview';
 
 function SessionsBody() {
   const { user } = useAuth();
   const router = useRouter();
-  const previewState = previewFromParams(useSearchParams());
+  const params = useSearchParams();
+  const previewState = previewFromParams(params);
   const profile = user?.profile || {};
 
   const client = previewState
@@ -40,8 +41,8 @@ function SessionsBody() {
       client={client}
       fixture={previewState ? PREVIEWS[previewState] : null}
       previewState={previewState}
-      onPreviewChange={previewState
-        ? (next) => router.replace(`/profile/sessions?preview=${next}`, { scroll: false })
+      onPreviewChange={showSwitch(params)
+        ? (next) => router.replace(next ? `/profile/sessions?preview=${next}` : '/profile/sessions', { scroll: false })
         : null}
     />
   );

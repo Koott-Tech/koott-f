@@ -485,6 +485,7 @@ function HistoryRow({ session, open, onToggle, onRate }) {
  * preview switch, kept (see /dashboard?preview=paid). Real use passes nothing.
  */
 const PREVIEW_STATES = [
+  ['', 'Live data'],
   ['new', 'New client'], ['awaiting', 'Awaiting payment'], ['paid', 'Paid'],
   ['package', '3-session package'], ['multi', 'Multiple upcoming'], ['history', 'Completed'],
 ];
@@ -495,10 +496,10 @@ function PreviewSwitch({ state, onChange }) {
     <div className="cdb-preview" role="group" aria-label="Design preview">
       <span>Preview</span>
       {PREVIEW_STATES.map(([key, label]) => (
-        <button key={key} type="button" aria-pressed={state === key} onClick={() => onChange(key)}>{label}</button>
+        <button key={key || 'live'} type="button" aria-pressed={state === key} onClick={() => onChange(key)}>{label}</button>
       ))}
       <select aria-label="Preview state" value={state} onChange={(e) => onChange(e.target.value)}>
-        {PREVIEW_STATES.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+        {PREVIEW_STATES.map(([key, label]) => <option key={key || 'live'} value={key}>{label}</option>)}
       </select>
     </div>
   );

@@ -21,6 +21,7 @@ import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import LogoLoader from '@/components/LogoLoader';
+import { previewFromParams } from '@/lib/dashboardPreview';
 
 // The site header is fixed and reserves no space of its own.
 const Shell = ({ children }) => (
@@ -30,7 +31,8 @@ const Shell = ({ children }) => (
 function ProfileGuard({ children }) {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
-  const previewing = useSearchParams().get('preview') !== null;
+  // Only a preview that really draws from fixtures skips the login.
+  const previewing = previewFromParams(useSearchParams()) !== '';
 
   useEffect(() => {
     if (previewing || authLoading || user) return;

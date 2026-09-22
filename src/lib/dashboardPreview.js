@@ -61,9 +61,17 @@ export const PREVIEWS = {
 };
 
 
-/** The state named in ?preview, or '' when the switch is not up. */
+/** The state named in ?preview, or '' for the client's own data. */
 export const previewFromParams = (params) => {
   const asked = params?.get('preview');
-  if (asked === null || asked === undefined) return '';
+  if (!asked || asked === '0' || asked === 'live') return '';
   return PREVIEWS[asked] ? asked : 'new';
 };
+
+/**
+ * Whether to show the switch. While developing it is simply always there, so the
+ * states can be flipped through without knowing the URL; in production it takes
+ * ?preview to bring it up, and ?preview=0 or the "Live data" pill puts it away.
+ */
+export const showSwitch = (params) => process.env.NODE_ENV !== 'production'
+  || params?.get('preview') !== null;
