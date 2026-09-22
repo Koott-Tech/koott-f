@@ -19,16 +19,8 @@ export default function HeaderWrapper({ conditionMenu }) {
   
   if (shouldHideCompletely) return null;
   
-  // For client dashboard (/profile), show header only on laptop/desktop, hide on mobile
-  const isClientDashboard = pathname.startsWith('/profile');
-  
-  if (isClientDashboard) {
-    return (
-      <div className="hidden md:block fixed top-0 left-0 right-0 z-50 bg-white">
-        <Header conditionMenu={conditionMenu} />
-      </div>
-    );
-  }
-  
+  // The client area used to hide this on phones because its own sidebar carried
+  // the navigation there. That sidebar is gone (the dashboard prototype has
+  // none), so the header is the navigation at every width.
   return <Header conditionMenu={conditionMenu} />;
 }
