@@ -49,6 +49,8 @@ export function Tip({ tip }) {
 }
 
 export function useWidth(ref, min = 200) {
+  // 480 only until the observer reports; the svg is scaled to its box meanwhile,
+  // so a stale number is never visible as overflow.
   const [w, setW] = useState(480);
   useEffect(() => {
     if (!ref.current) return undefined;
@@ -90,13 +92,15 @@ export function AreaChart({ rows, keys, height = 220, fmt = N }) {
   const ticks = rows.length > 1 ? Array.from({ length: nTicks }, (_, i) => Math.round((i * (rows.length - 1)) / (nTicks - 1))) : [0];
   const move = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
-    const i = Math.max(0, Math.min(rows.length - 1, Math.round(((e.clientX - r.left - L) / (W - L - R)) * (rows.length - 1))));
+    // r is the hit area in screen pixels; L/R/W are chart units. On a narrow
+    // screen the svg is scaled, so work in the ratio rather than in pixels.
+    const i = Math.max(0, Math.min(rows.length - 1, Math.round(((e.clientX - r.left) / Math.max(1, r.width)) * (rows.length - 1))));
     setHover(i);
     setTip({ x: e.clientX, y: e.clientY, content: <><b>{fmtDay(rows[i].day, { weekday: 'short', month: 'short', day: 'numeric' })}</b>{keys.map((k) => <div key={k.key}>{k.label}: {fmt(rows[i][k.key] || 0)}</div>)}</> });
   };
   return (
     <div ref={ref} className="wx-chart">
-      <svg width={W} height={H} role="img" aria-label="Sessions over time">
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} preserveAspectRatio="none" role="img" aria-label="Sessions over time">
         {[0, 1, 2, 3, 4].map((k) => {
           const v = (mx * k) / 4;
           return (
@@ -182,7 +186,7 @@ export function Columns({ rows }) {
   const y = (v) => T + (1 - v / mx) * (H - T - B);
   return (
     <div ref={ref} className="wx-chart">
-      <svg width={W} height={H} role="img" aria-label="Average sessions by day">
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} preserveAspectRatio="none" role="img" aria-label="Average sessions by day">
         {[0, 1, 2, 3, 4, 5, 6].map((k) => { const v = (mx * k) / 6; return <g key={k}><line x1={L} x2={W} y1={y(v)} y2={y(v)} stroke="#E7ECF2" /><text x={L - 6} y={y(v) + 4} textAnchor="end" fontSize="10.5" fill="#6B7C8D">{compact(v)}</text></g>; })}
         {rows.map((r, i) => (
           <g key={r.label} onMouseMove={(e) => setTip({ x: e.clientX, y: e.clientY, content: <><b>{r.label}</b>Avg. sessions: {N(r.value)}</> })} onMouseLeave={() => setTip(null)}>
@@ -228,7 +232,7 @@ export function WorldMap({ rows, mode = 'choropleth' }) {
   };
   return (
     <div ref={ref} className="wx-map">
-      <svg width={W} height={H} role="img" aria-label="Sessions by country">
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Sessions by country">
         {geo.features.map((f) => {
           const v = val[f.properties.name] || 0;
           return <path key={f.id || f.properties.name} d={path(f)} fill={mode === 'choropleth' ? shade(v) : '#E1E6EC'} stroke="#fff" strokeWidth="0.5"

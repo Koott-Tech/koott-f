@@ -104,7 +104,7 @@ function Table({ cols, rows, summary, sortKey: initialSort, onRow }) {
       <table>
         <thead>
           <tr>{cols.map((c) => (
-            <th key={c.k} className={c.n ? 'n' : ''} scope="col">
+            <th key={c.k} className={`${c.n ? 'n' : ''}${c.cls ? ` ${c.cls}` : ''}`} scope="col">
               <button type="button" onClick={() => setSort((s) => ({ k: c.k, dir: s.k === c.k ? -s.dir : -1 }))} title={c.info || ''}>
                 {c.h}{sort.k === c.k ? (sort.dir < 0 ? ' ↓' : ' ↑') : ''}
               </button>
@@ -112,7 +112,7 @@ function Table({ cols, rows, summary, sortKey: initialSort, onRow }) {
           ))}</tr>
         </thead>
         <tbody>
-          {summary && <tr className="wx-summary">{cols.map((c, i) => <td key={c.k} className={c.n ? 'n' : ''}>{i === 0 ? 'Summary' : summary[c.k] != null ? (c.fmt ? c.fmt(summary[c.k], summary) : summary[c.k]) : ''}</td>)}</tr>}
+          {summary && <tr className="wx-summary">{cols.map((c, i) => <td key={c.k} className={`${c.n ? 'n' : ''}${c.cls ? ` ${c.cls}` : ''}`}>{i === 0 ? 'Summary' : summary[c.k] != null ? (c.fmt ? c.fmt(summary[c.k], summary) : summary[c.k]) : ''}</td>)}</tr>}
           {sorted.slice(0, limit).map((r, i) => (
             <tr
               key={i}
@@ -121,7 +121,7 @@ function Table({ cols, rows, summary, sortKey: initialSort, onRow }) {
               tabIndex={onRow ? 0 : undefined}
               onKeyDown={onRow ? (e) => { if (e.key === 'Enter') onRow(r); } : undefined}
             >
-              {cols.map((c) => <td key={c.k} className={c.n ? 'n' : ''}>{c.render ? c.render(r) : c.fmt ? c.fmt(r[c.k], r) : (r[c.k] ?? '—')}</td>)}
+              {cols.map((c) => <td key={c.k} className={`${c.n ? 'n' : ''}${c.cls ? ` ${c.cls}` : ''}`}>{c.render ? c.render(r) : c.fmt ? c.fmt(r[c.k], r) : (r[c.k] ?? '—')}</td>)}
             </tr>
           ))}
         </tbody>
@@ -205,7 +205,13 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
   }, [session, dates.from, dates.to, env, request]);
 
   const d = state.data;
-  const view = d ? buildView(name, d, opt) : null;
+  // A report that cannot be drawn should be one broken card, not a blank
+  // dashboard: an answer missing a field it needs used to throw all the way up.
+  let view = null;
+  let viewError = '';
+  if (d) {
+    try { view = buildView(name, d, opt); } catch (e) { viewError = e?.message || 'Could not draw this report.'; }
+  }
   const exportCsv = () => {
     if (!view) return;
     const url = URL.createObjectURL(new Blob([toCsv(view.cols, view.rows)], { type: 'text/csv' }));
@@ -287,7 +293,13 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
         {state.loading && <span className="wx-muted">Updating…</span>}
       </div>
 
-      {state.error ? <div className="wx-card"><b>Couldn’t load this report</b><p>{state.error}</p></div>
+      {state.error || viewError ? (
+        <div className="wx-card">
+          <b>Couldn’t show this report</b>
+          <p>{state.error || viewError}</p>
+          {viewError && <p className="wx-muted">The data arrived but is not the shape this report expects.</p>}
+        </div>
+      )
         : !view ? <p className="wx-empty">Loading…</p> : view.message ? <div className="wx-card"><p className="wx-empty">{view.message}</p></div> : (
           <>
             <div className="wx-card wx-report-chart">
@@ -568,8 +580,8 @@ function buildView(name, d, opt) {
         cols: [
           { k: 'element', h: 'Button text', fmt: buttonName },
           { k: 'path', h: 'Page URL from click', render: (r) => <span className="wx-path" title={r.path}>{r.path || '—'}</span> },
-          { k: 'target', h: 'Link details', info: 'Where the button leads.', render: (r) => <span className="wx-path" title={r.target || ''}>{r.target || '—'}</span> },
-          { k: 'visitors', h: 'Unique visitors', n: 1, fmt: N, info: 'Everyone who visited the site in this period.' },
+          { k: 'target', cls: 'wx-hide-sm', h: 'Link details', info: 'Where the button leads.', render: (r) => <span className="wx-path" title={r.target || ''}>{r.target || '—'}</span> },
+          { k: 'visitors', h: 'Unique visitors', n: 1, fmt: N, cls: 'wx-hide-sm', info: 'Everyone who visited the site in this period.' },
           { k: 'uniqueClicks', h: 'Unique clicks', n: 1, fmt: N, info: 'Visitors who clicked the button.' },
           { k: 'ctr', h: 'CTR', n: 1, fmt: (v) => pct(v), sortValue: (r) => (r.visitors ? r.uniqueClicks / r.visitors : 0), render: (r) => pct(r.visitors ? r.uniqueClicks / r.visitors : 0), csv: (r) => (r.visitors ? (r.uniqueClicks / r.visitors).toFixed(4) : '') },
         ],
@@ -583,7 +595,7 @@ function buildView(name, d, opt) {
         measures, measure: m.k,
         chart: <Bars rows={[...d.rows].sort((a, b) => b[m.k] - a[m.k]).slice(0, 8).map((r) => ({ label: r.title, value: r[m.k] }))} />,
         cols: [
-          { k: 'image', h: 'Post image', render: (r) => (r.image ? <img src={r.image} alt="" className="wx-post-img" /> : <span className="wx-post-img wx-item-ph">B</span>), csv: () => '' },
+          { k: 'image', cls: 'wx-hide-sm', h: 'Post image', render: (r) => (r.image ? <img src={r.image} alt="" className="wx-post-img" /> : <span className="wx-post-img wx-item-ph">B</span>), csv: () => '' },
           { k: 'title', h: 'Post title', render: (r) => <a href={r.path} target="_blank" rel="noreferrer" className="wx-path" title={r.title}>{r.title}</a> },
           { k: 'publishedAt', h: 'Publish date', fmt: dateCell },
           { k: 'views', h: 'Post views', n: 1, fmt: N },
@@ -626,7 +638,7 @@ function buildView(name, d, opt) {
           ...(dimCols.length ? dimCols : [{ k: 'all', h: 'All', fmt: () => 'All traffic' }]),
           { k: 'sessions', h: 'Sessions', n: 1, fmt: N, info: 'Distinct sessions — they do not add up across rows.' },
           { k: 'visitors', h: 'Visitors', n: 1, fmt: N },
-          { k: 'events', h: 'Events', n: 1, fmt: N },
+          { k: 'events', h: 'Events', n: 1, fmt: N, cls: 'wx-hide-md' },
           { k: 'value', h: 'Value', n: 1, fmt: (v) => (v ? INRfull(v) : '—') },
         ],
         rows: d.rows, summary: d.summary, sortKey: 'sessions',
@@ -657,12 +669,12 @@ function buildView(name, d, opt) {
           { k: 'session', h: 'Session', fmt: (v) => String(v).slice(0, 8) },
           { k: 'current', h: 'On page now', fmt: (v) => v || '—' },
           { k: 'previous', h: 'Page before', fmt: (v) => v || '—' },
-          { k: 'landing', h: 'Landed on', fmt: (v) => v || '—' },
+          { k: 'landing', h: 'Landed on', fmt: (v) => v || '—', cls: 'wx-hide-md' },
           { k: 'stage', h: 'Stage' },
           { k: 'pages', h: 'Pages', n: 1, fmt: N },
           { k: 'seconds', h: 'On site', n: 1, fmt: duration },
           { k: 'channel', h: 'Source', fmt: (v, r) => [v || 'unknown', r?.campaign].filter(Boolean).join(' · ') },
-          { k: 'device', h: 'Device', fmt: (v) => v || '—' },
+          { k: 'device', h: 'Device', fmt: (v) => v || '—', cls: 'wx-hide-md' },
           { k: 'region', h: 'Country', fmt: (v) => v || '—' },
         ],
         rows: d.rows, sortKey: 'lastAt',
@@ -690,15 +702,15 @@ function buildView(name, d, opt) {
         cols: [
           { k: 'campaign', h: 'Campaign' },
           { k: 'source', h: 'Source' },
-          { k: 'category', h: 'Category' },
+          { k: 'category', h: 'Category', cls: 'wx-hide-md' },
           { k: 'sessions', h: 'Sessions', n: 1, fmt: N },
-          { k: 'visitors', h: 'Visitors', n: 1, fmt: N },
+          { k: 'visitors', h: 'Visitors', n: 1, fmt: N, cls: 'wx-hide-sm' },
           { k: 'bookingStarted', h: 'Booking starts', n: 1, fmt: N },
-          { k: 'checkoutStarted', h: 'Checkout', n: 1, fmt: N },
+          { k: 'checkoutStarted', h: 'Checkout', n: 1, fmt: N, cls: 'wx-hide-sm' },
           { k: 'bookings', h: 'Bookings', n: 1, fmt: N, info: 'Paid and verified on the server.' },
           { k: 'conversion', h: 'Sessions → booking', n: 1, fmt: (v) => pct(v, 1) },
           { k: 'revenue', h: 'Revenue', n: 1, fmt: INRfull },
-          { k: 'prevSessions', h: 'Sessions (previous)', n: 1, fmt: N },
+          { k: 'prevSessions', h: 'Sessions (previous)', n: 1, fmt: N, cls: 'wx-hide-md' },
         ],
         rows: d.rows, summary: d.summary, sortKey: 'sessions',
       };
@@ -733,9 +745,9 @@ function buildView(name, d, opt) {
           { k: 'pageGroup', h: 'Page group' },
           { k: 'device', h: 'Device' },
           { k: 'samples', h: 'Samples', n: 1, fmt: N },
-          { k: 'p50', h: 'Median', n: 1, fmt: (v, r) => unit(r.metric, v) },
+          { k: 'p50', h: 'Median', n: 1, fmt: (v, r) => unit(r.metric, v), cls: 'wx-hide-sm' },
           { k: 'p75', h: '75th pct', n: 1, fmt: (v, r) => unit(r.metric, v), info: 'The number Google grades on.' },
-          { k: 'p95', h: '95th pct', n: 1, fmt: (v, r) => unit(r.metric, v) },
+          { k: 'p95', h: '95th pct', n: 1, fmt: (v, r) => unit(r.metric, v), cls: 'wx-hide-sm' },
           { k: 'good', h: 'Good', n: 1, fmt: N },
           { k: 'poor', h: 'Poor', n: 1, fmt: N },
         ],
@@ -764,7 +776,7 @@ function buildView(name, d, opt) {
           { k: 'session', h: 'Session', fmt: (v) => String(v).slice(0, 8) },
           { k: 'channel', h: 'Came from', fmt: (v, r) => [v || 'unknown', r?.campaign].filter(Boolean).join(' · ') },
           { k: 'landing', h: 'Landed on', fmt: (v) => v || '—' },
-          { k: 'pageViews', h: 'Pages', n: 1, fmt: N },
+          { k: 'pageViews', h: 'Pages', n: 1, fmt: N, cls: 'wx-hide-sm' },
           { k: 'seconds', h: 'Length', n: 1, fmt: duration },
           { k: 'stage', h: 'Got as far as' },
           { k: 'booked', h: 'Booked', fmt: (v) => (v ? 'Yes' : '—') },
@@ -836,7 +848,7 @@ function buildView(name, d, opt) {
           { k: 'checkoutStarted', h: 'Reached checkout', n: 1, fmt: N },
           { k: 'bookings', h: 'Bookings', n: 1, fmt: N, info: 'Paid bookings from the payments table — everyone, not only visitors who accepted cookies.' },
           { k: 'revenue', h: 'Revenue', n: 1, fmt: INRfull },
-          { k: 'prevBookings', h: 'Bookings (previous)', n: 1, fmt: N },
+          { k: 'prevBookings', h: 'Bookings (previous)', n: 1, fmt: N, cls: 'wx-hide-md' },
         ],
         rows: d.rows, summary: d.summary, sortKey: 'revenue',
       };
@@ -884,7 +896,7 @@ export const REPORT_CSS = `
 .wx-measure{display:flex;align-items:center;gap:6px;font-size:13.5px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid #EEF1F5}
 .wx-measure select{border:0;background:none;color:#116DFF;font-size:13.5px;cursor:pointer}
 .wx-rbars{display:grid;gap:8px}
-.wx-rbar{display:grid;grid-template-columns:minmax(120px,220px) minmax(0,1fr);gap:12px;align-items:center;font-size:12.5px}
+.wx-rbar{display:grid;grid-template-columns:minmax(120px,32%) minmax(0,1fr);gap:12px;align-items:center;font-size:12.5px}
 .wx-rbar-l{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3B4F63}
 .wx-rbar-t{display:flex;align-items:center;gap:6px;min-width:0}
 .wx-rbar-t span{height:22px;background:#3E82F4;border-radius:2px;display:block}
@@ -947,12 +959,16 @@ export const REPORT_CSS = `
 .wx-defs dt{font-weight:600;font-size:14px}
 .wx-defs dd{margin:3px 0 0;font-size:13px;color:#162D3D}
 .wx-defs dd.wx-muted{font-size:12.5px}
+/* Columns a laptop can do without; the CSV export still carries every one. */
+@media (max-width:1200px){ .wx-hide-md{display:none} }
+@media (max-width:1000px){ .wx-hide-sm{display:none} }
 .wx-rtable{overflow-x:auto}
 .wx-rtable table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:600px}
 .wx-rtable th{background:#E8F0FE;text-align:left;font-weight:500;padding:0;border-bottom:1px solid #D9E3F2}
-.wx-rtable th button{background:none;border:0;width:100%;text-align:inherit;padding:12px 16px;font:inherit;color:#162D3D;cursor:pointer;white-space:nowrap}
+.wx-rtable th button{background:none;border:0;width:100%;text-align:inherit;padding:11px 13px;font:inherit;color:#162D3D;cursor:pointer;white-space:normal;line-height:1.25}
 .wx-rtable th.n,.wx-rtable td.n{text-align:right}
-.wx-rtable td{padding:12px 16px;border-bottom:1px solid #EEF1F5;max-width:320px}
+.wx-rtable td.n{white-space:nowrap;overflow-wrap:normal}
+.wx-rtable td{padding:11px 13px;border-bottom:1px solid #EEF1F5;max-width:280px;overflow-wrap:anywhere}
 .wx-rtable tr.wx-summary td{font-weight:600}
 .wx-rtable tbody tr:hover td{background:#F7F9FC}
 .wx-path{display:inline-block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;color:inherit;text-decoration:none}

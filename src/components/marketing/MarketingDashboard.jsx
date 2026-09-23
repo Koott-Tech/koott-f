@@ -485,7 +485,7 @@ export default function MarketingDashboard() {
 
   return (
     <div className="wx">
-      <style dangerouslySetInnerHTML={{ __html: CSS + REPORT_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: MARKETING_CSS + REPORT_CSS }} />
       <aside className="wx-side">
         <div className="wx-brand"><span className="wx-mk">K</span><div><b>Koott</b><small>Insights</small></div></div>
         <div className="wx-navgrp">Analytics</div>
@@ -539,7 +539,7 @@ export default function MarketingDashboard() {
   );
 }
 
-const CSS = `
+export const MARKETING_CSS = `
 .wx-col-report{float:right;font-weight:400}
 .wx-section-links{display:flex;gap:8px;flex-wrap:wrap}
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
@@ -560,7 +560,7 @@ const CSS = `
 .wx-who b{color:#fff;overflow:hidden;text-overflow:ellipsis}
 .wx-who small{color:#8C97A3}
 .wx-who button{justify-self:start;margin-top:6px;background:#232A31;border:0;border-radius:6px;padding:4px 10px;color:#C9D1D9;cursor:pointer}
-.wx-main{min-width:0;padding:24px 28px 80px;max-width:1260px}
+.wx-main{min-width:0;padding:24px 28px 80px;max-width:1600px}
 .wx-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .wx-head h1{font-size:28px!important;font-weight:700!important;line-height:1.2!important}
 .wx-head p{margin:2px 0 0;color:#3B4F63}
@@ -620,22 +620,23 @@ const CSS = `
 .wx-item-txt b{display:block;font-weight:500;font-size:13px}
 .wx-item-txt small{color:#6B7C8D}
 .wx-item > b{font-size:13px}
-.wx-barlist{display:grid;gap:14px}
+.wx-barlist{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
 .wx-bl-top{display:flex;align-items:center;gap:8px;font-size:13px}
 .wx-bl-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#116DFF}
 .wx-bl-top b{font-weight:600}
 .wx-bl-track{height:4px;background:#EEF1F5;border-radius:2px;margin-top:5px;overflow:hidden}
 .wx-bl-track span{display:block;height:100%;background:#116DFF;border-radius:2px}
 .wx-traffic .wx-bl-label{color:#162D3D}
-.wx-chart{position:relative;width:100%}
+.wx-chart{position:relative;width:100%;min-width:0}
+.wx-chart svg{display:block;max-width:100%;height:auto}
 .wx-chart svg{display:block}
 .wx-keys{display:flex;gap:16px;font-size:12px;color:#3B4F63;margin-top:6px}
 .wx-keys i{display:inline-block;width:14px;height:2px;background:#116DFF;vertical-align:middle;margin-right:6px}
 .wx-keys i.is-prev{background:repeating-linear-gradient(90deg,#9CB8E6 0 4px,transparent 4px 7px)}
 .wx-tip{position:fixed;z-index:90;pointer-events:none;background:#162D3D;color:#fff;border-radius:6px;padding:7px 10px;font-size:12px;max-width:240px}
 .wx-tip b{display:block}
-.wx-map{position:relative;width:100%}
-.wx-map svg{display:block}
+.wx-map{position:relative;width:100%;min-width:0}
+.wx-map svg{display:block;max-width:100%;height:auto}
 .wx-eng{display:grid}
 .wx-eng div{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid #EEF1F5;font-size:13px}
 .wx-eng div:last-child{border-bottom:0}
