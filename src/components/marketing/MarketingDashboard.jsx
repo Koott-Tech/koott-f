@@ -17,6 +17,7 @@ import {
   nf, N, compact, INR, INRfull, duration, ymd, addDays, fmtDay, WEEK, slotLabel, ELEMENT, Change, Tip, useWidth, Spark, AreaChart, BarList, Donut, Columns, SMALL, WorldMap, Section, Col, OpenReport,
 } from './ui';
 import { REPORTS, REPORT_CSS, ReportsList, ReportView } from './MarketingReports';
+import { COMPARISONS, compareLabel, istToday, presets, rangeLabel, resolve } from './dateRange';
 
 const API = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
@@ -374,14 +375,51 @@ function Traffic({ d }) {
 
 /* ------------------------------------------------------------ shell */
 
-const RANGES = [[7, 'Last 7 days'], [30, 'Last 30 days'], [90, 'Last 90 days'], [365, 'Last 365 days']];
+/** The selection is kept for the session, so moving between reports keeps the dates. */
+const STORE = 'koott_mkt_range';
+const loadSel = () => {
+  try { return JSON.parse(sessionStorage.getItem(STORE) || 'null') || { preset: 'last30', compare: 'previous' }; }
+  catch (_) { return { preset: 'last30', compare: 'previous' }; }
+};
+
+/** Presets, a custom range, and what to compare against — used by every page. */
+function DateRange({ sel, dates, today, onChange }) {
+  const opts = presets(today);
+  const current = opts.find((o) => o.k === sel.preset) || opts[3];
+  return (
+    <div className="wx-daterange">
+      <select
+        value={sel.preset}
+        onChange={(e) => onChange({ ...sel, preset: e.target.value, from: dates.from, to: dates.to })}
+        aria-label="Date range"
+      >
+        {opts.map((o) => (
+          <option key={o.k} value={o.k}>
+            {o.label}{o.from ? ` (${rangeLabel(o.from, o.to)})` : ''}
+          </option>
+        ))}
+      </select>
+      {sel.preset === 'custom' && (
+        <span className="wx-dates">
+          <input type="date" value={sel.from || dates.from} max={today} onChange={(e) => onChange({ ...sel, from: e.target.value })} aria-label="From" />
+          <em>to</em>
+          <input type="date" value={sel.to || dates.to} max={today} onChange={(e) => onChange({ ...sel, to: e.target.value })} aria-label="To" />
+        </span>
+      )}
+      <select value={sel.compare} onChange={(e) => onChange({ ...sel, compare: e.target.value })} aria-label="Comparison">
+        {COMPARISONS.map((c) => <option key={c.k} value={c.k}>{c.label}</option>)}
+      </select>
+      {current?.partial && <span className="wx-muted" title="Today is still running, so it holds part of a day.">Includes today</span>}
+    </div>
+  );
+}
 
 export default function MarketingDashboard() {
   const { user, logout } = useAuth();
   const [meta, setMeta] = useState(null);
   const [notReady, setNotReady] = useState(null);
   const [page, setPage] = useState('highlights');
-  const [range, setRange] = useState(30);
+  const [sel, setSel] = useState(loadSel);
   const [env, setEnv] = useState('production');
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -411,17 +449,15 @@ export default function MarketingDashboard() {
     request('meta').then((j) => setMeta(j.data)).catch((e) => (e.notReady ? setNotReady(e.message) : setError(e.message)));
   }, [request]);
 
-  const dates = useMemo(() => {
-    const to = meta?.today || ymd(new Date());
-    const from = addDays(to, -(range - 1));
-    return { from, to, prevFrom: addDays(from, -range), prevTo: addDays(from, -1) };
-  }, [meta, range]);
+  const today = meta?.today || istToday();
+  const dates = useMemo(() => resolve(sel, today), [sel, today]);
+  useEffect(() => { try { sessionStorage.setItem(STORE, JSON.stringify(sel)); } catch (_) { /* private mode */ } }, [sel]);
 
   useEffect(() => {
     if (!meta || !['highlights', 'traffic'].includes(page)) return undefined;
     let off = false;
     setLoading(true); setError('');
-    request(`${page}?from=${dates.from}&to=${dates.to}&env=${env}`)
+    request(`${page}?from=${dates.from}&to=${dates.to}&compare=${dates.compare}&env=${env}`)
       .then((j) => { if (!off) { setNotReady(null); setData({ page, d: j.data }); } })
       .catch((e) => { if (!off) { if (e.notReady) setNotReady(e.message); else setError(e.message); } })
       .finally(() => { if (!off) setLoading(false); });
@@ -437,11 +473,7 @@ export default function MarketingDashboard() {
   const sub = page === 'highlights' ? 'Get a complete overview of your site’s activity across all areas.' : page === 'reports' ? 'Dig into the details of your site’s traffic, visitors and content.' : 'Track your site’s traffic trends and get to know your visitors.';
   const show = data && data.page === page;
   const isReports = page === 'reports' || !!reportName;
-  const rangeSelect = (
-    <select value={range} onChange={(e) => setRange(Number(e.target.value))} aria-label="Date range">
-      {RANGES.map(([r, l]) => <option key={r} value={r}>{l}{r === range ? ` (${fmtDay(dates.from)} - Today)` : ''}</option>)}
-    </select>
-  );
+  const rangeSelect = <DateRange sel={sel} dates={dates} today={today} onChange={setSel} />;
 
   return (
     <div className="wx">
@@ -474,7 +506,7 @@ export default function MarketingDashboard() {
         </div>}
         {!isReports && <div className="wx-range">
           {rangeSelect}
-          <span>compared to previous period ({fmtDay(dates.prevFrom)} - {fmtDay(dates.prevTo, { month: 'short', day: 'numeric', year: 'numeric' })})</span>
+          <span>{compareLabel(dates)}</span>
           {loading && <span className="wx-muted">Updating…</span>}
         </div>}
         {env !== 'production' && <div className="wx-banner">Showing <b>{env}</b> data (test traffic), not the live site.</div>}
@@ -528,6 +560,11 @@ const CSS = `
 .wx-range{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0 14px;color:#3B4F63}
 .wx-banner{background:#FFF4D6;border-radius:6px;padding:8px 12px;margin-bottom:14px;font-size:13px}
 .wx-card,.wx-section{background:#fff;border-radius:8px;box-shadow:0 1px 2px rgba(22,45,61,.06),0 0 0 1px rgba(22,45,61,.04)}
+.wx-daterange{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.wx-daterange select{background:#fff;border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font-size:13.5px;max-width:100%}
+.wx-dates{display:inline-flex;align-items:center;gap:6px}
+.wx-dates input{border:1px solid #D3DCE6;border-radius:18px;padding:5px 10px;font:inherit;font-size:13.5px;background:#fff}
+.wx-dates em{font-style:normal;color:#3B4F63;font-size:13px}
 .wx-card{padding:16px 18px}
 .wx-card p{margin:6px 0 0}
 .wx-section{margin-bottom:16px}
