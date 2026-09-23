@@ -442,15 +442,16 @@ export default function MarketingDashboard() {
     return json;
   }, []);
 
+  // The page and the environment are remembered across visits; the date range
+  // keeps itself, for the session only (see loadSel).
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem('koott-mk2') || '{}');
       if (['highlights', 'traffic', 'reports'].includes(s.page) || REPORTS.some((r) => `report:${r.k}` === s.page)) setPage(s.page);
-      if (RANGES.some(([r]) => r === s.range)) setRange(s.range);
       if (['production', 'staging', 'development'].includes(s.env)) setEnv(s.env);
     } catch (_) { /* ignore */ }
   }, []);
-  useEffect(() => { try { localStorage.setItem('koott-mk2', JSON.stringify({ page, range, env })); } catch (_) { /* ignore */ } }, [page, range, env]);
+  useEffect(() => { try { localStorage.setItem('koott-mk2', JSON.stringify({ page, env })); } catch (_) { /* ignore */ } }, [page, env]);
 
   useEffect(() => {
     request('meta').then((j) => setMeta(j.data)).catch((e) => (e.notReady ? setNotReady(e.message) : setError(e.message)));
