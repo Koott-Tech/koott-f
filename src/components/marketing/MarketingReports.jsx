@@ -22,6 +22,8 @@ export const REPORTS = [
   { k: 'booking-funnel', grp: 'Bookings', t: 'Booking Funnel', d: 'How far people get towards a booking, and where they stop.' },
   { k: 'therapist-performance', grp: 'Bookings', t: 'Therapist Performance', d: 'Profile views, booking starts, bookings and revenue per therapist.' },
   { k: 'journeys', grp: 'Visitors', t: 'Visitor Journeys', d: 'Every session, in order: how it arrived, what it saw, how far it got.' },
+  { k: 'campaigns', grp: 'Marketing', t: 'Marketing Campaigns', d: 'What each tagged campaign brought, from first visit to paid booking.' },
+  { k: 'technical', grp: 'Technical', t: 'Technical Performance', d: 'Core Web Vitals from real visits, and the errors people hit.' },
 ];
 
 const pct = (v, digits = 0) => `${((v || 0) * 100).toFixed(digits)}%`;
@@ -467,6 +469,80 @@ function buildView(name, d, opt) {
         rows: d.cells, summary: { avgSessions: d.summary.sessions, clicks: d.summary.clicks }, sortKey: 'avgSessions',
       };
     }
+    case 'campaigns': {
+      const measures = [
+        { k: 'sessions', h: 'Sessions', fmt: N }, { k: 'bookingStarted', h: 'Booking starts', fmt: N },
+        { k: 'bookings', h: 'Bookings', fmt: N }, { k: 'revenue', h: 'Revenue', fmt: INRfull },
+      ];
+      const m = measures.find((x) => x.k === opt.measure) || measures[0];
+      return {
+        measures, measure: m.k,
+        chart: (
+          <>
+            <BarList rows={[...d.rows].sort((a, b) => b[m.k] - a[m.k]).slice(0, 10).map((r) => ({ label: r.campaign, value: r[m.k] }))} fmt={m.fmt} />
+            {d.untagged > 0 && (
+              <p className="wx-muted" style={{ marginTop: 12 }}>
+                {N(d.untagged)} sessions arrived without a campaign tag and are not in this report — direct visits,
+                and any link that went out without utm parameters.
+              </p>
+            )}
+          </>
+        ),
+        cols: [
+          { k: 'campaign', h: 'Campaign' },
+          { k: 'source', h: 'Source' },
+          { k: 'category', h: 'Category' },
+          { k: 'sessions', h: 'Sessions', n: 1, fmt: N },
+          { k: 'visitors', h: 'Visitors', n: 1, fmt: N },
+          { k: 'bookingStarted', h: 'Booking starts', n: 1, fmt: N },
+          { k: 'checkoutStarted', h: 'Checkout', n: 1, fmt: N },
+          { k: 'bookings', h: 'Bookings', n: 1, fmt: N, info: 'Paid and verified on the server.' },
+          { k: 'conversion', h: 'Sessions → booking', n: 1, fmt: (v) => pct(v, 1) },
+          { k: 'revenue', h: 'Revenue', n: 1, fmt: INRfull },
+          { k: 'prevSessions', h: 'Sessions (previous)', n: 1, fmt: N },
+        ],
+        rows: d.rows, summary: d.summary, sortKey: 'sessions',
+      };
+    }
+    case 'technical': {
+      const unit = (metric, v) => (v == null ? '—' : metric === 'CLS' ? v.toFixed(3) : `${N(v)} ms`);
+      return {
+        chart: (
+          <div>
+            <div className="wx-vitals">
+              {d.metrics.length === 0 && <p className="wx-empty">No Core Web Vitals recorded yet for this period.</p>}
+              {d.metrics.map((m) => (
+                <div key={m.metric} className={`wx-vital is-${m.goodRate >= 0.75 ? 'good' : m.goodRate >= 0.5 ? 'ok' : 'poor'}`}>
+                  <b>{m.metric}</b>
+                  <strong>{unit(m.metric, m.p75)}</strong>
+                  <span>75th percentile · {N(m.samples)} samples</span>
+                  <span>{pct(m.goodRate)} rated good</span>
+                </div>
+              ))}
+            </div>
+            <p className="wx-muted" style={{ marginTop: 12 }}>{d.note}</p>
+            {d.errors.length > 0 && (
+              <div className="wx-funnel-stopped">
+                <h3>Errors visitors hit</h3>
+                <BarList rows={d.errors.slice(0, 8).map((e) => ({ label: `${e.code} (${e.event.replace(/_/g, ' ')})`, value: e.events }))} />
+              </div>
+            )}
+          </div>
+        ),
+        cols: [
+          { k: 'metric', h: 'Metric' },
+          { k: 'pageGroup', h: 'Page group' },
+          { k: 'device', h: 'Device' },
+          { k: 'samples', h: 'Samples', n: 1, fmt: N },
+          { k: 'p50', h: 'Median', n: 1, fmt: (v, r) => unit(r.metric, v) },
+          { k: 'p75', h: '75th pct', n: 1, fmt: (v, r) => unit(r.metric, v), info: 'The number Google grades on.' },
+          { k: 'p95', h: '95th pct', n: 1, fmt: (v, r) => unit(r.metric, v) },
+          { k: 'good', h: 'Good', n: 1, fmt: N },
+          { k: 'poor', h: 'Poor', n: 1, fmt: N },
+        ],
+        rows: d.rows, sortKey: 'samples',
+      };
+    }
     case 'journeys': {
       if (d.session) return { session: d.session };
       const shown = d.rows.length;
@@ -647,6 +723,15 @@ export const REPORT_CSS = `
 .wx-steps li.is-funnel b{color:#116DFF}
 .wx-steps .wx-path{grid-column:2;font-size:12px;color:#3B4F63;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wx-steps em{font-style:normal;color:#0F6B35;font-weight:600}
+/* Core Web Vitals */
+.wx-vitals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.wx-vital{border:1px solid #E5EBF2;border-left-width:4px;border-radius:8px;padding:12px 14px;display:grid;gap:2px}
+.wx-vital b{font-size:12.5px;color:#3B4F63;letter-spacing:.04em}
+.wx-vital strong{font-size:22px;font-weight:700}
+.wx-vital span{font-size:12px;color:#3B4F63}
+.wx-vital.is-good{border-left-color:#1FA463}
+.wx-vital.is-ok{border-left-color:#E5A000}
+.wx-vital.is-poor{border-left-color:#D6453D}
 .wx-rtable{overflow-x:auto}
 .wx-rtable table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:600px}
 .wx-rtable th{background:#E8F0FE;text-align:left;font-weight:500;padding:0;border-bottom:1px solid #D9E3F2}

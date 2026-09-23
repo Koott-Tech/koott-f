@@ -12,6 +12,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { refreshIdentity, setTrackingEnabled, track } from '@/analytics';
 import { installAutotrack, newPage } from '@/analytics/autotrack';
+import { startVitals } from '@/analytics/vitals';
 import ConsentBanner from './ConsentBanner';
 
 const STAFF_AREA = /^\/(admin|superadmin|finance|psychologist|event-organizer|marketing|dev)(\/|$)/;
@@ -25,7 +26,7 @@ export default function AnalyticsProvider() {
   const staff = !!user?.role && user.role !== 'client';
 
   useEffect(() => { setTrackingEnabled(!staff); }, [staff]);
-  useEffect(() => { installAutotrack(); }, []);
+  useEffect(() => { installAutotrack(); startVitals(); }, []);
 
   useEffect(() => {
     if (!pathname || STAFF_AREA.test(pathname)) return;
