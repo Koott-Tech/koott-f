@@ -426,9 +426,16 @@ export default function MarketingDashboard() {
   const [loading, setLoading] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
 
-  const request = useCallback(async (path) => {
+  const request = useCallback(async (path, { method = 'GET', body } = {}) => {
     const token = getStoredToken?.();
-    const res = await fetch(`${API}/marketing/${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const res = await fetch(`${API}/marketing/${path}`, {
+      method,
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
     const json = await res.json().catch(() => ({}));
     if (res.status === 503 && json.code === 'NOT_MIGRATED') { const e = new Error(json.message); e.notReady = true; throw e; }
     if (!res.ok || json.success === false) throw new Error(json.message || `Could not load (${res.status}).`);
@@ -483,7 +490,8 @@ export default function MarketingDashboard() {
         <div className="wx-navgrp">Analytics</div>
         <nav aria-label="Analytics">
           <button type="button" aria-current={page === 'highlights' ? 'page' : undefined} onClick={() => setPage('highlights')}>Highlights</button>
-          <button type="button" onClick={() => setLiveOpen(true)}>Real-time</button>
+          <button type="button" aria-current={page === 'report:realtime' ? 'page' : undefined} onClick={() => openReport('realtime')}>Real-time</button>
+          <button type="button" onClick={() => setLiveOpen(true)}>Live feed</button>
           <button type="button" aria-current={page === 'traffic' ? 'page' : undefined} onClick={() => setPage('traffic')}>Traffic</button>
           <button type="button" aria-current={isReports ? 'page' : undefined} onClick={() => setPage('reports')}>Reports</button>
         </nav>

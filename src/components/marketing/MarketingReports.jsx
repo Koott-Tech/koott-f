@@ -7,8 +7,9 @@
  * Data: GET /api/marketing/report/:name — totals only.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { N, INRfull, duration, ELEMENT, Tip, AreaChart, WorldMap, BarList } from './ui';
+import { DEFINITIONS, FOR_REPORT } from './definitions';
 
 export const REPORTS = [
   { k: 'traffic-over-time', grp: 'Traffic', t: 'Traffic over Time', d: 'Learn which days or months get the most site visits.' },
@@ -24,7 +25,17 @@ export const REPORTS = [
   { k: 'journeys', grp: 'Visitors', t: 'Visitor Journeys', d: 'Every session, in order: how it arrived, what it saw, how far it got.' },
   { k: 'campaigns', grp: 'Marketing', t: 'Marketing Campaigns', d: 'What each tagged campaign brought, from first visit to paid booking.' },
   { k: 'technical', grp: 'Technical', t: 'Technical Performance', d: 'Core Web Vitals from real visits, and the errors people hit.' },
+  { k: 'realtime', grp: 'Visitors', t: 'Real-Time Activity', d: 'Who is on the site right now, and what each session has done.' },
+  { k: 'custom', grp: 'Custom', t: 'Custom Report', d: 'Pick the dimensions and events, save the ones you use often.' },
 ];
+
+/** Plain names for the dimensions a custom report can group by. */
+const DIM_NAME = {
+  day: 'Date', dow: 'Weekday', hour: 'Hour of day', channel: 'Traffic category', utm_source: 'Source',
+  utm_medium: 'Medium', utm_campaign: 'Campaign', device_class: 'Device', region: 'Country', city: 'City',
+  page_path: 'Page', page_group: 'Page group', page_topic: 'Page topic', landing_group: 'Landing group',
+  landing_topic: 'Landing topic', element: 'Button', target: 'Link target', psychologist_id: 'Therapist',
+};
 
 const pct = (v, digits = 0) => `${((v || 0) * 100).toFixed(digits)}%`;
 const hourLabel = (h) => `${h % 12 || 12} ${h < 12 ? 'AM' : 'PM'}`;
@@ -155,13 +166,22 @@ function toCsv(cols, rows) {
 
 export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
   const def = REPORTS.find((r) => r.k === name) || REPORTS[0];
-  const [opt, setOpt] = useState({ grain: 'day', model: 'last_non_direct', group: 'page', measure: null, device: '', channel: '' });
+  const [opt, setOpt] = useState({ grain: 'day', model: 'last_non_direct', group: 'page', measure: null, device: '', channel: '', stage: '', booked: '', minutes: 15, dims: ['page_group'], events: [] });
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    if (name !== 'realtime') return undefined;
+    const id = setInterval(() => setTick((t) => t + 1), 20000);
+    return () => clearInterval(id);
+  }, [name]);
   const [state, setState] = useState({ loading: true, data: null, error: '' });
 
   const extra = name === 'traffic-over-time' ? `&grain=${opt.grain}`
     : name === 'traffic-sources' ? `&model=${opt.model}`
       : name === 'page-visits' ? `&group=${opt.group}`
         : name === 'booking-funnel' ? `${opt.device ? `&device=${opt.device}` : ''}${opt.channel ? `&channel=${opt.channel}` : ''}`
+          : name === 'custom' ? `&dims=${(opt.dims || []).join(',')}&events=${(opt.events || []).join(',')}`
+            : name === 'realtime' ? `&minutes=${opt.minutes || 15}`
+            : name === 'journeys' ? `${opt.stage ? `&stage=${opt.stage}` : ''}${opt.booked ? `&booked=${opt.booked}` : ''}`
           : '';
   useEffect(() => {
     let off = false;
@@ -170,8 +190,9 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
       .then((j) => { if (!off) setState({ loading: false, data: j.data, error: '' }); })
       .catch((e) => { if (!off) setState({ loading: false, data: null, error: e.message }); });
     return () => { off = true; };
-  }, [name, dates.from, dates.to, dates.compare, env, extra, request]);
+  }, [name, dates.from, dates.to, dates.compare, env, extra, request, tick]);
 
+  const [defs, setDefs] = useState(false);
   const [session, setSession] = useState(null);
   useEffect(() => { setSession(null); }, [name, dates.from, dates.to]);
   useEffect(() => {
@@ -198,7 +219,13 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
     <div className="wx-report">
       <nav className="wx-crumbs"><button type="button" className="wx-link" onClick={goAll}>All Reports</button> › <span>{def.t}</span></nav>
       <div className="wx-report-head">
-        <div><h1>{def.t}</h1><p>{def.d}</p></div>
+        <div>
+          <h1>{def.t}</h1>
+          <p>
+            {def.d}{' '}
+            <button type="button" className="wx-link" onClick={() => setDefs(true)}>View report definitions</button>
+          </p>
+        </div>
         <button type="button" className="wx-icon" onClick={exportCsv} disabled={!view} title="Export CSV" aria-label="Export CSV">⤓</button>
       </div>
       <div className="wx-card wx-report-controls">
@@ -230,6 +257,13 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
               <option value="whatsapp">WhatsApp</option><option value="email">Email</option><option value="ai_platform">AI platforms</option>
             </select>
           </>
+        )}
+        {name === 'custom' && <CustomControls opt={opt} setOpt={setOpt} request={request} available={state.data?.available} />}
+        {name === 'realtime' && (
+          <select value={opt.minutes} onChange={(e) => setOpt((o) => ({ ...o, minutes: Number(e.target.value) }))} aria-label="Window">
+            <option value={5}>Last 5 minutes</option><option value={15}>Last 15 minutes</option>
+            <option value={30}>Last 30 minutes</option><option value={60}>Last hour</option>
+          </select>
         )}
         {name === 'journeys' && (
           <>
@@ -273,8 +307,115 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
               />
             </div>
             {session && <SessionTimeline session={session} onClose={() => setSession(null)} />}
+            {defs && <Definitions name={name} onClose={() => setDefs(false)} />}
           </>
         )}
+    </div>
+  );
+}
+
+/** What the numbers on this report mean, in plain words and then exactly. */
+function Definitions({ name, onClose }) {
+  const wanted = FOR_REPORT[name];
+  const list = wanted ? DEFINITIONS.filter((d) => wanted.includes(d.term)) : DEFINITIONS;
+  return (
+    <div className="wx-timeline-wrap" role="dialog" aria-label="Report definitions">
+      <div className="wx-timeline">
+        <header>
+          <div><h2>Report definitions</h2><p className="wx-muted">What each number counts, and what it cannot tell you.</p></div>
+          <button type="button" className="wx-icon" onClick={onClose} aria-label="Close">×</button>
+        </header>
+        <dl className="wx-defs">
+          {list.map((d) => (
+            <div key={d.term}>
+              <dt>{d.term}</dt>
+              <dd>{d.plain}</dd>
+              <dd className="wx-muted">{d.how}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="wx-muted">
+          Everything here counts only visitors who accepted analytics cookies, except bookings and revenue, which
+          come from the payments table and count everyone.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The custom report's pickers, and the saved configurations behind them.
+ * A saved report stores the question — dimensions and events — not any data.
+ */
+function CustomControls({ opt, setOpt, request, available }) {
+  const [saved, setSaved] = useState([]);
+  const [name, setName] = useState('');
+  const [msg, setMsg] = useState('');
+  const dims = available?.dimensions || [];
+  const events = available?.events || [];
+
+  const load = useCallback(() => {
+    request('saved').then((j) => setSaved(j.data.reports || [])).catch(() => setSaved([]));
+  }, [request]);
+  useEffect(load, [load]);
+
+  const toggle = (key, value) => setOpt((o) => {
+    const list = o[key] || [];
+    const next = list.includes(value) ? list.filter((x) => x !== value) : [...list, value];
+    return { ...o, [key]: key === 'dims' ? next.slice(0, 3) : next };
+  });
+
+  const save = async () => {
+    const n = name.trim();
+    if (!n) return;
+    try {
+      await request('saved', { method: 'POST', body: { name: n, config: { dims: opt.dims, events: opt.events } } });
+      setName(''); setMsg(`Saved “${n}”.`); load();
+    } catch (e) { setMsg(e.message); }
+    setTimeout(() => setMsg(''), 4000);
+  };
+
+  return (
+    <div className="wx-builder">
+      <div className="wx-builder-row">
+        <b>Group by</b>
+        <div className="wx-chips">
+          {dims.map((k) => (
+            <button key={k} type="button" aria-pressed={(opt.dims || []).includes(k)} onClick={() => toggle('dims', k)}>
+              {DIM_NAME[k] || k}
+            </button>
+          ))}
+        </div>
+        <span className="wx-muted">up to three</span>
+      </div>
+      <div className="wx-builder-row">
+        <b>Events</b>
+        <div className="wx-chips">
+          {events.map((k) => (
+            <button key={k} type="button" aria-pressed={(opt.events || []).includes(k)} onClick={() => toggle('events', k)}>
+              {k.replace(/_/g, ' ')}
+            </button>
+          ))}
+        </div>
+        <span className="wx-muted">{(opt.events || []).length ? '' : 'all events'}</span>
+      </div>
+      <div className="wx-builder-row">
+        <b>Saved</b>
+        <select
+          value=""
+          onChange={(e) => {
+            const r = saved.find((x) => x.id === e.target.value);
+            if (r) setOpt((o) => ({ ...o, dims: r.config.dims || [], events: r.config.events || [] }));
+          }}
+          aria-label="Open a saved report"
+        >
+          <option value="">Open a saved report…</option>
+          {saved.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+        </select>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name this report" aria-label="Report name" />
+        <button type="button" className="wx-btn" onClick={save} disabled={!name.trim()}>Save</button>
+        {msg && <span className="wx-muted">{msg}</span>}
+      </div>
     </div>
   );
 }
@@ -467,6 +608,64 @@ function buildView(name, d, opt) {
           { k: 'avgVisitors', h: 'Avg. visitors by day', n: 1, fmt: fmt1 },
         ],
         rows: d.cells, summary: { avgSessions: d.summary.sessions, clicks: d.summary.clicks }, sortKey: 'avgSessions',
+      };
+    }
+    case 'custom': {
+      const dimCols = d.dims.map((k) => ({ k, h: DIM_NAME[k] || k, fmt: (v) => (v == null || v === '' ? '—' : String(v)) }));
+      const measures = [
+        { k: 'sessions', h: 'Sessions' }, { k: 'visitors', h: 'Visitors' }, { k: 'events', h: 'Events' },
+      ];
+      const m = measures.find((x) => x.k === opt.measure) || measures[0];
+      const label = (r) => d.dims.map((k) => r[k] ?? '—').join(' · ') || 'All';
+      return {
+        measures, measure: m.k,
+        chart: d.rows.length
+          ? <BarList rows={[...d.rows].sort((a, b) => b[m.k] - a[m.k]).slice(0, 12).map((r) => ({ label: label(r), value: r[m.k] }))} />
+          : <p className="wx-empty">Pick a dimension and an event, or widen the dates.</p>,
+        cols: [
+          ...(dimCols.length ? dimCols : [{ k: 'all', h: 'All', fmt: () => 'All traffic' }]),
+          { k: 'sessions', h: 'Sessions', n: 1, fmt: N, info: 'Distinct sessions — they do not add up across rows.' },
+          { k: 'visitors', h: 'Visitors', n: 1, fmt: N },
+          { k: 'events', h: 'Events', n: 1, fmt: N },
+          { k: 'value', h: 'Value', n: 1, fmt: (v) => (v ? INRfull(v) : '—') },
+        ],
+        rows: d.rows, summary: d.summary, sortKey: 'sessions',
+      };
+    }
+    case 'realtime': {
+      return {
+        chart: (
+          <div>
+            <div className="wx-funnel-sum">
+              <span><b>{N(d.summary.sessions)}</b> active sessions</span>
+              <span><b>{N(d.summary.visitors)}</b> visitors</span>
+              <span><b>{N(d.summary.inBooking)}</b> in the booking flow</span>
+              <span><b>{N(d.summary.booked)}</b> booked</span>
+            </div>
+            <div className="wx-rt-cols">
+              <div><h3>Pages they are on</h3><BarList rows={d.byPage.map((r) => ({ label: r.key, value: r.sessions }))} empty="Nobody on the site in this window." /></div>
+              <div><h3>Where they came from</h3><BarList rows={d.byChannel.map((r) => ({ label: r.key, value: r.sessions }))} empty="—" /></div>
+            </div>
+            <p className="wx-muted" style={{ marginTop: 12 }}>
+              Refreshes every 20 seconds. Steps are only what was actually recorded — a session that seems to skip
+              a step did something we did not observe, and is not filled in.
+            </p>
+          </div>
+        ),
+        cols: [
+          { k: 'lastAt', h: 'Last seen', fmt: (v) => timeCell(v), csv: (r) => r.lastAt },
+          { k: 'session', h: 'Session', fmt: (v) => String(v).slice(0, 8) },
+          { k: 'current', h: 'On page now', fmt: (v) => v || '—' },
+          { k: 'previous', h: 'Page before', fmt: (v) => v || '—' },
+          { k: 'landing', h: 'Landed on', fmt: (v) => v || '—' },
+          { k: 'stage', h: 'Stage' },
+          { k: 'pages', h: 'Pages', n: 1, fmt: N },
+          { k: 'seconds', h: 'On site', n: 1, fmt: duration },
+          { k: 'channel', h: 'Source', fmt: (v, r) => [v || 'unknown', r?.campaign].filter(Boolean).join(' · ') },
+          { k: 'device', h: 'Device', fmt: (v) => v || '—' },
+          { k: 'region', h: 'Country', fmt: (v) => v || '—' },
+        ],
+        rows: d.rows, sortKey: 'lastAt',
       };
     }
     case 'campaigns': {
@@ -732,6 +931,22 @@ export const REPORT_CSS = `
 .wx-vital.is-good{border-left-color:#1FA463}
 .wx-vital.is-ok{border-left-color:#E5A000}
 .wx-vital.is-poor{border-left-color:#D6453D}
+/* Real-time */
+.wx-rt-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:16px}
+.wx-rt-cols h3{margin:0 0 10px;font-size:14px!important;font-weight:600!important}
+/* Custom report builder */
+.wx-builder{display:grid;gap:10px;width:100%;padding-top:10px;border-top:1px solid #EEF1F5}
+.wx-builder-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.wx-builder-row > b{min-width:74px;font-weight:600}
+.wx-builder-row input{border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font:inherit;font-size:13px}
+.wx-chips{display:flex;flex-wrap:wrap;gap:6px}
+.wx-chips button{border:1px solid #D3DCE6;background:#fff;border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer}
+.wx-chips button[aria-pressed="true"]{background:#116DFF;border-color:#116DFF;color:#fff}
+/* Report definitions */
+.wx-defs{display:grid;gap:16px;margin:0 0 18px}
+.wx-defs dt{font-weight:600;font-size:14px}
+.wx-defs dd{margin:3px 0 0;font-size:13px;color:#162D3D}
+.wx-defs dd.wx-muted{font-size:12.5px}
 .wx-rtable{overflow-x:auto}
 .wx-rtable table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:600px}
 .wx-rtable th{background:#E8F0FE;text-align:left;font-weight:500;padding:0;border-bottom:1px solid #D9E3F2}
