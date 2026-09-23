@@ -880,26 +880,26 @@ export const REPORT_CSS = `
 .wx-reports .wx-section{margin-bottom:16px}
 .wx-report-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:16px 18px}
 .wx-report-card{display:grid;gap:4px;text-align:left;border:1px solid #E1E7EE;border-radius:8px;background:#fff;padding:14px 16px;cursor:pointer}
-.wx-report-card:hover{border-color:#116DFF;box-shadow:0 2px 10px rgba(17,109,255,.12)}
+.wx-report-card:hover{border-color:#1B6930;box-shadow:0 2px 10px rgba(17,109,255,.12)}
 .wx-report-card b{font-size:14px}
 .wx-report-card span{font-size:12.5px;color:#3B4F63}
 .wx-crumbs{font-size:13px;color:#3B4F63;margin-bottom:6px}
 .wx-report-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
 .wx-report-head h1{font-size:28px!important;font-weight:700!important;line-height:1.2!important}
 .wx-report-head p{margin:2px 0 0;color:#3B4F63}
-.wx-icon{width:38px;height:38px;border-radius:50%;border:0;background:#fff;color:#116DFF;font-size:17px;cursor:pointer;box-shadow:0 1px 3px rgba(22,45,61,.12)}
+.wx-icon{width:38px;height:38px;border-radius:50%;border:0;background:#fff;color:#1B6930;font-size:17px;cursor:pointer;box-shadow:0 1px 3px rgba(22,45,61,.12)}
 .wx-icon:disabled{opacity:.5;cursor:default}
 .wx-report-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
-.wx-report-controls select{background:#fff;border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font-size:13.5px}
+.wx-report-controls select{background:#fff;border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font-size:13.5px;max-width:100%;min-width:0}
 .wx-report-chart{border-radius:8px 8px 0 0;margin-bottom:0}
 .wx-report-table{border-radius:0 0 8px 8px;border-top:1px solid #EEF1F5;padding:0;overflow:hidden}
 .wx-measure{display:flex;align-items:center;gap:6px;font-size:13.5px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid #EEF1F5}
-.wx-measure select{border:0;background:none;color:#116DFF;font-size:13.5px;cursor:pointer}
+.wx-measure select{border:0;background:none;color:#1B6930;font-size:13.5px;cursor:pointer}
 .wx-rbars{display:grid;gap:8px}
 .wx-rbar{display:grid;grid-template-columns:minmax(120px,32%) minmax(0,1fr);gap:12px;align-items:center;font-size:12.5px}
 .wx-rbar-l{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3B4F63}
 .wx-rbar-t{display:flex;align-items:center;gap:6px;min-width:0}
-.wx-rbar-t span{height:22px;background:#3E82F4;border-radius:2px;display:block}
+.wx-rbar-t span{height:22px;background:#189E4F;border-radius:2px;display:block}
 .wx-rbar-t em{font-style:normal;font-size:12px;color:#3B4F63;white-space:nowrap}
 /* Booking funnel */
 .wx-funnel{display:grid;gap:10px}
@@ -907,8 +907,8 @@ export const REPORT_CSS = `
 .wx-funnel-sum b{color:#162D3D;font-size:16px}
 .wx-funnel-row{display:grid;grid-template-columns:minmax(120px,210px) minmax(0,1fr) 62px 54px;gap:12px;align-items:center;font-size:12.5px}
 .wx-funnel-label{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3B4F63}
-.wx-funnel-bar{display:block;background:#EEF3FB;border-radius:3px;height:22px}
-.wx-funnel-bar i{display:block;height:100%;background:#3E82F4;border-radius:3px}
+.wx-funnel-bar{display:block;background:#EAF6EE;border-radius:3px;height:22px}
+.wx-funnel-bar i{display:block;height:100%;background:#189E4F;border-radius:3px}
 .wx-funnel-row b{text-align:right}
 .wx-funnel-pct{color:#3B4F63;text-align:right}
 .wx-funnel-stopped{margin-top:16px;padding-top:16px;border-top:1px solid #EEF1F5}
@@ -920,7 +920,7 @@ export const REPORT_CSS = `
 }
 /* Visitor journeys */
 .wx-rowlink{cursor:pointer}
-.wx-rowlink:hover td{background:#F6F9FE}
+.wx-rowlink:hover td{background:#F5FFF6}
 .wx-journeys-top .wx-muted{margin:0;font-size:12.5px}
 .wx-timeline-wrap{position:fixed;inset:0;z-index:60;background:rgba(22,45,61,.35);display:flex;justify-content:flex-end}
 .wx-timeline{width:min(460px,100%);background:#fff;height:100%;overflow:auto;padding:20px 22px;box-shadow:-8px 0 30px rgba(22,45,61,.2)}
@@ -931,7 +931,7 @@ export const REPORT_CSS = `
 .wx-steps li{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid #F1F4F8;font-size:13px}
 .wx-steps time{color:#8A9AA8;font-size:12px}
 .wx-steps b{font-weight:600}
-.wx-steps li.is-funnel b{color:#116DFF}
+.wx-steps li.is-funnel b{color:#1B6930}
 .wx-steps .wx-path{grid-column:2;font-size:12px;color:#3B4F63;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wx-steps em{font-style:normal;color:#0F6B35;font-weight:600}
 /* Core Web Vitals */
@@ -953,7 +953,7 @@ export const REPORT_CSS = `
 .wx-builder-row input{border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font:inherit;font-size:13px}
 .wx-chips{display:flex;flex-wrap:wrap;gap:6px}
 .wx-chips button{border:1px solid #D3DCE6;background:#fff;border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer}
-.wx-chips button[aria-pressed="true"]{background:#116DFF;border-color:#116DFF;color:#fff}
+.wx-chips button[aria-pressed="true"]{background:#1B6930;border-color:#1B6930;color:#fff}
 /* Report definitions */
 .wx-defs{display:grid;gap:16px;margin:0 0 18px}
 .wx-defs dt{font-weight:600;font-size:14px}
@@ -964,7 +964,7 @@ export const REPORT_CSS = `
 @media (max-width:1000px){ .wx-hide-sm{display:none} }
 .wx-rtable{overflow-x:auto}
 .wx-rtable table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:600px}
-.wx-rtable th{background:#E8F0FE;text-align:left;font-weight:500;padding:0;border-bottom:1px solid #D9E3F2}
+.wx-rtable th{background:#EAF7EC;text-align:left;font-weight:500;padding:0;border-bottom:1px solid #CFE6D6}
 .wx-rtable th button{background:none;border:0;width:100%;text-align:inherit;padding:11px 13px;font:inherit;color:#162D3D;cursor:pointer;white-space:normal;line-height:1.25}
 .wx-rtable th.n,.wx-rtable td.n{text-align:right}
 .wx-rtable td.n{white-space:nowrap;overflow-wrap:normal}
@@ -972,9 +972,9 @@ export const REPORT_CSS = `
 .wx-rtable tr.wx-summary td{font-weight:600}
 .wx-rtable tbody tr:hover td{background:#F7F9FC}
 .wx-path{display:inline-block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;color:inherit;text-decoration:none}
-a.wx-path:hover{color:#116DFF}
+a.wx-path:hover{color:#1B6930}
 .wx-post-img{width:48px;height:48px;border-radius:6px;object-fit:cover;display:inline-grid;place-items:center}
-.wx-more{display:block;margin:10px auto 14px;background:none;border:1px solid #D3DCE6;border-radius:16px;padding:6px 14px;color:#116DFF;cursor:pointer}
+.wx-more{display:block;margin:10px auto 14px;background:none;border:1px solid #D3DCE6;border-radius:16px;padding:6px 14px;color:#1B6930;cursor:pointer}
 .wx-report-map{max-width:760px;margin:0 auto}
 .wx-heat24{display:grid;gap:2px;overflow-x:auto}
 .wx-heat24-row{display:grid;grid-template-columns:52px repeat(7,minmax(64px,1fr));gap:2px}
