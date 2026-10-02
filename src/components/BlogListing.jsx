@@ -46,8 +46,12 @@ export default function BlogListing({ initialCategory, extraSlugs, heading }) {
   const [posts, setPosts] = useState(null);
   const [usingSample, setUsingSample] = useState(false);
   const [category, setCategory] = useState(initialCategory || 'All Posts');
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const [email, setEmail] = useState('');
-  const PAGE = 12;
+  /** Categories shown in the bar; the rest go behind "More", as on the live site. */
+const TOP_CATEGORIES = 5;
+const PAGE = 12;
   const [shown, setShown] = useState(PAGE);
 
   useEffect(() => {
@@ -63,16 +67,21 @@ export default function BlogListing({ initialCategory, extraSlugs, heading }) {
 
   const visible = useMemo(() => {
     if (!posts) return [];
-    if (category === 'All Posts') return posts;
+    const q = query.trim().toLowerCase();
+    const matchesQuery = (p) => !q
+      || String(p.title || '').toLowerCase().includes(q)
+      || String(p.excerpt || '').toLowerCase().includes(q)
+      || (p.tags || []).some((t) => String(t).toLowerCase().includes(q));
+    if (category === 'All Posts') return posts.filter(matchesQuery);
     const want = category.toLowerCase();
     const extra = new Set(extraSlugs || []);
     return posts.filter((p) =>
-      (p.categories || []).some((c) => String(c).toLowerCase() === want)
-      || (category === initialCategory && extra.has(p.slug)));
-  }, [posts, category, extraSlugs, initialCategory]);
+      ((p.categories || []).some((c) => String(c).toLowerCase() === want)
+        || (category === initialCategory && extra.has(p.slug))) && matchesQuery(p));
+  }, [posts, category, extraSlugs, initialCategory, query]);
 
   // A new category starts again from the first page.
-  useEffect(() => { setShown(PAGE); }, [category]);
+  useEffect(() => { setShown(PAGE); }, [category, query]);
 
   // Build the tag row from the posts actually published, falling back to the
   // sample list only while the CMS is empty. With the real corpus loaded there
@@ -88,6 +97,16 @@ export default function BlogListing({ initialCategory, extraSlugs, heading }) {
     if (initialCategory && !ordered.includes(initialCategory)) ordered.unshift(initialCategory);
     return ['All Posts', ...ordered];
   }, [posts, usingSample, initialCategory]);
+
+  const rest = categories.slice(TOP_CATEGORIES);
+
+  // The "More" menu closes on the next click anywhere else.
+  useEffect(() => {
+    if (!moreOpen) return undefined;
+    const close = (e) => { if (!e.target.closest?.('.kbl-more')) setMoreOpen(false); };
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [moreOpen]);
 
   return (
     <main className="kbl">
@@ -120,8 +139,11 @@ export default function BlogListing({ initialCategory, extraSlugs, heading }) {
         </form>
       </section>
 
+      {/* The live site shows a single row — the busiest few categories, then
+          "More" for the rest. Showing all of them turned the top of the page
+          into a wall of chips. */}
       <nav className="kbl-cats" aria-label="Blog categories">
-        {categories.map((c) => (
+        {categories.slice(0, TOP_CATEGORIES).map((c) => (
           <button
             key={c}
             type="button"
@@ -131,6 +153,40 @@ export default function BlogListing({ initialCategory, extraSlugs, heading }) {
             {c}
           </button>
         ))}
+
+        {categories.length > TOP_CATEGORIES && (
+          <div className={`kbl-more ${moreOpen ? 'is-open' : ''}`}>
+            <button
+              type="button"
+              className={`kbl-cat ${rest.includes(category) ? 'is-on' : ''}`}
+              aria-expanded={moreOpen}
+              onClick={() => setMoreOpen((v) => !v)}
+            >
+              {rest.includes(category) ? category : 'More'}
+              <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" /></svg>
+            </button>
+            {moreOpen && (
+              <ul>
+                {rest.map((c) => (
+                  <li key={c}>
+                    <button type="button" onClick={() => { setCategory(c); setMoreOpen(false); }}>{c}</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        <label className="kbl-find">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search posts"
+            aria-label="Search posts"
+          />
+        </label>
       </nav>
 
       <section className="kbl-body">
@@ -248,6 +304,24 @@ const CSS = `
 }
 .kbl-join:hover{background:#54483F;}
 
+.kbl-more{position:relative;}
+.kbl-more > button{display:inline-flex;align-items:center;gap:6px;}
+.kbl-more svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.6;transition:transform .15s ease;}
+.kbl-more.is-open svg{transform:rotate(180deg);}
+.kbl-more ul{position:absolute;left:0;top:calc(100% + 6px);z-index:20;min-width:220px;max-height:320px;overflow:auto;
+  margin:0;padding:6px;list-style:none;background:#fff;border:1px solid rgba(38,34,34,.14);border-radius:12px;
+  box-shadow:0 10px 30px rgba(22,45,61,.12);}
+.kbl-more ul button{display:block;width:100%;text-align:left;padding:8px 12px;border:0;border-radius:8px;
+  background:none;font:inherit;font-size:14px;cursor:pointer;color:#100E0E;}
+.kbl-more ul button:hover{background:#F2FFF1;}
+.kbl-find{display:inline-flex;align-items:center;gap:7px;margin-left:auto;padding:6px 12px;
+  border:1px solid rgba(38,34,34,.14);border-radius:999px;background:#fff;}
+.kbl-find svg{width:15px;height:15px;flex:none;fill:none;stroke:#5B5757;stroke-width:1.8;stroke-linecap:round;}
+.kbl-find input{border:0;outline:none;background:none;font:inherit;font-size:14px;width:150px;min-width:0;}
+@media (max-width:720px){
+  .kbl-find{margin-left:0;width:100%;}
+  .kbl-find input{width:100%;}
+}
 .kbl-cats{
   max-width:980px;margin:34px auto 0;padding:0 20px 14px;
   display:flex;flex-wrap:wrap;gap:26px;border-bottom:1px solid var(--k-line);

@@ -135,6 +135,16 @@ function renderMarkdownish(content) {
       return;
     }
     flush(i);
+    // An imported post carries its in-body images as markdown: ![alt](src)
+    const img = line.match(/^!\[([^\]]*)\]\((https?:[^)\s]+)\)$/);
+    if (img) {
+      blocks.push(
+        <figure key={i} className="kba-fig">
+          <img className="kba-img" src={img[2]} alt={img[1]} loading="lazy" />
+        </figure>,
+      );
+      return;
+    }
     if (line.startsWith('## ')) blocks.push(<h2 key={i} className="kba-h2">{line.slice(3)}</h2>);
     else if (line.startsWith('### ')) blocks.push(<h3 key={i} className="kba-h3">{line.slice(4)}</h3>);
     else if (line.startsWith('> ')) blocks.push(<p key={i} className="kba-lede">{withLinks(line.slice(2), i)}</p>);
@@ -156,10 +166,27 @@ function renderBody(post) {
   return renderMarkdownish(content);
 }
 
+/** Tags are the list at the foot of a post; categories are the bar at the top. */
+const tagsOf = (post) => {
+  const raw = Array.isArray(post?.tags) ? post.tags : [];
+  return [...new Set(raw.map((t) => String(t).trim()).filter(Boolean))].slice(0, 24);
+};
+
 export default function BlogArticle({ slug, post: givenPost, preview = false }) {
   // undefined = loading, null = not found
   const [post, setPost] = useState(givenPost || undefined);
   const [usingSample, setUsingSample] = useState(false);
+  const [recent, setRecent] = useState([]);
+
+  /* The three most recent posts, as the live site shows under every article.
+     The post being read is dropped, so it never recommends itself. */
+  useEffect(() => {
+    let off = false;
+    blogApi.list({ limit: 4 })
+      .then((rows) => { if (!off) setRecent((rows || []).filter((r) => r.slug !== slug).slice(0, 3)); })
+      .catch(() => { /* the block simply does not show */ });
+    return () => { off = true; };
+  }, [slug]);
 
   useEffect(() => {
     if (givenPost) { setPost(givenPost); return undefined; }
@@ -174,6 +201,8 @@ export default function BlogArticle({ slug, post: givenPost, preview = false }) 
     })();
     return () => { off = true; };
   }, [slug, givenPost]);
+
+  const tagList = tagsOf(post);
 
   return (
     <main className={`kba ${preview ? 'kba--preview' : ''}`}>
@@ -217,6 +246,39 @@ export default function BlogArticle({ slug, post: givenPost, preview = false }) 
               This is a sample post — it is replaced automatically once the CMS has a
               published article at this slug.
             </p>
+          )}
+
+          {tagList.length > 0 && (
+            <ul className="kba-tags" aria-label="Tags">
+              {tagList.map((t) => (
+                <li key={t}><a href={`/blog?tag=${encodeURIComponent(t)}`}>{t}</a></li>
+              ))}
+            </ul>
+          )}
+
+          {recent.length > 0 && (
+            <section className="kba-recent" aria-labelledby="kba-recent-h">
+              <header>
+                <h2 id="kba-recent-h">Recent Posts</h2>
+                <a href="/blog">See All</a>
+              </header>
+              <ul>
+                {recent.map((r) => (
+                  <li key={r.slug}>
+                    <a href={`/blog/${r.slug}`}>
+                      {r.featured_image_url
+                        ? <img src={r.featured_image_url} alt="" loading="lazy" />
+                        : <span className="kba-recent-ph" aria-hidden />}
+                      <b>{r.title}</b>
+                      <small>
+                        {formatPostDate(r.published_at || r.created_at)}
+                        {r.read_time_minutes ? ` · ${r.read_time_minutes} min read` : ''}
+                      </small>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
 
           <p className="kba-backrow"><a className="kba-back" href="/blog">← All posts</a></p>
@@ -308,6 +370,26 @@ const CSS = `
 .kba-quote cite{display:block;margin-top:8px;font-style:normal;font-size:15px;color:#5B5757;}
 .kba-fig,.kba-html figure{margin:28px 0 0;}
 .kba-img,.kba-html img{display:block;max-width:100%;height:auto;margin:28px auto 0;border-radius:6px;}
+
+/* Tags, as the live post has them: a wrapped row of small links. */
+.kba-tags{display:flex;flex-wrap:wrap;gap:8px;margin:40px 0 0;padding:24px 0 0;border-top:1px solid var(--k-line);list-style:none;}
+.kba-tags a{display:inline-block;padding:5px 12px;border:1px solid var(--k-line);border-radius:999px;
+  font-size:13px!important;color:var(--k-ink)!important;text-decoration:none;}
+.kba-tags a:hover{border-color:var(--k-accent);color:var(--k-accent)!important;}
+
+/* Recent Posts / See All */
+.kba-recent{margin-top:48px;padding-top:26px;border-top:1px solid var(--k-line);}
+.kba-recent header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;}
+.kba-recent h2{font-size:20px!important;font-weight:600!important;font-family:var(--k-display)!important;margin:0;}
+.kba-recent header a{font-size:14px!important;color:var(--k-accent)!important;text-decoration:none;}
+.kba-recent ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:0;padding:0;list-style:none;}
+.kba-recent a{text-decoration:none;color:inherit;display:block;}
+.kba-recent img,.kba-recent-ph{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:#EFF4F0;margin:0 0 10px;}
+.kba-recent b{display:block;font-size:15px!important;font-weight:600!important;line-height:1.35;}
+.kba-recent small{display:block;margin-top:4px;font-size:12.5px!important;color:#5B5757;}
+@media (max-width:720px){
+  .kba-recent ul{grid-template-columns:1fr;gap:18px;}
+}
 .kba-fig .kba-img{margin-top:0;}
 .kba-cap,.kba-html figcaption{
   margin-top:8px;text-align:center;font-family:var(--k-body)!important;font-size:14px!important;color:#5B5757!important;
