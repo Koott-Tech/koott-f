@@ -42,19 +42,23 @@ export function formatPostDate(iso) {
  *        which do not carry the category as a tag; they are shown alongside.
  * @param {object}   [heading] override the page heading for a category page.
  */
-export default function BlogListing({ initialCategory, extraSlugs, heading }) {
-  const [posts, setPosts] = useState(null);
+/** Categories shown in the bar; the rest go behind "More", as on the live site. */
+const TOP_CATEGORIES = 5;
+/** Cards per page, and per press of "Load more posts". */
+const PAGE = 12;
+
+export default function BlogListing({ initialCategory, extraSlugs, heading, initialPosts = null }) {
+  // Server-rendered posts arrive as a prop, so the first screen needs no fetch.
+  const [posts, setPosts] = useState(initialPosts);
   const [usingSample, setUsingSample] = useState(false);
   const [category, setCategory] = useState(initialCategory || 'All Posts');
   const [moreOpen, setMoreOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [email, setEmail] = useState('');
-  /** Categories shown in the bar; the rest go behind "More", as on the live site. */
-const TOP_CATEGORIES = 5;
-const PAGE = 12;
   const [shown, setShown] = useState(PAGE);
 
   useEffect(() => {
+    if (initialPosts && initialPosts.length) return undefined;
     let off = false;
     (async () => {
       const rows = await blogApi.list();
@@ -358,8 +362,9 @@ const CSS = `
 }
 .kbl-title{margin:14px 0 0;padding:0 8px;}
 .kbl-title a{
+  /* 26/36.4 and weight 400, as koott.in sets a card title at every width. */
   font-family:var(--k-display)!important;font-size:26px!important;font-weight:400!important;
-  line-height:1.28em!important;letter-spacing:0!important;color:var(--k-ink)!important;
+  line-height:36.4px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   text-decoration:none;
 }
 .kbl-title a:hover{color:var(--k-accent)!important;}
@@ -372,6 +377,10 @@ const CSS = `
 .kbl-foot{margin:22px 8px 0;padding-top:12px;border-top:1px solid var(--k-line);}
 .kbl-heart{color:#E0748A;font-size:16px;line-height:1;}
 
+/* While the posts are still coming, the body holds the height a screen of cards
+   will take. Without it the page is a heading and one line, the footer sits in
+   the middle of the screen, and everything jumps when the cards arrive. */
+.kbl-body:has(.kbl-state){min-height:72vh;}
 .kbl-state,.kbl-note{
   font-family:var(--k-body)!important;font-size:14px!important;font-weight:400!important;
   letter-spacing:0!important;color:#5B5757!important;text-align:center;margin:40px 0 0;

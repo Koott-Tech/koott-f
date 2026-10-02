@@ -43,7 +43,10 @@ export default async function BlogPostPage({ params }) {
   return (
     <>
       {post && <JsonLd data={articleJsonLd(post, `/blog/${post.slug}`)} />}
-      <BlogArticle slug={params.slug} />
+      {/* The post is already loaded here for the metadata and the JSON-LD.
+          Handing it to the component renders the article in the first HTML
+          instead of fetching the same row again after hydration. */}
+      <BlogArticle slug={params.slug} post={post} />
     </>
   );
 }

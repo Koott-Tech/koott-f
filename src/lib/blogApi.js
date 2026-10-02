@@ -17,11 +17,17 @@ async function get(path) {
   return res.json();
 }
 
-/** Published posts, newest first. Returns [] on any failure. */
-async function list() {
+/**
+ * Published posts, newest first. Returns [] on any failure.
+ *
+ * Ask for what you are going to show: the whole corpus is 144 rows and ~120KB,
+ * which is worth fetching for the listing and not for the three "Recent Posts"
+ * under an article.
+ */
+async function list({ limit = 200 } = {}) {
   try {
-    // The list now honours `limit` (default 10) and returns card fields only.
-    const json = await get('/blogs?limit=200');
+    // The list honours `limit` and returns card fields only (no bodies).
+    const json = await get(`/blogs?limit=${Math.max(1, Math.min(200, limit))}`);
     const rows = json?.data?.blogs || json?.blogs
       || (Array.isArray(json?.data) ? json.data : null)
       || (Array.isArray(json) ? json : []);

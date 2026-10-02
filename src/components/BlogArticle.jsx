@@ -325,9 +325,11 @@ const CSS = `
   line-height:1.5em!important;letter-spacing:0!important;color:var(--k-ink)!important;
 }
 
+/* Measured off koott.in: 40/50 on a laptop, 26/36.4 on a phone, weight 400,
+   letter-spacing normal. The post column is 740px wide there too. */
 .kba-title{
   font-family:var(--k-display)!important;font-size:40px!important;font-weight:400!important;
-  line-height:1.25em!important;letter-spacing:0!important;color:var(--k-ink)!important;
+  line-height:50px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   margin:22px 0 0;
 }
 .kba-cover{
@@ -337,7 +339,7 @@ const CSS = `
 .kba-body{margin:30px 0 0;}
 .kba-p,.kba-html p{
   font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
-  line-height:1.5em!important;letter-spacing:0!important;color:var(--k-ink)!important;margin:20px 0 0;
+  line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:20px 0 0;
 }
 .kba-lede{
   font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
@@ -345,12 +347,12 @@ const CSS = `
   color:var(--k-ink)!important;margin:20px 0 0;
 }
 .kba-h2,.kba-html h1,.kba-html h2{
-  font-family:var(--k-display)!important;font-size:28px!important;font-weight:700!important;
-  line-height:1.25em!important;letter-spacing:0!important;color:var(--k-ink)!important;margin:38px 0 0;
+  font-family:var(--k-display)!important;font-size:28px!important;font-weight:400!important;
+  line-height:35px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:38px 0 0;
 }
 .kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6{
-  font-family:var(--k-display)!important;font-size:22px!important;font-weight:700!important;
-  line-height:1.23em!important;letter-spacing:0!important;color:var(--k-ink)!important;margin:30px 0 0;
+  font-family:var(--k-display)!important;font-size:22px!important;font-weight:400!important;
+  line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:30px 0 0;
 }
 .kba-ul,.kba-html ul{margin:14px 0 0;padding-left:27px;list-style:disc!important;}
 .kba-ol,.kba-html ol{margin:14px 0 0;padding-left:27px;list-style:decimal!important;}
@@ -406,6 +408,9 @@ const CSS = `
 .kba-spacer{height:28px;}
 .kba-body a{color:var(--k-accent)!important;text-decoration:underline;}
 
+/* Same reason as the listing: hold the fold while the post loads so the footer
+   does not ride up into the middle of the screen and then drop. */
+.kba:has(.kba-state){min-height:86vh;}
 .kba-state{
   font-family:var(--k-body)!important;font-size:16px!important;letter-spacing:0!important;
   color:#5B5757!important;text-align:center;margin:80px 0;
@@ -422,11 +427,13 @@ const CSS = `
 .kba-back:hover{text-decoration:underline;}
 
 @media (max-width:640px){
-  .kba-title{font-size:28px!important;}
+  .kba-title{font-size:26px!important;line-height:36.4px!important;}
   .kba-cover{height:230px;}
-  .kba-p,.kba-lede,.kba-ul li,.kba-ol li,.kba-html p,.kba-html li,.kba-quote p,.kba-html blockquote{font-size:16px!important;}
-  .kba-h2,.kba-html h1,.kba-html h2{font-size:23px!important;}
-  .kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6{font-size:19px!important;}
+  .kba-p,.kba-lede,.kba-ul li,.kba-ol li,.kba-html p,.kba-html li,.kba-quote p,.kba-html blockquote{
+    font-size:16px!important;line-height:24px!important;
+  }
+  .kba-h2,.kba-html h1,.kba-html h2{font-size:24px!important;line-height:35px!important;}
+  .kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6{font-size:20px!important;line-height:27px!important;}
   .kba-cats{gap:16px;}
 }
 `;
