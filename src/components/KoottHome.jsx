@@ -1338,7 +1338,10 @@ const CSS = `
 }
 /* Fixed 560 wide whatever the headline is doing. */
 .kh2-search{
-  width:100%;max-width:560px;margin:0 auto;background:#F7FFF3;border-radius:18px;padding:14px;
+  /* 608px is the artboard's own proportion: the card is 42% of a 1440 page
+     ("Koott Website Sep-26 (3).pdf"). The textarea and the two buttons below it
+     are all full-width inside, so they widen with it. */
+  width:100%;max-width:608px;margin:0 auto;background:#F7FFF3;border-radius:18px;padding:14px;
   box-shadow:0 10px 40px rgba(24,158,79,.08);
 }
 .kh2-search-input{
