@@ -28,6 +28,7 @@ import {
 import DocumentStyleEditor, { getDefaultToolbarState } from '@/components/DocumentStyleEditor';
 import { BlogPreviewButton } from '@/components/BlogPreviewOverlay';
 import { normalizeImageUrl } from '@/utils/urlNormalizer';
+import { markdownToHtml } from '@/lib/markdownToHtml';
 import styles from './BlogEditor.module.css';
 
 const generateSlug = (title) => {
@@ -163,6 +164,12 @@ const BlogEditor = forwardRef(function BlogEditor({
     }
   };
   const removeMetaKeyword = (k) => onChange({ ...blog, meta_keywords: (blog.meta_keywords || []).filter((x) => x !== k) });
+
+  /* The imported posts are stored in markdown (see lib/markdownToHtml). The
+     editor sets innerHTML, so it has to be handed HTML or it shows the raw "##"
+     marks — and would save them as literal text. Saving converts the post for
+     good; one left alone keeps the format it was imported in. */
+  const editorHtml = useMemo(() => markdownToHtml(blog.content || ''), [blog.content]);
 
   const wordCount = useMemo(() => {
     const html = blog.content ?? '';
@@ -539,7 +546,7 @@ const BlogEditor = forwardRef(function BlogEditor({
                 <div className={styles.becDocumentEditorWrap} data-blog-cms-editor>
                   <DocumentStyleEditor
                     ref={editorRef}
-                    content={blog.content || ''}
+                    content={editorHtml}
                     onChange={(html) => onChange({ ...blog, content: html })}
                     onImageUpload={handleImageUpload}
                     onToolbarStateChange={setToolbarState}
