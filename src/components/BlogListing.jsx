@@ -295,17 +295,17 @@ const CSS = `
 }
 .kbl-dates{display:inline-flex;align-items:center;}
 .kbl-dot{width:4px;height:4px;flex:none;border-radius:50%;background:var(--k-ink);margin:0 7px;}
-/* koott.in's card titles run to three lines; Poppins is wider, so the same
-   title ran to five and the heading block towered over the card. Capped at the
-   live block's three lines (3 x 36.4). */
+/* Three lines at the tightened 30.4px leading. koott.in leads its card titles
+   at 36.4, but Poppins has a taller x-height than Brandon Light and reads loose
+   at that figure, so the cards are set tighter here on purpose. */
 .kbl-title{
   margin:13px 0 0;padding:0 31px;
-  max-height:109.2px;overflow:hidden;
+  max-height:91.2px;overflow:hidden;
 }
 .kbl-title a{
-  /* 26/36.4, the leading normal resolves to on koott.in at every width. */
+  /* 26px at 30.4px leading, tighter than koott.in's 36.4 to suit Poppins. */
   font-family:var(--k-display)!important;font-size:26px!important;font-weight:400!important;
-  line-height:36.4px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
+  line-height:30.4px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   text-decoration:none;
 }
 .kbl-title a:hover{color:var(--k-accent)!important;}
