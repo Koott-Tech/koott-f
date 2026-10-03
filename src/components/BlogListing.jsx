@@ -297,9 +297,16 @@ const CSS = `
 .kbl-dot{width:4px;height:4px;flex:none;border-radius:50%;background:var(--k-ink);margin:0 7px;}
 /* Three lines at the tightened 30.4px leading. koott.in leads its card titles
    at 36.4, but Poppins has a taller x-height than Brandon Light and reads loose
-   at that figure, so the cards are set tighter here on purpose. */
-.kbl-title{
+   at that figure, so the cards are set tighter here on purpose.
+
+   The size and leading have to sit on the h2, not only on the link inside it:
+   globals.css sets h2 to --h2-size (clamping up to 48px) at !important, and
+   that strut sets the height of every line box in the block however small the
+   inline text is. :not(#_) outranks it the same way globals.css does. */
+.kbl-title,.kbl-title:not(#_){
   margin:13px 0 0;padding:0 31px;
+  font-family:var(--k-display)!important;font-size:26px!important;font-weight:400!important;
+  line-height:30.4px!important;letter-spacing:normal!important;
   max-height:91.2px;overflow:hidden;
 }
 .kbl-title a{
