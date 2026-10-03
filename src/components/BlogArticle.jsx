@@ -284,14 +284,16 @@ export default function BlogArticle({ slug, post: givenPost, preview = false }) 
 }
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600;700&display=swap');
 
 .kba{
   --k-ink:#100E0E;
   --k-accent:#3D985C;
   --k-line:rgba(38,34,34,.16);
-  --k-display:'Poppins','Brandon Grotesque',ui-sans-serif,system-ui,sans-serif;
-  --k-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-display:'Jost','Brandon Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --k-display-w:300;            /* Brandon Grotesque Light */
+  --k-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-body-w:300;               /* Avenir LT 35 Light */
   padding-top:64px;              /* Header.jsx is fixed and h-16 */
   display:block;background:#fff;color:var(--k-ink);font-family:var(--k-body)!important;
 }
@@ -308,14 +310,14 @@ const CSS = `
   background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
 }
 .kba-byline{
-  font-family:var(--k-body)!important;font-size:14px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:14px!important;font-weight:var(--k-body-w)!important;
   line-height:21px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
 }
 
 /* Measured off koott.in: 40/50 on a laptop, 26/36.4 on a phone, weight 400,
    letter-spacing normal. The post column is 740px wide there too. */
-.kba-title{
-  font-family:var(--k-display)!important;font-size:40px!important;font-weight:400!important;
+.kba-title,.kba-title:not(#_){
+  font-family:var(--k-display)!important;font-size:40px!important;font-weight:var(--k-display-w)!important;
   line-height:50px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   margin:21px 0 0;
 }
@@ -325,27 +327,29 @@ const CSS = `
 
 .kba-body{margin:27px 0 0;}
 .kba-p,.kba-html p{
-  font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:18px!important;font-weight:var(--k-body-w)!important;
   line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:27px 0 0;
 }
 .kba-lede{
-  font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:18px!important;font-weight:var(--k-body-w)!important;
   font-style:italic;line-height:1.5em!important;letter-spacing:0!important;
   color:var(--k-ink)!important;margin:27px 0 0;
 }
-.kba-h2,.kba-html h1,.kba-html h2{
-  font-family:var(--k-display)!important;font-size:28px!important;font-weight:400!important;
+.kba-h2,.kba-html h1,.kba-html h2,
+.kba-h2:not(#_),.kba-html h1:not(#_),.kba-html h2:not(#_){
+  font-family:var(--k-display)!important;font-size:28px!important;font-weight:var(--k-display-w)!important;
   line-height:35px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:27px 0 0;
 }
-.kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6{
-  font-family:var(--k-display)!important;font-size:22px!important;font-weight:400!important;
+.kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6,
+.kba-h3:not(#_),.kba-html h3:not(#_),.kba-html h4:not(#_),.kba-html h5:not(#_),.kba-html h6:not(#_){
+  font-family:var(--k-display)!important;font-size:22px!important;font-weight:var(--k-display-w)!important;
   line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:27px 0 0;
 }
 .kba-ul,.kba-html ul{margin:27px 0 0;padding-left:27px;list-style:disc!important;}
 .kba-ol,.kba-html ol{margin:27px 0 0;padding-left:27px;list-style:decimal!important;}
 .kba-ul li,.kba-ol li,.kba-html li{
   display:list-item!important;list-style:inherit!important;
-  font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:18px!important;font-weight:var(--k-body-w)!important;
   /* 18/27 and no space between items, as on the live post */
   line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:0;
 }
@@ -367,7 +371,7 @@ const CSS = `
 .kba-tags{display:flex;flex-wrap:wrap;gap:8px;margin:48px 0 0;padding:0;list-style:none;}
 .kba-tags a{display:inline-block;padding:6px 12px;background:#fff;
   border:0.8px solid rgba(16,14,14,.2);border-radius:0;
-  font-family:var(--k-body)!important;font-size:14px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:14px!important;font-weight:var(--k-body-w)!important;
   line-height:17px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   text-decoration:none;}
 .kba-tags a:hover{border-color:var(--k-accent);color:var(--k-accent)!important;}
@@ -380,11 +384,11 @@ const CSS = `
 }
 .kba-recent header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:21px;}
 .kba-recent h2,.kba-recent h2:not(#_){
-  font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:18px!important;font-weight:var(--k-body-w)!important;
   line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:0;
 }
 .kba-recent header a{
-  font-family:var(--k-body)!important;font-size:14px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:14px!important;font-weight:var(--k-body-w)!important;
   line-height:21px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   text-decoration:none;
 }
@@ -394,7 +398,7 @@ const CSS = `
 .kba-recent img,.kba-recent-ph{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:0;background:#EFF4F0;margin:0 0 24px;}
 .kba-recent b{
   display:block;padding:0 24px;
-  font-family:var(--k-display)!important;font-size:18px!important;font-weight:400!important;
+  font-family:var(--k-display)!important;font-size:18px!important;font-weight:var(--k-display-w)!important;
   line-height:24px!important;letter-spacing:normal!important;
 }
 .kba-recent small{display:block;margin-top:6px;padding:0 24px;font-size:12px!important;color:#5B5757;}
@@ -436,12 +440,45 @@ const CSS = `
 .kba-back:hover{text-decoration:underline;}
 
 @media (max-width:640px){
-  .kba-title{font-size:26px!important;line-height:36.4px!important;}
-  .kba-cover{aspect-ratio:16/9;height:auto;}
-  .kba-p,.kba-lede,.kba-ul li,.kba-ol li,.kba-html p,.kba-html li,.kba-quote p,.kba-html blockquote{
-    font-size:16px!important;line-height:24px!important;
+  /* koott.in serves the blog on a fixed 320px canvas (<meta name="viewport"
+     content="width=320">) and scales it to the device, so its lengths render at
+     viewport/320 — 1.17x on a 375px phone. --k-u is that unit, so the figures
+     here are koott.in's own and land at its rendered size. Capped at 1.35px
+     (432px viewport), past which koott.in serves its desktop layout.
+
+     The heading rules above carry :not(#_) to outrank globals.css, so the phone
+     sizes have to carry it too or the desktop figures win here. */
+  .kba{--k-u:min(calc(100vw / 320),1.35px);}
+
+  .kba-article{
+    padding:calc(44 * var(--k-u)) calc(18 * var(--k-u)) calc(90 * var(--k-u));
   }
-  .kba-h2,.kba-html h1,.kba-html h2{font-size:24px!important;line-height:35px!important;}
-  .kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6{font-size:20px!important;line-height:27px!important;}
+  .kba-meta{gap:calc(12 * var(--k-u));}
+  .kba-title,.kba-title:not(#_){
+    font-size:calc(26 * var(--k-u))!important;line-height:calc(36.4 * var(--k-u))!important;
+  }
+  .kba-cover{aspect-ratio:16/9;height:auto;}
+  .kba-body{margin-top:calc(27 * var(--k-u));}
+  .kba-p,.kba-lede,.kba-ul li,.kba-ol li,.kba-html p,.kba-html li,.kba-quote p,.kba-html blockquote{
+    font-size:calc(16 * var(--k-u))!important;line-height:calc(24 * var(--k-u))!important;
+  }
+  .kba-p,.kba-html p,.kba-lede,.kba-quote,.kba-html blockquote,
+  .kba-fig,.kba-html figure,.kba-ul,.kba-html ul,.kba-ol,.kba-html ol{
+    margin-top:calc(27 * var(--k-u));
+  }
+  .kba-ul,.kba-html ul,.kba-ol,.kba-html ol{padding-left:calc(27 * var(--k-u));}
+  .kba-quote,.kba-html blockquote{padding-left:calc(20 * var(--k-u));}
+  .kba-h2,.kba-html h1,.kba-html h2,
+  .kba-h2:not(#_),.kba-html h1:not(#_),.kba-html h2:not(#_){
+    font-size:calc(24 * var(--k-u))!important;line-height:calc(35 * var(--k-u))!important;
+    margin-top:calc(27 * var(--k-u));
+  }
+  .kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6,
+  .kba-h3:not(#_),.kba-html h3:not(#_),.kba-html h4:not(#_),.kba-html h5:not(#_),.kba-html h6:not(#_){
+    font-size:calc(20 * var(--k-u))!important;line-height:calc(27 * var(--k-u))!important;
+    margin-top:calc(27 * var(--k-u));
+  }
+  .kba-cap,.kba-html figcaption{font-size:calc(14 * var(--k-u))!important;margin-top:calc(8 * var(--k-u));}
+  .kba-tags{gap:calc(8 * var(--k-u));margin-top:calc(48 * var(--k-u));}
 }
 `;

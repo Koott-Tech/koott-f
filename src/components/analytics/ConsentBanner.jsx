@@ -19,7 +19,15 @@ export default function ConsentBanner() {
   const [advertising, setAdvertising] = useState(false);
 
   useEffect(() => {
-    if (!getConsent()) setOpen(true);
+    // The banner is not shown on arrival. A default choice is recorded instead
+    // (analytics on, advertising off) so events are never left queued forever;
+    // the banner still opens from the footer's "Cookie settings" link.
+    if (!getConsent()) {
+      setConsent(
+        { analytics: true, advertising: false },
+        { anonymousId: analyticsContext()?.anonymousId, apiBase: API, source: 'default' },
+      );
+    }
     const reopen = () => {
       const c = getConsent();
       setAnalytics(c ? c.analytics : true);

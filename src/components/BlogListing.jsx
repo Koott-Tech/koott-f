@@ -205,7 +205,7 @@ export default function BlogListing({ initialCategory, extraSlugs, heading, init
    "never edit") forces Poppins / 60px on h1, Inter / 16px on p, and
    letter-spacing on span, a and button. */
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap');
 
 .kbl{
   --k-ink:#100E0E;
@@ -213,16 +213,18 @@ const CSS = `
   --k-accent:#3D985C;
   --k-join:#6B5D57;
   --k-line:rgba(38,34,34,.16);
-  --k-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
-  --k-display:'Poppins','Brandon Grotesque',ui-sans-serif,system-ui,sans-serif;
-  --k-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
+  --k-display:'Jost','Brandon Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --k-display-w:300;            /* Brandon Grotesque Light */
+  --k-body:'Mulish','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --k-body-w:300;               /* Avenir LT 35 Light */
   padding-top:64px;              /* Header.jsx is fixed and h-16 */
   display:block;background:#fff;color:var(--k-ink);font-family:var(--k-body)!important;
 }
 .kbl *{box-sizing:border-box;}
 
 .kbl-head{max-width:980px;margin:0 auto;padding:56px 20px 0;text-align:center;}
-.kbl-mal{
+.kbl-mal,.kbl-mal:not(#_){
   /* size from the global --h1-size scale; Malayalam glyphs need the taller line */
   font-family:var(--k-sans)!important;font-size:31px!important;font-weight:500!important;
   line-height:32.5px!important;letter-spacing:-1.25px!important;color:var(--k-deep2)!important;margin:0;
@@ -233,7 +235,7 @@ const CSS = `
   line-height:32.5px!important;letter-spacing:-1.25px!important;color:var(--k-ink)!important;margin:2px 0 0;
 }
 .kbl-intro{
-  font-family:var(--k-body)!important;font-size:15px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:15px!important;font-weight:var(--k-body-w)!important;
   line-height:25.5px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   margin:11px auto 0;max-width:505px;
 }
@@ -290,34 +292,34 @@ const CSS = `
 }
 .kbl-metacol{display:flex;flex-direction:column;gap:2px;min-width:0;}
 .kbl-author,.kbl-dates{
-  font-family:var(--k-body)!important;font-size:12px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:12px!important;font-weight:var(--k-body-w)!important;
   line-height:14.4px!important;letter-spacing:0!important;color:var(--k-ink)!important;
 }
 .kbl-dates{display:inline-flex;align-items:center;}
 .kbl-dot{width:4px;height:4px;flex:none;border-radius:50%;background:var(--k-ink);margin:0 7px;}
-/* Three lines at the tightened 30.4px leading. koott.in leads its card titles
-   at 36.4, but Poppins has a taller x-height than Brandon Light and reads loose
-   at that figure, so the cards are set tighter here on purpose.
+/* Three lines at koott.in's own 36.4px leading. The cards used to be set
+   tighter because Poppins Regular reads heavier than Brandon Light; now that
+   the titles use the Light cut, the live figure is right again.
 
    The size and leading have to sit on the h2, not only on the link inside it:
    globals.css sets h2 to --h2-size (clamping up to 48px) at !important, and
    that strut sets the height of every line box in the block however small the
    inline text is. :not(#_) outranks it the same way globals.css does. */
 .kbl-title,.kbl-title:not(#_){
-  margin:13px 0 0;padding:0 31px;
-  font-family:var(--k-display)!important;font-size:26px!important;font-weight:400!important;
-  line-height:30.4px!important;letter-spacing:normal!important;
-  height:91.2px;overflow:hidden;
+  margin:18px 0 0;padding:0 31px;
+  font-family:var(--k-display)!important;font-size:26px!important;font-weight:var(--k-display-w)!important;
+  line-height:36.4px!important;letter-spacing:normal!important;
+  height:109.2px;overflow:hidden;
 }
 .kbl-title a{
-  /* 26px at 30.4px leading, tighter than koott.in's 36.4 to suit Poppins. */
-  font-family:var(--k-display)!important;font-size:26px!important;font-weight:400!important;
-  line-height:30.4px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
+  /* 26px at 36.4px leading, as koott.in sets it. */
+  font-family:var(--k-display)!important;font-size:26px!important;font-weight:var(--k-display-w)!important;
+  line-height:36.4px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   text-decoration:none;
 }
 .kbl-title a:hover{color:var(--k-accent)!important;}
 .kbl-excerpt{
-  font-family:var(--k-body)!important;font-size:16px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:16px!important;font-weight:var(--k-body-w)!important;
   line-height:24px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   margin:10px 0 0;padding:0 31px;
   /* three lines, held whether or not the excerpt fills them — the title above
@@ -333,7 +335,7 @@ const CSS = `
    the middle of the screen, and everything jumps when the cards arrive. */
 .kbl-body:has(.kbl-state){min-height:72vh;}
 .kbl-state,.kbl-note{
-  font-family:var(--k-body)!important;font-size:14px!important;font-weight:400!important;
+  font-family:var(--k-body)!important;font-size:14px!important;font-weight:var(--k-body-w)!important;
   letter-spacing:0!important;color:#5B5757!important;text-align:center;margin:40px 0 0;
 }
 
@@ -341,14 +343,72 @@ const CSS = `
   .kbl-grid{grid-template-columns:1fr;gap:44px;}
 }
 @media (max-width:640px){
-  /* koott.in's phone header: 18/22.1 and 17/22.1 at -0.85px, intro 13/22.1.
-     The card text drops its inset and sits on the page gutter. */
-  .kbl-mal{font-size:18px!important;line-height:22.1px!important;letter-spacing:-.85px!important;}
-  .kbl-sub{font-size:17px!important;line-height:22.1px!important;letter-spacing:-.85px!important;}
-  .kbl-intro{font-size:13px!important;line-height:22.1px!important;}
-  .kbl-meta,.kbl-title,.kbl-excerpt{padding:0;}
-  .kbl-foot{margin-left:0;margin-right:0;}
+  /* koott.in serves the blog on a fixed 320px canvas (<meta name="viewport"
+     content="width=320">) and lets the browser scale that canvas up to the
+     device, so every length it authors renders at viewport/320 — 1.17x on a
+     375px phone, 1.29x on a 414px one. --k-u is that same unit, so the figures
+     below are koott.in's own numbers and land at its rendered size.
+
+     Capped at 1.35px (a 432px viewport): past that koott.in is serving its
+     desktop layout anyway, and uncapped the type would keep growing on
+     foldables and small tablets. */
+  .kbl{--k-u:min(calc(100vw / 320),1.35px);}
+
+  .kbl-head{padding:calc(56 * var(--k-u)) calc(18 * var(--k-u)) 0;}
+  /* .kbl-mal carries :not(#_) above to outrank globals.css, so it needs it here too. */
+  .kbl-mal,.kbl-mal:not(#_){
+    font-size:calc(18 * var(--k-u))!important;line-height:calc(22.1 * var(--k-u))!important;
+    letter-spacing:calc(-.85 * var(--k-u))!important;
+  }
+  .kbl-sub{
+    font-size:calc(17 * var(--k-u))!important;line-height:calc(22.1 * var(--k-u))!important;
+    letter-spacing:calc(-.85 * var(--k-u))!important;
+  }
+  .kbl-intro{
+    font-size:calc(13 * var(--k-u))!important;line-height:calc(22.1 * var(--k-u))!important;
+    margin-top:calc(11 * var(--k-u));
+  }
+  .kbl-form{margin-top:calc(30 * var(--k-u));}
+  .kbl-label{font-size:calc(14 * var(--k-u))!important;margin-bottom:calc(8 * var(--k-u));}
+  .kbl-input,.kbl-join{height:calc(38 * var(--k-u));font-size:calc(14 * var(--k-u))!important;}
+  .kbl-input{padding:0 calc(12 * var(--k-u));}
+  .kbl-join{padding:0 calc(22 * var(--k-u));}
+
+  .kbl-body{padding:calc(38 * var(--k-u)) calc(18 * var(--k-u)) calc(80 * var(--k-u));}
+  .kbl-grid{grid-template-columns:1fr;gap:calc(44 * var(--k-u));}
+
+  /* The card text drops its 31px inset and sits on the page gutter. */
+  .kbl-meta{margin-top:calc(28 * var(--k-u));gap:calc(10 * var(--k-u));padding:0;}
+  .kbl-ava{
+    width:calc(32 * var(--k-u));height:calc(32 * var(--k-u));
+    font-size:calc(12 * var(--k-u))!important;
+  }
+  .kbl-author,.kbl-dates{
+    font-size:calc(12 * var(--k-u))!important;line-height:calc(14.4 * var(--k-u))!important;
+  }
+  .kbl-dot{width:calc(4 * var(--k-u));height:calc(4 * var(--k-u));margin:0 calc(7 * var(--k-u));}
+  .kbl-title,.kbl-title:not(#_){
+    padding:0;margin-top:calc(18 * var(--k-u));
+    font-size:calc(26 * var(--k-u))!important;line-height:calc(36.4 * var(--k-u))!important;
+    height:calc(109.2 * var(--k-u));
+  }
+  .kbl-title a{
+    font-size:calc(26 * var(--k-u))!important;line-height:calc(36.4 * var(--k-u))!important;
+  }
+  .kbl-excerpt{
+    padding:0;margin-top:calc(10 * var(--k-u));
+    font-size:calc(16 * var(--k-u))!important;line-height:calc(24 * var(--k-u))!important;
+    height:calc(72 * var(--k-u));
+  }
+  .kbl-foot{margin:calc(17 * var(--k-u)) 0 0;}
+  .kbl-heart{font-size:calc(16 * var(--k-u));}
   .kbl-cover{aspect-ratio:16/9;}
-  .kbl-more{width:100%;justify-content:center;}
+  .kbl-more-wrap{margin-top:calc(48 * var(--k-u));}
+  .kbl-more{
+    width:100%;justify-content:center;
+    font-size:calc(15 * var(--k-u))!important;
+    padding:calc(12 * var(--k-u)) calc(26 * var(--k-u));
+  }
+  .kbl-state,.kbl-note{font-size:calc(14 * var(--k-u))!important;margin-top:calc(40 * var(--k-u));}
 }
 `;
