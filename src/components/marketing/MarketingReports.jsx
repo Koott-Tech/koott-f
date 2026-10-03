@@ -7,8 +7,9 @@
  * Data: GET /api/marketing/report/:name — totals only.
  */
 
-import { useEffect, useMemo, useState } from 'react';
-import { N, duration, ELEMENT, Tip, AreaChart, WorldMap } from './ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { N, INRfull, duration, ELEMENT, Tip, AreaChart, WorldMap, BarList } from './ui';
+import { DEFINITIONS, FOR_REPORT } from './definitions';
 
 export const REPORTS = [
   { k: 'traffic-over-time', grp: 'Traffic', t: 'Traffic over Time', d: 'Learn which days or months get the most site visits.' },
@@ -19,11 +20,27 @@ export const REPORTS = [
   { k: 'blog-posts', grp: 'Blog', t: 'Top Blog Posts', d: 'See which posts had the most views.' },
   { k: 'blog-time', grp: 'Blog', t: 'Blog Activity by Time of Day', d: 'Discover the best hours in each day to publish new posts.' },
   { k: 'search-queries', grp: 'Marketing', t: 'Top Search Queries on Google', d: 'See how your site performed for different Google searches.' },
+  { k: 'booking-funnel', grp: 'Bookings', t: 'Booking Funnel', d: 'How far people get towards a booking, and where they stop.' },
+  { k: 'therapist-performance', grp: 'Bookings', t: 'Therapist Performance', d: 'Profile views, booking starts, bookings and revenue per therapist.' },
+  { k: 'journeys', grp: 'Visitors', t: 'Visitor Journeys', d: 'Every session, in order: how it arrived, what it saw, how far it got.' },
+  { k: 'campaigns', grp: 'Marketing', t: 'Marketing Campaigns', d: 'What each tagged campaign brought, from first visit to paid booking.' },
+  { k: 'technical', grp: 'Technical', t: 'Technical Performance', d: 'Core Web Vitals from real visits, and the errors people hit.' },
+  { k: 'realtime', grp: 'Visitors', t: 'Real-Time Activity', d: 'Who is on the site right now, and what each session has done.' },
+  { k: 'custom', grp: 'Custom', t: 'Custom Report', d: 'Pick the dimensions and events, save the ones you use often.' },
 ];
+
+/** Plain names for the dimensions a custom report can group by. */
+const DIM_NAME = {
+  day: 'Date', dow: 'Weekday', hour: 'Hour of day', channel: 'Traffic category', utm_source: 'Source',
+  utm_medium: 'Medium', utm_campaign: 'Campaign', device_class: 'Device', region: 'Country', city: 'City',
+  page_path: 'Page', page_group: 'Page group', page_topic: 'Page topic', landing_group: 'Landing group',
+  landing_topic: 'Landing topic', element: 'Button', target: 'Link target', psychologist_id: 'Therapist',
+};
 
 const pct = (v, digits = 0) => `${((v || 0) * 100).toFixed(digits)}%`;
 const hourLabel = (h) => `${h % 12 || 12} ${h < 12 ? 'AM' : 'PM'}`;
 const WEEKDAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const timeCell = (v) => (v ? new Date(v).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' }) : '—');
 const dateCell = (s) => (s ? new Date(`${s.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'UTC' }) : '—');
 const displayCountry = (c) => (c === 'United States of America' ? 'United States' : c);
 const buttonName = (id) => ELEMENT[id] || String(id || '').replace(/_/g, ' ');
@@ -69,7 +86,7 @@ function Bars({ rows, fmt = N }) {
 }
 
 /** Sortable table with a Summary row; shows 50 rows, then "Show more". */
-function Table({ cols, rows, summary, sortKey: initialSort }) {
+function Table({ cols, rows, summary, sortKey: initialSort, onRow }) {
   const [sort, setSort] = useState({ k: initialSort || cols.find((c) => c.n)?.k, dir: -1 });
   const [limit, setLimit] = useState(50);
   const sorted = useMemo(() => {
@@ -87,7 +104,7 @@ function Table({ cols, rows, summary, sortKey: initialSort }) {
       <table>
         <thead>
           <tr>{cols.map((c) => (
-            <th key={c.k} className={c.n ? 'n' : ''} scope="col">
+            <th key={c.k} className={`${c.n ? 'n' : ''}${c.cls ? ` ${c.cls}` : ''}`} scope="col">
               <button type="button" onClick={() => setSort((s) => ({ k: c.k, dir: s.k === c.k ? -s.dir : -1 }))} title={c.info || ''}>
                 {c.h}{sort.k === c.k ? (sort.dir < 0 ? ' ↓' : ' ↑') : ''}
               </button>
@@ -95,9 +112,17 @@ function Table({ cols, rows, summary, sortKey: initialSort }) {
           ))}</tr>
         </thead>
         <tbody>
-          {summary && <tr className="wx-summary">{cols.map((c, i) => <td key={c.k} className={c.n ? 'n' : ''}>{i === 0 ? 'Summary' : summary[c.k] != null ? (c.fmt ? c.fmt(summary[c.k], summary) : summary[c.k]) : ''}</td>)}</tr>}
+          {summary && <tr className="wx-summary">{cols.map((c, i) => <td key={c.k} className={`${c.n ? 'n' : ''}${c.cls ? ` ${c.cls}` : ''}`}>{i === 0 ? 'Summary' : summary[c.k] != null ? (c.fmt ? c.fmt(summary[c.k], summary) : summary[c.k]) : ''}</td>)}</tr>}
           {sorted.slice(0, limit).map((r, i) => (
-            <tr key={i}>{cols.map((c) => <td key={c.k} className={c.n ? 'n' : ''}>{c.render ? c.render(r) : c.fmt ? c.fmt(r[c.k], r) : (r[c.k] ?? '—')}</td>)}</tr>
+            <tr
+              key={i}
+              className={onRow ? 'wx-rowlink' : undefined}
+              onClick={onRow ? () => onRow(r) : undefined}
+              tabIndex={onRow ? 0 : undefined}
+              onKeyDown={onRow ? (e) => { if (e.key === 'Enter') onRow(r); } : undefined}
+            >
+              {cols.map((c) => <td key={c.k} className={`${c.n ? 'n' : ''}${c.cls ? ` ${c.cls}` : ''}`}>{c.render ? c.render(r) : c.fmt ? c.fmt(r[c.k], r) : (r[c.k] ?? '—')}</td>)}
+            </tr>
           ))}
         </tbody>
       </table>
@@ -141,21 +166,52 @@ function toCsv(cols, rows) {
 
 export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
   const def = REPORTS.find((r) => r.k === name) || REPORTS[0];
-  const [opt, setOpt] = useState({ grain: 'day', model: 'last_non_direct', group: 'page', measure: null });
+  const [opt, setOpt] = useState({ grain: 'day', model: 'last_non_direct', group: 'page', measure: null, device: '', channel: '', stage: '', booked: '', minutes: 15, dims: ['page_group'], events: [] });
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    if (name !== 'realtime') return undefined;
+    const id = setInterval(() => setTick((t) => t + 1), 20000);
+    return () => clearInterval(id);
+  }, [name]);
   const [state, setState] = useState({ loading: true, data: null, error: '' });
 
-  const extra = name === 'traffic-over-time' ? `&grain=${opt.grain}` : name === 'traffic-sources' ? `&model=${opt.model}` : name === 'page-visits' ? `&group=${opt.group}` : '';
+  const extra = name === 'traffic-over-time' ? `&grain=${opt.grain}`
+    : name === 'traffic-sources' ? `&model=${opt.model}`
+      : name === 'page-visits' ? `&group=${opt.group}`
+        : name === 'booking-funnel' ? `${opt.device ? `&device=${opt.device}` : ''}${opt.channel ? `&channel=${opt.channel}` : ''}`
+          : name === 'custom' ? `&dims=${(opt.dims || []).join(',')}&events=${(opt.events || []).join(',')}`
+            : name === 'realtime' ? `&minutes=${opt.minutes || 15}`
+            : name === 'journeys' ? `${opt.stage ? `&stage=${opt.stage}` : ''}${opt.booked ? `&booked=${opt.booked}` : ''}`
+          : '';
   useEffect(() => {
     let off = false;
     setState((s) => ({ ...s, loading: true, error: '' }));
-    request(`report/${name}?from=${dates.from}&to=${dates.to}&env=${env}${extra}`)
+    request(`report/${name}?from=${dates.from}&to=${dates.to}&compare=${dates.compare}&env=${env}${extra}`)
       .then((j) => { if (!off) setState({ loading: false, data: j.data, error: '' }); })
       .catch((e) => { if (!off) setState({ loading: false, data: null, error: e.message }); });
     return () => { off = true; };
-  }, [name, dates.from, dates.to, env, extra, request]);
+  }, [name, dates.from, dates.to, dates.compare, env, extra, request, tick]);
+
+  const [defs, setDefs] = useState(false);
+  const [session, setSession] = useState(null);
+  useEffect(() => { setSession(null); }, [name, dates.from, dates.to]);
+  useEffect(() => {
+    if (!session?.id || session.rows) return undefined;
+    let off = false;
+    request(`report/journeys?from=${dates.from}&to=${dates.to}&env=${env}&session=${session.id}`)
+      .then((j) => { if (!off) setSession(j.data.session); })
+      .catch((e) => { if (!off) setSession({ id: session.id, error: e.message }); });
+    return () => { off = true; };
+  }, [session, dates.from, dates.to, env, request]);
 
   const d = state.data;
-  const view = d ? buildView(name, d, opt) : null;
+  // A report that cannot be drawn should be one broken card, not a blank
+  // dashboard: an answer missing a field it needs used to throw all the way up.
+  let view = null;
+  let viewError = '';
+  if (d) {
+    try { view = buildView(name, d, opt); } catch (e) { viewError = e?.message || 'Could not draw this report.'; }
+  }
   const exportCsv = () => {
     if (!view) return;
     const url = URL.createObjectURL(new Blob([toCsv(view.cols, view.rows)], { type: 'text/csv' }));
@@ -169,7 +225,13 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
     <div className="wx-report">
       <nav className="wx-crumbs"><button type="button" className="wx-link" onClick={goAll}>All Reports</button> › <span>{def.t}</span></nav>
       <div className="wx-report-head">
-        <div><h1>{def.t}</h1><p>{def.d}</p></div>
+        <div>
+          <h1>{def.t}</h1>
+          <p>
+            {def.d}{' '}
+            <button type="button" className="wx-link" onClick={() => setDefs(true)}>View report definitions</button>
+          </p>
+        </div>
         <button type="button" className="wx-icon" onClick={exportCsv} disabled={!view} title="Export CSV" aria-label="Export CSV">⤓</button>
       </div>
       <div className="wx-card wx-report-controls">
@@ -188,6 +250,41 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
             <option value="last_non_direct_google">Attribution model: Last non-direct (Google)</option>
           </select>
         )}
+        {(name === 'booking-funnel' || name === 'journeys') && (
+          <>
+            <select value={opt.device || ''} onChange={(e) => setOpt((o) => ({ ...o, device: e.target.value }))} aria-label="Device">
+              <option value="">All devices</option><option value="mobile">Mobile</option><option value="desktop">Desktop</option><option value="tablet">Tablet</option>
+            </select>
+            <select value={opt.channel || ''} onChange={(e) => setOpt((o) => ({ ...o, channel: e.target.value }))} aria-label="Traffic source">
+              <option value="">All sources</option>
+              <option value="paid_social">Paid social</option><option value="organic_social">Organic social</option>
+              <option value="paid_search">Paid search</option><option value="organic_search">Organic search</option>
+              <option value="direct">Direct</option><option value="referral">Referral</option>
+              <option value="whatsapp">WhatsApp</option><option value="email">Email</option><option value="ai_platform">AI platforms</option>
+            </select>
+          </>
+        )}
+        {name === 'custom' && <CustomControls opt={opt} setOpt={setOpt} request={request} available={state.data?.available} />}
+        {name === 'realtime' && (
+          <select value={opt.minutes} onChange={(e) => setOpt((o) => ({ ...o, minutes: Number(e.target.value) }))} aria-label="Window">
+            <option value={5}>Last 5 minutes</option><option value={15}>Last 15 minutes</option>
+            <option value={30}>Last 30 minutes</option><option value={60}>Last hour</option>
+          </select>
+        )}
+        {name === 'journeys' && (
+          <>
+            <select value={opt.stage || ''} onChange={(e) => setOpt((o) => ({ ...o, stage: e.target.value }))} aria-label="Got as far as">
+              <option value="">Any stage</option>
+              <option value="2">Saw a profile or further</option>
+              <option value="3">Started booking or further</option>
+              <option value="5">Chose a time or further</option>
+              <option value="8">Reached checkout or further</option>
+            </select>
+            <select value={opt.booked || ''} onChange={(e) => setOpt((o) => ({ ...o, booked: e.target.value }))} aria-label="Outcome">
+              <option value="">Any outcome</option><option value="yes">Booked</option><option value="no">Did not book</option>
+            </select>
+          </>
+        )}
         {name === 'page-visits' && (
           <select value={opt.group} onChange={(e) => setOpt((o) => ({ ...o, group: e.target.value }))} aria-label="Group by">
             <option value="page">Group by page</option><option value="day">Group by day</option>
@@ -196,7 +293,13 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
         {state.loading && <span className="wx-muted">Updating…</span>}
       </div>
 
-      {state.error ? <div className="wx-card"><b>Couldn’t load this report</b><p>{state.error}</p></div>
+      {state.error || viewError ? (
+        <div className="wx-card">
+          <b>Couldn’t show this report</b>
+          <p>{state.error || viewError}</p>
+          {viewError && <p className="wx-muted">The data arrived but is not the shape this report expects.</p>}
+        </div>
+      )
         : !view ? <p className="wx-empty">Loading…</p> : view.message ? <div className="wx-card"><p className="wx-empty">{view.message}</p></div> : (
           <>
             <div className="wx-card wx-report-chart">
@@ -210,13 +313,173 @@ export function ReportView({ name, request, dates, env, rangeControl, goAll }) {
               {view.chart}
             </div>
             <div className="wx-card wx-report-table">
-              <Table cols={view.cols} rows={view.rows} summary={view.summary} sortKey={view.sortKey} />
+              <Table
+                cols={view.cols} rows={view.rows} summary={view.summary} sortKey={view.sortKey}
+                onRow={name === 'journeys' ? (r) => setSession({ id: r.session }) : undefined}
+              />
             </div>
+            {session && <SessionTimeline session={session} onClose={() => setSession(null)} />}
+            {defs && <Definitions name={name} onClose={() => setDefs(false)} />}
           </>
         )}
     </div>
   );
 }
+
+/** What the numbers on this report mean, in plain words and then exactly. */
+function Definitions({ name, onClose }) {
+  const wanted = FOR_REPORT[name];
+  const list = wanted ? DEFINITIONS.filter((d) => wanted.includes(d.term)) : DEFINITIONS;
+  return (
+    <div className="wx-timeline-wrap" role="dialog" aria-label="Report definitions">
+      <div className="wx-timeline">
+        <header>
+          <div><h2>Report definitions</h2><p className="wx-muted">What each number counts, and what it cannot tell you.</p></div>
+          <button type="button" className="wx-icon" onClick={onClose} aria-label="Close">×</button>
+        </header>
+        <dl className="wx-defs">
+          {list.map((d) => (
+            <div key={d.term}>
+              <dt>{d.term}</dt>
+              <dd>{d.plain}</dd>
+              <dd className="wx-muted">{d.how}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="wx-muted">
+          Everything here counts only visitors who accepted analytics cookies, except bookings and revenue, which
+          come from the payments table and count everyone.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The custom report's pickers, and the saved configurations behind them.
+ * A saved report stores the question — dimensions and events — not any data.
+ */
+function CustomControls({ opt, setOpt, request, available }) {
+  const [saved, setSaved] = useState([]);
+  const [name, setName] = useState('');
+  const [msg, setMsg] = useState('');
+  const dims = available?.dimensions || [];
+  const events = available?.events || [];
+
+  const load = useCallback(() => {
+    request('saved').then((j) => setSaved(j.data.reports || [])).catch(() => setSaved([]));
+  }, [request]);
+  useEffect(load, [load]);
+
+  const toggle = (key, value) => setOpt((o) => {
+    const list = o[key] || [];
+    const next = list.includes(value) ? list.filter((x) => x !== value) : [...list, value];
+    return { ...o, [key]: key === 'dims' ? next.slice(0, 3) : next };
+  });
+
+  const save = async () => {
+    const n = name.trim();
+    if (!n) return;
+    try {
+      await request('saved', { method: 'POST', body: { name: n, config: { dims: opt.dims, events: opt.events } } });
+      setName(''); setMsg(`Saved “${n}”.`); load();
+    } catch (e) { setMsg(e.message); }
+    setTimeout(() => setMsg(''), 4000);
+  };
+
+  return (
+    <div className="wx-builder">
+      <div className="wx-builder-row">
+        <b>Group by</b>
+        <div className="wx-chips">
+          {dims.map((k) => (
+            <button key={k} type="button" aria-pressed={(opt.dims || []).includes(k)} onClick={() => toggle('dims', k)}>
+              {DIM_NAME[k] || k}
+            </button>
+          ))}
+        </div>
+        <span className="wx-muted">up to three</span>
+      </div>
+      <div className="wx-builder-row">
+        <b>Events</b>
+        <div className="wx-chips">
+          {events.map((k) => (
+            <button key={k} type="button" aria-pressed={(opt.events || []).includes(k)} onClick={() => toggle('events', k)}>
+              {k.replace(/_/g, ' ')}
+            </button>
+          ))}
+        </div>
+        <span className="wx-muted">{(opt.events || []).length ? '' : 'all events'}</span>
+      </div>
+      <div className="wx-builder-row">
+        <b>Saved</b>
+        <select
+          value=""
+          onChange={(e) => {
+            const r = saved.find((x) => x.id === e.target.value);
+            if (r) setOpt((o) => ({ ...o, dims: r.config.dims || [], events: r.config.events || [] }));
+          }}
+          aria-label="Open a saved report"
+        >
+          <option value="">Open a saved report…</option>
+          {saved.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+        </select>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name this report" aria-label="Report name" />
+        <button type="button" className="wx-btn" onClick={save} disabled={!name.trim()}>Save</button>
+        {msg && <span className="wx-muted">{msg}</span>}
+      </div>
+    </div>
+  );
+}
+
+/** One session's events in order — the drill-down from Visitor Journeys. */
+function SessionTimeline({ session, onClose }) {
+  const rows = session.rows || [];
+  return (
+    <div className="wx-timeline-wrap" role="dialog" aria-label="Session timeline">
+      <div className="wx-timeline">
+        <header>
+          <div>
+            <h2>Session {String(session.id).slice(0, 8)}</h2>
+            <p className="wx-muted">
+              {session.channel || 'unknown source'}{session.campaign ? ` · ${session.campaign}` : ''}
+              {session.device ? ` · ${session.device}` : ''}{session.region ? ` · ${session.region}` : ''}
+            </p>
+          </div>
+          <button type="button" className="wx-icon" onClick={onClose} aria-label="Close">×</button>
+        </header>
+        {session.error ? <p className="wx-empty">{session.error}</p>
+          : !session.rows ? <p className="wx-empty">Loading…</p>
+            : rows.length === 0 ? <p className="wx-empty">No events recorded for this session.</p>
+              : (
+                <ol className="wx-steps">
+                  {rows.map((r, i) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <li key={i} className={r.step ? 'is-funnel' : ''}>
+                      <time>{new Date(r.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata' })}</time>
+                      <b>{r.step || EVENT_NAME[r.event] || r.event.replace(/_/g, ' ')}</b>
+                      {r.path && <span className="wx-path" title={r.path}>{r.path}</span>}
+                      {r.value ? <em>₹{N(r.value)}</em> : null}
+                    </li>
+                  ))}
+                </ol>
+              )}
+        {session.truncated && <p className="wx-muted">Only the first 500 events of this session are shown.</p>}
+      </div>
+    </div>
+  );
+}
+
+/** Plain names for the events that are not funnel steps. */
+const EVENT_NAME = {
+  page_view: 'Viewed a page', page_engaged: 'Stayed on the page', scroll_depth: 'Scrolled',
+  ui_click: 'Clicked something', filter_applied: 'Filtered the list', contact_clicked: 'Clicked to contact',
+  voice_intro_played: 'Played a voice intro', booking_step_error: 'Hit an error in booking',
+  payment_attempt_failed: 'Payment failed', payment_dismissed: 'Closed the payment window',
+  js_error: 'Page error', api_error: 'Request failed', login_completed: 'Signed in',
+  registration_completed: 'Created an account', popup_shown: 'Saw a popup', popup_action: 'Acted on a popup',
+  popup_dismissed: 'Closed a popup',
+};
 
 /* ------------------------------------------------------------ per-report views */
 
@@ -317,8 +580,8 @@ function buildView(name, d, opt) {
         cols: [
           { k: 'element', h: 'Button text', fmt: buttonName },
           { k: 'path', h: 'Page URL from click', render: (r) => <span className="wx-path" title={r.path}>{r.path || '—'}</span> },
-          { k: 'target', h: 'Link details', info: 'Where the button leads.', render: (r) => <span className="wx-path" title={r.target || ''}>{r.target || '—'}</span> },
-          { k: 'visitors', h: 'Unique visitors', n: 1, fmt: N, info: 'Everyone who visited the site in this period.' },
+          { k: 'target', cls: 'wx-hide-sm', h: 'Link details', info: 'Where the button leads.', render: (r) => <span className="wx-path" title={r.target || ''}>{r.target || '—'}</span> },
+          { k: 'visitors', h: 'Unique visitors', n: 1, fmt: N, cls: 'wx-hide-sm', info: 'Everyone who visited the site in this period.' },
           { k: 'uniqueClicks', h: 'Unique clicks', n: 1, fmt: N, info: 'Visitors who clicked the button.' },
           { k: 'ctr', h: 'CTR', n: 1, fmt: (v) => pct(v), sortValue: (r) => (r.visitors ? r.uniqueClicks / r.visitors : 0), render: (r) => pct(r.visitors ? r.uniqueClicks / r.visitors : 0), csv: (r) => (r.visitors ? (r.uniqueClicks / r.visitors).toFixed(4) : '') },
         ],
@@ -332,7 +595,7 @@ function buildView(name, d, opt) {
         measures, measure: m.k,
         chart: <Bars rows={[...d.rows].sort((a, b) => b[m.k] - a[m.k]).slice(0, 8).map((r) => ({ label: r.title, value: r[m.k] }))} />,
         cols: [
-          { k: 'image', h: 'Post image', render: (r) => (r.image ? <img src={r.image} alt="" className="wx-post-img" /> : <span className="wx-post-img wx-item-ph">B</span>), csv: () => '' },
+          { k: 'image', cls: 'wx-hide-sm', h: 'Post image', render: (r) => (r.image ? <img src={r.image} alt="" className="wx-post-img" /> : <span className="wx-post-img wx-item-ph">B</span>), csv: () => '' },
           { k: 'title', h: 'Post title', render: (r) => <a href={r.path} target="_blank" rel="noreferrer" className="wx-path" title={r.title}>{r.title}</a> },
           { k: 'publishedAt', h: 'Publish date', fmt: dateCell },
           { k: 'views', h: 'Post views', n: 1, fmt: N },
@@ -357,6 +620,237 @@ function buildView(name, d, opt) {
           { k: 'avgVisitors', h: 'Avg. visitors by day', n: 1, fmt: fmt1 },
         ],
         rows: d.cells, summary: { avgSessions: d.summary.sessions, clicks: d.summary.clicks }, sortKey: 'avgSessions',
+      };
+    }
+    case 'custom': {
+      const dimCols = d.dims.map((k) => ({ k, h: DIM_NAME[k] || k, fmt: (v) => (v == null || v === '' ? '—' : String(v)) }));
+      const measures = [
+        { k: 'sessions', h: 'Sessions' }, { k: 'visitors', h: 'Visitors' }, { k: 'events', h: 'Events' },
+      ];
+      const m = measures.find((x) => x.k === opt.measure) || measures[0];
+      const label = (r) => d.dims.map((k) => r[k] ?? '—').join(' · ') || 'All';
+      return {
+        measures, measure: m.k,
+        chart: d.rows.length
+          ? <BarList rows={[...d.rows].sort((a, b) => b[m.k] - a[m.k]).slice(0, 12).map((r) => ({ label: label(r), value: r[m.k] }))} />
+          : <p className="wx-empty">Pick a dimension and an event, or widen the dates.</p>,
+        cols: [
+          ...(dimCols.length ? dimCols : [{ k: 'all', h: 'All', fmt: () => 'All traffic' }]),
+          { k: 'sessions', h: 'Sessions', n: 1, fmt: N, info: 'Distinct sessions — they do not add up across rows.' },
+          { k: 'visitors', h: 'Visitors', n: 1, fmt: N },
+          { k: 'events', h: 'Events', n: 1, fmt: N, cls: 'wx-hide-md' },
+          { k: 'value', h: 'Value', n: 1, fmt: (v) => (v ? INRfull(v) : '—') },
+        ],
+        rows: d.rows, summary: d.summary, sortKey: 'sessions',
+      };
+    }
+    case 'realtime': {
+      return {
+        chart: (
+          <div>
+            <div className="wx-funnel-sum">
+              <span><b>{N(d.summary.sessions)}</b> active sessions</span>
+              <span><b>{N(d.summary.visitors)}</b> visitors</span>
+              <span><b>{N(d.summary.inBooking)}</b> in the booking flow</span>
+              <span><b>{N(d.summary.booked)}</b> booked</span>
+            </div>
+            <div className="wx-rt-cols">
+              <div><h3>Pages they are on</h3><BarList rows={d.byPage.map((r) => ({ label: r.key, value: r.sessions }))} empty="Nobody on the site in this window." /></div>
+              <div><h3>Where they came from</h3><BarList rows={d.byChannel.map((r) => ({ label: r.key, value: r.sessions }))} empty="—" /></div>
+            </div>
+            <p className="wx-muted" style={{ marginTop: 12 }}>
+              Refreshes every 20 seconds. Steps are only what was actually recorded — a session that seems to skip
+              a step did something we did not observe, and is not filled in.
+            </p>
+          </div>
+        ),
+        cols: [
+          { k: 'lastAt', h: 'Last seen', fmt: (v) => timeCell(v), csv: (r) => r.lastAt },
+          { k: 'session', h: 'Session', fmt: (v) => String(v).slice(0, 8) },
+          { k: 'current', h: 'On page now', fmt: (v) => v || '—' },
+          { k: 'previous', h: 'Page before', fmt: (v) => v || '—' },
+          { k: 'landing', h: 'Landed on', fmt: (v) => v || '—', cls: 'wx-hide-md' },
+          { k: 'stage', h: 'Stage' },
+          { k: 'pages', h: 'Pages', n: 1, fmt: N },
+          { k: 'seconds', h: 'On site', n: 1, fmt: duration },
+          { k: 'channel', h: 'Source', fmt: (v, r) => [v || 'unknown', r?.campaign].filter(Boolean).join(' · ') },
+          { k: 'device', h: 'Device', fmt: (v) => v || '—', cls: 'wx-hide-md' },
+          { k: 'region', h: 'Country', fmt: (v) => v || '—' },
+        ],
+        rows: d.rows, sortKey: 'lastAt',
+      };
+    }
+    case 'campaigns': {
+      const measures = [
+        { k: 'sessions', h: 'Sessions', fmt: N }, { k: 'bookingStarted', h: 'Booking starts', fmt: N },
+        { k: 'bookings', h: 'Bookings', fmt: N }, { k: 'revenue', h: 'Revenue', fmt: INRfull },
+      ];
+      const m = measures.find((x) => x.k === opt.measure) || measures[0];
+      return {
+        measures, measure: m.k,
+        chart: (
+          <>
+            <BarList rows={[...d.rows].sort((a, b) => b[m.k] - a[m.k]).slice(0, 10).map((r) => ({ label: r.campaign, value: r[m.k] }))} fmt={m.fmt} />
+            {d.untagged > 0 && (
+              <p className="wx-muted" style={{ marginTop: 12 }}>
+                {N(d.untagged)} sessions arrived without a campaign tag and are not in this report — direct visits,
+                and any link that went out without utm parameters.
+              </p>
+            )}
+          </>
+        ),
+        cols: [
+          { k: 'campaign', h: 'Campaign' },
+          { k: 'source', h: 'Source' },
+          { k: 'category', h: 'Category', cls: 'wx-hide-md' },
+          { k: 'sessions', h: 'Sessions', n: 1, fmt: N },
+          { k: 'visitors', h: 'Visitors', n: 1, fmt: N, cls: 'wx-hide-sm' },
+          { k: 'bookingStarted', h: 'Booking starts', n: 1, fmt: N },
+          { k: 'checkoutStarted', h: 'Checkout', n: 1, fmt: N, cls: 'wx-hide-sm' },
+          { k: 'bookings', h: 'Bookings', n: 1, fmt: N, info: 'Paid and verified on the server.' },
+          { k: 'conversion', h: 'Sessions → booking', n: 1, fmt: (v) => pct(v, 1) },
+          { k: 'revenue', h: 'Revenue', n: 1, fmt: INRfull },
+          { k: 'prevSessions', h: 'Sessions (previous)', n: 1, fmt: N, cls: 'wx-hide-md' },
+        ],
+        rows: d.rows, summary: d.summary, sortKey: 'sessions',
+      };
+    }
+    case 'technical': {
+      const unit = (metric, v) => (v == null ? '—' : metric === 'CLS' ? v.toFixed(3) : `${N(v)} ms`);
+      return {
+        chart: (
+          <div>
+            <div className="wx-vitals">
+              {d.metrics.length === 0 && <p className="wx-empty">No Core Web Vitals recorded yet for this period.</p>}
+              {d.metrics.map((m) => (
+                <div key={m.metric} className={`wx-vital is-${m.goodRate >= 0.75 ? 'good' : m.goodRate >= 0.5 ? 'ok' : 'poor'}`}>
+                  <b>{m.metric}</b>
+                  <strong>{unit(m.metric, m.p75)}</strong>
+                  <span>75th percentile · {N(m.samples)} samples</span>
+                  <span>{pct(m.goodRate)} rated good</span>
+                </div>
+              ))}
+            </div>
+            <p className="wx-muted" style={{ marginTop: 12 }}>{d.note}</p>
+            {d.errors.length > 0 && (
+              <div className="wx-funnel-stopped">
+                <h3>Errors visitors hit</h3>
+                <BarList rows={d.errors.slice(0, 8).map((e) => ({ label: `${e.code} (${e.event.replace(/_/g, ' ')})`, value: e.events }))} />
+              </div>
+            )}
+          </div>
+        ),
+        cols: [
+          { k: 'metric', h: 'Metric' },
+          { k: 'pageGroup', h: 'Page group' },
+          { k: 'device', h: 'Device' },
+          { k: 'samples', h: 'Samples', n: 1, fmt: N },
+          { k: 'p50', h: 'Median', n: 1, fmt: (v, r) => unit(r.metric, v), cls: 'wx-hide-sm' },
+          { k: 'p75', h: '75th pct', n: 1, fmt: (v, r) => unit(r.metric, v), info: 'The number Google grades on.' },
+          { k: 'p95', h: '95th pct', n: 1, fmt: (v, r) => unit(r.metric, v), cls: 'wx-hide-sm' },
+          { k: 'good', h: 'Good', n: 1, fmt: N },
+          { k: 'poor', h: 'Poor', n: 1, fmt: N },
+        ],
+        rows: d.rows, sortKey: 'samples',
+      };
+    }
+    case 'journeys': {
+      if (d.session) return { session: d.session };
+      const shown = d.rows.length;
+      return {
+        chart: (
+          <div className="wx-journeys-top">
+            <div className="wx-funnel-sum">
+              <span><b>{N(d.total)}</b> sessions match</span>
+              <span><b>{N(d.rows.filter((r) => r.booked).length)}</b> of the {N(shown)} shown booked</span>
+              <span><b>{N(d.rows.filter((r) => r.furthest >= 3 && !r.booked).length)}</b> started booking and did not finish</span>
+            </div>
+            <p className="wx-muted">
+              Sessions are anonymous — no name, email or phone is recorded against them. Click a row to see its
+              timeline. Only visitors who accepted analytics cookies appear here.
+            </p>
+          </div>
+        ),
+        cols: [
+          { k: 'startedAt', h: 'Started', fmt: (v) => timeCell(v), csv: (r) => r.startedAt },
+          { k: 'session', h: 'Session', fmt: (v) => String(v).slice(0, 8) },
+          { k: 'channel', h: 'Came from', fmt: (v, r) => [v || 'unknown', r?.campaign].filter(Boolean).join(' · ') },
+          { k: 'landing', h: 'Landed on', fmt: (v) => v || '—' },
+          { k: 'pageViews', h: 'Pages', n: 1, fmt: N, cls: 'wx-hide-sm' },
+          { k: 'seconds', h: 'Length', n: 1, fmt: duration },
+          { k: 'stage', h: 'Got as far as' },
+          { k: 'booked', h: 'Booked', fmt: (v) => (v ? 'Yes' : '—') },
+          { k: 'device', h: 'Device', fmt: (v) => v || '—' },
+          { k: 'region', h: 'Country', fmt: (v) => v || '—' },
+        ],
+        rows: d.rows, sortKey: 'startedAt',
+      };
+    }
+    case 'booking-funnel': {
+      const top = d.rows[0]?.sessions || 0;
+      const stopped = d.stopped || [];
+      const worst = stopped[0];
+      return {
+        chart: (
+          <div className="wx-funnel">
+            <div className="wx-funnel-sum">
+              <span><b>{N(d.summary.entered)}</b> started booking</span>
+              <span><b>{N(d.summary.completed)}</b> paid</span>
+              <span><b>{pct(d.summary.conversion, 1)}</b> of those who started</span>
+              <span><b>{N(d.summary.abandoned)}</b> did not finish</span>
+            </div>
+            {d.rows.map((r) => (
+              <div key={r.step} className="wx-funnel-row">
+                <span className="wx-funnel-label" title={r.label}>{r.label}</span>
+                <span className="wx-funnel-bar"><i style={{ width: `${top ? Math.max(0.5, (r.sessions / top) * 100) : 0}%` }} /></span>
+                <b>{N(r.sessions)}</b>
+                <span className="wx-funnel-pct">{r.toPrevious === null ? '' : pct(r.toPrevious)}</span>
+              </div>
+            ))}
+            {stopped.length > 0 && (
+              <div className="wx-funnel-stopped">
+                <h3>Where sessions stopped</h3>
+                <p className="wx-muted">
+                  The furthest step each session reached, counted once. Sessions still in progress at the end of
+                  the period are counted here too{worst ? `; most stopped at “${worst.label}”.` : '.'}
+                </p>
+                <BarList rows={stopped.map((r) => ({ label: r.label, value: r.sessions }))} />
+              </div>
+            )}
+          </div>
+        ),
+        cols: [
+          { k: 'label', h: 'Step' },
+          { k: 'sessions', h: 'Sessions', n: 1, fmt: N, info: 'Sessions that reached this step at least once.' },
+          { k: 'visitors', h: 'Visitors', n: 1, fmt: N },
+          { k: 'toPrevious', h: 'From the step above', n: 1, fmt: (v) => (v === null ? '—' : pct(v)), info: 'Sessions here ÷ sessions at the step above. Above 100% means sessions skipped that step.' },
+          { k: 'ofEntry', h: 'Of all who entered', n: 1, fmt: (v) => pct(v) },
+          { k: 'dropped', h: 'Lost here', n: 1, fmt: (v) => (v === null ? '—' : N(v)) },
+          { k: 'prevSessions', h: 'Previous period', n: 1, fmt: N },
+        ],
+        rows: d.rows, sortKey: 'order',
+      };
+    }
+    case 'therapist-performance': {
+      const measures = [
+        { k: 'revenue', h: 'Revenue', fmt: INRfull }, { k: 'bookings', h: 'Bookings', fmt: N },
+        { k: 'profileViews', h: 'Profile views', fmt: N }, { k: 'bookingStarted', h: 'Booking starts', fmt: N },
+      ];
+      const m = measures.find((x) => x.k === opt.measure) || measures[0];
+      return {
+        measures, measure: m.k,
+        chart: <BarList rows={[...d.rows].sort((a, b) => b[m.k] - a[m.k]).slice(0, 10).map((r) => ({ label: r.name, value: r[m.k] }))} fmt={m.fmt} />,
+        cols: [
+          { k: 'name', h: 'Therapist' },
+          { k: 'profileViews', h: 'Profile views', n: 1, fmt: N, info: 'Only visitors who accepted analytics cookies.' },
+          { k: 'visitors', h: 'Unique visitors', n: 1, fmt: N },
+          { k: 'bookingStarted', h: 'Booking starts', n: 1, fmt: N },
+          { k: 'checkoutStarted', h: 'Reached checkout', n: 1, fmt: N },
+          { k: 'bookings', h: 'Bookings', n: 1, fmt: N, info: 'Paid bookings from the payments table — everyone, not only visitors who accepted cookies.' },
+          { k: 'revenue', h: 'Revenue', n: 1, fmt: INRfull },
+          { k: 'prevBookings', h: 'Bookings (previous)', n: 1, fmt: N, cls: 'wx-hide-md' },
+        ],
+        rows: d.rows, summary: d.summary, sortKey: 'revenue',
       };
     }
     case 'search-queries': {
@@ -386,39 +880,101 @@ export const REPORT_CSS = `
 .wx-reports .wx-section{margin-bottom:16px}
 .wx-report-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:16px 18px}
 .wx-report-card{display:grid;gap:4px;text-align:left;border:1px solid #E1E7EE;border-radius:8px;background:#fff;padding:14px 16px;cursor:pointer}
-.wx-report-card:hover{border-color:#116DFF;box-shadow:0 2px 10px rgba(17,109,255,.12)}
+.wx-report-card:hover{border-color:#1B6930;box-shadow:0 2px 10px rgba(17,109,255,.12)}
 .wx-report-card b{font-size:14px}
 .wx-report-card span{font-size:12.5px;color:#3B4F63}
 .wx-crumbs{font-size:13px;color:#3B4F63;margin-bottom:6px}
 .wx-report-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
 .wx-report-head h1{font-size:28px!important;font-weight:700!important;line-height:1.2!important}
 .wx-report-head p{margin:2px 0 0;color:#3B4F63}
-.wx-icon{width:38px;height:38px;border-radius:50%;border:0;background:#fff;color:#116DFF;font-size:17px;cursor:pointer;box-shadow:0 1px 3px rgba(22,45,61,.12)}
+.wx-icon{width:38px;height:38px;border-radius:50%;border:0;background:#fff;color:#1B6930;font-size:17px;cursor:pointer;box-shadow:0 1px 3px rgba(22,45,61,.12)}
 .wx-icon:disabled{opacity:.5;cursor:default}
 .wx-report-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
-.wx-report-controls select{background:#fff;border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font-size:13.5px}
+.wx-report-controls select{background:#fff;border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font-size:13.5px;max-width:100%;min-width:0}
 .wx-report-chart{border-radius:8px 8px 0 0;margin-bottom:0}
 .wx-report-table{border-radius:0 0 8px 8px;border-top:1px solid #EEF1F5;padding:0;overflow:hidden}
 .wx-measure{display:flex;align-items:center;gap:6px;font-size:13.5px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid #EEF1F5}
-.wx-measure select{border:0;background:none;color:#116DFF;font-size:13.5px;cursor:pointer}
+.wx-measure select{border:0;background:none;color:#1B6930;font-size:13.5px;cursor:pointer}
 .wx-rbars{display:grid;gap:8px}
-.wx-rbar{display:grid;grid-template-columns:minmax(120px,220px) minmax(0,1fr);gap:12px;align-items:center;font-size:12.5px}
+.wx-rbar{display:grid;grid-template-columns:minmax(120px,32%) minmax(0,1fr);gap:12px;align-items:center;font-size:12.5px}
 .wx-rbar-l{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3B4F63}
 .wx-rbar-t{display:flex;align-items:center;gap:6px;min-width:0}
-.wx-rbar-t span{height:22px;background:#3E82F4;border-radius:2px;display:block}
+.wx-rbar-t span{height:22px;background:#189E4F;border-radius:2px;display:block}
 .wx-rbar-t em{font-style:normal;font-size:12px;color:#3B4F63;white-space:nowrap}
+/* Booking funnel */
+.wx-funnel{display:grid;gap:10px}
+.wx-funnel-sum{display:flex;flex-wrap:wrap;gap:8px 22px;padding-bottom:14px;margin-bottom:6px;border-bottom:1px solid #EEF1F5;font-size:13.5px;color:#3B4F63}
+.wx-funnel-sum b{color:#162D3D;font-size:16px}
+.wx-funnel-row{display:grid;grid-template-columns:minmax(120px,210px) minmax(0,1fr) 62px 54px;gap:12px;align-items:center;font-size:12.5px}
+.wx-funnel-label{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3B4F63}
+.wx-funnel-bar{display:block;background:#EAF6EE;border-radius:3px;height:22px}
+.wx-funnel-bar i{display:block;height:100%;background:#189E4F;border-radius:3px}
+.wx-funnel-row b{text-align:right}
+.wx-funnel-pct{color:#3B4F63;text-align:right}
+.wx-funnel-stopped{margin-top:16px;padding-top:16px;border-top:1px solid #EEF1F5}
+.wx-funnel-stopped h3{margin:0 0 2px;font-size:15px!important;font-weight:600!important}
+.wx-funnel-stopped p{margin:0 0 12px;font-size:12.5px}
+@media (max-width:720px){
+  .wx-funnel-row{grid-template-columns:minmax(0,1fr) 56px 46px;gap:8px}
+  .wx-funnel-label{grid-column:1/-1;text-align:left}
+}
+/* Visitor journeys */
+.wx-rowlink{cursor:pointer}
+.wx-rowlink:hover td{background:#F5FFF6}
+.wx-journeys-top .wx-muted{margin:0;font-size:12.5px}
+.wx-timeline-wrap{position:fixed;inset:0;z-index:60;background:rgba(22,45,61,.35);display:flex;justify-content:flex-end}
+.wx-timeline{width:min(460px,100%);background:#fff;height:100%;overflow:auto;padding:20px 22px;box-shadow:-8px 0 30px rgba(22,45,61,.2)}
+.wx-timeline header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.wx-timeline h2{font-size:19px!important;font-weight:700!important;margin:0}
+.wx-timeline header p{margin:2px 0 0;font-size:12.5px}
+.wx-steps{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.wx-steps li{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid #F1F4F8;font-size:13px}
+.wx-steps time{color:#8A9AA8;font-size:12px}
+.wx-steps b{font-weight:600}
+.wx-steps li.is-funnel b{color:#1B6930}
+.wx-steps .wx-path{grid-column:2;font-size:12px;color:#3B4F63;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wx-steps em{font-style:normal;color:#0F6B35;font-weight:600}
+/* Core Web Vitals */
+.wx-vitals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.wx-vital{border:1px solid #E5EBF2;border-left-width:4px;border-radius:8px;padding:12px 14px;display:grid;gap:2px}
+.wx-vital b{font-size:12.5px;color:#3B4F63;letter-spacing:.04em}
+.wx-vital strong{font-size:22px;font-weight:700}
+.wx-vital span{font-size:12px;color:#3B4F63}
+.wx-vital.is-good{border-left-color:#1FA463}
+.wx-vital.is-ok{border-left-color:#E5A000}
+.wx-vital.is-poor{border-left-color:#D6453D}
+/* Real-time */
+.wx-rt-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:16px}
+.wx-rt-cols h3{margin:0 0 10px;font-size:14px!important;font-weight:600!important}
+/* Custom report builder */
+.wx-builder{display:grid;gap:10px;width:100%;padding-top:10px;border-top:1px solid #EEF1F5}
+.wx-builder-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.wx-builder-row > b{min-width:74px;font-weight:600}
+.wx-builder-row input{border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font:inherit;font-size:13px}
+.wx-chips{display:flex;flex-wrap:wrap;gap:6px}
+.wx-chips button{border:1px solid #D3DCE6;background:#fff;border-radius:999px;padding:5px 11px;font-size:12.5px;cursor:pointer}
+.wx-chips button[aria-pressed="true"]{background:#1B6930;border-color:#1B6930;color:#fff}
+/* Report definitions */
+.wx-defs{display:grid;gap:16px;margin:0 0 18px}
+.wx-defs dt{font-weight:600;font-size:14px}
+.wx-defs dd{margin:3px 0 0;font-size:13px;color:#162D3D}
+.wx-defs dd.wx-muted{font-size:12.5px}
+/* Columns a laptop can do without; the CSV export still carries every one. */
+@media (max-width:1200px){ .wx-hide-md{display:none} }
+@media (max-width:1000px){ .wx-hide-sm{display:none} }
 .wx-rtable{overflow-x:auto}
 .wx-rtable table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:600px}
-.wx-rtable th{background:#E8F0FE;text-align:left;font-weight:500;padding:0;border-bottom:1px solid #D9E3F2}
-.wx-rtable th button{background:none;border:0;width:100%;text-align:inherit;padding:12px 16px;font:inherit;color:#162D3D;cursor:pointer;white-space:nowrap}
+.wx-rtable th{background:#EAF7EC;text-align:left;font-weight:500;padding:0;border-bottom:1px solid #CFE6D6}
+.wx-rtable th button{background:none;border:0;width:100%;text-align:inherit;padding:11px 13px;font:inherit;color:#162D3D;cursor:pointer;white-space:normal;line-height:1.25}
 .wx-rtable th.n,.wx-rtable td.n{text-align:right}
-.wx-rtable td{padding:12px 16px;border-bottom:1px solid #EEF1F5;max-width:320px}
+.wx-rtable td.n{white-space:nowrap;overflow-wrap:normal}
+.wx-rtable td{padding:11px 13px;border-bottom:1px solid #EEF1F5;max-width:280px;overflow-wrap:anywhere}
 .wx-rtable tr.wx-summary td{font-weight:600}
 .wx-rtable tbody tr:hover td{background:#F7F9FC}
 .wx-path{display:inline-block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;color:inherit;text-decoration:none}
-a.wx-path:hover{color:#116DFF}
+a.wx-path:hover{color:#1B6930}
 .wx-post-img{width:48px;height:48px;border-radius:6px;object-fit:cover;display:inline-grid;place-items:center}
-.wx-more{display:block;margin:10px auto 14px;background:none;border:1px solid #D3DCE6;border-radius:16px;padding:6px 14px;color:#116DFF;cursor:pointer}
+.wx-more{display:block;margin:10px auto 14px;background:none;border:1px solid #D3DCE6;border-radius:16px;padding:6px 14px;color:#1B6930;cursor:pointer}
 .wx-report-map{max-width:760px;margin:0 auto}
 .wx-heat24{display:grid;gap:2px;overflow-x:auto}
 .wx-heat24-row{display:grid;grid-template-columns:52px repeat(7,minmax(64px,1fr));gap:2px}

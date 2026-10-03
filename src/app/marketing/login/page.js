@@ -66,7 +66,7 @@ export default function MarketingLogin() {
 }
 
 const CSS = `
-.mkl{min-height:100vh;display:grid;place-items:center;background:#F3F6F4;padding:24px 16px;font-family:'Public Sans','Work Sans',ui-sans-serif,system-ui,sans-serif}
+.mkl{min-height:100vh;display:grid;place-items:center;background:#F3F6F4;padding:24px 16px;font-family:'Inter',ui-sans-serif,system-ui,sans-serif}
 .mkl-card{width:100%;max-width:400px;background:#fff;border:1px solid #DCE4DE;border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 30px rgba(6,51,39,.08)}
 .mkl-brand{display:flex;gap:10px;align-items:center;margin-bottom:10px}
 .mkl-mk{width:34px;height:34px;border-radius:9px;background:#1B6930;color:#fff!important;display:grid;place-items:center;font-weight:800;font-size:16px}

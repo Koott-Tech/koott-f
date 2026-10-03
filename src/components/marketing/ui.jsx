@@ -49,6 +49,8 @@ export function Tip({ tip }) {
 }
 
 export function useWidth(ref, min = 200) {
+  // 480 only until the observer reports; the svg is scaled to its box meanwhile,
+  // so a stale number is never visible as overflow.
   const [w, setW] = useState(480);
   useEffect(() => {
     if (!ref.current) return undefined;
@@ -63,7 +65,7 @@ export function Spark({ values }) {
   if (!values?.length) return null;
   const w = 64; const h = 20; const mx = Math.max(1, ...values); const mn = Math.min(...values);
   const d = values.map((v, i) => `${i ? 'L' : 'M'}${((i / Math.max(1, values.length - 1)) * w).toFixed(1)} ${(h - 2 - ((v - mn) / Math.max(1, mx - mn)) * (h - 4)).toFixed(1)}`).join('');
-  return <svg className="wx-spark" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true"><path d={d} fill="none" stroke="#116DFF" strokeWidth="1.4" vectorEffect="non-scaling-stroke" /></svg>;
+  return <svg className="wx-spark" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true"><path d={d} fill="none" stroke="#1B6930" strokeWidth="1.4" vectorEffect="non-scaling-stroke" /></svg>;
 }
 
 /** Smooth area chart; an optional second, dashed series is the previous period. */
@@ -90,13 +92,15 @@ export function AreaChart({ rows, keys, height = 220, fmt = N }) {
   const ticks = rows.length > 1 ? Array.from({ length: nTicks }, (_, i) => Math.round((i * (rows.length - 1)) / (nTicks - 1))) : [0];
   const move = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
-    const i = Math.max(0, Math.min(rows.length - 1, Math.round(((e.clientX - r.left - L) / (W - L - R)) * (rows.length - 1))));
+    // r is the hit area in screen pixels; L/R/W are chart units. On a narrow
+    // screen the svg is scaled, so work in the ratio rather than in pixels.
+    const i = Math.max(0, Math.min(rows.length - 1, Math.round(((e.clientX - r.left) / Math.max(1, r.width)) * (rows.length - 1))));
     setHover(i);
     setTip({ x: e.clientX, y: e.clientY, content: <><b>{fmtDay(rows[i].day, { weekday: 'short', month: 'short', day: 'numeric' })}</b>{keys.map((k) => <div key={k.key}>{k.label}: {fmt(rows[i][k.key] || 0)}</div>)}</> });
   };
   return (
     <div ref={ref} className="wx-chart">
-      <svg width={W} height={H} role="img" aria-label="Sessions over time">
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} preserveAspectRatio="none" role="img" aria-label="Sessions over time">
         {[0, 1, 2, 3, 4].map((k) => {
           const v = (mx * k) / 4;
           return (
@@ -109,12 +113,12 @@ export function AreaChart({ rows, keys, height = 220, fmt = N }) {
         {ticks.map((i) => <text key={i} x={x(i)} y={H - 6} textAnchor={i === 0 ? 'start' : i === rows.length - 1 ? 'end' : 'middle'} fontSize="11" fill="#6B7C8D">{rows[i] && fmtDay(rows[i].day)}</text>)}
         {keys.map((k, idx) => (
           <g key={k.key}>
-            {idx === 0 && rows.length > 1 && <path d={`${curve(k.key)} L${x(rows.length - 1)} ${y(0)} L${x(0)} ${y(0)}Z`} fill="#116DFF" opacity=".14" />}
-            <path d={curve(k.key)} fill="none" stroke={idx === 0 ? '#116DFF' : '#9CB8E6'} strokeWidth="2" strokeDasharray={idx === 0 ? undefined : '4 4'} />
+            {idx === 0 && rows.length > 1 && <path d={`${curve(k.key)} L${x(rows.length - 1)} ${y(0)} L${x(0)} ${y(0)}Z`} fill="#1B6930" opacity=".14" />}
+            <path d={curve(k.key)} fill="none" stroke={idx === 0 ? '#1B6930' : '#A9CDB6'} strokeWidth="2" strokeDasharray={idx === 0 ? undefined : '4 4'} />
           </g>
         ))}
         {hover !== null && <line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} stroke="#9AAAB8" strokeDasharray="3 3" />}
-        {hover !== null && <circle cx={x(hover)} cy={y(rows[hover][keys[0].key] || 0)} r="4" fill="#116DFF" stroke="#fff" strokeWidth="2" />}
+        {hover !== null && <circle cx={x(hover)} cy={y(rows[hover][keys[0].key] || 0)} r="4" fill="#1B6930" stroke="#fff" strokeWidth="2" />}
         <rect x={L} y={T} width={Math.max(0, W - L - R)} height={H - T - B} fill="transparent" onMouseMove={move} onMouseLeave={() => { setHover(null); setTip(null); }} />
       </svg>
       {keys.length > 1 && <div className="wx-keys">{keys.map((k, i) => <span key={k.key}><i className={i ? 'is-prev' : ''} />{k.label}</span>)}</div>}
@@ -182,11 +186,11 @@ export function Columns({ rows }) {
   const y = (v) => T + (1 - v / mx) * (H - T - B);
   return (
     <div ref={ref} className="wx-chart">
-      <svg width={W} height={H} role="img" aria-label="Average sessions by day">
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} preserveAspectRatio="none" role="img" aria-label="Average sessions by day">
         {[0, 1, 2, 3, 4, 5, 6].map((k) => { const v = (mx * k) / 6; return <g key={k}><line x1={L} x2={W} y1={y(v)} y2={y(v)} stroke="#E7ECF2" /><text x={L - 6} y={y(v) + 4} textAnchor="end" fontSize="10.5" fill="#6B7C8D">{compact(v)}</text></g>; })}
         {rows.map((r, i) => (
           <g key={r.label} onMouseMove={(e) => setTip({ x: e.clientX, y: e.clientY, content: <><b>{r.label}</b>Avg. sessions: {N(r.value)}</> })} onMouseLeave={() => setTip(null)}>
-            <rect x={L + i * bw + bw * 0.14} y={y(r.value)} width={bw * 0.72} height={Math.max(0, H - B - y(r.value))} fill="#116DFF" />
+            <rect x={L + i * bw + bw * 0.14} y={y(r.value)} width={bw * 0.72} height={Math.max(0, H - B - y(r.value))} fill="#1B6930" />
             <text x={L + i * bw + bw / 2} y={H - 6} textAnchor="middle" fontSize="11" fill="#6B7C8D">{r.label}</text>
           </g>
         ))}
@@ -228,7 +232,7 @@ export function WorldMap({ rows, mode = 'choropleth' }) {
   };
   return (
     <div ref={ref} className="wx-map">
-      <svg width={W} height={H} role="img" aria-label="Sessions by country">
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Sessions by country">
         {geo.features.map((f) => {
           const v = val[f.properties.name] || 0;
           return <path key={f.id || f.properties.name} d={path(f)} fill={mode === 'choropleth' ? shade(v) : '#E1E6EC'} stroke="#fff" strokeWidth="0.5"
@@ -240,7 +244,7 @@ export function WorldMap({ rows, mode = 'choropleth' }) {
           const at = small ? projection(small) : feature ? path.centroid(feature) : null;
           if (!at || Number.isNaN(at[0]) || (mode === 'choropleth' && !small)) return null;
           const rad = mode === 'bubbles' ? 3 + Math.sqrt(r.sessions / mx) * 14 : 4;
-          return <circle key={r.country} cx={at[0]} cy={at[1]} r={rad} fill="#116DFF" fillOpacity={mode === 'bubbles' ? 0.55 : 0.9} stroke="#fff" strokeWidth="1"
+          return <circle key={r.country} cx={at[0]} cy={at[1]} r={rad} fill="#1B6930" fillOpacity={mode === 'bubbles' ? 0.55 : 0.9} stroke="#fff" strokeWidth="1"
             onMouseMove={(e) => setTip({ x: e.clientX, y: e.clientY, content: <><b>{r.country}</b>{N(r.sessions)} sessions</> })} onMouseLeave={() => setTip(null)} />;
         })}
       </svg>

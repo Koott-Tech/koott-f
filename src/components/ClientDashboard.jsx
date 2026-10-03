@@ -484,14 +484,6 @@ function HistoryRow({ session, open, onToggle, onRate }) {
  * `fixture` stands in for the API while a design is being checked — the prototype's
  * preview switch, kept (see /dashboard?preview=paid). Real use passes nothing.
  */
-const ACCOUNT_PAGES = [
-  ['/profile/profile', 'Your profile'],
-  ['/profile/messages', 'Messages'],
-  ['/profile/packages', 'Packages'],
-  ['/profile/receipts', 'Receipts'],
-  ['/profile/reports', 'Reports'],
-];
-
 const PREVIEW_STATES = [
   ['', 'Live data'],
   ['new', 'New client'], ['awaiting', 'Awaiting payment'], ['paid', 'Paid'],
@@ -641,12 +633,6 @@ export default function ClientDashboard({ client, fixture = null, previewState =
           </button>
         </div>
         <div role="tabpanel">{body()}</div>
-
-        {/* The sidebar is gone and the account menu holds only Dashboard, so the
-            client's other pages are reached from here — the page they all hang off. */}
-        <nav className="cdb-links" aria-label="Your account">
-          {ACCOUNT_PAGES.map(([href, label]) => <a key={href} href={href}>{label}</a>)}
-        </nav>
       </main>
       {onPreviewChange && <PreviewSwitch state={previewState} onChange={onPreviewChange} />}
       <div className={`cdb-toast${toast ? ' cdb-on' : ''}`} role="status">{toast}</div>
@@ -834,12 +820,6 @@ const CSS = `
 .cdb-star.cdb-on{color:#f0b429}
 .cdb-docrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
 
-.cdb-links{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:44px;padding-top:22px;border-top:1px solid var(--line)}
-.cdb-links a{
-  padding:9px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);
-  color:var(--muted);font-size:14px;font-weight:500;text-decoration:none
-}
-.cdb-links a:hover{border-color:var(--brand-ink);color:var(--brand-ink)}
 .cdb-toast{position:fixed;left:50%;bottom:26px;z-index:60;transform:translate(-50%,16px);opacity:0;pointer-events:none;
   padding:12px 18px;border-radius:999px;background:#111;color:#fff;font-size:14px;transition:opacity .2s ease,transform .2s ease}
 .cdb-toast.cdb-on{opacity:1;transform:translate(-50%,0)}
@@ -891,8 +871,6 @@ const CSS = `
   .cdb-preview button{display:none}
   .cdb-preview select{display:block}
   .cdb-preview{padding:6px}
-  .cdb-links{gap:8px}
-  .cdb-links a{flex:1 1 calc(50% - 8px);text-align:center;min-height:44px;display:flex;align-items:center;justify-content:center}
 }
 @media (max-width:420px){
   .cdb-preview span{display:none}

@@ -22,7 +22,14 @@ import { Analytics } from '@vercel/analytics/react';
 import { getConsent, onConsent } from '@/analytics/consent';
 import { redactPath, redactUrl } from '@/analytics/redact';
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-K7Z8F94Z80';
+/**
+ * GA4 only loads when a measurement id is deliberately set. It used to fall back
+ * to a hardcoded id, which meant Google received page views from every consenting
+ * visitor the moment the site was deployed — before anyone decided it should.
+ * Leave NEXT_PUBLIC_GA_MEASUREMENT_ID unset and nothing is sent to Google;
+ * Koott's own analytics is unaffected either way.
+ */
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '';
 const STAFF_AREA = /^\/(admin|superadmin|finance|psychologist|event-organizer|marketing|dev)(\/|$)/;
 
 const TITLES = { '/': 'Home', '/topic': 'Topic page', '/blog': 'Blog', '/book': 'Booking', '/therapist-profile': 'Therapist profile' };
@@ -39,7 +46,7 @@ export default function ThirdPartyAnalytics() {
 
   // One redacted page_view per route (automatic page views are disabled in config).
   useEffect(() => {
-    if (!analytics || !pathname || STAFF_AREA.test(pathname) || typeof window.gtag !== 'function') return;
+    if (!GA_ID || !analytics || !pathname || STAFF_AREA.test(pathname) || typeof window.gtag !== 'function') return;
     const path = redactPath(pathname);
     const location = redactUrl(window.location.href);
     window.gtag('set', { page_location: location, page_title: titleFor(path), page_referrer: '' });
@@ -51,7 +58,7 @@ export default function ThirdPartyAnalytics() {
   return (
     <>
       <Analytics beforeSend={beforeSend} />
-      {analytics && pathname && !STAFF_AREA.test(pathname) && (
+      {GA_ID && analytics && pathname && !STAFF_AREA.test(pathname) && (
         <>
           <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
           <Script id="ga4-init" strategy="afterInteractive">{`

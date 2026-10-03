@@ -17,6 +17,7 @@ import {
   nf, N, compact, INR, INRfull, duration, ymd, addDays, fmtDay, WEEK, slotLabel, ELEMENT, Change, Tip, useWidth, Spark, AreaChart, BarList, Donut, Columns, SMALL, WorldMap, Section, Col, OpenReport,
 } from './ui';
 import { REPORTS, REPORT_CSS, ReportsList, ReportView } from './MarketingReports';
+import { COMPARISONS, compareLabel, istToday, presets, rangeLabel, resolve } from './dateRange';
 
 const API = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
@@ -121,7 +122,7 @@ function Highlights({ d, live, openLive, goTraffic }) {
   const [heatTip, setHeatTip] = useState(null);
   const latest = live.feed.find((e) => e.name !== 'page_view') || live.feed[0];
   const hmMax = Math.max(1, ...d.blog.heatmap.flat());
-  const shade = (v) => (v ? ['#D6E6FF', '#A9C9FF', '#76A8FF', '#3F86FF', '#116DFF'][Math.min(4, Math.floor((v / hmMax) * 4.999))] : '#EEF2F6');
+  const shade = (v) => (v ? ['#D7EFDF', '#BFE4CB', '#7CC894', '#189E4F', '#1B6930'][Math.min(4, Math.floor((v / hmMax) * 4.999))] : '#EEF2F6');
   const s = d.engagement.stats;
   const q = d.marketing.search; const m = d.marketing.meta;
   return (
@@ -304,13 +305,13 @@ function Traffic({ d }) {
         <div className="wx-duo-cards">
           <div className="wx-card">
             <h3 className="wx-card-t">New vs returning visitors</h3>
-            <Donut center="Unique visitors" total={d.newVsReturning.total} parts={[{ label: 'New', value: d.newVsReturning.new, color: '#116DFF' }, { label: 'Returning', value: d.newVsReturning.returning, color: '#2FB3E8' }]} />
+            <Donut center="Unique visitors" total={d.newVsReturning.total} parts={[{ label: 'New', value: d.newVsReturning.new, color: '#1B6930' }, { label: 'Returning', value: d.newVsReturning.returning, color: '#4A9C58' }]} />
           </div>
           <div className="wx-card">
             <h3 className="wx-card-t">Sessions by device</h3>
             <Donut center="Site sessions" total={d.devices.reduce((t, x) => t + x.sessions, 0)} parts={[
-              { label: 'Mobile', value: d.devices[0].sessions, color: '#116DFF' },
-              { label: 'Desktop', value: d.devices[1].sessions, color: '#2FB3E8' },
+              { label: 'Mobile', value: d.devices[0].sessions, color: '#1B6930' },
+              { label: 'Desktop', value: d.devices[1].sessions, color: '#4A9C58' },
               { label: 'Tablet', value: d.devices[2].sessions, color: '#7B61FF' },
             ]} />
           </div>
@@ -374,54 +375,97 @@ function Traffic({ d }) {
 
 /* ------------------------------------------------------------ shell */
 
-const RANGES = [[7, 'Last 7 days'], [30, 'Last 30 days'], [90, 'Last 90 days'], [365, 'Last 365 days']];
+/** The selection is kept for the session, so moving between reports keeps the dates. */
+const STORE = 'koott_mkt_range';
+const loadSel = () => {
+  try { return JSON.parse(sessionStorage.getItem(STORE) || 'null') || { preset: 'last30', compare: 'previous' }; }
+  catch (_) { return { preset: 'last30', compare: 'previous' }; }
+};
+
+/** Presets, a custom range, and what to compare against — used by every page. */
+function DateRange({ sel, dates, today, onChange }) {
+  const opts = presets(today);
+  const current = opts.find((o) => o.k === sel.preset) || opts[3];
+  return (
+    <div className="wx-daterange">
+      <select
+        value={sel.preset}
+        onChange={(e) => onChange({ ...sel, preset: e.target.value, from: dates.from, to: dates.to })}
+        aria-label="Date range"
+      >
+        {opts.map((o) => (
+          <option key={o.k} value={o.k}>
+            {o.label}{o.from ? ` (${rangeLabel(o.from, o.to)})` : ''}
+          </option>
+        ))}
+      </select>
+      {sel.preset === 'custom' && (
+        <span className="wx-dates">
+          <input type="date" value={sel.from || dates.from} max={today} onChange={(e) => onChange({ ...sel, from: e.target.value })} aria-label="From" />
+          <em>to</em>
+          <input type="date" value={sel.to || dates.to} max={today} onChange={(e) => onChange({ ...sel, to: e.target.value })} aria-label="To" />
+        </span>
+      )}
+      <select value={sel.compare} onChange={(e) => onChange({ ...sel, compare: e.target.value })} aria-label="Comparison">
+        {COMPARISONS.map((c) => <option key={c.k} value={c.k}>{c.label}</option>)}
+      </select>
+      {current?.partial && <span className="wx-muted" title="Today is still running, so it holds part of a day.">Includes today</span>}
+    </div>
+  );
+}
 
 export default function MarketingDashboard() {
   const { user, logout } = useAuth();
   const [meta, setMeta] = useState(null);
   const [notReady, setNotReady] = useState(null);
   const [page, setPage] = useState('highlights');
-  const [range, setRange] = useState(30);
+  const [sel, setSel] = useState(loadSel);
   const [env, setEnv] = useState('production');
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [liveOpen, setLiveOpen] = useState(false);
 
-  const request = useCallback(async (path) => {
+  const request = useCallback(async (path, { method = 'GET', body } = {}) => {
     const token = getStoredToken?.();
-    const res = await fetch(`${API}/marketing/${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const res = await fetch(`${API}/marketing/${path}`, {
+      method,
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
     const json = await res.json().catch(() => ({}));
     if (res.status === 503 && json.code === 'NOT_MIGRATED') { const e = new Error(json.message); e.notReady = true; throw e; }
     if (!res.ok || json.success === false) throw new Error(json.message || `Could not load (${res.status}).`);
     return json;
   }, []);
 
+  // The page and the environment are remembered across visits; the date range
+  // keeps itself, for the session only (see loadSel).
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem('koott-mk2') || '{}');
       if (['highlights', 'traffic', 'reports'].includes(s.page) || REPORTS.some((r) => `report:${r.k}` === s.page)) setPage(s.page);
-      if (RANGES.some(([r]) => r === s.range)) setRange(s.range);
       if (['production', 'staging', 'development'].includes(s.env)) setEnv(s.env);
     } catch (_) { /* ignore */ }
   }, []);
-  useEffect(() => { try { localStorage.setItem('koott-mk2', JSON.stringify({ page, range, env })); } catch (_) { /* ignore */ } }, [page, range, env]);
+  useEffect(() => { try { localStorage.setItem('koott-mk2', JSON.stringify({ page, env })); } catch (_) { /* ignore */ } }, [page, env]);
 
   useEffect(() => {
     request('meta').then((j) => setMeta(j.data)).catch((e) => (e.notReady ? setNotReady(e.message) : setError(e.message)));
   }, [request]);
 
-  const dates = useMemo(() => {
-    const to = meta?.today || ymd(new Date());
-    const from = addDays(to, -(range - 1));
-    return { from, to, prevFrom: addDays(from, -range), prevTo: addDays(from, -1) };
-  }, [meta, range]);
+  const today = meta?.today || istToday();
+  const dates = useMemo(() => resolve(sel, today), [sel, today]);
+  useEffect(() => { try { sessionStorage.setItem(STORE, JSON.stringify(sel)); } catch (_) { /* private mode */ } }, [sel]);
 
   useEffect(() => {
     if (!meta || !['highlights', 'traffic'].includes(page)) return undefined;
     let off = false;
     setLoading(true); setError('');
-    request(`${page}?from=${dates.from}&to=${dates.to}&env=${env}`)
+    request(`${page}?from=${dates.from}&to=${dates.to}&compare=${dates.compare}&env=${env}`)
       .then((j) => { if (!off) { setNotReady(null); setData({ page, d: j.data }); } })
       .catch((e) => { if (!off) { if (e.notReady) setNotReady(e.message); else setError(e.message); } })
       .finally(() => { if (!off) setLoading(false); });
@@ -437,21 +481,18 @@ export default function MarketingDashboard() {
   const sub = page === 'highlights' ? 'Get a complete overview of your site’s activity across all areas.' : page === 'reports' ? 'Dig into the details of your site’s traffic, visitors and content.' : 'Track your site’s traffic trends and get to know your visitors.';
   const show = data && data.page === page;
   const isReports = page === 'reports' || !!reportName;
-  const rangeSelect = (
-    <select value={range} onChange={(e) => setRange(Number(e.target.value))} aria-label="Date range">
-      {RANGES.map(([r, l]) => <option key={r} value={r}>{l}{r === range ? ` (${fmtDay(dates.from)} - Today)` : ''}</option>)}
-    </select>
-  );
+  const rangeSelect = <DateRange sel={sel} dates={dates} today={today} onChange={setSel} />;
 
   return (
     <div className="wx">
-      <style dangerouslySetInnerHTML={{ __html: CSS + REPORT_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: MARKETING_CSS + REPORT_CSS }} />
       <aside className="wx-side">
         <div className="wx-brand"><span className="wx-mk">K</span><div><b>Koott</b><small>Insights</small></div></div>
         <div className="wx-navgrp">Analytics</div>
         <nav aria-label="Analytics">
           <button type="button" aria-current={page === 'highlights' ? 'page' : undefined} onClick={() => setPage('highlights')}>Highlights</button>
-          <button type="button" onClick={() => setLiveOpen(true)}>Real-time</button>
+          <button type="button" aria-current={page === 'report:realtime' ? 'page' : undefined} onClick={() => openReport('realtime')}>Real-time</button>
+          <button type="button" onClick={() => setLiveOpen(true)}>Live feed</button>
           <button type="button" aria-current={page === 'traffic' ? 'page' : undefined} onClick={() => setPage('traffic')}>Traffic</button>
           <button type="button" aria-current={isReports ? 'page' : undefined} onClick={() => setPage('reports')}>Reports</button>
         </nav>
@@ -474,7 +515,7 @@ export default function MarketingDashboard() {
         </div>}
         {!isReports && <div className="wx-range">
           {rangeSelect}
-          <span>compared to previous period ({fmtDay(dates.prevFrom)} - {fmtDay(dates.prevTo, { month: 'short', day: 'numeric', year: 'numeric' })})</span>
+          <span>{compareLabel(dates)}</span>
           {loading && <span className="wx-muted">Updating…</span>}
         </div>}
         {env !== 'production' && <div className="wx-banner">Showing <b>{env}</b> data (test traffic), not the live site.</div>}
@@ -498,28 +539,28 @@ export default function MarketingDashboard() {
   );
 }
 
-const CSS = `
+export const MARKETING_CSS = `
 .wx-col-report{float:right;font-weight:400}
 .wx-section-links{display:flex;gap:8px;flex-wrap:wrap}
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
-.wx{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh;background:#EEF1F5;color:#162D3D;font-family:'Figtree',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14px;line-height:1.45}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap');
+.wx{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh;background:#EEF1F5;color:#162D3D;font-family:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14px;line-height:1.45}
 .wx *{box-sizing:border-box}
 .wx h1,.wx h2,.wx h3,.wx h4{font-family:inherit!important;letter-spacing:0!important;color:#162D3D!important;margin:0!important}
 .wx button,.wx select{font:inherit;color:inherit}
-.wx-side{background:#15191E;color:#C9D1D9;position:sticky;top:0;height:100vh;padding:14px 10px;display:flex;flex-direction:column}
+.wx-side{background:#012F23;color:#CFE3D6;position:sticky;top:0;height:100vh;padding:14px 10px;display:flex;flex-direction:column}
 .wx-brand{display:flex;gap:10px;align-items:center;padding:4px 8px 16px}
-.wx-mk{width:30px;height:30px;border-radius:7px;background:#116DFF;color:#fff!important;display:grid;place-items:center;font-weight:700}
+.wx-mk{width:30px;height:30px;border-radius:7px;background:#1B6930;color:#fff!important;display:grid;place-items:center;font-weight:700}
 .wx-brand b{color:#fff;display:block}
 .wx-brand small{color:#8C97A3}
 .wx-navgrp{font-size:13px;color:#E6EBF0;padding:8px 10px 6px;font-weight:600}
-.wx-side nav button{display:block;width:100%;text-align:left;background:none;border:0;color:#C9D1D9;padding:6px 10px 6px 26px;border-radius:6px;cursor:pointer;font-size:13px}
-.wx-side nav button:hover{background:#232A31}
-.wx-side nav button[aria-current="page"]{background:#2B333C;color:#fff}
-.wx-who{margin-top:auto;border-top:1px solid #2B333C;padding:12px 10px 4px;display:grid;gap:2px;font-size:12.5px}
+.wx-side nav button{display:block;width:100%;text-align:left;background:none;border:0;color:#CFE3D6;padding:6px 10px 6px 26px;border-radius:6px;cursor:pointer;font-size:13px}
+.wx-side nav button:hover{background:#063B2D}
+.wx-side nav button[aria-current="page"]{background:#0A4A38;color:#fff}
+.wx-who{margin-top:auto;border-top:1px solid #0A4A38;padding:12px 10px 4px;display:grid;gap:2px;font-size:12.5px}
 .wx-who b{color:#fff;overflow:hidden;text-overflow:ellipsis}
 .wx-who small{color:#8C97A3}
-.wx-who button{justify-self:start;margin-top:6px;background:#232A31;border:0;border-radius:6px;padding:4px 10px;color:#C9D1D9;cursor:pointer}
-.wx-main{min-width:0;padding:24px 28px 80px;max-width:1260px}
+.wx-who button{justify-self:start;margin-top:6px;background:#063B2D;border:0;border-radius:6px;padding:4px 10px;color:#CFE3D6;cursor:pointer}
+.wx-main{min-width:0;padding:24px 28px 80px;max-width:1600px}
 .wx-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .wx-head h1{font-size:28px!important;font-weight:700!important;line-height:1.2!important}
 .wx-head p{margin:2px 0 0;color:#3B4F63}
@@ -528,6 +569,11 @@ const CSS = `
 .wx-range{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0 14px;color:#3B4F63}
 .wx-banner{background:#FFF4D6;border-radius:6px;padding:8px 12px;margin-bottom:14px;font-size:13px}
 .wx-card,.wx-section{background:#fff;border-radius:8px;box-shadow:0 1px 2px rgba(22,45,61,.06),0 0 0 1px rgba(22,45,61,.04)}
+.wx-daterange{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.wx-daterange select{background:#fff;border:1px solid #D3DCE6;border-radius:18px;padding:6px 12px;font-size:13.5px;max-width:100%}
+.wx-dates{display:inline-flex;align-items:center;gap:6px}
+.wx-dates input{border:1px solid #D3DCE6;border-radius:18px;padding:5px 10px;font:inherit;font-size:13.5px;background:#fff}
+.wx-dates em{font-style:normal;color:#3B4F63;font-size:13px}
 .wx-card{padding:16px 18px}
 .wx-card p{margin:6px 0 0}
 .wx-section{margin-bottom:16px}
@@ -535,8 +581,8 @@ const CSS = `
 .wx-section-head h2{font-size:17px!important;font-weight:700!important}
 .wx-h2-sm{font-size:14px!important}
 .wx-section-body{padding:16px 18px}
-.wx-btn{background:#116DFF;color:#fff!important;border:0;border-radius:18px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
-.wx-link{background:none;border:0;color:#116DFF;padding:0;cursor:pointer;font-size:12.5px}
+.wx-btn{background:#1B6930;color:#fff!important;border:0;border-radius:18px;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer}
+.wx-link{background:none;border:0;color:#1B6930;padding:0;cursor:pointer;font-size:12.5px}
 .wx-muted{color:#6B7C8D;font-size:12px}
 .wx-empty{color:#6B7C8D;font-size:13px;margin:6px 0}
 .wx-chg{font-size:11.5px;font-weight:600;white-space:nowrap}
@@ -548,7 +594,7 @@ const CSS = `
 .wx-livecard .wx-link{justify-self:start}
 .wx-ask-head{font-weight:600;display:flex;gap:8px;align-items:center}
 .wx-soon{font-size:10.5px;font-weight:700;text-transform:uppercase;color:#6B7C8D;border:1px solid #D3DCE6;border-radius:999px;padding:0 7px}
-.wx-ask-input{margin:12px 0;background:#EEF4FF;border-radius:6px;padding:10px 12px;color:#6B7C8D}
+.wx-ask-input{margin:12px 0;background:#EFFAF2;border-radius:6px;padding:10px 12px;color:#6B7C8D}
 .wx-ask-chips{display:flex;gap:8px;overflow:hidden}
 .wx-ask-chips span{white-space:nowrap;border:1px solid #D3DCE6;border-radius:6px;padding:6px 10px;font-size:12.5px;color:#3B4F63}
 .wx-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:14px 18px 18px}
@@ -563,33 +609,34 @@ const CSS = `
 .wx-col+.wx-col{border-left:1px solid #EEF1F5}
 .wx-col:first-child{padding-left:0}.wx-col:last-child{padding-right:0}
 .wx-col h3{font-size:13.5px!important;font-weight:600!important;margin-bottom:12px!important;display:flex;gap:6px;align-items:center}
-.wx-info{color:#116DFF;font-size:12px;cursor:help}
+.wx-info{color:#1B6930;font-size:12px;cursor:help}
 .wx-center{text-align:center;display:grid;place-items:center;align-content:center;gap:6px;padding:10px 18px}
 .wx-center p{margin:0;color:#3B4F63;font-size:13px;max-width:34ch}
 .wx-lock{font-size:30px}
 .wx-item{display:flex;align-items:center;gap:10px;padding:8px 0}
 .wx-item-img{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:none}
-.wx-item-ph{display:grid;place-items:center;background:#EEF4FF;color:#116DFF;font-weight:700;width:34px;height:34px;border-radius:50%;flex:none}
+.wx-item-ph{display:grid;place-items:center;background:#EFFAF2;color:#1B6930;font-weight:700;width:34px;height:34px;border-radius:50%;flex:none}
 .wx-item-txt{flex:1;min-width:0}
 .wx-item-txt b{display:block;font-weight:500;font-size:13px}
 .wx-item-txt small{color:#6B7C8D}
 .wx-item > b{font-size:13px}
-.wx-barlist{display:grid;gap:14px}
+.wx-barlist{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
 .wx-bl-top{display:flex;align-items:center;gap:8px;font-size:13px}
-.wx-bl-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#116DFF}
+.wx-bl-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1B6930}
 .wx-bl-top b{font-weight:600}
 .wx-bl-track{height:4px;background:#EEF1F5;border-radius:2px;margin-top:5px;overflow:hidden}
-.wx-bl-track span{display:block;height:100%;background:#116DFF;border-radius:2px}
+.wx-bl-track span{display:block;height:100%;background:#1B6930;border-radius:2px}
 .wx-traffic .wx-bl-label{color:#162D3D}
-.wx-chart{position:relative;width:100%}
+.wx-chart{position:relative;width:100%;min-width:0}
+.wx-chart svg{display:block;max-width:100%;height:auto}
 .wx-chart svg{display:block}
 .wx-keys{display:flex;gap:16px;font-size:12px;color:#3B4F63;margin-top:6px}
-.wx-keys i{display:inline-block;width:14px;height:2px;background:#116DFF;vertical-align:middle;margin-right:6px}
-.wx-keys i.is-prev{background:repeating-linear-gradient(90deg,#9CB8E6 0 4px,transparent 4px 7px)}
+.wx-keys i{display:inline-block;width:14px;height:2px;background:#1B6930;vertical-align:middle;margin-right:6px}
+.wx-keys i.is-prev{background:repeating-linear-gradient(90deg,#A9CDB6 0 4px,transparent 4px 7px)}
 .wx-tip{position:fixed;z-index:90;pointer-events:none;background:#162D3D;color:#fff;border-radius:6px;padding:7px 10px;font-size:12px;max-width:240px}
 .wx-tip b{display:block}
-.wx-map{position:relative;width:100%}
-.wx-map svg{display:block}
+.wx-map{position:relative;width:100%;min-width:0}
+.wx-map svg{display:block;max-width:100%;height:auto}
 .wx-eng{display:grid}
 .wx-eng div{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid #EEF1F5;font-size:13px}
 .wx-eng div:last-child{border-bottom:0}
@@ -614,7 +661,7 @@ const CSS = `
 .wx-blog-title img{width:34px;height:34px;border-radius:6px;object-fit:cover;flex:none}
 .wx-blog-title > div{min-width:0}
 .wx-blog-title a{color:#162D3D;text-decoration:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wx-blog-title a:hover{color:#116DFF}
+.wx-blog-title a:hover{color:#1B6930}
 .wx-blog-title small{color:#6B7C8D}
 .wx-heat{display:grid;gap:2px}
 .wx-heat-row{display:grid;grid-template-columns:repeat(7,1fr) 44px;gap:2px}
@@ -622,7 +669,7 @@ const CSS = `
 .wx-heat-row em{font-style:normal;font-size:9.5px;color:#3B4F63;line-height:12px;padding-left:4px}
 .wx-heat-days b{font-size:11px;font-weight:500;text-align:center;color:#3B4F63;padding-top:4px}
 .wx-heat-scale{display:grid;grid-template-columns:repeat(5,1fr);margin-top:8px;height:6px;max-width:calc(100% - 46px)}
-.wx-heat-scale span:nth-child(1){background:#D6E6FF}.wx-heat-scale span:nth-child(2){background:#A9C9FF}.wx-heat-scale span:nth-child(3){background:#76A8FF}.wx-heat-scale span:nth-child(4){background:#3F86FF}.wx-heat-scale span:nth-child(5){background:#116DFF}
+.wx-heat-scale span:nth-child(1){background:#D7EFDF}.wx-heat-scale span:nth-child(2){background:#BFE4CB}.wx-heat-scale span:nth-child(3){background:#7CC894}.wx-heat-scale span:nth-child(4){background:#189E4F}.wx-heat-scale span:nth-child(5){background:#1B6930}
 .wx-heat-scale-l{display:flex;justify-content:space-between;color:#6B7C8D;max-width:calc(100% - 46px)}
 .wx-traffic{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(0,1fr);gap:16px;align-items:start}
 .wx-traffic-main,.wx-traffic-side{display:grid;gap:16px}
@@ -642,10 +689,10 @@ const CSS = `
 .wx-country h4{font-size:13px!important;font-weight:600!important;margin-bottom:12px!important}
 .wx-country .wx-bl-row{margin-bottom:14px}
 .wx-scale{display:flex;align-items:center;gap:8px;margin-top:8px}
-.wx-scale span{width:70px;height:8px;background:linear-gradient(90deg,#CDE1FF,#116DFF)}
+.wx-scale span{width:70px;height:8px;background:linear-gradient(90deg,#CDE1FF,#1B6930)}
 .wx-scale small{color:#3B4F63}
 .wx-pager{display:flex;gap:8px;justify-content:center;margin-top:8px}
-.wx-pager button{width:26px;height:26px;border-radius:50%;border:1px solid #D3DCE6;background:#fff;color:#116DFF;cursor:pointer}
+.wx-pager button{width:26px;height:26px;border-radius:50%;border:1px solid #D3DCE6;background:#fff;color:#1B6930;cursor:pointer}
 .wx-pager button:disabled{color:#B7C3CF;cursor:default}
 .wx-insight{margin:0;font-size:13px}
 .wx-live{position:fixed;right:18px;bottom:18px;z-index:80;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:calc(100vw - 36px)}
@@ -658,7 +705,7 @@ const CSS = `
 @keyframes wx-in{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
 .wx-toast b,.wx-live-panel li b{display:block;font-size:13px;font-weight:600}
 .wx-toast small,.wx-live-panel li small{display:block;color:#6B7C8D;font-size:12px}
-.wx-livedot{flex:none;width:8px;height:8px;border-radius:50%;margin-top:5px;background:#116DFF}
+.wx-livedot{flex:none;width:8px;height:8px;border-radius:50%;margin-top:5px;background:#1B6930}
 .wx-toast.is-good .wx-livedot{background:#25A55F}.wx-toast.is-bad .wx-livedot{background:#E62214}
 .wx-live-panel{width:360px;max-width:100%;max-height:min(460px,70vh);overflow:auto;background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 14px 34px rgba(22,45,61,.24)}
 .wx-live-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
@@ -667,7 +714,7 @@ const CSS = `
 .wx-live-panel ul{list-style:none;margin:0;padding:0}
 .wx-live-panel li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #EEF1F5}
 .wx-live-panel li:last-child{border-bottom:0}
-.wx button:focus-visible,.wx select:focus-visible{outline:2px solid #116DFF;outline-offset:2px}
+.wx button:focus-visible,.wx select:focus-visible{outline:2px solid #1B6930;outline-offset:2px}
 .wx-mobnav{display:none}
 @media (prefers-reduced-motion:reduce){.wx-beacon.is-on::after,.wx-toast{animation:none}}
 @media (max-width:1100px){.wx-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.wx-traffic{grid-template-columns:1fr}}
@@ -677,7 +724,7 @@ const CSS = `
   .wx-main{padding:16px 16px 80px}
   .wx-mobnav{display:flex;gap:6px;margin-bottom:12px}
   .wx-mobnav button{flex:1;border:1px solid #D3DCE6;background:#fff;border-radius:6px;padding:8px;cursor:pointer}
-  .wx-mobnav button[aria-pressed="true"]{background:#116DFF;color:#fff;border-color:#116DFF}
+  .wx-mobnav button[aria-pressed="true"]{background:#1B6930;color:#fff;border-color:#1B6930}
   .wx-toprow,.wx-cols,.wx-cols-blog,.wx-duo-cards,.wx-country{grid-template-columns:1fr}
   .wx-col{padding:14px 0!important;border-left:0!important;border-top:1px solid #EEF1F5}
   .wx-col:first-child{border-top:0}
