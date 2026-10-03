@@ -3,16 +3,15 @@
 /**
  * BlogArticle — port of a koott.in/post/<slug> article page.
  *
- * Measured off the live page (article column 740 wide):
- *   category nav  avenir 15/400, above the article
- *   meta row      28px avatar + avenir 14/400 "author · date · N min read"
- *   title         brandon-grot-w01-light 40/400, 1.25em  → Poppins stands in
- *   cover         740x416
- *   lede          avenir 18/400 ITALIC, 1.5em
- *   body          avenir 18/400, 1.5em
- *   h2            brandon-grot 28/700, 1.25em
- *   h3            brandon-grot 22/700, 1.23em
- *   list item     avenir 18/400, indented 27px
+ * Measured off the live page (article column 740 wide, no category bar):
+ *   author row    32px photo + avenir 14/21 "author · date · N min read"
+ *   title         brandon-grot-w01-light 40/50/400  → Poppins stands in
+ *   cover         740x416 (16:9), 34px under the title
+ *   body          avenir 18/27/400
+ *   h2            brandon-grot 28/35/400
+ *   h3            brandon-grot 22/27/400
+ *   list item     avenir 18/27/400, indented 27px, no space between items
+ * Every block in the column is separated by a uniform 27px.
  *
  * Content is CMS-driven: it reads /api/blogs/slug/<slug> and only falls back to
  * data/blogSampleData.js while the CMS has no matching post. Pass `post` to
@@ -29,7 +28,6 @@
 
 import { useEffect, useState } from 'react';
 import { blogApi } from '@/lib/blogApi';
-import { BLOG_SAMPLE_POSTS, BLOG_CATEGORIES } from '@/data/blogSampleData';
 import { looksLikeHtml, sanitizeHtml } from '@/lib/sanitizeHtml';
 import { formatPostDate } from './BlogListing';
 
@@ -208,11 +206,8 @@ export default function BlogArticle({ slug, post: givenPost, preview = false }) 
     <main className={`kba ${preview ? 'kba--preview' : ''}`}>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <nav className="kba-cats" aria-label="Blog categories">
-        {BLOG_CATEGORIES.map((c) => (
-          <a key={c} href="/blog" className="kba-cat">{c}</a>
-        ))}
-      </nav>
+      {/* koott.in's post page carries no category bar: it opens straight on the
+          author row, then the title. */}
 
       {post === undefined && <p className="kba-state">Loading…</p>}
 
@@ -303,26 +298,18 @@ const CSS = `
 .kba.kba--preview{padding-top:0;}
 .kba *{box-sizing:border-box;}
 
-.kba-cats{
-  max-width:980px;margin:0 auto;padding:26px 20px 14px;
-  display:flex;flex-wrap:wrap;gap:26px;border-bottom:1px solid var(--k-line);
-}
-.kba-cat{
-  font-family:var(--k-body)!important;font-size:15px!important;font-weight:400!important;
-  letter-spacing:0!important;color:var(--k-ink)!important;text-decoration:none;
-}
-.kba-cat:hover{color:var(--k-accent)!important;}
-
+/* koott.in's post column measures 740px; every block in it is separated by a
+   uniform 27px, and the cover sits 34px under the title. */
 .kba-article{max-width:780px;margin:0 auto;padding:44px 20px 90px;}
 
 .kba-meta{display:flex;align-items:center;gap:12px;}
 .kba-avatar{
-  width:28px;height:28px;border-radius:50%;flex:none;
+  width:32px;height:32px;border-radius:50%;flex:none;
   background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
 }
 .kba-byline{
   font-family:var(--k-body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:1.5em!important;letter-spacing:0!important;color:var(--k-ink)!important;
+  line-height:21px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
 }
 
 /* Measured off koott.in: 40/50 on a laptop, 26/36.4 on a phone, weight 400,
@@ -330,48 +317,49 @@ const CSS = `
 .kba-title{
   font-family:var(--k-display)!important;font-size:40px!important;font-weight:400!important;
   line-height:50px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
-  margin:22px 0 0;
+  margin:21px 0 0;
 }
 .kba-cover{
-  display:block;width:100%;height:416px;object-fit:cover;margin:28px 0 0;background:#EFF4F0;
+  display:block;width:100%;aspect-ratio:16/9;height:auto;object-fit:cover;margin:34px 0 0;background:#EFF4F0;
 }
 
-.kba-body{margin:30px 0 0;}
+.kba-body{margin:27px 0 0;}
 .kba-p,.kba-html p{
   font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
-  line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:20px 0 0;
+  line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:27px 0 0;
 }
 .kba-lede{
   font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
   font-style:italic;line-height:1.5em!important;letter-spacing:0!important;
-  color:var(--k-ink)!important;margin:20px 0 0;
+  color:var(--k-ink)!important;margin:27px 0 0;
 }
 .kba-h2,.kba-html h1,.kba-html h2{
   font-family:var(--k-display)!important;font-size:28px!important;font-weight:400!important;
-  line-height:35px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:38px 0 0;
+  line-height:35px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:27px 0 0;
 }
 .kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6{
   font-family:var(--k-display)!important;font-size:22px!important;font-weight:400!important;
-  line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:30px 0 0;
+  line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:27px 0 0;
 }
-.kba-ul,.kba-html ul{margin:14px 0 0;padding-left:27px;list-style:disc!important;}
-.kba-ol,.kba-html ol{margin:14px 0 0;padding-left:27px;list-style:decimal!important;}
+.kba-ul,.kba-html ul{margin:27px 0 0;padding-left:27px;list-style:disc!important;}
+.kba-ol,.kba-html ol{margin:27px 0 0;padding-left:27px;list-style:decimal!important;}
 .kba-ul li,.kba-ol li,.kba-html li{
   display:list-item!important;list-style:inherit!important;
   font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
-  line-height:1.5em!important;letter-spacing:0!important;color:var(--k-ink)!important;margin:8px 0 0;
+  /* 18/27 and no space between items, as on the live post */
+  line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:0;
 }
 .kba-html li p{margin:0!important;}
 .kba-quote,.kba-html blockquote{
-  margin:26px 0 0;padding:4px 0 4px 20px;border-left:3px solid var(--k-accent);
+  margin:27px 0 0;padding:4px 0 4px 20px;border-left:3px solid var(--k-accent);
 }
 .kba-quote p,.kba-html blockquote p,.kba-html blockquote{
   font-family:var(--k-body)!important;font-size:18px!important;font-style:italic;
   line-height:1.5em!important;letter-spacing:0!important;color:var(--k-ink)!important;margin:0;
 }
 .kba-quote cite{display:block;margin-top:8px;font-style:normal;font-size:15px;color:#5B5757;}
-.kba-fig,.kba-html figure{margin:28px 0 0;}
-.kba-img,.kba-html img{display:block;max-width:100%;height:auto;margin:28px auto 0;border-radius:6px;}
+.kba-fig,.kba-html figure{margin:27px 0 0;}
+.kba-img,.kba-html img{display:block;max-width:100%;height:auto;margin:27px auto 0;border-radius:0;}
 
 /* Tags, as the live post has them: a wrapped row of small links. */
 .kba-tags{display:flex;flex-wrap:wrap;gap:8px;margin:40px 0 0;padding:24px 0 0;border-top:1px solid var(--k-line);list-style:none;}
@@ -397,12 +385,12 @@ const CSS = `
   margin-top:8px;text-align:center;font-family:var(--k-body)!important;font-size:14px!important;color:#5B5757!important;
 }
 .kba-html pre{
-  margin:22px 0 0;padding:14px 16px;background:#F5F7F6;border-radius:6px;overflow-x:auto;
+  margin:27px 0 0;padding:14px 16px;background:#F5F7F6;border-radius:6px;overflow-x:auto;
   font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;line-height:1.5;
 }
 .kba-html code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9em;}
-.kba-html hr{border:0;border-top:1px solid var(--k-line);margin:34px 0 0;}
-.kba-html table{border-collapse:collapse;margin:22px 0 0;width:100%;display:block;overflow-x:auto;}
+.kba-html hr{border:0;border-top:1px solid var(--k-line);margin:27px 0 0;}
+.kba-html table{border-collapse:collapse;margin:27px 0 0;width:100%;display:block;overflow-x:auto;}
 .kba-html th,.kba-html td{border:1px solid var(--k-line);padding:8px 10px;font-size:16px;text-align:left;}
 .kba-html > :first-child{margin-top:0;}
 .kba-spacer{height:28px;}
@@ -428,12 +416,11 @@ const CSS = `
 
 @media (max-width:640px){
   .kba-title{font-size:26px!important;line-height:36.4px!important;}
-  .kba-cover{height:230px;}
+  .kba-cover{aspect-ratio:16/9;height:auto;}
   .kba-p,.kba-lede,.kba-ul li,.kba-ol li,.kba-html p,.kba-html li,.kba-quote p,.kba-html blockquote{
     font-size:16px!important;line-height:24px!important;
   }
   .kba-h2,.kba-html h1,.kba-html h2{font-size:24px!important;line-height:35px!important;}
   .kba-h3,.kba-html h3,.kba-html h4,.kba-html h5,.kba-html h6{font-size:20px!important;line-height:27px!important;}
-  .kba-cats{gap:16px;}
 }
 `;

@@ -24,6 +24,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { blogApi } from '@/lib/blogApi';
 import { BLOG_SAMPLE_POSTS, BLOG_CATEGORIES } from '@/data/blogSampleData';
 
+/** Two letters for the author chip, where koott.in shows the author's photo. */
+function initialsOf(name) {
+  const parts = String(name || 'Koott').trim().split(/\s+/);
+  return ((parts[0] || '')[0] || 'K').concat((parts[1] || '')[0] || '').toUpperCase();
+}
+
 export function formatPostDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -42,8 +48,6 @@ export function formatPostDate(iso) {
  *        which do not carry the category as a tag; they are shown alongside.
  * @param {object}   [heading] override the page heading for a category page.
  */
-/** Categories shown in the bar; the rest go behind "More", as on the live site. */
-const TOP_CATEGORIES = 5;
 /** Cards per page, and per press of "Load more posts". */
 const PAGE = 12;
 
@@ -52,8 +56,6 @@ export default function BlogListing({ initialCategory, extraSlugs, heading, init
   const [posts, setPosts] = useState(initialPosts);
   const [usingSample, setUsingSample] = useState(false);
   const [category, setCategory] = useState(initialCategory || 'All Posts');
-  const [moreOpen, setMoreOpen] = useState(false);
-  const [query, setQuery] = useState('');
   const [email, setEmail] = useState('');
   const [shown, setShown] = useState(PAGE);
 
@@ -71,21 +73,16 @@ export default function BlogListing({ initialCategory, extraSlugs, heading, init
 
   const visible = useMemo(() => {
     if (!posts) return [];
-    const q = query.trim().toLowerCase();
-    const matchesQuery = (p) => !q
-      || String(p.title || '').toLowerCase().includes(q)
-      || String(p.excerpt || '').toLowerCase().includes(q)
-      || (p.tags || []).some((t) => String(t).toLowerCase().includes(q));
-    if (category === 'All Posts') return posts.filter(matchesQuery);
+    if (category === 'All Posts') return posts;
     const want = category.toLowerCase();
     const extra = new Set(extraSlugs || []);
     return posts.filter((p) =>
-      ((p.categories || []).some((c) => String(c).toLowerCase() === want)
-        || (category === initialCategory && extra.has(p.slug))) && matchesQuery(p));
-  }, [posts, category, extraSlugs, initialCategory, query]);
+      (p.categories || []).some((c) => String(c).toLowerCase() === want)
+      || (category === initialCategory && extra.has(p.slug)));
+  }, [posts, category, extraSlugs, initialCategory]);
 
   // A new category starts again from the first page.
-  useEffect(() => { setShown(PAGE); }, [category, query]);
+  useEffect(() => { setShown(PAGE); }, [category]);
 
   // Build the tag row from the posts actually published, falling back to the
   // sample list only while the CMS is empty. With the real corpus loaded there
@@ -102,15 +99,6 @@ export default function BlogListing({ initialCategory, extraSlugs, heading, init
     return ['All Posts', ...ordered];
   }, [posts, usingSample, initialCategory]);
 
-  const rest = categories.slice(TOP_CATEGORIES);
-
-  // The "More" menu closes on the next click anywhere else.
-  useEffect(() => {
-    if (!moreOpen) return undefined;
-    const close = (e) => { if (!e.target.closest?.('.kbl-more')) setMoreOpen(false); };
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
-  }, [moreOpen]);
 
   return (
     <main className="kbl">
@@ -143,55 +131,9 @@ export default function BlogListing({ initialCategory, extraSlugs, heading, init
         </form>
       </section>
 
-      {/* The live site shows a single row — the busiest few categories, then
-          "More" for the rest. Showing all of them turned the top of the page
-          into a wall of chips. */}
-      <nav className="kbl-cats" aria-label="Blog categories">
-        {categories.slice(0, TOP_CATEGORIES).map((c) => (
-          <button
-            key={c}
-            type="button"
-            className={`kbl-cat ${c === category ? 'is-on' : ''}`}
-            onClick={() => setCategory(c)}
-          >
-            {c}
-          </button>
-        ))}
-
-        {categories.length > TOP_CATEGORIES && (
-          <div className={`kbl-more ${moreOpen ? 'is-open' : ''}`}>
-            <button
-              type="button"
-              className={`kbl-cat ${rest.includes(category) ? 'is-on' : ''}`}
-              aria-expanded={moreOpen}
-              onClick={() => setMoreOpen((v) => !v)}
-            >
-              {rest.includes(category) ? category : 'More'}
-              <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" /></svg>
-            </button>
-            {moreOpen && (
-              <ul>
-                {rest.map((c) => (
-                  <li key={c}>
-                    <button type="button" onClick={() => { setCategory(c); setMoreOpen(false); }}>{c}</button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
-        <label className="kbl-find">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search posts"
-            aria-label="Search posts"
-          />
-        </label>
-      </nav>
+      {/* koott.in's blog listing has no category bar and no search: it is the
+          heading, the sign-up, then the grid. A category is still reachable at
+          /blog/categories/<slug>, which passes initialCategory in. */}
 
       <section className="kbl-body">
         {posts === null && <p className="kbl-state">Loading posts…</p>}
@@ -211,10 +153,18 @@ export default function BlogListing({ initialCategory, extraSlugs, heading, init
                 </a>
 
                 <div className="kbl-meta">
-                  <span className="kbl-author">{p.author_name || 'Koott'}</span>
-                  <span className="kbl-dates">
-                    {formatPostDate(p.created_at)}
-                    {p.read_time_minutes ? ` · ${p.read_time_minutes} min read` : ''}
+                  <span className="kbl-ava" aria-hidden>{initialsOf(p.author_name)}</span>
+                  <span className="kbl-metacol">
+                    <span className="kbl-author">{p.author_name || 'Koott'}</span>
+                    <span className="kbl-dates">
+                      <span>{formatPostDate(p.created_at)}</span>
+                      {p.read_time_minutes ? (
+                        <>
+                          <i className="kbl-dot" aria-hidden />
+                          <span>{p.read_time_minutes} min read</span>
+                        </>
+                      ) : null}
+                    </span>
                   </span>
                 </div>
 
@@ -274,17 +224,18 @@ const CSS = `
 .kbl-head{max-width:980px;margin:0 auto;padding:56px 20px 0;text-align:center;}
 .kbl-mal{
   /* size from the global --h1-size scale; Malayalam glyphs need the taller line */
-  font-family:var(--k-sans)!important;font-weight:500!important;
-  line-height:1.25em!important;letter-spacing:-.05em!important;color:var(--k-deep2)!important;margin:0;
+  font-family:var(--k-sans)!important;font-size:31px!important;font-weight:500!important;
+  line-height:32.5px!important;letter-spacing:-1.25px!important;color:var(--k-deep2)!important;margin:0;
 }
 .kbl-sub{
+  /* 25/32.5, tracking -1.25px, 2px under the heading — koott.in's own numbers */
   font-family:var(--k-sans)!important;font-size:25px!important;font-weight:500!important;
-  line-height:1.3em!important;letter-spacing:-.05em!important;color:var(--k-ink)!important;margin:6px 0 0;
+  line-height:32.5px!important;letter-spacing:-1.25px!important;color:var(--k-ink)!important;margin:2px 0 0;
 }
 .kbl-intro{
   font-family:var(--k-body)!important;font-size:15px!important;font-weight:400!important;
-  line-height:1.7em!important;letter-spacing:0!important;color:var(--k-ink)!important;
-  margin:14px auto 0;max-width:505px;
+  line-height:25.5px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
+  margin:11px auto 0;max-width:505px;
 }
 
 .kbl-form{max-width:520px;margin:30px auto 0;text-align:left;}
@@ -308,37 +259,9 @@ const CSS = `
 }
 .kbl-join:hover{background:#54483F;}
 
-.kbl-more{position:relative;}
-.kbl-more > button{display:inline-flex;align-items:center;gap:6px;}
-.kbl-more svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.6;transition:transform .15s ease;}
-.kbl-more.is-open svg{transform:rotate(180deg);}
-.kbl-more ul{position:absolute;left:0;top:calc(100% + 6px);z-index:20;min-width:220px;max-height:320px;overflow:auto;
-  margin:0;padding:6px;list-style:none;background:#fff;border:1px solid rgba(38,34,34,.14);border-radius:12px;
-  box-shadow:0 10px 30px rgba(22,45,61,.12);}
-.kbl-more ul button{display:block;width:100%;text-align:left;padding:8px 12px;border:0;border-radius:8px;
-  background:none;font:inherit;font-size:14px;cursor:pointer;color:#100E0E;}
-.kbl-more ul button:hover{background:#F2FFF1;}
-.kbl-find{display:inline-flex;align-items:center;gap:7px;margin-left:auto;padding:6px 12px;
-  border:1px solid rgba(38,34,34,.14);border-radius:999px;background:#fff;}
-.kbl-find svg{width:15px;height:15px;flex:none;fill:none;stroke:#5B5757;stroke-width:1.8;stroke-linecap:round;}
-.kbl-find input{border:0;outline:none;background:none;font:inherit;font-size:14px;width:150px;min-width:0;}
-@media (max-width:720px){
-  .kbl-find{margin-left:0;width:100%;}
-  .kbl-find input{width:100%;}
-}
-.kbl-cats{
-  max-width:980px;margin:34px auto 0;padding:0 20px 14px;
-  display:flex;flex-wrap:wrap;gap:26px;border-bottom:1px solid var(--k-line);
-}
-.kbl-cat{
-  border:0;background:none;padding:2px 0;cursor:pointer;
-  font-family:var(--k-body)!important;font-size:15px;font-weight:400;
-  letter-spacing:0!important;color:var(--k-ink);border-bottom:2px solid transparent;
-}
-.kbl-cat:hover{color:var(--k-accent);}
-.kbl-cat.is-on{color:var(--k-accent);border-bottom-color:var(--k-accent);}
-
+/* koott.in's gallery column measures 940px, with the page gutter outside it. */
 .kbl-body{max-width:980px;margin:0 auto;padding:38px 20px 80px;}
+
 .kbl-more-wrap{display:flex;justify-content:center;margin-top:48px;}
 .kbl-more{
   display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--k-line);
@@ -347,22 +270,40 @@ const CSS = `
 }
 .kbl-more:hover{border-color:var(--k-accent);color:var(--k-accent);}
 .kbl-more-n{font-size:13px;color:#8A8A8A;}
-.kbl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:56px 32px;}
+.kbl-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:56px 34px;}
 .kbl-card{margin:0;}
 .kbl-cover-link{display:block;}
 .kbl-cover{
-  display:block;width:100%;height:255px;object-fit:cover;background:#EFF4F0;
+  /* 16:9, the ratio the live gallery crops to (454x255) */
+  display:block;width:100%;aspect-ratio:16/9;height:auto;object-fit:cover;background:#EFF4F0;
 }
 .kbl-cover--ph{background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);}
 
-.kbl-meta{display:flex;flex-direction:column;gap:2px;margin:18px 0 0;padding:0 8px;}
+/* The live card insets its text 31px inside the 454px cover, and runs
+   cover -> 28 -> author row -> 13 -> title -> 10 -> excerpt -> 17 -> like. */
+.kbl-meta{display:flex;align-items:center;gap:10px;margin:28px 0 0;padding:0 31px;}
+.kbl-ava{
+  width:32px;height:32px;flex:none;border-radius:50%;background:#E4EFE6;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--k-body)!important;font-size:12px!important;font-weight:500!important;
+  letter-spacing:0!important;color:var(--k-deep2)!important;
+}
+.kbl-metacol{display:flex;flex-direction:column;gap:2px;min-width:0;}
 .kbl-author,.kbl-dates{
   font-family:var(--k-body)!important;font-size:12px!important;font-weight:400!important;
-  line-height:1.4em!important;letter-spacing:0!important;color:var(--k-ink)!important;
+  line-height:14.4px!important;letter-spacing:0!important;color:var(--k-ink)!important;
 }
-.kbl-title{margin:14px 0 0;padding:0 8px;}
+.kbl-dates{display:inline-flex;align-items:center;}
+.kbl-dot{width:4px;height:4px;flex:none;border-radius:50%;background:var(--k-ink);margin:0 7px;}
+/* koott.in's card titles run to three lines; Poppins is wider, so the same
+   title ran to five and the heading block towered over the card. Capped at the
+   live block's three lines (3 x 36.4). */
+.kbl-title{
+  margin:13px 0 0;padding:0 31px;
+  max-height:109.2px;overflow:hidden;
+}
 .kbl-title a{
-  /* 26/36.4 and weight 400, as koott.in sets a card title at every width. */
+  /* 26/36.4, the leading normal resolves to on koott.in at every width. */
   font-family:var(--k-display)!important;font-size:26px!important;font-weight:400!important;
   line-height:36.4px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   text-decoration:none;
@@ -370,11 +311,11 @@ const CSS = `
 .kbl-title a:hover{color:var(--k-accent)!important;}
 .kbl-excerpt{
   font-family:var(--k-body)!important;font-size:16px!important;font-weight:400!important;
-  line-height:1.5em!important;letter-spacing:0!important;color:var(--k-ink)!important;
-  margin:12px 0 0;padding:0 8px;
+  line-height:24px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
+  margin:10px 0 0;padding:0 31px;
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
 }
-.kbl-foot{margin:22px 8px 0;padding-top:12px;border-top:1px solid var(--k-line);}
+.kbl-foot{margin:17px 31px 0;}
 .kbl-heart{color:#E0748A;font-size:16px;line-height:1;}
 
 /* While the posts are still coming, the body holds the height a screen of cards
@@ -390,15 +331,14 @@ const CSS = `
   .kbl-grid{grid-template-columns:1fr;gap:44px;}
 }
 @media (max-width:640px){
-  .kbl-sub{font-size:20px!important;}
-  .kbl-title a{font-size:22px!important;}
-  .kbl-cover{height:200px;}
-  .kbl-cats{
-    gap:18px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
-    margin-top:24px;padding:0 20px 10px;white-space:nowrap;
-  }
-  .kbl-cats::-webkit-scrollbar{display:none;}
-  .kbl-cat{flex:none;padding:6px 0;}
+  /* koott.in's phone header: 18/22.1 and 17/22.1 at -0.85px, intro 13/22.1.
+     The card text drops its inset and sits on the page gutter. */
+  .kbl-mal{font-size:18px!important;line-height:22.1px!important;letter-spacing:-.85px!important;}
+  .kbl-sub{font-size:17px!important;line-height:22.1px!important;letter-spacing:-.85px!important;}
+  .kbl-intro{font-size:13px!important;line-height:22.1px!important;}
+  .kbl-meta,.kbl-title,.kbl-excerpt{padding:0;}
+  .kbl-foot{margin-left:0;margin-right:0;}
+  .kbl-cover{aspect-ratio:16/9;}
   .kbl-more{width:100%;justify-content:center;}
 }
 `;
