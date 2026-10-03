@@ -362,21 +362,42 @@ const CSS = `
 .kba-img,.kba-html img{display:block;max-width:100%;height:auto;margin:27px auto 0;border-radius:0;}
 
 /* Tags, as the live post has them: a wrapped row of small links. */
-.kba-tags{display:flex;flex-wrap:wrap;gap:8px;margin:40px 0 0;padding:24px 0 0;border-top:1px solid var(--k-line);list-style:none;}
-.kba-tags a{display:inline-block;padding:5px 12px;border:1px solid var(--k-line);border-radius:999px;
-  font-size:13px!important;color:var(--k-ink)!important;text-decoration:none;}
+/* Square 14px chips with a hairline, 8px apart. koott.in draws no rule above
+   them — the live post page has no divider anywhere on it. */
+.kba-tags{display:flex;flex-wrap:wrap;gap:8px;margin:48px 0 0;padding:0;list-style:none;}
+.kba-tags a{display:inline-block;padding:6px 12px;background:#fff;
+  border:0.8px solid rgba(16,14,14,.2);border-radius:0;
+  font-family:var(--k-body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:17px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
+  text-decoration:none;}
 .kba-tags a:hover{border-color:var(--k-accent);color:var(--k-accent)!important;}
 
-/* Recent Posts / See All */
-.kba-recent{margin-top:48px;padding-top:26px;border-top:1px solid var(--k-line);}
-.kba-recent header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;}
-.kba-recent h2{font-size:20px!important;font-weight:600!important;font-family:var(--k-display)!important;margin:0;}
-.kba-recent header a{font-size:14px!important;color:var(--k-accent)!important;text-decoration:none;}
-.kba-recent ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:0;padding:0;list-style:none;}
+/* Recent Posts / See All. The strip is 940 wide on koott.in — wider than the
+   740 the post itself runs in — so it breaks out of the column. */
+.kba-recent{
+  margin:72px 0 0;width:min(940px,calc(100vw - 40px));
+  position:relative;left:50%;transform:translateX(-50%);
+}
+.kba-recent header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:21px;}
+.kba-recent h2,.kba-recent h2:not(#_){
+  font-family:var(--k-body)!important;font-size:18px!important;font-weight:400!important;
+  line-height:27px!important;letter-spacing:normal!important;color:var(--k-ink)!important;margin:0;
+}
+.kba-recent header a{
+  font-family:var(--k-body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:21px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
+  text-decoration:none;
+}
+.kba-recent header a:hover{color:var(--k-accent)!important;}
+.kba-recent ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;margin:0;padding:0;list-style:none;}
 .kba-recent a{text-decoration:none;color:inherit;display:block;}
-.kba-recent img,.kba-recent-ph{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:#EFF4F0;margin:0 0 10px;}
-.kba-recent b{display:block;font-size:15px!important;font-weight:600!important;line-height:1.35;}
-.kba-recent small{display:block;margin-top:4px;font-size:12.5px!important;color:#5B5757;}
+.kba-recent img,.kba-recent-ph{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:0;background:#EFF4F0;margin:0 0 24px;}
+.kba-recent b{
+  display:block;padding:0 24px;
+  font-family:var(--k-display)!important;font-size:18px!important;font-weight:400!important;
+  line-height:24px!important;letter-spacing:normal!important;
+}
+.kba-recent small{display:block;margin-top:6px;padding:0 24px;font-size:12px!important;color:#5B5757;}
 @media (max-width:720px){
   .kba-recent ul{grid-template-columns:1fr;gap:18px;}
 }
