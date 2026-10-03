@@ -171,7 +171,7 @@ export default function BlogListing({ initialCategory, extraSlugs, heading, init
                 <h2 className="kbl-title">
                   <a href={`/blog/${p.slug}`}>{p.title}</a>
                 </h2>
-                {p.excerpt && <p className="kbl-excerpt">{p.excerpt}</p>}
+                <p className="kbl-excerpt">{p.excerpt || ''}</p>
 
                 <div className="kbl-foot">
                   <span className="kbl-heart" aria-hidden>♡</span>
@@ -307,7 +307,7 @@ const CSS = `
   margin:13px 0 0;padding:0 31px;
   font-family:var(--k-display)!important;font-size:26px!important;font-weight:400!important;
   line-height:30.4px!important;letter-spacing:normal!important;
-  max-height:91.2px;overflow:hidden;
+  height:91.2px;overflow:hidden;
 }
 .kbl-title a{
   /* 26px at 30.4px leading, tighter than koott.in's 36.4 to suit Poppins. */
@@ -320,7 +320,10 @@ const CSS = `
   font-family:var(--k-body)!important;font-size:16px!important;font-weight:400!important;
   line-height:24px!important;letter-spacing:normal!important;color:var(--k-ink)!important;
   margin:10px 0 0;padding:0 31px;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  /* three lines, held whether or not the excerpt fills them — the title above
+     does the same, so every card's like row sits on one line across the row */
+  height:72px;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
 }
 .kbl-foot{margin:17px 31px 0;}
 .kbl-heart{color:#E0748A;font-size:16px;line-height:1;}
