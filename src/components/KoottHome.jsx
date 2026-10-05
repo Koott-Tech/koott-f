@@ -613,7 +613,8 @@ export default function KoottHome({ content } = {}) {
                 {HERO.concernCta}<SparkleTrio />
               </button>
               <Link href={BOOK} className="kh2-book" data-track="hero_book_slot">
-                {HERO.bookCta}<Chevron />
+                <span className="kh2-book-l">{HERO.bookCta}</span>
+                <Chevron dir="right" className="kh2-book-c" />
               </Link>
             </div>
           </div>
@@ -658,7 +659,11 @@ export default function KoottHome({ content } = {}) {
 
       {/* ══ therapists ════════════════════════════════════════════════════ */}
       <section className="kh2-sec">
-        <div className="kh2-in">
+        {/* The therapist cards and their filter row were built to a 1180px
+            column; at the artboard's narrower 1090 the three cards lose ~30px
+            each and the condition chips start clipping. This section keeps its
+            own width — the artboard itself insets each section differently. */}
+        <div className="kh2-in kh2-in--wide">
           <h2 className="kh2-h2 kh2-center">{THERAPISTS_SECTION.title}</h2>
           <p className="kh2-sub kh2-center">{THERAPISTS_SECTION.subtitle}</p>
 
@@ -839,25 +844,14 @@ export default function KoottHome({ content } = {}) {
           <div className="kh2-steps" ref={stepsRef} onScroll={onStepsScroll}>
             {HOW_IT_WORKS.steps.map((s) => (
               <div key={s.n} className="kh2-step">
-                <p className="kh2-step-n">{s.n}</p>
+                {/* The artboard drops the step number and centres the card. */}
                 <h3 className="kh2-step-t">{s.title}</h3>
 
                 <div className="kh2-step-body">
-                  {s.chips && (
-                    <ul className="kh2-chips">
-                      {s.chips.map((c) => (
-                        <li key={c}><span className="kh2-chip-i"><Tick /></span>{c}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {s.match && (
-                    <>
-                      <div className="kh2-avatars" aria-hidden>
-                        {[0, 1, 2, 3, 4].map((i) => <span key={i} className={`kh2-av kh2-av--${i}`} />)}
-                      </div>
-                      <p className="kh2-match-n">{s.match.name}</p>
-                      <p className="kh2-match-r">{s.match.role}</p>
-                    </>
+                  {s.avatars && (
+                    <div className="kh2-avatars" aria-hidden>
+                      {[0, 1, 2, 3, 4].map((i) => <span key={i} className={`kh2-av kh2-av--${i}`} />)}
+                    </div>
                   )}
                   {s.slot && (
                     <>
@@ -869,14 +863,14 @@ export default function KoottHome({ content } = {}) {
                       </ul>
                     </>
                   )}
-                  {s.n === 4 && (
+                  {s.photos && (
                     <div className="kh2-join" aria-hidden>
-                      <span className="kh2-join-a" /><span className="kh2-join-b" />
+                      <span className="kh2-join-a" /><span className="kh2-join-b" /><span className="kh2-join-c" />
                     </div>
                   )}
                 </div>
 
-                <p className="kh2-step-c">{HOW_IT_WORKS.caption}</p>
+                <p className="kh2-step-c">{s.caption}</p>
               </div>
             ))}
           </div>
@@ -896,7 +890,7 @@ export default function KoottHome({ content } = {}) {
       {/* ══ what koott offers ═════════════════════════════════════════════ */}
       <section className="kh2-sec">
         <div className="kh2-in">
-          <h2 className="kh2-h2 kh2-center">{OFFERS.title}</h2>
+          <h2 className="kh2-h2 kh2-h2--offers kh2-center">{OFFERS.title}</h2>
           <p className="kh2-sub kh2-center">{OFFERS.subtitle}</p>
 
           <div className="kh2-offers">
@@ -952,7 +946,7 @@ export default function KoottHome({ content } = {}) {
       <section className="kh2-sec">
         <div className="kh2-in kh2-care">
           <div className="kh2-care-card">
-            <h2 className="kh2-h2">
+            <h2 className="kh2-h2 kh2-h2--feature">
               {CARE.title.map((l, i) => <span key={i} className="kh2-block">{l}</span>)}
             </h2>
             {CARE.paragraphs.map((p, i) => <p key={i} className="kh2-care-p">{p}</p>)}
@@ -980,7 +974,7 @@ export default function KoottHome({ content } = {}) {
         <div className="kh2-in">
           <span className="kh2-eyebrow">{REVIEWS.eyebrow}</span>
           <div className="kh2-headrow">
-            <h2 className="kh2-h2">{REVIEWS.title}</h2>
+            <h2 className="kh2-h2 kh2-h2--reviews">{REVIEWS.title}</h2>
             <div className="kh2-google">
               <span className="kh2-google-g" aria-hidden>G</span>
               <div>
@@ -1076,7 +1070,7 @@ export default function KoottHome({ content } = {}) {
       <section className="kh2-sec">
         <div className="kh2-in">
           <span className="kh2-eyebrow kh2-eyebrow--c">{SERVICES.eyebrow}</span>
-          <h2 className="kh2-h2 kh2-center">{SERVICES.title}</h2>
+          <h2 className="kh2-h2 kh2-h2--services kh2-center">{SERVICES.title}</h2>
 
           <div className="kh2-tabs kh2-tabs--scroll" ref={serviceTabsRef}>
             {SERVICES.tabs.map((t, i) => (
@@ -1203,7 +1197,7 @@ export default function KoottHome({ content } = {}) {
       {/* ══ final cta ═════════════════════════════════════════════════════ */}
       <section className="kh2-final">
         <div className="kh2-in kh2-center">
-          <h2 className="kh2-h2 kh2-h2--big">{FINAL_CTA.title}</h2>
+          <h2 className="kh2-h2 kh2-h2--final">{FINAL_CTA.title}</h2>
           <div className="kh2-ctarow kh2-ctarow--c">
             <span className="kh2-outline">{FINAL_CTA.secondary}</span>
             <Link href={BOOK} className="kh2-btn">{FINAL_CTA.primary}</Link>
@@ -1219,20 +1213,33 @@ const CSS = `
   --deep:#012F23; --header:#063327; --green:#189E4F; --green-d:#12813F;
   --band:#D5FFC4; --band-t:#E6FFDE; --tint:#F9FFF8; --ink:#000; --body:#3B3B3B; --muted:#6B7280;
   --line:rgba(38,34,34,.13); --page:#FFFFFF;
-  --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
-  --text:'Inter',ui-sans-serif,system-ui,sans-serif;
+  /* "Koott Website Sep-26 (5)" sets the whole page in Work Sans — headings at
+     Medium (500), never the Poppins SemiBold/Bold this page used before. The
+     artboard's nav, buttons and captions are TT Interphases, which is licensed;
+     Inter stands in for it as the closest free neo-grotesque (--ui). */
+  --sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
+  --text:'Work Sans',ui-sans-serif,system-ui,sans-serif;
+  --ui:'Inter',ui-sans-serif,system-ui,sans-serif;
+  --h-weight:500;                /* Work Sans Medium — the artboard's headings */
   background:var(--page);
 }
 .kh2 *{box-sizing:border-box;}
-.kh2-in{max-width:1180px;margin:0 auto;padding:0 24px;}
+/* The artboard runs its content from x=136 to x=1230 on a 1366 page, so the
+   column is ~1090px, not the 1180 this page used. */
+.kh2-in{max-width:1090px;margin:0 auto;padding:0 24px;}
+.kh2-in--wide{max-width:1180px;}
 /* Viewport-relative so a section still fits one screen under the fixed
-   header on a 768px-tall laptop; 84px is the artboard value on a tall screen. */
-.kh2-sec{padding:clamp(122px,16.3vh,176px) 0;}
+   header on a 768px-tall laptop. The artboard's section gaps run ~230-280px
+   total, so each side is ~115-140 rather than the 122-176 used before. */
+.kh2-sec{padding:clamp(96px,12.6vh,140px) 0;}
 .kh2-center{text-align:center;}
 .kh2-block{display:block;}
 
-.kh2-h1{
-  font-family:var(--sans)!important;font-size:58px!important;font-weight:700!important;
+/* Artboard: 52.6px / 51.3px SemiBold over two lines. globals.css forces
+   Poppins onto any bare h1/h2 with an h1:not(#_) rule marked !important, so
+   these carry the same no-op guard or the page still renders in Poppins. */
+.kh2-h1,.kh2-h1:not(#_){
+  font-family:var(--sans)!important;font-size:52.6px!important;font-weight:600!important;
   line-height:1.08em!important;letter-spacing:-.02em!important;color:var(--deep)!important;margin:0 0 22px;
 }
 .kh2-h1 span{display:block;}
@@ -1254,18 +1261,28 @@ const CSS = `
 @media (prefers-reduced-motion:reduce){
   .kh2-h1-word{animation:kh2-fade-in .4s ease both;}
 }
-.kh2-h2{
-  font-family:var(--sans)!important;font-size:31px!important;font-weight:600!important;
+/* The artboard does not use one heading size: each section is set a little
+   differently, 25.6 -> 28.7, with "Care that understands you." pulled up to
+   45.5 as the page's one feature moment. Modifiers carry those figures. */
+.kh2-h2,.kh2-h2:not(#_){
+  font-family:var(--sans)!important;font-size:28.7px!important;font-weight:var(--h-weight)!important;
   line-height:1.25em!important;letter-spacing:-.02em!important;color:var(--ink)!important;margin:0 0 10px;
 }
-.kh2-h2--big{font-size:44px!important;font-weight:700!important;}
+.kh2-h2--offers,.kh2-h2--offers:not(#_){font-size:26.8px!important;}     /* What Koott offers */
+.kh2-h2--reviews,.kh2-h2--reviews:not(#_){font-size:27.6px!important;}    /* We Helped 30,000+ … */
+.kh2-h2--services,.kh2-h2--services:not(#_){font-size:25.6px!important;}   /* Koott is right with you … */
+.kh2-h2--feature,.kh2-h2--feature:not(#_){                                /* Care that understands you. */
+  font-size:45.5px!important;line-height:1.14em!important;color:var(--deep)!important;
+}
+.kh2-h2--final,.kh2-h2--final:not(#_){font-size:29.9px!important;}      /* Your first session could be today. */
+.kh2-h2--big,.kh2-h2--big:not(#_){font-size:45.5px!important;font-weight:600!important;}
 .kh2-sub{
   font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;
   line-height:1.6em!important;letter-spacing:0!important;color:var(--body)!important;margin:0 0 14px;
 }
 .kh2-eyebrow{
   display:inline-block;background:var(--tint);border-radius:6px;padding:5px 12px;margin-bottom:14px;
-  font-family:var(--text)!important;font-size:14px!important;letter-spacing:0!important;color:var(--body)!important;
+  font-family:var(--text)!important;font-size:14.4px!important;letter-spacing:0!important;color:var(--body)!important;
 }
 .kh2-eyebrow--c{display:block;width:fit-content;margin-left:auto;margin-right:auto;}
 .kh2-headrow{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:30px;}
@@ -1365,11 +1382,16 @@ const CSS = `
 .kh2-concern:hover{border-color:var(--green);}
 /* The sparkles are the design's green, not the button's text colour. */
 .kh2-trio{color:var(--green);flex:none;}
+/* The artboard sets the label centred with the chevron held against the right
+   edge, not tucked beside the text — so the label takes the free space and the
+   arrow keeps its own column. */
 .kh2-book{
-  flex:1;min-width:220px;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  flex:1;min-width:220px;display:inline-flex;align-items:center;justify-content:space-between;gap:10px;
   background:var(--green);color:#fff!important;text-decoration:none;border-radius:9px;padding:14px 22px;
   font-family:var(--text)!important;font-size:16px!important;font-weight:600!important;letter-spacing:0!important;
 }
+.kh2-book-l{flex:1;text-align:center;}
+.kh2-book-c{flex:none;}
 .kh2-book:hover{background:var(--green-d);}
 /* The looped clip runs along the foot of the hero, full width. */
 /* margin-top:auto eats the slack; the floor for the gap is the margin-bottom
@@ -1632,19 +1654,16 @@ const CSS = `
    height 254pt — a squarer card than the one we had. The fill is a very light
    green that deepens slightly downwards (#F7FFF5 -> #F1FFF0), edged with a soft
    shadow rather than a line. */
-.kh2-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;}
+/* Three cards on the Sep-26 artboard, not four. */
+.kh2-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
 .kh2-step{
   background:linear-gradient(180deg,#F7FFF5 0%,#F1FFF0 100%);
   border:1px solid rgba(24,158,79,.10);border-radius:16px;
   box-shadow:0 6px 22px rgba(16,14,14,.05);
   padding:18px 18px 16px;display:flex;flex-direction:column;text-align:center;
 }
-.kh2-step-n{
-  font-family:var(--sans)!important;font-size:34px!important;font-weight:500!important;
-  letter-spacing:0!important;color:var(--deep)!important;margin:0 0 4px;line-height:1.1em!important;
-}
-.kh2-step-t{
-  font-family:var(--text)!important;font-size:18px!important;font-weight:400!important;
+.kh2-step-t,.kh2-step-t:not(#_){
+  font-family:var(--text)!important;font-size:18.6px!important;font-weight:400!important;
   letter-spacing:0!important;color:var(--ink)!important;margin:0 0 16px;line-height:1.3em!important;
 }
 .kh2-step-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:118px;}
@@ -1676,9 +1695,10 @@ const CSS = `
 .kh2-days li.is-on{border:1px solid rgba(24,158,79,.35);background:#fff;color:var(--ink)!important;}
 .kh2-join{display:flex;gap:8px;}
 .kh2-join-a{width:56px;height:74px;border-radius:8px;background:linear-gradient(160deg,#CFE7D4,#A9CDB2);}
-.kh2-join-b{width:104px;height:74px;border-radius:8px;background:linear-gradient(160deg,#E4CDBF,#CBA894);}
+.kh2-join-b{width:76px;height:74px;border-radius:8px;background:linear-gradient(160deg,#E4CDBF,#CBA894);}
+.kh2-join-c{width:56px;height:74px;border-radius:8px;background:linear-gradient(160deg,#BFD9E7,#94B4CB);}
 .kh2-step-c{
-  font-family:var(--text)!important;font-size:12.5px!important;line-height:1.45em!important;
+  font-family:var(--text)!important;font-size:12px!important;line-height:1.5em!important;
   letter-spacing:0!important;color:var(--muted)!important;margin:12px 0 0;
 }
 
@@ -1693,7 +1713,7 @@ const CSS = `
      artboard where both columns end on the same line. */
   display:flex;flex-direction:column;
 }
-.kh2-offer-h{
+.kh2-offer-h,.kh2-offer-h:not(#_){
   font-family:var(--sans)!important;font-size:27px!important;font-weight:600!important;
   line-height:1.22em!important;letter-spacing:-.01em!important;color:var(--deep)!important;margin:0 0 12px;
 }
@@ -1765,11 +1785,11 @@ const CSS = `
 .kh2-offer-row:hover{box-shadow:0 4px 18px rgba(16,14,14,.07);}
 .kh2-offer-row.is-on{border-color:#5EA277;}
 .kh2-offer-t{
-  display:block;font-family:var(--sans)!important;font-size:20px!important;font-weight:500!important;
+  display:block;font-family:var(--sans)!important;font-size:17.2px!important;font-weight:400!important;
   letter-spacing:0!important;color:var(--ink)!important;margin-bottom:4px;
 }
 .kh2-offer-n{
-  display:block;font-family:var(--text)!important;font-size:14px!important;
+  display:block;font-family:var(--text)!important;font-size:13.3px!important;
   letter-spacing:0!important;color:var(--muted)!important;
 }
 
@@ -1778,17 +1798,17 @@ const CSS = `
 .kh2-care{display:grid;grid-template-columns:1.8fr 1fr;gap:22px;align-items:stretch;}
 .kh2-care-card{background:#EFFFEA;border-radius:16px;padding:32px;}
 .kh2-care-p{
-  font-family:var(--text)!important;font-size:15.5px!important;line-height:1.6em!important;
+  font-family:var(--text)!important;font-size:16px!important;line-height:1.6em!important;
   letter-spacing:0!important;color:var(--body)!important;margin:0 0 14px;
 }
 .kh2-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px 34px;margin:22px 0 24px;}
 .kh2-stat{border-left:2px solid var(--deep);padding-left:16px;}
 .kh2-stat-v{
-  font-family:var(--sans)!important;font-size:38px!important;font-weight:500!important;
+  font-family:var(--sans)!important;font-size:48.2px!important;font-weight:500!important;
   line-height:1.1em!important;letter-spacing:-.01em!important;color:var(--deep)!important;margin:0 0 6px;
 }
 .kh2-stat-l{
-  font-family:var(--text)!important;font-size:15px!important;line-height:1.45em!important;
+  font-family:var(--text)!important;font-size:16.9px!important;font-weight:500!important;line-height:1.35em!important;
   letter-spacing:0!important;color:var(--ink)!important;margin:0;
 }
 .kh2-care-media{
@@ -1836,10 +1856,10 @@ const CSS = `
 }
 .kh2-review-head{display:flex;gap:11px;align-items:center;margin-bottom:10px;}
 .kh2-review-av{width:34px;height:34px;border-radius:50%;background:#CFE7D4;flex:none;}
-.kh2-review-n{font-family:var(--text)!important;font-size:15px!important;font-weight:600!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;}
-.kh2-review-p{font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--muted)!important;margin:0;}
+.kh2-review-n{font-family:var(--text)!important;font-size:14px!important;font-weight:500!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;}
+.kh2-review-p{font-family:var(--text)!important;font-size:12px!important;letter-spacing:0!important;color:var(--muted)!important;margin:0;}
 .kh2-review-q{
-  font-family:var(--text)!important;font-size:13.5px!important;line-height:1.5em!important;
+  font-family:var(--text)!important;font-size:12.7px!important;line-height:1.45em!important;
   letter-spacing:0!important;color:var(--body)!important;margin:0 0 12px;flex:1;
   /* Four lines is what the artboard shows; a longer quote is trimmed rather
      than allowed to stretch one card past its neighbours. */
@@ -1850,7 +1870,7 @@ const CSS = `
   width:26px;height:26px;border-radius:50%;background:#F3F4F6;display:flex;align-items:center;
   justify-content:center;font-size:13px;color:var(--body);
 }
-.kh2-review-score{font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--body)!important;}
+.kh2-review-score{font-family:var(--text)!important;font-size:12px!important;letter-spacing:0!important;color:var(--body)!important;}
 
 /* ---- experts ---- */
 /* No box: the rows run the full width of the window, past the content column,
@@ -1876,29 +1896,40 @@ const CSS = `
 /* Card ground is a hair off-white in the artboard (250,252,249), not pure. */
 .kh2-feat{background:#FAFCF9;border:1px solid rgba(1,47,35,.08);border-radius:12px;padding:16px 16px 18px;}
 .kh2-feat-i{font-size:24px;display:block;margin-bottom:8px;}
-.kh2-feat-t{
-  font-family:var(--sans)!important;font-size:21px!important;font-weight:500!important;
+.kh2-feat-t,.kh2-feat-t:not(#_){
+  font-family:var(--sans)!important;font-size:18.7px!important;font-weight:400!important;
   line-height:1.25em!important;letter-spacing:0!important;color:var(--deep)!important;margin:0 0 12px;
 }
 .kh2-feat-l{list-style:none!important;margin:0;padding:0;}
 .kh2-feat-l li{
   display:block!important;margin:0 0 3px;
-  font-family:var(--text)!important;font-size:14px!important;line-height:1.32em!important;
-  letter-spacing:0!important;color:var(--body)!important;
+  font-family:var(--text)!important;font-size:13.2px!important;line-height:1.5em!important;
+  letter-spacing:0!important;color:#59514D!important;   /* artboard's warm grey */
 }
 
 /* ---- services ---- */
 /* All eight service tabs fit the 1132px row once the pills are not padded out
    to 22px a side — before this the last one was clipped by the scroller. */
 .kh2-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 26px;}
-.kh2-tabs--scroll{overflow:visible;padding-bottom:0;}
+/* The artboard runs the eight pills as one row that overflows the right edge
+   (its last pill is clipped), so this scrolls sideways rather than wrapping. */
+.kh2-tabs--scroll{
+  flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
+}
+.kh2-tabs--scroll::-webkit-scrollbar{display:none;}
+.kh2-tabs--scroll .kh2-tab{scroll-snap-align:start;}
 .kh2-tabs--center{justify-content:center;flex-wrap:wrap;}
+/* The FAQ's category pills are set larger than the pricing tabs: 17.3px Medium,
+   and the artboard draws them without the pricing pills' border. */
+.kh2-tabs--center .kh2-tab{font-size:17.3px!important;font-weight:500!important;border-color:transparent;background:transparent;}
+.kh2-tabs--center .kh2-tab.is-on{background:var(--green);border-color:var(--green);}
 .kh2-tab{
   flex:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 15px;cursor:pointer;
-  font-family:var(--text)!important;font-size:16px!important;letter-spacing:0!important;color:var(--body)!important;
+  font-family:var(--text)!important;font-size:14.1px!important;letter-spacing:0!important;color:var(--body)!important;
   white-space:nowrap;
 }
-.kh2-tab.is-on{background:var(--green);border-color:var(--green);color:#fff!important;font-weight:600!important;}
+.kh2-tab.is-on{background:var(--green);border-color:var(--green);color:#fff!important;font-weight:500!important;}
 /* Carousel: the track holds every panel and slides one step per tab. A panel is
    87% of the row with a 24px gutter — the artboard's proportion, which is what
    leaves the next panel peeking at the right edge. */
@@ -1927,8 +1958,8 @@ const CSS = `
   position:relative;border-radius:14px;min-height:300px;overflow:hidden;background:#E6EEE8;
 }
 .kh2-slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
-.kh2-slide-t{
-  font-family:var(--sans)!important;font-size:31px!important;font-weight:600!important;
+.kh2-slide-t,.kh2-slide-t:not(#_){
+  font-family:var(--sans)!important;font-size:32.2px!important;font-weight:var(--h-weight)!important;
   line-height:1.2em!important;letter-spacing:-.01em!important;color:var(--ink)!important;margin:0 0 18px;
 }
 .kh2-slide-lead{font-family:var(--text)!important;font-size:16px!important;line-height:1.6em!important;letter-spacing:0!important;color:var(--body)!important;margin:0 0 10px;}
@@ -1950,7 +1981,7 @@ const CSS = `
 .kh2-faq-q{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;
   background:none;border:0;cursor:pointer;padding:22px 4px;
-  font-family:var(--text)!important;font-size:18px!important;letter-spacing:0!important;color:var(--ink)!important;
+  font-family:var(--text)!important;font-size:16px!important;letter-spacing:0!important;color:var(--ink)!important;
 }
 .kh2-faq-plus{font-size:22px;color:var(--body);line-height:1;}
 .kh2-faq-a{
@@ -2009,7 +2040,7 @@ const CSS = `
 }
 @media (max-width:640px){
   .kh2-sec{padding:48px 0;}
-  .kh2-h1{font-size:38px!important;}
+  .kh2-h1,.kh2-h1:not(#_){font-size:38px!important;}
 
   /* ── Mobile hero, to the phone comp ─────────────────────────────────────
      Left-aligned copy, the sparkle inside the text box, a "Find the match"
@@ -2027,7 +2058,7 @@ const CSS = `
     max-height:none;
   }
   .kh2-hero-in{text-align:left;padding:0 22px;}
-  .kh2-h1{font-size:clamp(30px,8.6vw,36px)!important;line-height:1.14em!important;margin-bottom:clamp(6px,1.4svh,12px)!important;}
+  .kh2-h1,.kh2-h1:not(#_){font-size:clamp(30px,8.6vw,36px)!important;line-height:1.14em!important;margin-bottom:clamp(6px,1.4svh,12px)!important;}
   /* One line on every phone. At 15px the sentence is ~22.2px wide per px of
      font (333px), so it wrapped on anything under ~390px — iPhone SE/mini,
      360px Androids. 15px where it fits, otherwise scaled to the width left
@@ -2115,9 +2146,9 @@ const CSS = `
      extra space above the headline and under the CTA without pushing the
      plants below the fold on a typical iPhone. Only bites on short screens; a
      tall phone has slack under the card and the card never reaches the band. */
-  .kh2-h1{font-weight:700!important;}
-  .kh2-h2{font-size:24px!important;}
-  .kh2-h2--big{font-size:30px!important;}
+  .kh2-h1,.kh2-h1:not(#_){font-weight:700!important;}
+  .kh2-h2,.kh2-h2:not(#_){font-size:24px!important;}
+  .kh2-h2--big,.kh2-h2--big:not(#_){font-size:30px!important;}
   .kh2-tgrid,.kh2-steps,.kh2-feats,.kh2-posts,.kh2-stats{grid-template-columns:1fr;}
   .kh2-care-card,.kh2-offer-panel{padding:24px;}
   .kh2-headrow{flex-direction:column;}
@@ -2202,7 +2233,7 @@ const CSS = `
        section edge and the heading is well inside it */
     background:radial-gradient(130% 100% at 50% 100%, var(--band) 0%, var(--band-t) 94%, #fff 95%)!important;
   }
-  .kh2-final .kh2-h2--big{font-size:26px!important;line-height:1.25em!important;}
+  .kh2-final .kh2-h2--final,.kh2-final .kh2-h2--final:not(#_){font-size:26px!important;line-height:1.25em!important;}
   .kh2-ctarow--c{flex-direction:row;flex-wrap:nowrap;justify-content:center;gap:10px;margin-top:16px;}
   .kh2-ctarow--c .kh2-btn,.kh2-ctarow--c .kh2-outline{
     min-width:0;width:auto;flex:0 1 auto;padding:9px 18px;font-size:14px!important;white-space:nowrap;

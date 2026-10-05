@@ -232,14 +232,21 @@ const CSS = `
 .kf{
   --kf-line:rgba(255,255,255,.14);
   background:#012F23;color:#E6F0EA;
-  font-family:'Inter','Avenir',system-ui,sans-serif;
+  font-family:'Work Sans','Avenir',system-ui,sans-serif;
+}
+/* globals.css targets the <p> element itself with
+   p{font-family:var(--font-body)!important} (Inter), which beats inheritance
+   from .kf however the class is written — so the face has to be declared on
+   the elements here, with the same :not(#_) guard globals.css uses. */
+.kf p,.kf p:not(#_),.kf li,.kf li:not(#_),.kf span,.kf span:not(#_){
+  font-family:'Work Sans','Avenir',system-ui,sans-serif!important;
 }
 /* Same 1180px column and 24px gutter as the page sections (.kh2-in), so the
    footer lines up with everything above it. Inside that, spacing and type are
    fluid (clamp against the viewport) rather than fixed, so the layout grows and
    shrinks with the window instead of holding still until a breakpoint snaps. */
 .kf-in{
-  max-width:1180px;margin:0 auto;
+  max-width:1090px;margin:0 auto;
   padding:clamp(40px,4.5vw,60px) 24px clamp(26px,2.6vw,36px);
 }
 
@@ -261,11 +268,11 @@ const CSS = `
   width:180px;height:180px;max-width:none;display:block;margin:-67px 0 0 -24px;
   filter:brightness(0) invert(1);
 }
-.kf-co{font-size:14px!important;font-weight:700!important;letter-spacing:0!important;color:#fff!important;margin:0 0 6px;}
-.kf-ad{font-size:13.5px!important;letter-spacing:0!important;color:#C9DCD1!important;margin:0 0 3px;line-height:1.5em!important;}
+.kf-co,.kf-co:not(#_){font-size:14.9px!important;font-weight:500!important;letter-spacing:0!important;color:#fff!important;margin:0 0 6px;}
+.kf-ad,.kf-ad:not(#_){font-size:14.9px!important;letter-spacing:0!important;color:#C9DCD1!important;margin:0 0 3px;line-height:1.5em!important;}
 .kf-contact{
   display:flex;align-items:center;gap:8px;margin-top:10px;text-decoration:none;
-  font-size:13.5px!important;letter-spacing:0!important;color:#E6F0EA!important;
+  font-size:14.9px!important;letter-spacing:0!important;color:#E6F0EA!important;
 }
 .kf-dot{
   display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;flex:none;
@@ -273,8 +280,8 @@ const CSS = `
 }
 .kf-dot.is-wa{background:#25D366;}
 
-.kf-h{
-  font-size:11px!important;font-weight:700!important;letter-spacing:.08em!important;
+.kf-h,.kf-h:not(#_){
+  font-size:12.3px!important;font-weight:400!important;letter-spacing:.08em!important;
   text-transform:uppercase;color:#8FBFA8!important;margin:0 0 14px;
 }
 .kf-list{list-style:none!important;margin:0;padding:0;}
@@ -282,12 +289,12 @@ const CSS = `
 /* 14.5px on a wide screen easing to 13px near the tablet switch, so the four
    columns keep their labels on one line for as long as there is room. */
 .kf-link{
-  text-decoration:none;font-size:clamp(13px,.45vw + 8.5px,14.5px)!important;letter-spacing:0!important;
+  text-decoration:none;font-size:clamp(13px,.55vw + 7.4px,14.9px)!important;letter-spacing:0!important;
   color:#E6F0EA!important;line-height:1.4em!important;
 }
 .kf-link:hover{color:#fff!important;text-decoration:underline;}
 /* The second row's links are set in caps in the artboard. */
-.kf-col.is-small .kf-link{font-size:clamp(11.5px,.35vw + 8px,12.5px)!important;letter-spacing:.02em!important;text-transform:uppercase;}
+.kf-col.is-small .kf-link{font-size:clamp(11.5px,.35vw + 8px,12px)!important;letter-spacing:.02em!important;text-transform:uppercase;}
 
 /* Photo card with the JOIN US pill; a tinted panel until we have the team shot. */
 .kf-join{display:flex;justify-content:flex-end;align-items:flex-start;}
@@ -310,9 +317,9 @@ const CSS = `
 .kf-bot{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;}
 .kf-bot-l{max-width:620px;}
 .kf-bot-r{display:flex;flex-direction:column;align-items:flex-end;gap:14px;}
-.kf-copy{font-size:12.5px!important;letter-spacing:0!important;color:#C9DCD1!important;margin:0 0 12px;}
-.kf-crisis{font-size:12.5px!important;line-height:1.7em!important;letter-spacing:0!important;color:#A9C4B6!important;margin:0 0 10px;}
-.kf-help{font-size:12.5px!important;letter-spacing:0!important;color:#A9C4B6!important;margin:0;}
+.kf-copy,.kf-copy:not(#_){font-size:14.7px!important;letter-spacing:0!important;color:#C9DCD1!important;margin:0 0 12px;}
+.kf-crisis,.kf-crisis:not(#_){font-size:12px!important;line-height:1.7em!important;letter-spacing:0!important;color:#A9C4B6!important;margin:0 0 10px;}
+.kf-help,.kf-help:not(#_){font-size:12px!important;letter-spacing:0!important;color:#A9C4B6!important;margin:0;}
 .kf-sitemap{
   text-decoration:none;font-size:12px!important;letter-spacing:.06em!important;
   text-transform:uppercase;color:#C9DCD1!important;

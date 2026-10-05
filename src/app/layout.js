@@ -118,6 +118,9 @@ export default async function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        {/* Home is set in Work Sans per the Sep-26 design; Inter stands in for
+            TT Interphases (licensed) on the nav, buttons and captions. */}
+        <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         {/* Preload logo for instant loading screen display */}
         <link rel="preload" as="image" href="/favicon-512.png" />
         {/* CRITICAL: Script to manage loader - runs only on client side to prevent hydration mismatch */}

@@ -68,8 +68,18 @@ const HOME_SECTIONS = [
     fields: [
       { k: 'eyebrow', label: 'Eyebrow' }, heading,
       { k: 'subtitle', label: 'Sub-heading', t: 'textarea', rows: 2 },
-      { k: 'cta', label: 'Button text' }, { k: 'caption', label: 'Caption' },
-      { k: 'steps', label: 'Steps', t: 'list', item: [{ k: 'n', label: 'Number', t: 'number' }, { k: 'title', label: 'Title' }] },
+      { k: 'cta', label: 'Button text' },
+      // Each step now carries its own caption (the artboard's three-card layout);
+      // the section-wide caption this used to expose is no longer rendered.
+      // `n` is the step's key and dot label, not shown on the card.
+      {
+        k: 'steps', label: 'Steps', t: 'list',
+        item: [
+          { k: 'n', label: 'Order (not shown on the card)', t: 'number' },
+          { k: 'title', label: 'Title' },
+          { k: 'caption', label: 'Caption under the card' },
+        ],
+      },
     ],
   },
   {

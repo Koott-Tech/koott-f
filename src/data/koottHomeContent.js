@@ -36,7 +36,7 @@ export const HERO = {
   ],
   titleTail: 'all with Koott',
   title: ['Feel less anxious', 'all with Koott'],
-  subtitle: 'Online Therapy with Malayali Psychologists, 24/7',
+  subtitle: 'Online Therapy with Malayali Psychologists, Anytime!',
   searchPlaceholder: "Type in what's on your mind.\nWe'll help you find the right therapist for you.",
   concernCta: 'Find therapist by concern',
   bookCta: 'Book a slot now',
@@ -86,12 +86,12 @@ export const HOW_IT_WORKS = {
   title: 'Koott is easy, simple & confidential',
   subtitle: 'At Koott, we believe feeling understood is where healing begins. Our experienced',
   cta: 'Find the Therapist',
-  caption: 'Choose what do you want to prioritize to get started.',
+  // The Sep-26 artboard reduces this to three steps, each with its own caption
+  // under the card instead of one shared line.
   steps: [
-    { n: 1, title: "Tell us what's important", chips: ['I am anxious', 'Issues in relationship', 'Struggling to sleep'] },
-    { n: 2, title: 'Explore your matches', match: { name: 'Dr. Thaniya K Leela', role: 'Consultant Psychologist' } },
-    { n: 3, title: 'Schedule your session', slot: 'Evenings After 4pm', days: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] },
-    { n: 4, title: 'Join your online session' },
+    { n: 1, title: 'Choose your therapist', avatars: true, caption: 'Browse and choose your psychologist' },
+    { n: 2, title: 'Book a session', slot: 'Evenings After 4pm', days: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], caption: 'Choose your slot & day' },
+    { n: 3, title: 'Start getting better', photos: true, caption: 'Start healing to a better life.' },
   ],
 };
 

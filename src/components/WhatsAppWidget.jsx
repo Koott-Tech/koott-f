@@ -111,6 +111,12 @@ export default function WhatsAppWidget() {
       <div
         className="fixed z-50 select-none whatsapp-widget-container"
         style={{
+          // The Tailwind `fixed z-50` classes do not reach this component in the
+          // built CSS, so the widget fell back to static and rendered at the end
+          // of the document instead of pinning to the viewport. Setting both
+          // here keeps it pinned whatever Tailwind does.
+          position: 'fixed',
+          zIndex: 50,
           right: `${RIGHT_OFFSET}px`,
           bottom: `${BOTTOM_OFFSET}px`,
           pointerEvents: 'auto'
