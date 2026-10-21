@@ -12,7 +12,7 @@ const ConditionalProviders = memo(({ children }) => {
   // Static pages that don't need heavy providers
   const staticPages = [
     '/',
-    '/about',
+    '/about-us',
     '/career',
     '/faq'
   ];

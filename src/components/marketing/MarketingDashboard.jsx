@@ -17,6 +17,7 @@ import {
   nf, N, compact, INR, INRfull, duration, ymd, addDays, fmtDay, WEEK, slotLabel, ELEMENT, Change, Tip, useWidth, Spark, AreaChart, BarList, Donut, Columns, SMALL, WorldMap, Section, Col, OpenReport,
 } from './ui';
 import { REPORTS, REPORT_CSS, ReportsList, ReportView } from './MarketingReports';
+import ContentPages, { CONTENT_CSS } from './ContentPages';
 import { COMPARISONS, compareLabel, istToday, presets, rangeLabel, resolve } from './dateRange';
 
 const API = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
@@ -477,15 +478,21 @@ export default function MarketingDashboard() {
   const envOptions = ['production', 'staging', 'development'].filter((e) => e === 'production' || envs[e] > 0);
   const reportName = page.startsWith('report:') ? page.slice(7) : null;
   const openReport = useCallback((name) => { setPage(`report:${name}`); window.scrollTo(0, 0); }, []);
-  const title = page === 'highlights' ? 'Analytics Highlights' : page === 'reports' ? 'All Reports' : 'Traffic Overview';
-  const sub = page === 'highlights' ? 'Get a complete overview of your site’s activity across all areas.' : page === 'reports' ? 'Dig into the details of your site’s traffic, visitors and content.' : 'Track your site’s traffic trends and get to know your visitors.';
+  const title = page === 'highlights' ? 'Analytics Highlights'
+    : page === 'reports' ? 'All Reports'
+    : page === 'pages' ? 'Edit Pages'
+    : 'Traffic Overview';
+  const sub = page === 'highlights' ? 'Get a complete overview of your site’s activity across all areas.'
+    : page === 'reports' ? 'Dig into the details of your site’s traffic, visitors and content.'
+    : page === 'pages' ? 'Edit the text and search settings for each page of the website.'
+    : 'Track your site’s traffic trends and get to know your visitors.';
   const show = data && data.page === page;
   const isReports = page === 'reports' || !!reportName;
   const rangeSelect = <DateRange sel={sel} dates={dates} today={today} onChange={setSel} />;
 
   return (
     <div className="wx">
-      <style dangerouslySetInnerHTML={{ __html: MARKETING_CSS + REPORT_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: MARKETING_CSS + REPORT_CSS + CONTENT_CSS }} />
       <aside className="wx-side">
         <div className="wx-brand"><span className="wx-mk">K</span><div><b>Koott</b><small>Insights</small></div></div>
         <div className="wx-navgrp">Analytics</div>
@@ -495,6 +502,10 @@ export default function MarketingDashboard() {
           <button type="button" onClick={() => setLiveOpen(true)}>Live feed</button>
           <button type="button" aria-current={page === 'traffic' ? 'page' : undefined} onClick={() => setPage('traffic')}>Traffic</button>
           <button type="button" aria-current={isReports ? 'page' : undefined} onClick={() => setPage('reports')}>Reports</button>
+        </nav>
+        <div className="wx-navgrp">Content</div>
+        <nav aria-label="Content">
+          <button type="button" aria-current={page === 'pages' ? 'page' : undefined} onClick={() => setPage('pages')}>Edit Pages</button>
         </nav>
         <div className="wx-who"><b>{user?.name || user?.email}</b><small>{user?.role}</small><button type="button" onClick={() => { logout(); window.location.href = '/marketing/login'; }}>Sign out</button></div>
       </aside>
@@ -513,14 +524,15 @@ export default function MarketingDashboard() {
             </label>
           )}
         </div>}
-        {!isReports && <div className="wx-range">
+        {!isReports && page !== 'pages' && <div className="wx-range">
           {rangeSelect}
           <span>{compareLabel(dates)}</span>
           {loading && <span className="wx-muted">Updating…</span>}
         </div>}
-        {env !== 'production' && <div className="wx-banner">Showing <b>{env}</b> data (test traffic), not the live site.</div>}
+        {env !== 'production' && page !== 'pages' && <div className="wx-banner">Showing <b>{env}</b> data (test traffic), not the live site.</div>}
 
-        {notReady ? (
+        {page === 'pages' ? <ContentPages />
+          : notReady ? (
           <div className="wx-card"><b>Almost there</b><p>{notReady}</p></div>
         ) : error ? (
           <div className="wx-card"><b>Couldn’t load this report</b><p>{error}</p></div>

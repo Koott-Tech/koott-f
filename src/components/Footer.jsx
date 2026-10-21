@@ -278,22 +278,22 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
                 }}>
                     <div className="text-center max-w-4xl mx-auto px-4">
                         <h4 className="footer-heading mb-2 font-semibold">
-                            {pathname === '/about' 
+                            {pathname === '/about-us' 
                                 ? " We're  here to listen, guide, and support." 
                                 : "Confused where\nto start?"}
                         </h4>
                         <p className="footer-description text-sm md:text-base text-gray-700 mb-8">
-                            {pathname === '/about'
+                            {pathname === '/about-us'
                                 ? 'Care doesn’t end here.'
                                 : 'Book a free 20 minutes session with our child psychologist.'}
                         </p>
                         <div className="flex items-center justify-center gap-3">
                             <a
-                                href={pathname === '/about' ? "/#choose-your-guide" : "https://wa.me/919539007766?text=Hi%20MyKoott%2C%20I%27d%20like%20to%20know%20more%20about%20your%20services."}
+                                href={pathname === '/about-us' ? "/#choose-your-guide" : "https://wa.me/919539007766?text=Hi%20MyKoott%2C%20I%27d%20like%20to%20know%20more%20about%20your%20services."}
                                 className="px-4 py-2 md:px-6 md:py-2.5 rounded-3xl text-sm md:text-base font-semibold transition-all duration-200"
                                 style={{ backgroundColor: 'transparent', color: '#025545', boxShadow: 'inset 0 0 0 2px #025545' }}
                                 onClick={(e) => {
-                                    if (pathname === '/about') {
+                                    if (pathname === '/about-us') {
                                         e.preventDefault();
                                         window.location.href = '/#choose-your-guide';
                                     }
@@ -301,7 +301,7 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
                                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#025545'; e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.boxShadow = 'inset 0 0 0 2px #025545'; }}
                                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#025545'; e.currentTarget.style.boxShadow = 'inset 0 0 0 2px #025545'; }}
                             >
-                                {pathname === '/about' ? 'Start Your Care' : 'WhatsApp Us'}
+                                {pathname === '/about-us' ? 'Start Your Care' : 'WhatsApp Us'}
                             </a>
                             <button 
                                 className="text-white px-5 py-2 md:px-7 md:py-2.5 rounded-3xl text-sm md:text-base font-semibold transition-all duration-200 shadow-sm" 
@@ -310,7 +310,7 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
                                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#025545'}
                                 onClick={() => router.push('/online-child-psychologist')}
                             >
-                                {pathname === '/about' ? 'Join Our Team' : 'Book  Now'}
+                                {pathname === '/about-us' ? 'Join Our Team' : 'Book  Now'}
                             </button>
                         </div>
                     </div>
@@ -553,7 +553,7 @@ export default function Footer({ isHomePage = false, isCmsPage = false, isTherap
                             </button>
                             <h2 className="footer-main-menu-item hidden md:block text-white mb-8 text-left" suppressHydrationWarning>About Us</h2>
                             <ul className={`space-y-1 text-base leading-relaxed text-left ${openSections.about ? 'block' : 'hidden md:block'}`}>
-                                <li className="text-left"><a href="/about" className="text-white hover:text-green-200 transition-colors duration-200 font-medium text-left block"><h2 className="footer-individual-menu-item">Company</h2></a></li>
+                                <li className="text-left"><a href="/about-us" className="text-white hover:text-green-200 transition-colors duration-200 font-medium text-left block"><h2 className="footer-individual-menu-item">Company</h2></a></li>
                                 <li className="text-left"><a href="/career" className="text-white hover:text-green-200 transition-colors duration-200 font-medium text-left block"><h2 className="footer-individual-menu-item">Career</h2></a></li>
                                 <li className="text-left"><a href="/faq" className="text-white hover:text-green-200 transition-colors duration-200 font-medium text-left block"><h2 className="footer-individual-menu-item">FAQ</h2></a></li>
                                 <li className="text-left"><a href="/blog" className="text-white hover:text-green-200 transition-colors duration-200 font-medium text-left block"><h2 className="footer-individual-menu-item">Blog</h2></a></li>

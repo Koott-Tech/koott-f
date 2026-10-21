@@ -82,6 +82,22 @@ const SparkleTrio = () => (
  * One of the two working filters over the therapist list — the shared custom
  * dropdown, with the empty option ("Speciality" / "Need") as "show all".
  */
+/* The artboard draws a different outline glyph beside each quick filter. */
+const QuickIcon = ({ name }) => {
+  const d = {
+    chat: 'M21 11.5a8.4 8.4 0 0 1-9 8.4L3 21l1.1-3.3A8.4 8.4 0 1 1 21 11.5z',
+    check: 'M9 11.5l2 2 4-4M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z',
+    heart: 'M20.8 6.6a5 5 0 0 0-7.1 0L12 8.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 22l8.8-8.3a5 5 0 0 0 0-7.1z',
+    pill: 'M10.5 20.5a5 5 0 0 1-7-7l6-6a5 5 0 0 1 7 7zM8 11l5 5',
+  }[name] || '';
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d={d} />
+    </svg>
+  );
+};
+
 const FilterSelect = ({ label, value, options, onChange, format }) => (
   <CustomSelect
     className="kh2-filter"
@@ -377,6 +393,8 @@ export default function KoottHome({ content } = {}) {
   const [deck, setDeck] = useState({ cur: 0, out: null });
   const [speciality, setSpeciality] = useState('');
   const [need, setNeed] = useState('');
+  // Name search, as the artboard's first control.
+  const [query, setQuery] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
   // The panel edits a draft; nothing reaches the list until Apply is pressed.
   const [draft, setDraft] = useState(EMPTY_FILTERS);
@@ -497,6 +515,8 @@ export default function KoottHome({ content } = {}) {
   // The design shows a row of three.
   const priceOf = (t) => Number(t.individual_session_price || t.price || 0);
   const matches = useMemo(() => pool.filter((t) => {
+    const q = query.trim().toLowerCase();
+    if (q && !String(t.name || t.full_name || '').toLowerCase().includes(q)) return false;
     if (speciality && roleOf(t) !== speciality) return false;
     if (need && !needsOf(t).includes(need)) return false;
     if (applied.concerns.length && !needsOf(t).some((n) => applied.concerns.includes(n))) return false;
@@ -505,13 +525,13 @@ export default function KoottHome({ content } = {}) {
     // A card with no price recorded is not excluded by a budget filter.
     if (applied.maxPrice && priceOf(t) && priceOf(t) > applied.maxPrice) return false;
     return true;
-  }), [pool, speciality, need, applied]);
+  }), [pool, query, speciality, need, applied]);
 
-  const activeCount = (speciality ? 1 : 0) + (need ? 1 : 0)
+  const activeCount = (query.trim() ? 1 : 0) + (speciality ? 1 : 0) + (need ? 1 : 0)
     + applied.concerns.length + applied.roles.length
     + (applied.minExp ? 1 : 0) + (applied.maxPrice ? 1 : 0);
   const clearAll = () => {
-    setSpeciality(''); setNeed('');
+    setQuery(''); setSpeciality(''); setNeed('');
     setDraft(EMPTY_FILTERS); setApplied(EMPTY_FILTERS);
   };
   // Escape closes the sheet, as a dialog should.
@@ -668,14 +688,44 @@ export default function KoottHome({ content } = {}) {
           <p className="kh2-sub kh2-center">{THERAPISTS_SECTION.subtitle}</p>
 
           <div className="kh2-filters">
-            <FilterSelect
-              label={THERAPISTS_SECTION.filters[0]}
-              value={speciality} options={specialityOptions} onChange={(v) => { setSpeciality(v); if (v) track('filter_applied', { filter: 'speciality', value: String(v) }); }}
-            />
-            <FilterSelect
-              label={THERAPISTS_SECTION.filters[1]}
-              value={need} options={needOptions} onChange={(v) => { setNeed(v); if (v) track('filter_applied', { filter: 'need', value: String(v) }); }}
-            />
+            {/* Artboard: a name search, then one-tap chips, then an icon-only
+                button for the full filter sheet. The two dropdowns it replaces
+                are still reachable inside that sheet, so nothing is lost. */}
+            <label className="kh2-fsearch">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="1.8" strokeLinecap="round" aria-hidden>
+                <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.2-3.2" />
+              </svg>
+              <input
+                type="search"
+                className="ph-no-capture"
+                value={query}
+                placeholder={THERAPISTS_SECTION.searchPlaceholder}
+                aria-label={THERAPISTS_SECTION.searchPlaceholder}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+
+            {(THERAPISTS_SECTION.quickFilters || []).map((f) => {
+              const on = f.kind === 'need' ? need === f.label : speciality === f.label;
+              const toggle = () => {
+                const next = on ? '' : f.label;
+                if (f.kind === 'need') setNeed(next); else setSpeciality(next);
+                if (next) track('filter_applied', { filter: f.kind, value: f.label });
+              };
+              return (
+                <button
+                  key={f.label} type="button"
+                  className={`kh2-quick${on ? ' is-on' : ''}`}
+                  aria-pressed={on}
+                  onClick={toggle}
+                >
+                  <span className="kh2-quick-i"><QuickIcon name={f.icon} /></span>
+                  {f.label}
+                </button>
+              );
+            })}
+
             {activeCount > 0 && (
               <button type="button" className="kh2-filter-clear" onClick={clearAll}>Clear</button>
             )}
@@ -691,7 +741,7 @@ export default function KoottHome({ content } = {}) {
                   strokeWidth="1.8" strokeLinecap="round" aria-hidden>
                   <path d="M4 7h16M7 12h10M10 17h4" />
                 </svg>
-                Filters
+                <span className="kh2-sr">All filters</span>
                 {activeCount > 0 && <span className="kh2-filter-count">{activeCount}</span>}
               </button>
 
@@ -1470,7 +1520,36 @@ const CSS = `
 }
 
 /* ---- therapist cards ---- */
-.kh2-filters{display:flex;gap:14px;align-items:center;margin:16px 0 16px;flex-wrap:wrap;}
+.kh2-filters{display:flex;gap:6px;align-items:center;margin:16px 0 16px;flex-wrap:wrap;}
+/* Measured off the artboard at 1366: the row is 38px tall, the chips sit 6px
+   apart, and the search field is held 22px clear of the first chip. Labels are
+   13px semibold with a 14px green glyph. */
+.kh2-fsearch{
+  display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;
+  background:#F2F4F3;border-radius:9px;color:#8A8A8A;
+  flex:0 0 201px;max-width:100%;margin-right:16px;
+}
+.kh2-fsearch svg{width:15px;height:15px;flex:none;}
+.kh2-fsearch input{
+  border:0;background:none;outline:none;width:100%;min-width:0;
+  font-family:var(--ui)!important;font-size:13px!important;color:var(--ink);
+}
+.kh2-fsearch input::placeholder{color:#8A8A8A;}
+.kh2-fsearch input::-webkit-search-cancel-button{cursor:pointer;}
+.kh2-quick{
+  display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 10px;
+  background:#fff;border:1px solid var(--line);border-radius:9px;cursor:pointer;
+  font-family:var(--ui)!important;font-size:13px!important;font-weight:600!important;
+  letter-spacing:-.1px!important;color:var(--ink);white-space:nowrap;
+  transition:border-color .18s ease,background .18s ease;
+}
+.kh2-quick-i{display:inline-flex;color:var(--green);}
+.kh2-quick-i svg{width:14px;height:14px;}
+.kh2-quick:hover{border-color:var(--green);}
+.kh2-quick.is-on{border-color:var(--green);background:#F2FBF5;}
+.kh2-quick.is-on .kh2-quick-i{color:var(--green-d);}
+/* Reachable by keyboard and screen readers, invisible on screen. */
+.kh2-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
 .kh2-filter{
   display:inline-flex;align-items:center;justify-content:space-between;gap:26px;min-width:210px;
   /* Same 12px radius as the therapist cards, and shallower than the default
@@ -1487,6 +1566,7 @@ const CSS = `
    sheet offers is built from the therapist data, so no control here is
    decorative — a chip exists only if some therapist carries that value. */
 .kh2-filter-anchor{position:relative;margin-left:auto;}
+.kh2-filter-icon{width:40px;height:38px;padding:0;justify-content:center;border-radius:9px;}
 .kh2-filter-icon{
   display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
   border-radius:12px;min-height:37px;padding:0 16px;cursor:pointer;color:var(--body);

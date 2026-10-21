@@ -78,6 +78,18 @@ export const THERAPISTS_SECTION = {
   title: "Kerala's best Malayali counsellors and therapists are your Koott now.",
   subtitle: 'Licensed, experienced, and culturally sensitive. Book them instantly',
   filters: ['Speciality', 'Needs'],
+  // The Sep-26 artboard replaces the two dropdowns with a name search and a row
+  // of one-tap filters. `kind` says which filter a chip drives: 'role' matches
+  // the therapist's title, 'need' matches what they work with — the artboard
+  // mixes both in one row ("Sexual Health" is a concern, the rest are roles).
+  // `icon` names one of the glyphs drawn in KoottHome's QuickIcon.
+  searchPlaceholder: 'Search by therapist name',
+  quickFilters: [
+    { label: 'Consultant Psychologist', kind: 'role', icon: 'chat' },
+    { label: 'Clinical Psychologist', kind: 'role', icon: 'check' },
+    { label: 'Sexual Health', kind: 'need', icon: 'heart' },
+    { label: 'Psychiatrist', kind: 'role', icon: 'pill' },
+  ],
   moreLabel: 'more.',
 };
 

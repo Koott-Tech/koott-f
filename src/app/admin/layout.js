@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebarContext } from '@/contexts/AdminSidebarContext';
 import Image from 'next/image';
@@ -38,9 +38,33 @@ export default function AdminLayout({ children }) {
     return false; // SSR default
   });
   const [isCmsMenuOpen, setIsCmsMenuOpen] = useState(false);
+
   const { user, isAuthenticated, hasRole, isLoading: authLoading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  // The CMS editors are two-panel already (the form on the left, a live preview
+  // of the real page on the right), so the admin side menu is folded away when
+  // one opens and put back on the way out. The toggle in the top bar still
+  // works inside an editor, and a choice made there is left alone until the
+  // next editor is opened.
+  const isCmsEditor = useMemo(() => {
+    const path = pathname || '';
+    return /^\/admin\/site-pages\/[^/]+$/.test(path)
+      || /^\/admin\/(counselling|blogs|careers|events-cms)\/(create|[^/]+\/edit)$/.test(path);
+  }, [pathname]);
+
+  const sidebarBeforeEditor = useRef(null);
+  useEffect(() => {
+    if (isCmsEditor) {
+      if (sidebarBeforeEditor.current === null) sidebarBeforeEditor.current = isSidebarOpen;
+      setIsSidebarOpen(false);
+    } else if (sidebarBeforeEditor.current !== null) {
+      setIsSidebarOpen(sidebarBeforeEditor.current);
+      sidebarBeforeEditor.current = null;
+    }
+    // Only on entering or leaving an editor, so a manual toggle inside one stands.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCmsEditor]);
 
   useEffect(() => {
     if (!authLoading) {

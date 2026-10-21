@@ -30,6 +30,15 @@ import { DEFAULT_FOOTER } from '@/data/footerConfig';
 const API = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
 const clone = (v) => JSON.parse(JSON.stringify(v));
+
+// Plain words for what a revision was, since the people reading this are not
+// developers.
+const KIND_LABEL = {
+  publish: 'Published',
+  seo: 'SEO settings changed',
+  restore: 'Restored an earlier version',
+  draft_discarded: 'Draft discarded',
+};
 const cta = (k, label) => ({ k, label, t: 'cta' });
 const heading = { k: 'title', label: 'Heading' };
 const qa = [{ k: 'q', label: 'Question' }, { k: 'a', label: 'Answer', t: 'textarea', rows: 4 }];
@@ -275,6 +284,10 @@ export default function SitePageEditor({ pageId, onBack }) {
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [msg, setMsg] = useState(null); // { ok: boolean, text }
+  // Draft state: a save writes a draft, and only Publish changes the live page.
+  const [draftInfo, setDraftInfo] = useState({ hasDraft: false, draftUpdatedBy: null, publishedAt: null });
+  const [history, setHistory] = useState(null); // null = panel closed
+  const [busy, setBusy] = useState('');
 
   useEffect(() => {
     if (!page) return undefined;
@@ -282,9 +295,18 @@ export default function SitePageEditor({ pageId, onBack }) {
     (async () => {
       let stored = null;
       try {
-        const res = await fetch(`${API}/site-config/${page.key}`, { cache: 'no-store' });
+        // The CMS endpoint returns both; an unpublished draft is what the editor
+        // should open, so the work in progress is not silently lost.
+        const res = await fetch(`${API}/pages/${page.key}/content`, {
+          cache: 'no-store',
+          headers: { Authorization: `Bearer ${getStoredToken() || ''}` },
+        });
         const json = res.ok ? await res.json() : null;
-        stored = (json?.data ?? json)?.data ?? null;
+        const d = json?.data ?? null;
+        stored = d?.draft ?? d?.published ?? null;
+        if (!off && d) {
+          setDraftInfo({ hasDraft: !!d.hasDraft, draftUpdatedBy: d.draftUpdatedBy, publishedAt: d.publishedAt });
+        }
       } catch (_) { /* start from the built-in copy */ }
       if (!off) setContent(clone(mergeSiteContent(page.defaults, stored)));
     })();
@@ -296,22 +318,90 @@ export default function SitePageEditor({ pageId, onBack }) {
   const update = (key, value) => { setContent((c) => ({ ...c, [key]: value })); setDirty(true); setMsg(null); };
   const resetSection = (key) => update(key, clone(page.defaults[key]));
 
+  const call = async (path, { method = 'POST', body } = {}) => {
+    const res = await fetch(`${API}/pages/${page.key}${path}`, {
+      method,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getStoredToken() || ''}` },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json?.success === false) throw new Error(json?.message || `Request failed (${res.status})`);
+    return json?.data ?? json;
+  };
+
+  /** Save a draft. The live page is deliberately untouched. */
   const save = async () => {
     setSaving(true); setMsg(null);
     try {
-      const res = await fetch(`${API}/site-config/${page.key}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getStoredToken() || ''}` },
-        body: JSON.stringify({ data: tidy(content) }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || json?.success === false) throw new Error(json?.message || `Save failed (${res.status})`);
+      await call('/content', { method: 'PUT', body: { data: tidy(content) } });
       setDirty(false);
-      setMsg({ ok: true, text: 'Saved — the live page now shows this version.' });
+      setDraftInfo((d) => ({ ...d, hasDraft: true }));
+      setMsg({ ok: true, text: 'Draft saved. The live page still shows the published version — press Publish when you are ready.' });
     } catch (e) {
       setMsg({ ok: false, text: e.message || 'Save failed' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  /** Make the current content live. Confirmed, because it is public immediately. */
+  const publish = async () => {
+    if (!window.confirm('Publish this version? The live website will show it straight away.')) return;
+    setBusy('publish'); setMsg(null);
+    try {
+      await call('/publish', { body: { data: tidy(content) } });
+      setDirty(false);
+      setDraftInfo({ hasDraft: false, draftUpdatedBy: null, publishedAt: new Date().toISOString() });
+      setMsg({ ok: true, text: 'Published — the live page now shows this version.' });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || 'Publish failed' });
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const discard = async () => {
+    if (!window.confirm('Discard the unpublished draft and go back to the live version?')) return;
+    setBusy('discard'); setMsg(null);
+    try {
+      await call('/discard-draft');
+      const d = await call('/content', { method: 'GET' });
+      setContent(clone(mergeSiteContent(page.defaults, d?.published ?? null)));
+      setDirty(false);
+      setDraftInfo({ hasDraft: false, draftUpdatedBy: null, publishedAt: d?.publishedAt ?? null });
+      setMsg({ ok: true, text: 'Draft discarded. You are back to the published version.' });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || 'Could not discard the draft' });
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const openHistory = async () => {
+    setHistory({ loading: true, rows: [], error: null });
+    try {
+      const d = await call('/versions', { method: 'GET' });
+      setHistory({ loading: false, rows: d?.versions || [], error: null });
+    } catch (e) {
+      setHistory({ loading: false, rows: [], error: e.message });
+    }
+  };
+
+  const restore = async (id) => {
+    if (!window.confirm('Restore this version? It comes back as a draft so you can review it before publishing.')) return;
+    setBusy('restore'); setMsg(null);
+    try {
+      await call(`/restore/${id}`);
+      const d = await call('/content', { method: 'GET' });
+      setContent(clone(mergeSiteContent(page.defaults, d?.draft ?? d?.published ?? null)));
+      setDraftInfo((x) => ({ ...x, hasDraft: true }));
+      setHistory(null);
+      setDirty(false);
+      setMsg({ ok: true, text: 'Restored as a draft. Review it, then press Publish to make it live.' });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || 'Restore failed' });
+    } finally {
+      setBusy('');
     }
   };
 
@@ -333,11 +423,57 @@ export default function SitePageEditor({ pageId, onBack }) {
         </div>
         <div className="spe-bar-r">
           {dirty && <span className="spe-dirty">Unsaved changes</span>}
-          <button type="button" className="spe-btn" onClick={save} disabled={saving || !content}>
-            {saving ? 'Saving…' : 'Save'}
+          {!dirty && draftInfo.hasDraft && <span className="spe-draft">Unpublished draft</span>}
+          <button type="button" className="spe-btn is-ghost" onClick={openHistory}>History</button>
+          {draftInfo.hasDraft && (
+            <button type="button" className="spe-btn is-ghost" onClick={discard} disabled={!!busy}>
+              {busy === 'discard' ? 'Discarding…' : 'Discard draft'}
+            </button>
+          )}
+          <button type="button" className="spe-btn is-ghost" onClick={save} disabled={saving || !content}>
+            {saving ? 'Saving…' : 'Save draft'}
+          </button>
+          <button type="button" className="spe-btn" onClick={publish} disabled={!!busy || !content}>
+            {busy === 'publish' ? 'Publishing…' : 'Publish'}
           </button>
         </div>
       </header>
+
+      {history && (
+        <div className="spe-hist" role="dialog" aria-label="Version history">
+          <div className="spe-hist-box">
+            <div className="spe-hist-head">
+              <b>Version history</b>
+              <button type="button" className="spe-x" aria-label="Close" onClick={() => setHistory(null)}>×</button>
+            </div>
+            {history.loading ? <p className="spe-loading">Loading…</p>
+              : history.error ? <p className="spe-msg is-err">{history.error}</p>
+                : history.rows.length === 0
+                  ? <p className="spe-hist-empty">No earlier versions yet. One is kept every time you publish, restore or discard a draft.</p>
+                  : (
+                    <ul className="spe-hist-list">
+                      {history.rows.map((v) => (
+                        <li key={v.id}>
+                          <div>
+                            <b>{KIND_LABEL[v.kind] || v.kind}</b>
+                            <small>
+                              {new Date(v.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                              {v.user_email ? ` · ${v.user_email}` : ''}
+                            </small>
+                            {v.note && <small>{v.note}</small>}
+                          </div>
+                          {v.kind !== 'restore' && (
+                            <button type="button" className="spe-btn is-ghost" onClick={() => restore(v.id)} disabled={!!busy}>
+                              Restore
+                            </button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+          </div>
+        </div>
+      )}
 
       {msg && <p className={`spe-msg ${msg.ok ? 'is-ok' : 'is-err'}`}>{msg.text}</p>}
 
@@ -381,6 +517,17 @@ const CSS = `
 .spe-bar-s a{color:#189E4F!important;}
 .spe-bar-r{display:flex;align-items:center;gap:12px;}
 .spe-dirty{font-size:12px;color:#B45309;}
+.spe-draft{font-size:12px;color:#1D4ED8;background:#EFF4FF;border-radius:12px;padding:3px 10px;}
+.spe-hist{position:fixed;inset:0;z-index:60;background:rgba(10,20,16,.42);display:flex;align-items:flex-start;justify-content:center;padding:60px 20px;}
+.spe-hist-box{background:#fff;border-radius:12px;width:min(560px,100%);max-height:70vh;overflow:auto;box-shadow:0 18px 50px rgba(0,0,0,.22);}
+.spe-hist-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #E7EDE9;position:sticky;top:0;background:#fff;}
+.spe-x{background:none;border:0;font-size:22px;line-height:1;cursor:pointer;color:#6B7280;}
+.spe-hist-empty{padding:18px;color:#6B7280;font-size:13px;margin:0;}
+.spe-hist-list{list-style:none;margin:0;padding:0;}
+.spe-hist-list li{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;border-bottom:1px solid #F1F5F2;}
+.spe-hist-list li:last-child{border-bottom:0;}
+.spe-hist-list b{display:block;font-size:13px;color:#111;font-weight:600;}
+.spe-hist-list small{display:block;font-size:11.5px;color:#6B7280;margin-top:2px;}
 .spe-btn{background:#189E4F;color:#fff;border:0;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;}
 .spe-btn:disabled{opacity:.6;cursor:default;}
 .spe-btn.is-ghost{background:#fff;color:#111;border:1px solid #E2E8E4;}

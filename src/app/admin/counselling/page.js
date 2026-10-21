@@ -154,6 +154,7 @@ export default function CounsellingAdminPage() {
           stored in site-config and merged over each page's built-in copy. */}
       <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
         <p className="text-sm font-semibold text-gray-900 mb-3">Site pages</p>
+        <p className="text-xs text-gray-500 mb-3">Edited in the Marketing dashboard, where their content and SEO settings sit together.</p>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
             ['home', 'Home', '/'],
@@ -164,7 +165,7 @@ export default function CounsellingAdminPage() {
           ].map(([key, label, where]) => (
             <button
               key={key}
-              onClick={() => router.push(`/admin/site-pages/${key}`)}
+              onClick={() => router.push('/marketing')}
               className="text-left border border-gray-200 rounded-lg px-4 py-3 hover:border-[#189e4f] hover:bg-[#F5FBF3] transition-colors"
             >
               <span className="block text-sm font-medium text-gray-900">{label}</span>

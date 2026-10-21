@@ -89,6 +89,14 @@ const nextConfig = {
   // Redirect old URLs to canonical psychologist listing
   async redirects() {
     return [
+      // /about was a second route rendering the same AboutPage. koott.in
+      // serves /about-us (and 404s on /about), so that is the indexed URL;
+      // this keeps any internal or external /about link working.
+      {
+        source: '/about',
+        destination: '/about-us',
+        permanent: true,
+      },
       {
         source: '/online-child-psycologist/:path*',
         destination: '/online-child-psychologist/:path*',

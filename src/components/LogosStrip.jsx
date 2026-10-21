@@ -95,7 +95,7 @@ export default function LogosStrip({ bgColor = "bg-white", height = "py-8", logo
               
               {/* About us text - under logos on mobile/tablet, to the right on laptop */}
               <div className="mt-2 lg:mt-0 lg:ml-8 w-full lg:w-auto flex justify-center lg:justify-start">
-                <a href="/about" className={`text-sm font-medium ${textColor} leading-[1.5] hover:opacity-80 transition-opacity`}>About us →</a>
+                <a href="/about-us" className={`text-sm font-medium ${textColor} leading-[1.5] hover:opacity-80 transition-opacity`}>About us →</a>
               </div>
          </div>
       </div>

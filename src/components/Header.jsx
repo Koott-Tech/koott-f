@@ -364,11 +364,11 @@ export default function Header() {
   };
 
   const handleAboutClick = () => {
-    router.push('/about');
+    router.push('/about-us');
   };
 
   const handleCompanyClick = () => {
-    router.push('/about');
+    router.push('/about-us');
     setIsAboutOpen(false);
   };
 
