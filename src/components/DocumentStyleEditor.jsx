@@ -122,7 +122,9 @@ const DocumentStyleEditor = forwardRef(function DocumentStyleEditor({
         el.setAttribute('data-draggable-image', 'true');
         // Normalize legacy inline sizing; body images match public post (narrower than full column).
         el.style.setProperty('display', 'block', 'important');
-        el.style.setProperty('width', '100%', 'important');
+        // A resized image records its width on the element, so reopening the
+        // post keeps the size rather than snapping everything back to full.
+        el.style.setProperty('width', el.dataset.width || '100%', 'important');
         el.style.setProperty('max-width', BLOG_BODY_IMAGE_MAX_WIDTH, 'important');
         el.style.setProperty('margin-left', 'auto', 'important');
         el.style.setProperty('margin-right', 'auto', 'important');
@@ -155,6 +157,9 @@ const DocumentStyleEditor = forwardRef(function DocumentStyleEditor({
           handle.setAttribute('contenteditable', 'false');
           handle.textContent = '⋮⋮ Drag to move';
           el.appendChild(handle);
+        }
+        if (!el.querySelector('.doc-editor-img-resize')) {
+          el.appendChild(createResizeGrip());
         }
       });
     }
@@ -957,6 +962,62 @@ const DocumentStyleEditor = forwardRef(function DocumentStyleEditor({
     }
   }, [handleInput]);
 
+  /**
+   * The corner grip an image is resized by. Not draggable, or the drag-to-move
+   * handler would claim the gesture before the resize could start.
+   */
+  const createResizeGrip = () => {
+    const grip = document.createElement('div');
+    grip.className = 'doc-editor-img-resize';
+    grip.setAttribute('contenteditable', 'false');
+    grip.setAttribute('draggable', 'false');
+    grip.setAttribute('role', 'separator');
+    grip.setAttribute('aria-label', 'Resize image');
+    grip.title = 'Drag to resize';
+    return grip;
+  };
+
+  /**
+   * Resize by dragging the corner grip.
+   *
+   * Width is kept as a percentage of the column rather than pixels, so an image
+   * sized on a wide screen stays proportional on a narrow one, and the stored
+   * HTML renders the same on the published post. It is written to both an
+   * inline width and data-width: the inline style does the work, and the
+   * attribute survives the normalization pass that runs when the post reopens.
+   */
+  const handleResizeStart = useCallback((e) => {
+    const grip = e.target.closest?.('.doc-editor-img-resize');
+    const block = grip?.closest?.(IMAGE_BLOCK_SELECTOR);
+    if (!grip || !block) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const track = block.parentElement?.getBoundingClientRect().width
+      || block.getBoundingClientRect().width;
+    const startX = e.clientX;
+    const startWidth = block.getBoundingClientRect().width;
+    block.classList.add('doc-editor-img-resizing');
+
+    const onMove = (ev) => {
+      const next = startWidth + (ev.clientX - startX);
+      // Floor at a fifth of the column: narrower than that and the grip is
+      // harder to grab than the image is to see.
+      const pct = Math.max(20, Math.min(100, Math.round((next / track) * 100)));
+      block.dataset.width = `${pct}%`;
+      block.style.setProperty('width', `${pct}%`, 'important');
+    };
+    const onUp = () => {
+      block.classList.remove('doc-editor-img-resizing');
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      handleInput();
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }, [handleInput]);
+
   // Create a simple image block: overlay + handle both draggable so image area shows grab and is grabbable.
   const createImageBlock = useCallback((imageUrl) => {
     const div = document.createElement('div');
@@ -986,6 +1047,7 @@ const DocumentStyleEditor = forwardRef(function DocumentStyleEditor({
     handle.setAttribute('contenteditable', 'false');
     handle.textContent = '⋮⋮ Drag to move';
     div.appendChild(handle);
+    div.appendChild(createResizeGrip());
     return div;
   }, []);
 
@@ -1112,20 +1174,41 @@ const DocumentStyleEditor = forwardRef(function DocumentStyleEditor({
     }
 
     skipContentSyncRef.current = true;
+
+    // The marker only exists to survive the file dialog, and tearing it down
+    // has to wait for the dialog's outcome.
+    //
+    // Picking a file refocuses the window, and `focus` fires *before* the
+    // input's `change`. Cleaning up on focus alone therefore removed the marker
+    // moments before the upload needed it, and the image landed at the end of
+    // the document instead of at the cursor — which is the bug this guards.
+    // So focus only schedules the cleanup, and a file arriving cancels it.
+    let picked = false;
+    let graceTimer = null;
     const cancelCleanup = () => {
       const m = insertionMarkerRef.current;
       if (m?.parentNode) m.remove();
       insertionMarkerRef.current = null;
       skipContentSyncRef.current = false;
     };
-    const cancelTimer = setTimeout(() => window.addEventListener('focus', cancelCleanup, { once: true }), 300);
+    const onWindowFocus = () => {
+      // Long enough for `change` to arrive when a file was chosen; when the
+      // dialog was dismissed nothing arrives and the marker goes.
+      graceTimer = setTimeout(() => { if (!picked) cancelCleanup(); }, 1000);
+    };
+    const stopWatching = () => {
+      window.clearTimeout(graceTimer);
+      window.removeEventListener('focus', onWindowFocus);
+    };
+    const armTimer = setTimeout(() => window.addEventListener('focus', onWindowFocus), 300);
 
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = async (e) => {
-      window.clearTimeout(cancelTimer);
-      window.removeEventListener('focus', cancelCleanup);
+      picked = true;
+      window.clearTimeout(armTimer);
+      stopWatching();
       const file = e.target.files?.[0];
       if (!file) { cancelCleanup(); return; }
       try {
@@ -1136,7 +1219,10 @@ const DocumentStyleEditor = forwardRef(function DocumentStyleEditor({
           || (result?.data?.uploadedImages?.[0] && (result.data.uploadedImages[0].imageUrl || result.data.uploadedImages[0].url));
         if (result?.success && imageUrl) {
           const block = createImageBlock(imageUrl);
-          const marker = editorEl.querySelector('[data-insertion-marker]');
+          // Prefer the marker still in the document; fall back to the one we
+          // kept a handle on, in case a re-render swapped the node out.
+          const marker = editorEl.querySelector('[data-insertion-marker]')
+            || (insertionMarkerRef.current?.parentNode ? insertionMarkerRef.current : null);
           if (marker?.parentNode) {
             marker.parentNode.insertBefore(block, marker);
             marker.remove();
@@ -2449,6 +2535,33 @@ const DocumentStyleEditor = forwardRef(function DocumentStyleEditor({
             user-select: none !important;
             -webkit-user-select: none !important;
           }
+          ${sel} .doc-editor-img-resize {
+            position: absolute !important;
+            right: -7px !important;
+            bottom: 25px !important;
+            width: 16px !important;
+            height: 16px !important;
+            z-index: 3 !important;
+            border: 2px solid #ffffff !important;
+            border-radius: 50% !important;
+            background: #025545 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+            cursor: ew-resize !important;
+            opacity: 0 !important;
+            transition: opacity 0.12s ease !important;
+            touch-action: none !important;
+          }
+          ${sel} .doc-editor-img-block:hover .doc-editor-img-resize,
+          ${sel} .document-editor-image-wrapper:hover .doc-editor-img-resize,
+          ${sel} .doc-editor-img-block.doc-editor-img-resizing .doc-editor-img-resize {
+            opacity: 1 !important;
+          }
+          ${sel} .doc-editor-img-block.doc-editor-img-resizing {
+            outline: 2px solid #025545 !important;
+            outline-offset: 2px !important;
+            cursor: ew-resize !important;
+            user-select: none !important;
+          }
           ${sel} .doc-editor-img-block.doc-editor-img-dragging,
           ${sel} .document-editor-image-wrapper.doc-editor-img-dragging {
             opacity: 0.6 !important;
@@ -2500,6 +2613,7 @@ const DocumentStyleEditor = forwardRef(function DocumentStyleEditor({
         onFocus={() => { saveSelection(); syncToolbarState(); }}
         onKeyDown={handleKeyDown}
         onContextMenu={handleContextMenu}
+        onPointerDown={handleResizeStart}
         onDragStart={handleImageDragStart}
         onDragOver={handleImageDragOver}
         onDrop={handleImageDrop}

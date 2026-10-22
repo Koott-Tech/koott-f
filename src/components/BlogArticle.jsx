@@ -406,6 +406,18 @@ const CSS = `
   .kba-recent ul{grid-template-columns:1fr;gap:18px;}
 }
 .kba-fig .kba-img{margin-top:0;}
+/* An image resized in the editor carries its own width, as a percentage of the
+   column. The editor's chrome (drag handle, resize grip) is not rendered here,
+   and the block centres itself at whatever width it was given. */
+.kba-html .doc-editor-img-block,.kba-html .document-editor-image-wrapper{
+  display:block;margin:27px auto 0;max-width:100%;
+}
+.kba-html .doc-editor-img-block img,.kba-html .document-editor-image-wrapper img{
+  width:100%;margin:0;
+}
+.kba-html .doc-editor-img-overlay,
+.kba-html .doc-editor-img-drag-handle,
+.kba-html .doc-editor-img-resize{display:none!important;}
 .kba-cap,.kba-html figcaption{
   margin-top:8px;text-align:center;font-family:var(--k-body)!important;font-size:14px!important;color:#5B5757!important;
 }

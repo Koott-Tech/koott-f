@@ -51,6 +51,10 @@ const BLOCK_TYPES = [
   { value: 'code', label: 'Code Block' },
 ];
 
+// Matches the floating toolbar's list, so the two never disagree about what
+// sizes exist.
+const FONT_SIZES = [12, 14, 16, 18, 20, 24, 32];
+
 const ACCEPT_IMAGE = 'image/jpeg,image/jpg,image/png,image/webp';
 
 // Toolbar button: prevent default so editor keeps focus/selection (Google Docs style), then run command
@@ -96,10 +100,13 @@ const BlogEditor = forwardRef(function BlogEditor({
   const [toolbarState, setToolbarState] = useState(() => getDefaultToolbarState());
   const [blockTypeDropdownOpen, setBlockTypeDropdownOpen] = useState(false);
   const blockTypeDropdownRef = useRef(null);
+  const [fontSizeDropdownOpen, setFontSizeDropdownOpen] = useState(false);
+  const fontSizeDropdownRef = useRef(null);
 
   useEffect(() => {
     const close = (e) => {
       if (blockTypeDropdownRef.current && !blockTypeDropdownRef.current.contains(e.target)) setBlockTypeDropdownOpen(false);
+      if (fontSizeDropdownRef.current && !fontSizeDropdownRef.current.contains(e.target)) setFontSizeDropdownOpen(false);
     };
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
@@ -454,6 +461,50 @@ const BlogEditor = forwardRef(function BlogEditor({
                         }}
                       >
                         {o.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className={styles.toolbarGroup} ref={fontSizeDropdownRef} style={{ position: 'relative', flexShrink: 0 }}>
+                <button
+                  type="button"
+                  className={styles.toolbarSelect}
+                  title="Font size"
+                  aria-label="Font size"
+                  aria-expanded={fontSizeDropdownOpen}
+                  style={{ minWidth: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    editorRef.current?.saveSelection?.();
+                    setBlockTypeDropdownOpen(false);
+                    setFontSizeDropdownOpen((open) => !open);
+                  }}
+                >
+                  <span>{toolbarState.fontSize ? parseInt(toolbarState.fontSize, 10) : 16}</span>
+                  <ChevronDown size={14} style={{ flexShrink: 0 }} />
+                </button>
+                {fontSizeDropdownOpen && (
+                  <div className={styles.blockTypeDropdownMenu} role="listbox">
+                    {FONT_SIZES.map((px) => (
+                      <button
+                        key={px}
+                        type="button"
+                        role="option"
+                        title={`${px}px`}
+                        aria-label={`${px} pixels`}
+                        aria-selected={parseInt(toolbarState.fontSize, 10) === px}
+                        className={`${styles.blockTypeDropdownItem} ${parseInt(toolbarState.fontSize, 10) === px ? styles.toolbarBtnActive : ''}`}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setFontSizeDropdownOpen(false);
+                          editorRef.current?.saveSelection?.();
+                          editorRef.current?.applyFontSize?.(px);
+                          editorRef.current?.focus?.();
+                        }}
+                      >
+                        {px}
                       </button>
                     ))}
                   </div>
