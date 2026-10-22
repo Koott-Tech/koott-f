@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2, RefreshCw, UserCheck, Mail, Phone, Edit2, X, Check, AlertCircle, User, Plus, Filter, Clock } from 'lucide-react';
+import { Loader2, RefreshCw, UserCheck, Mail, Phone, Edit2, X, Check, AlertCircle, User, Plus, Filter, Clock, CalendarOff } from 'lucide-react';
 import WorkingHoursModal from '@/components/admin/WorkingHoursModal';
+import BlockedTimeModal from '@/components/admin/BlockedTimeModal';
 import { adminApi } from '@/lib/backendApi';
 import { useNotification } from '@/contexts/NotificationContext';
 import DoctorModal from '@/components/DoctorModal';
@@ -285,6 +286,7 @@ export default function TherapistsPage() {
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);
   const [hoursFor, setHoursFor] = useState(null); // { id, name } — working-hours editor
+  const [blocksFor, setBlocksFor] = useState(null); // { id, name } — blocked-time editor
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [dateRange, setDateRange] = useState(() => istCalendarMonthBounds(new Date()));
 
@@ -557,6 +559,16 @@ export default function TherapistsPage() {
                       Working hours
                     </button>
                   )}
+                  {isLinked && (
+                    <button
+                      type="button"
+                      onClick={() => setBlocksFor({ id: row.psychologist.id, name: row.name })}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md transition-colors text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                      <CalendarOff className="h-4 w-4" />
+                      Blocked time
+                    </button>
+                  )}
                   <button
                     onClick={() => setEditing(row)}
                     className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-md transition-colors text-sm font-medium ${
@@ -596,6 +608,14 @@ export default function TherapistsPage() {
           psychologistId={hoursFor.id}
           name={hoursFor.name}
           onClose={() => setHoursFor(null)}
+        />
+      )}
+
+      {blocksFor && (
+        <BlockedTimeModal
+          psychologistId={blocksFor.id}
+          name={blocksFor.name}
+          onClose={() => setBlocksFor(null)}
         />
       )}
 

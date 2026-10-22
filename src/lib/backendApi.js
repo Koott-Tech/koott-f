@@ -35,7 +35,8 @@ const getTimeoutForRequest = (endpoint) => {
   const isPaymentEndpoint = endpoint.includes('/payment/');
   const isRescheduleEndpoint = endpoint.includes('/reschedule') || endpoint.includes('/reschedule-request');
   const isRecurringBlocksEndpoint = endpoint.includes('/recurring-blocks');
-  const isDateBlocksEndpoint = endpoint.includes('/date-blocks');
+  const isDateBlocksEndpoint = endpoint.includes('/date-blocks')
+    || endpoint.includes('/blocking-options');
   const region = detectRegion();
   
   // Payment and reschedule endpoints always get 30s
@@ -1141,6 +1142,40 @@ export const adminApi = {
     return apiRequest(`/admin/psychologists/${psychologistId}/working-hours`, {
       method: 'PUT',
       body: JSON.stringify({ workingHours }),
+    });
+  },
+
+  // Blocking a therapist's time on their behalf. The therapist dashboard calls
+  // the same endpoints under /psychologists, for whoever is signed in.
+  async getBlockingOptions(psychologistId) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/blocking-options`);
+  },
+  async getDateBlocks(psychologistId) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/date-blocks`);
+  },
+  async addDateBlock(psychologistId, data) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/date-blocks`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async deleteDateBlock(psychologistId, blockId) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/date-blocks/${blockId}`, {
+      method: 'DELETE',
+    });
+  },
+  async getRecurringBlocks(psychologistId) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/recurring-blocks`);
+  },
+  async addRecurringBlock(psychologistId, data) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/recurring-blocks`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async deleteRecurringBlock(psychologistId, blockId) {
+    return apiRequest(`/admin/psychologists/${psychologistId}/recurring-blocks/${blockId}`, {
+      method: 'DELETE',
     });
   },
 

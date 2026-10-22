@@ -20,10 +20,15 @@
  * Blocks are mirrored into Google Calendar when it is connected. If that fails
  * the block still stands on Koott — that is what governs bookings — and the
  * row says the calendar did not get it.
+ *
+ * The same panel serves both dashboards. A therapist opens it for themselves
+ * and passes no id; an admin opens it for someone and passes theirs, which
+ * swaps the endpoints for the /admin ones. Working hours are not editable from
+ * either — an admin sets those on the therapists page.
  */
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { psychologistApi } from "../lib/backendApi";
+import { psychologistApi, adminApi } from "../lib/backendApi";
 import {
   CalendarOff, CalendarDays, Repeat, Trash2, Loader2,
   AlertCircle, CheckCircle, Info,
@@ -73,7 +78,35 @@ function describeBlock(block) {
   return sorted.map(labelFor).join(', ');
 }
 
-export default function TherapistTimeBlocking({ calendarConnected = false }) {
+/**
+ * The four calls this panel makes, bound either to the signed-in therapist or
+ * to the one an admin named.
+ */
+function apiFor(psychologistId) {
+  if (!psychologistId) {
+    return {
+      options: () => psychologistApi.getBlockingOptions(),
+      dates: () => psychologistApi.getDateBlocks(),
+      weekly: () => psychologistApi.getRecurringBlocks(),
+      addDate: (data) => psychologistApi.addDateBlock(data),
+      addWeekly: (data) => psychologistApi.addRecurringBlock(data),
+      removeDate: (id) => psychologistApi.deleteDateBlock(id),
+      removeWeekly: (id) => psychologistApi.deleteRecurringBlock(id),
+    };
+  }
+  return {
+    options: () => adminApi.getBlockingOptions(psychologistId),
+    dates: () => adminApi.getDateBlocks(psychologistId),
+    weekly: () => adminApi.getRecurringBlocks(psychologistId),
+    addDate: (data) => adminApi.addDateBlock(psychologistId, data),
+    addWeekly: (data) => adminApi.addRecurringBlock(psychologistId, data),
+    removeDate: (id) => adminApi.deleteDateBlock(psychologistId, id),
+    removeWeekly: (id) => adminApi.deleteRecurringBlock(psychologistId, id),
+  };
+}
+
+export default function TherapistTimeBlocking({ calendarConnected = false, psychologistId = null }) {
+  const api = useMemo(() => apiFor(psychologistId), [psychologistId]);
   const [mode, setMode] = useState('date');          // 'date' | 'weekly'
   const [options, setOptions] = useState(null);      // per-weekday slots
   const [dateBlocks, setDateBlocks] = useState([]);
@@ -97,9 +130,9 @@ export default function TherapistTimeBlocking({ calendarConnected = false }) {
     setIsLoading(true);
     try {
       const [opts, dates, weekly] = await Promise.all([
-        psychologistApi.getBlockingOptions(),
-        psychologistApi.getDateBlocks(),
-        psychologistApi.getRecurringBlocks(),
+        api.options(),
+        api.dates(),
+        api.weekly(),
       ]);
       setOptions(opts?.data || null);
       setDateBlocks(Array.isArray(dates?.data) ? dates.data : []);
@@ -110,7 +143,7 @@ export default function TherapistTimeBlocking({ calendarConnected = false }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [api]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -202,12 +235,12 @@ export default function TherapistTimeBlocking({ calendarConnected = false }) {
       let unsynced = 0;
 
       if (mode === 'date') {
-        const res = await psychologistApi.addDateBlock({ ...payload, date });
+        const res = await api.addDate({ ...payload, date });
         if (res?.data && res.data.calendar_synced === false) unsynced += 1;
       } else {
         // One call per weekday: a weekly block is stored per day.
         for (const day of selectedDays) {
-          const res = await psychologistApi.addRecurringBlock({ ...payload, day_of_week: day });
+          const res = await api.addWeekly({ ...payload, day_of_week: day });
           if (res?.data && res.data.calendar_synced === false) unsynced += 1;
         }
       }
@@ -232,8 +265,8 @@ export default function TherapistTimeBlocking({ calendarConnected = false }) {
     setError(null);
     setSuccess(null);
     try {
-      if (kind === 'date') await psychologistApi.deleteDateBlock(block.id);
-      else await psychologistApi.deleteRecurringBlock(block.id);
+      if (kind === 'date') await api.removeDate(block.id);
+      else await api.removeWeekly(block.id);
       setSuccess(kind === 'date'
         ? `${prettyDate(block.date)} is available again`
         : `${DAYS[block.day_of_week]}s are available again`);
