@@ -35,14 +35,16 @@ const getTimeoutForRequest = (endpoint) => {
   const isPaymentEndpoint = endpoint.includes('/payment/');
   const isRescheduleEndpoint = endpoint.includes('/reschedule') || endpoint.includes('/reschedule-request');
   const isRecurringBlocksEndpoint = endpoint.includes('/recurring-blocks');
+  const isDateBlocksEndpoint = endpoint.includes('/date-blocks');
   const region = detectRegion();
   
   // Payment and reschedule endpoints always get 30s
   if (isPaymentEndpoint || isRescheduleEndpoint) {
     return 30000;
   }
-  // Recurring blocks: multiple GCal API calls + DB upsert + sync availability — can exceed 15s
-  if (isRecurringBlocksEndpoint) {
+  // Blocks: several Google Calendar calls, a DB upsert, and an availability
+  // sync — together these can exceed 15s.
+  if (isRecurringBlocksEndpoint || isDateBlocksEndpoint) {
     return 45000;
   }
   // Bulk admin session listing can be slow on large date ranges
@@ -822,7 +824,28 @@ export const psychologistApi = {
     });
   },
 
-  // Recurring blocks (e.g. block every Sunday - applies to all future weeks)
+  // The hours this therapist can block, cut from their own working hours.
+  async getBlockingOptions() {
+    return apiRequest('/psychologists/blocking-options');
+  },
+
+  // Date blocks (e.g. block the 3rd of November - that one date)
+  async getDateBlocks() {
+    return apiRequest('/psychologists/date-blocks');
+  },
+  async addDateBlock(data) {
+    return apiRequest('/psychologists/date-blocks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async deleteDateBlock(blockId) {
+    return apiRequest(`/psychologists/date-blocks/${blockId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Weekly blocks (e.g. block every Sunday - repeats for the next six months)
   async getRecurringBlocks() {
     return apiRequest('/psychologists/recurring-blocks');
   },

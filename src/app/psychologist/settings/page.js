@@ -1,37 +1,20 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { psychologistApi } from "../../../lib/backendApi";
+import TherapistTimeBlocking from "../../../components/TherapistTimeBlocking";
 import { 
-  User,
-  Mail,
-  GraduationCap,
-  BookOpen,
   AlertCircle,
   CheckCircle,
   Calendar,
+  CalendarOff,
   RefreshCw
 } from "lucide-react";
 
 export default function PsychologistSettings() {
   const { user, token } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [isManualSubmit, setIsManualSubmit] = useState(false);
-  const [profile, setProfile] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    country_code: '+91',
-    ug_college: '',
-    pg_college: '',
-    phd_college: '',
-    area_of_expertise: '',
-    description: ''
-  });
-  
   // Google Calendar states
   const [isCalendarConnected, setIsCalendarConnected] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -42,62 +25,13 @@ export default function PsychologistSettings() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Track initial profile (API payload shape) so we only send changed fields on save
-  const initialProfileRef = useRef(null);
-
+  // Whether Google Calendar is connected drives the rest of this page, so it is
+  // checked as soon as there is a signed-in therapist to check it for.
   useEffect(() => {
-    if (user && user.profile) {
-      // Parse phone number to extract country code and number
-      const phoneNumber = user.profile.phone || '';
-      let countryCode = '+91';
-      let phoneNumberOnly = phoneNumber;
-      
-      if (phoneNumber.startsWith('+91')) {
-        countryCode = '+91';
-        phoneNumberOnly = phoneNumber.substring(3);
-      } else if (phoneNumber.startsWith('91') && phoneNumber.length > 10) {
-        countryCode = '+91';
-        phoneNumberOnly = phoneNumber.substring(2);
-      }
-
-      const areaArr = Array.isArray(user.profile.area_of_expertise)
-        ? user.profile.area_of_expertise
-        : (user.profile.area_of_expertise || '').split(',').map(s => s.trim()).filter(Boolean);
-      const fullPhone = countryCode + phoneNumberOnly;
-
-      const nextProfile = {
-        first_name: user.profile.first_name || '',
-        last_name: user.profile.last_name || '',
-        email: user.email || '',
-        phone: phoneNumberOnly,
-        country_code: countryCode,
-        ug_college: user.profile.ug_college || '',
-        pg_college: user.profile.pg_college || '',
-        phd_college: user.profile.phd_college || '',
-        area_of_expertise: Array.isArray(user.profile.area_of_expertise) 
-          ? user.profile.area_of_expertise.join(', ') 
-          : user.profile.area_of_expertise || '',
-        description: user.profile.description || ''
-      };
-      setProfile(nextProfile);
-
-      // Store initial API payload shape for diffing (only send changed fields on save)
-      initialProfileRef.current = {
-        first_name: nextProfile.first_name,
-        last_name: nextProfile.last_name,
-        phone: fullPhone,
-        ug_college: nextProfile.ug_college,
-        pg_college: nextProfile.pg_college,
-        phd_college: nextProfile.phd_college,
-        area_of_expertise: areaArr,
-        description: nextProfile.description || ''
-      };
-      
-      // Check if Google Calendar is connected
-      checkCalendarStatus();
-    }
+    if (user) checkCalendarStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
-  
+
   const checkCalendarStatus = async () => {
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001/api';
@@ -382,100 +316,6 @@ export default function PsychologistSettings() {
     setCurrentMonth(newMonth);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setProfile(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    console.log('🔍 Form submitted - handleSubmit called');
-    console.log('🔍 Event type:', e.type);
-    console.log('🔍 Event target:', e.target);
-    
-    // Check if this is an automatic submission (no user interaction)
-    if (e.type === 'submit' && !e.isTrusted) {
-      console.log('⚠️ Automatic form submission detected, preventing...');
-      return;
-    }
-    
-    // Only proceed if this is a manual submission
-    if (!isManualSubmit) {
-      console.log('⚠️ Form submission not initiated by user, preventing...');
-      return;
-    }
-    
-    setIsLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      // Combine country code and phone number for storage
-      const fullPhoneNumber = profile.country_code + profile.phone;
-      
-      // Ensure area_of_expertise is an array (API expects array; form may store comma-separated string)
-      const areaOfExpertise = Array.isArray(profile.area_of_expertise)
-        ? profile.area_of_expertise
-        : (profile.area_of_expertise || '')
-            .split(',')
-            .map(s => s.trim())
-            .filter(Boolean);
-
-      // Build current payload in same shape as API
-      const currentPayload = {
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        phone: fullPhoneNumber,
-        ug_college: profile.ug_college,
-        pg_college: profile.pg_college,
-        phd_college: profile.phd_college || '',
-        area_of_expertise: areaOfExpertise,
-        description: profile.description || ''
-      };
-
-      // Send only changed fields (partial update)
-      const initial = initialProfileRef.current || {};
-      const changedFields = {};
-      for (const key of Object.keys(currentPayload)) {
-        const curr = currentPayload[key];
-        const prev = initial[key];
-        const same = Array.isArray(curr) && Array.isArray(prev)
-          ? JSON.stringify(curr) === JSON.stringify(prev)
-          : curr === prev;
-        if (!same) changedFields[key] = curr;
-      }
-
-      if (Object.keys(changedFields).length === 0) {
-        setSuccess('No changes to save.');
-        return;
-      }
-
-      console.log('🔍 Profile data being sent (changed fields only):', changedFields);
-      
-      await psychologistApi.updateProfile(changedFields);
-      
-      // Update initial ref so next save only diffs from this state
-      initialProfileRef.current = { ...initial, ...changedFields };
-      
-      setSuccess('Profile updated successfully!');
-    } catch (err) {
-      console.error('Profile update error:', err);
-      // Validation details are attached by backendApi on 400 (err.details)
-      let errorMessage = err.message || 'Failed to update profile. Please try again.';
-      if (err.details && Array.isArray(err.details) && err.details.length > 0) {
-        const validationErrors = err.details.map((d) => d.msg || d.message).join('. ');
-        errorMessage = validationErrors;
-      }
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -491,199 +331,17 @@ export default function PsychologistSettings() {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h6 className="font-semibold text-gray-900">Profile Settings</h6>
+          <h6 className="font-semibold text-gray-900">Calendar &amp; Availability</h6>
+          <p className="mt-1 text-sm text-gray-600">
+            Connect your Google Calendar, see what is on it, and block the time you
+            are not available.
+          </p>
         </div>
       </div>
 
       {/* Profile Form */}
       <div className="mt-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Personal Information */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-              <p className="font-medium text-gray-900 text-sm sm:text-base">Personal Information</p>
-            </div>
-            <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <User className="inline h-4 w-4 mr-1" />
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={profile.first_name}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-[#025545] focus:border-[#025545]"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <User className="inline h-4 w-4 mr-1" />
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={profile.last_name}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-[#025545] focus:border-[#025545]"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Mail className="inline h-4 w-4 mr-1" />
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={profile.email}
-                    disabled
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-gray-500"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    📱 Phone Number
-                  </label>
-                  <div className="flex">
-                    <select
-                      name="country_code"
-                      value={profile.country_code}
-                      onChange={handleInputChange}
-                      className="border border-gray-300 rounded-l-md px-3 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#025545] focus:border-[#025545]"
-                    >
-                      <option value="+91">🇮🇳 +91</option>
-                      <option value="+1">🇺🇸 +1</option>
-                      <option value="+44">🇬🇧 +44</option>
-                      <option value="+33">🇫🇷 +33</option>
-                      <option value="+49">🇩🇪 +49</option>
-                      <option value="+81">🇯🇵 +81</option>
-                      <option value="+86">🇨🇳 +86</option>
-                      <option value="+971">🇦🇪 +971</option>
-                      <option value="+966">🇸🇦 +966</option>
-                      <option value="+65">🇸🇬 +65</option>
-                    </select>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={profile.phone}
-                      onChange={handleInputChange}
-                      className="flex-1 border border-l-0 rounded-r-md px-3 py-2 focus:ring-[#025545] focus:border-[#025545]"
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Full number: {profile.country_code}{profile.phone || 'XXXXXXXXXX'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Education */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-              <p className="font-medium text-gray-900 text-sm sm:text-base">Education</p>
-            </div>
-            <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <GraduationCap className="inline h-4 w-4 mr-1" />
-                    Undergraduate College
-                  </label>
-                  <input
-                    type="text"
-                    name="ug_college"
-                    value={profile.ug_college}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-[#025545] focus:border-[#025545]"
-                    placeholder="e.g., University of California"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <GraduationCap className="inline h-4 w-4 mr-1" />
-                    Postgraduate College
-                  </label>
-                  <input
-                    type="text"
-                    name="pg_college"
-                    value={profile.pg_college}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-[#025545] focus:border-[#025545]"
-                    placeholder="e.g., Stanford University"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <GraduationCap className="inline h-4 w-4 mr-1" />
-                    PhD College (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    name="phd_college"
-                    value={profile.phd_college}
-                    onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-[#025545] focus:border-[#025545]"
-                    placeholder="e.g., Harvard University"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Professional Details */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-              <p className="font-medium text-gray-900 text-sm sm:text-base">Professional Details</p>
-            </div>
-            <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <BookOpen className="inline h-4 w-4 mr-1" />
-                  Areas of Expertise
-                </label>
-                <input
-                  type="text"
-                  name="area_of_expertise"
-                  value={profile.area_of_expertise}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-[#025545] focus:border-[#025545]"
-                  placeholder="e.g., Child Psychology, Family Therapy, Anxiety Disorders"
-                />
-                <p className="mt-1 text-xs text-gray-500">Separate multiple areas with commas</p>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <BookOpen className="inline h-4 w-4 mr-1" />
-                  Professional Description *
-                </label>
-                <textarea
-                  name="description"
-                  value={profile.description}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#025545] focus:border-[#025545]"
-                  placeholder="Describe the doctor's expertise and experience..."
-                />
-                <p className="mt-1 text-xs text-gray-500">This will be visible to potential clients</p>
-              </div>
-            </div>
-          </div>
-
+        <div className="space-y-8">
           {/* Google Calendar Integration */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
@@ -933,6 +591,17 @@ export default function PsychologistSettings() {
             </div>
           </div>
 
+          {/* Blocking your own time */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+              <p className="font-medium text-gray-900 text-sm sm:text-base flex items-center">
+                <CalendarOff className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                Block your time
+              </p>
+            </div>
+            <TherapistTimeBlocking calendarConnected={isCalendarConnected} />
+          </div>
+
           {/* Error and Success Messages */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -952,7 +621,7 @@ export default function PsychologistSettings() {
             </div>
           )}
 
-        </form>
+        </div>
       </div>
     </div>
   );
