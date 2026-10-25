@@ -154,7 +154,8 @@ export default function Operations({ request, dates, rangeControl }) {
   if (loading && !data) return <p className="wx-empty">Loading…</p>;
   if (!data) return null;
 
-  const { kpis, bookingTime, sessionTime, clients, slotOpenings, slots } = data;
+  const { kpis, bookingTime, sessionTime, clients, slotOpenings, slots, comparison } = data;
+  const byTeam = comparison?.groupBy === 'team';
 
   return (
     <>
@@ -238,38 +239,44 @@ export default function Operations({ request, dates, rangeControl }) {
         </Col>
       </Section>
 
-      {!therapist && (
+      {!therapist && comparison?.rows?.length > 0 && (
         <Section title={team ? `Therapists in ${team.name}` : 'Teams'}>
-          <Col title={team ? 'Slots opened per therapist' : 'Compare teams'}>
-            {team ? (
-              <Table
-                head={['Therapist', 'Slots in period', 'Bookable']}
-                empty="No availability for these therapists in this period."
-                rows={slots.perTherapist.map((r) => (
-                  <tr key={r.psychologistId}>
-                    <td>
-                      <button type="button" className="wx-link" onClick={() => setTherapist({ id: r.psychologistId, name: nameOf(r.psychologistId) })}>
-                        {nameOf(r.psychologistId)}
-                      </button>
-                    </td>
-                    <td>{N(r.slots)}</td>
-                    <td>{N(r.bookable)}</td>
-                  </tr>
-                ))}
-              />
-            ) : (
-              <Table
-                head={['Team', 'Therapists', '']}
-                empty="No teams yet."
-                rows={teams.map((t) => (
-                  <tr key={t.id}>
-                    <td>{t.name}</td>
-                    <td>{N(t.therapists)}</td>
-                    <td><button type="button" className="wx-link" onClick={() => { setTeam(t); setTherapist(null); }}>View more</button></td>
-                  </tr>
-                ))}
-              />
-            )}
+          <Col
+            title={byTeam ? 'How the teams compare' : 'How the therapists compare'}
+            info="The same figures as above, split into the parts of what you are looking at. They add up to the totals at the top."
+          >
+            <Table
+              head={[byTeam ? 'Team' : 'Therapist', 'Sessions', 'New', 'Returning', 'Slots', 'Bookable', 'Opened', '']}
+              empty=""
+              rows={comparison.rows.map((r) => (
+                <tr key={r.id}>
+                  <td>{r.name}</td>
+                  <td>{N(r.sessions)}</td>
+                  <td>{N(r.newClients)}</td>
+                  <td>{N(r.returningClients)}</td>
+                  <td>{N(r.slotsScheduled)}</td>
+                  <td>{N(r.slotsBookable)}</td>
+                  <td>{N(r.slotsOpened)}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="wx-link"
+                      onClick={() => {
+                        if (byTeam) {
+                          // Ungrouped is a real scope, not a team row to look up.
+                          setTeam(teams.find((t) => t.id === r.id) || { id: r.id, name: r.name });
+                          setTherapist(null);
+                        } else {
+                          setTherapist({ id: r.id, name: r.name });
+                        }
+                      }}
+                    >
+                      View more
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            />
           </Col>
         </Section>
       )}

@@ -285,6 +285,25 @@ const OPS_SLOTS = {
   ],
 };
 
+/** Rows add up to the overview's totals, as the real answer does. */
+const OPS_COMPARISON = {
+  groupBy: 'team',
+  rows: [
+    { id: 't1', name: 'Group A', sessions: 96, newClients: 41, returningClients: 55, slotsScheduled: 412, slotsBookable: 318, slotsOpened: 206, slotsOpenedByPeople: 48 },
+    { id: 't2', name: 'Group B', sessions: 74, newClients: 28, returningClients: 46, slotsScheduled: 338, slotsBookable: 262, slotsOpened: 171, slotsOpenedByPeople: 39 },
+    { id: 'ungrouped', name: 'Ungrouped', sessions: 16, newClients: 5, returningClients: 11, slotsScheduled: 74, slotsBookable: 58, slotsOpened: 35, slotsOpenedByPeople: 7 },
+  ],
+};
+
+/** Inside a team the parts are its therapists, which is what the API returns. */
+const OPS_COMPARISON_THERAPISTS = {
+  groupBy: 'therapist',
+  rows: [
+    { id: 'p1', name: 'Dr Ann Maria Thomson-Varghese', sessions: 58, newClients: 24, returningClients: 34, slotsScheduled: 236, slotsBookable: 181, slotsOpened: 118, slotsOpenedByPeople: 27 },
+    { id: 'p2', name: 'Rahul K', sessions: 38, newClients: 17, returningClients: 21, slotsScheduled: 176, slotsBookable: 137, slotsOpened: 88, slotsOpenedByPeople: 21 },
+  ],
+};
+
 export const OPS_SAMPLES = {
   'ops/teams': [
     { id: 't1', name: 'Group A', color: '#189E4F', sort_order: 0, therapists: 4 },
@@ -308,10 +327,13 @@ export const OPS_SAMPLES = {
     clients: OPS_CLIENTS,
     slotOpenings: OPS_OPENINGS,
     slots: OPS_SLOTS,
+    comparison: OPS_COMPARISON,
   },
   'ops/booking-time': OPS_BOOKING,
   'ops/session-time': OPS_SESSION,
   'ops/clients': OPS_CLIENTS,
   'ops/slot-openings': OPS_OPENINGS,
   'ops/slots-available': OPS_SLOTS,
+  'ops/comparison': OPS_COMPARISON,
+  'ops/comparison:team': OPS_COMPARISON_THERAPISTS,
 };

@@ -28,7 +28,22 @@ export default function MarketingPreviewPage() {
     const key = String(path).split('?')[0].replace('report/', '');
     // Operations asks for ops/* and takes the same request prop, so it previews
     // here alongside the reports.
-    if (OPS_SAMPLES[key]) return Promise.resolve({ success: true, data: OPS_SAMPLES[key] });
+    if (OPS_SAMPLES[key]) {
+      // The real API groups by therapist once a team is chosen, so the preview
+      // does too — otherwise the drill-down looks right while the table below
+      // it silently keeps showing teams.
+      const inTeam = /scope=team%3A|scope=team:/.test(String(path));
+      if (key === 'ops/overview') {
+        return Promise.resolve({
+          success: true,
+          data: {
+            ...OPS_SAMPLES['ops/overview'],
+            comparison: inTeam ? OPS_SAMPLES['ops/comparison:team'] : OPS_SAMPLES['ops/comparison'],
+          },
+        });
+      }
+      return Promise.resolve({ success: true, data: OPS_SAMPLES[key] });
+    }
     const data = SAMPLES[key] ?? SAMPLES[name];
     return data ? Promise.resolve({ success: true, data }) : Promise.reject(new Error(`No sample for ${key}`));
   };
