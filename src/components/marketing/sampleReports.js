@@ -214,3 +214,104 @@ export const SAMPLES = {
 };
 
 export default SAMPLES;
+
+/**
+ * Operations (Bookings & slots). Shaped exactly like /api/marketing/ops/*,
+ * with the awkward cases that break a layout: a therapist with a long name, a
+ * peak that is not at a round hour, and a day with no slots at all.
+ */
+const hours = (peakHour, total) => Array.from({ length: 24 }, (_, h) => ({
+  hour: h,
+  label: `${h % 12 || 12} ${h < 12 ? 'AM' : 'PM'}`,
+  sessions: h === peakHour ? total : (h >= 8 && h <= 21 ? Math.max(0, 6 - Math.abs(h - peakHour)) : 0),
+}));
+const bandsOf = (hs) => Array.from({ length: 12 }, (_, i) => ({
+  band: i * 2,
+  label: `${(i * 2) % 12 || 12} ${i * 2 < 12 ? 'AM' : 'PM'}–${((i * 2 + 2) % 12) || 12} ${(i * 2 + 2) < 12 ? 'AM' : 'PM'}`,
+  sessions: hs[i * 2].sessions + hs[i * 2 + 1].sessions,
+}));
+
+const OPS_BOOKING_HOURS = hours(15, 34);
+const OPS_SESSION_HOURS = hours(21, 41);
+const OPS_BOOKING = { total: 186, hours: OPS_BOOKING_HOURS, bands: bandsOf(OPS_BOOKING_HOURS), peak: { label: '2 PM–4 PM', sessions: 52 } };
+const OPS_SESSION = { total: 186, undated: 0, hours: OPS_SESSION_HOURS, bands: bandsOf(OPS_SESSION_HOURS), peak: { label: '8 PM–10 PM', sessions: 61 } };
+const OPS_CLIENTS = {
+  sessions: { total: 186, new: 74, returning: 112 },
+  clients: { total: 131, new: 74, returning: 57 },
+  byStatus: [
+    { status: 'booked', sessions: 121 },
+    { status: 'completed', sessions: 48 },
+    { status: 'cancelled', sessions: 12 },
+    { status: 'no_show', sessions: 5 },
+  ],
+  activeStatuses: ['booked', 'rescheduled', 'confirmed', 'scheduled'],
+};
+const OPS_OPENINGS = {
+  total: 412,
+  byActor: { system: 318, therapist: 79, admin: 15, client: 0 },
+  openedByPeople: 94,
+  byDay: Array.from({ length: 14 }, (_, i) => ({ date: `2026-09-${String(10 + i).padStart(2, '0')}`, slots: 18 + ((i * 7) % 23) })),
+  leadTime: { sameDay: 46, within3: 88, within7: 141, beyond7: 137 },
+  perTherapist: [
+    { psychologistId: 'p1', slots: 142 },
+    { psychologistId: 'p2', slots: 118 },
+    { psychologistId: 'p3', slots: 96 },
+  ],
+  openings: Array.from({ length: 140 }, (_, i) => ({
+    psychologistId: ['p1', 'p2', 'p3'][i % 3],
+    slotDate: `2026-09-${String(14 + (i % 12)).padStart(2, '0')}`,
+    slotTime: `${String(9 + (i % 11)).padStart(2, '0')}:00:00`,
+    openedDate: `2026-09-${String(10 + (i % 9)).padStart(2, '0')}`,
+    openedAt: `2026-09-${String(10 + (i % 9)).padStart(2, '0')}T0${3 + (i % 6)}:${String((i * 7) % 60).padStart(2, '0')}:00.000Z`,
+    actor: ['system', 'therapist', 'admin'][i % 3],
+    leadDays: i % 9,
+    sameDay: i % 9 === 0,
+  })),
+  trackingSince: '2026-09-10T04:30:00.000Z',
+};
+const OPS_SLOTS = {
+  scheduledInPeriod: 824,
+  bookable: 638,
+  booked: 186,
+  byDay: Array.from({ length: 14 }, (_, i) => ({
+    date: `2026-09-${String(10 + i).padStart(2, '0')}`,
+    slots: i === 6 ? 0 : 52 + ((i * 11) % 19),
+    bookable: i === 6 ? 0 : 38 + ((i * 5) % 17),
+  })),
+  perTherapist: [
+    { psychologistId: 'p1', slots: 310, bookable: 241 },
+    { psychologistId: 'p2', slots: 288, bookable: 219 },
+    { psychologistId: 'p3', slots: 226, bookable: 178 },
+  ],
+};
+
+export const OPS_SAMPLES = {
+  'ops/teams': [
+    { id: 't1', name: 'Group A', color: '#189E4F', sort_order: 0, therapists: 4 },
+    { id: 't2', name: 'Group B', color: '#2563EB', sort_order: 1, therapists: 3 },
+    { id: 'ungrouped', name: 'Ungrouped', color: null, sort_order: 9999, therapists: 1 },
+  ],
+  'ops/therapists': [
+    { id: 'p1', name: 'Dr Ann Maria Thomson-Varghese', team: 't1' },
+    { id: 'p2', name: 'Rahul K', team: 't1' },
+    { id: 'p3', name: 'Meera Nair', team: 't2' },
+  ],
+  'ops/overview': {
+    kpis: {
+      sessions: 186, newClients: 74, returningClients: 57,
+      slotsOpened: 412, slotsOpenedByPeople: 94,
+      slotsBookable: 638, slotsScheduled: 824,
+      peakBookingHour: '2 PM–4 PM', peakSessionHour: '8 PM–10 PM',
+    },
+    bookingTime: OPS_BOOKING,
+    sessionTime: OPS_SESSION,
+    clients: OPS_CLIENTS,
+    slotOpenings: OPS_OPENINGS,
+    slots: OPS_SLOTS,
+  },
+  'ops/booking-time': OPS_BOOKING,
+  'ops/session-time': OPS_SESSION,
+  'ops/clients': OPS_CLIENTS,
+  'ops/slot-openings': OPS_OPENINGS,
+  'ops/slots-available': OPS_SLOTS,
+};

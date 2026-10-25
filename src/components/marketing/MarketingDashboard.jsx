@@ -18,6 +18,7 @@ import {
 } from './ui';
 import { REPORTS, REPORT_CSS, ReportsList, ReportView } from './MarketingReports';
 import ContentPages, { CONTENT_CSS } from './ContentPages';
+import Operations, { OPERATIONS_CSS } from './Operations';
 import { COMPARISONS, compareLabel, istToday, presets, rangeLabel, resolve } from './dateRange';
 
 const API = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
@@ -481,10 +482,12 @@ export default function MarketingDashboard() {
   const title = page === 'highlights' ? 'Analytics Highlights'
     : page === 'reports' ? 'All Reports'
     : page === 'pages' ? 'Edit Pages'
+    : page === 'ops' ? 'Bookings & Slots'
     : 'Traffic Overview';
   const sub = page === 'highlights' ? 'Get a complete overview of your site’s activity across all areas.'
     : page === 'reports' ? 'Dig into the details of your site’s traffic, visitors and content.'
     : page === 'pages' ? 'Edit the text and search settings for each page of the website.'
+    : page === 'ops' ? 'When clients book, when they meet, and the slots behind it — across Koott, a team, or one therapist.'
     : 'Track your site’s traffic trends and get to know your visitors.';
   const show = data && data.page === page;
   const isReports = page === 'reports' || !!reportName;
@@ -492,7 +495,7 @@ export default function MarketingDashboard() {
 
   return (
     <div className="wx">
-      <style dangerouslySetInnerHTML={{ __html: MARKETING_CSS + REPORT_CSS + CONTENT_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: MARKETING_CSS + REPORT_CSS + CONTENT_CSS + OPERATIONS_CSS }} />
       <aside className="wx-side">
         <div className="wx-brand"><span className="wx-mk">K</span><div><b>Koott</b><small>Insights</small></div></div>
         <div className="wx-navgrp">Analytics</div>
@@ -502,6 +505,10 @@ export default function MarketingDashboard() {
           <button type="button" onClick={() => setLiveOpen(true)}>Live feed</button>
           <button type="button" aria-current={page === 'traffic' ? 'page' : undefined} onClick={() => setPage('traffic')}>Traffic</button>
           <button type="button" aria-current={isReports ? 'page' : undefined} onClick={() => setPage('reports')}>Reports</button>
+        </nav>
+        <div className="wx-navgrp">Operations</div>
+        <nav aria-label="Operations">
+          <button type="button" aria-current={page === 'ops' ? 'page' : undefined} onClick={() => setPage('ops')}>Bookings &amp; slots</button>
         </nav>
         <div className="wx-navgrp">Content</div>
         <nav aria-label="Content">
@@ -515,6 +522,7 @@ export default function MarketingDashboard() {
           <button type="button" aria-pressed={page === 'highlights'} onClick={() => setPage('highlights')}>Highlights</button>
           <button type="button" aria-pressed={page === 'traffic'} onClick={() => setPage('traffic')}>Traffic</button>
           <button type="button" aria-pressed={isReports} onClick={() => setPage('reports')}>Reports</button>
+          <button type="button" aria-pressed={page === 'ops'} onClick={() => setPage('ops')}>Bookings</button>
         </div>
         {!reportName && <div className="wx-head">
           <div><h1>{title}</h1><p>{sub}</p></div>
@@ -524,14 +532,15 @@ export default function MarketingDashboard() {
             </label>
           )}
         </div>}
-        {!isReports && page !== 'pages' && <div className="wx-range">
+        {!isReports && page !== 'pages' && page !== 'ops' && <div className="wx-range">
           {rangeSelect}
           <span>{compareLabel(dates)}</span>
           {loading && <span className="wx-muted">Updating…</span>}
         </div>}
-        {env !== 'production' && page !== 'pages' && <div className="wx-banner">Showing <b>{env}</b> data (test traffic), not the live site.</div>}
+        {env !== 'production' && page !== 'pages' && page !== 'ops' && <div className="wx-banner">Showing <b>{env}</b> data (test traffic), not the live site.</div>}
 
-        {page === 'pages' ? <ContentPages />
+        {page === 'ops' ? <Operations request={request} dates={dates} rangeControl={rangeSelect} />
+          : page === 'pages' ? <ContentPages />
           : notReady ? (
           <div className="wx-card"><b>Almost there</b><p>{notReady}</p></div>
         ) : error ? (
