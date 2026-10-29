@@ -120,6 +120,8 @@ export default function ConditionPageTemplate({ data }) {
   const [checked, setChecked] = useState([]);
   const [openSign, setOpenSign] = useState(0);
   const [openSeek, setOpenSeek] = useState(0);
+  const [openHelp, setOpenHelp] = useState(0);
+  const [openType, setOpenType] = useState(0);
   const [query, setQuery] = useState('');
   const [liveTherapists, setLiveTherapists] = useState([]);
   const d = data;
@@ -461,13 +463,33 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Types ──────────────────────────────────────────────────────── */}
-      <Section bg="rgba(241,250,238,0.49)">
-        <h2 className="kct-h2 kct-center">{d.types.title}</h2>
-        <p className="kct-sub kct-center">{d.types.subtitle}</p>
-        <div className="kct-grid-3 kct-grid-3--wide">
-          {d.types.items.map((it, i) => (
-            <Card key={i} {...it} icon="check" variant="kct-card--green" />
-          ))}
+      {/* A picture on the left, the heading and the types as accordions on
+          the right — not the three-across grid this used to be. */}
+      <Section bg="var(--bg-soft)">
+        <div className="kct-types">
+          <div className="kct-types-art" aria-hidden />
+          <div className="kct-types-body">
+            <h2 className="kct-h2">{d.types.title}</h2>
+            <p className="kct-sub">{d.types.subtitle}</p>
+            <ul className="kct-seek kct-seek--soft kct-seek--flush">
+              {d.types.items.map((it, i) => {
+                const open = openType === i;
+                return (
+                  <li key={i} className={`kct-seek-row ${open ? 'is-open' : ''}`}>
+                    <button type="button" className="kct-seek-head" aria-expanded={open}
+                      onClick={() => setOpenType(open ? -1 : i)}>
+                      <span className="kct-seek-t">{it.title}</span>
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+                    {open && <p className="kct-seek-b">{it.body}</p>}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       </Section>
 
@@ -475,18 +497,36 @@ export default function ConditionPageTemplate({ data }) {
       <Section>
         <h2 className="kct-h2 kct-center">{d.therapyHelps.title}</h2>
         <p className="kct-sub kct-center">{d.therapyHelps.subtitle}</p>
-        <div className="kct-stack">
-          {d.therapyHelps.items.map((it, i) => (
-            <Card key={i} {...it} icon="spark" iconSize={22} variant="kct-card--wide kct-card--plain" />
-          ))}
-        </div>
+        {/* The same accordion as "when to seek help", filled grey and set
+            smaller — the design uses the shape twice at two weights. */}
+        <ul className="kct-seek kct-seek--soft">
+          {d.therapyHelps.items.map((it, i) => {
+            const open = openHelp === i;
+            return (
+              <li key={i} className={`kct-seek-row ${open ? 'is-open' : ''}`}>
+                <button type="button" className="kct-seek-head" aria-expanded={open}
+                  onClick={() => setOpenHelp(open ? -1 : i)}>
+                  <span className="kct-seek-t">{it.title}</span>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {open && <p className="kct-seek-b">{it.body}</p>}
+              </li>
+            );
+          })}
+        </ul>
       </Section>
 
       {/* ── Final CTA ──────────────────────────────────────────────────── */}
       <Section>
-        <div className="kct-cta-row">
-          <p className="kct-cta-text">{d.finalCta.text}</p>
-          <OutlineButton href={d.finalCta.cta.href}>{d.finalCta.cta.label}</OutlineButton>
+        <div className="kct-bookband">
+          <span className="kct-bookband-art" aria-hidden />
+          <div className="kct-bookband-copy">
+            <p className="kct-band-p kct-band-p--lead">{d.finalCta.text}</p>
+          </div>
+          <BookButton href={d.finalCta.cta.href}>{d.finalCta.cta.label}</BookButton>
         </div>
       </Section>
 
@@ -1211,6 +1251,30 @@ const CSS = `
   .kct-bookband{flex-direction:column;align-items:stretch;text-align:center;}
   .kct-bookband-art{width:100%;height:120px;}
   .kct-seek-t{font-size:18px!important;line-height:26px!important;}
+}
+
+
+/* The soft variant of the accordion: filled rather than outlined, and set at
+   body size. Used by "how therapy helps". */
+.kct-seek--soft .kct-seek-row{background:var(--bg-soft);border-color:transparent;}
+.kct-seek--soft .kct-seek-row.is-open{background:var(--bg-soft);border-color:var(--s-1);}
+.kct-seek--soft .kct-seek-t{font-size:16px!important;line-height:24px!important;font-weight:500!important;}
+.kct-band-p--lead{font-size:16px!important;line-height:24px!important;color:var(--t-primary)!important;}
+
+
+/* Types we treat ----------------------------------------------------------
+   A tall picture beside the list, rather than the three-across grid this was.
+   The accordion is the soft one again, run full width of its column. */
+.kct-types{display:grid;grid-template-columns:360px minmax(0,1fr);gap:40px;align-items:start;}
+.kct-types-art{
+  border-radius:12px;min-height:420px;align-self:stretch;
+  background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+}
+.kct-types-body .kct-sub{margin:8px 0 0;}
+.kct-seek--flush{max-width:none;margin-left:0;margin-right:0;}
+@media (max-width:1024px){
+  .kct-types{grid-template-columns:1fr;gap:24px;}
+  .kct-types-art{min-height:240px;}
 }
 
 /* responsive -------------------------------------------------------------
