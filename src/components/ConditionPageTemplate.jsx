@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import TherapistCard, { THERAPIST_CARD_CSS } from './TherapistCard';
+import { toCard } from './BookMalayaliPsychologists';
 import { ResumeBooking } from './ResumeBookingCard';
+import { publicApi } from '@/lib/backendApi';
 
 /**
  * ConditionPageTemplate — layout for condition / counselling landing pages.
@@ -115,7 +117,37 @@ const OutlineButton = ({ href = '#', children, dark = false }) => (
 export default function ConditionPageTemplate({ data }) {
   const [openFaq, setOpenFaq] = useState(-1);
   const [query, setQuery] = useState('');
+  const [liveTherapists, setLiveTherapists] = useState([]);
   const d = data;
+
+  /**
+   * The design shows three therapists here, but no CMS row has ever filled
+   * therapists.items — every condition carries an empty list, so the section
+   * rendered as a heading above nothing. Live therapists are fetched instead,
+   * and a row that does list its own still wins.
+   *
+   * They are not filtered by condition yet: the slug ("vaginismus") and the
+   * condition tags from migration 0020 are separate vocabularies, and guessing
+   * a match would quietly show the wrong people. Mapping the two is a data job.
+   */
+  const cmsTherapists = d.therapists?.items || [];
+  useEffect(() => {
+    if (cmsTherapists.length) return undefined;
+    let off = false;
+    publicApi.getPsychologists()
+      .then((res) => {
+        if (off) return;
+        const rows = res?.data?.psychologists || res?.data || [];
+        setLiveTherapists(Array.isArray(rows) ? rows.slice(0, 3).map(toCard) : []);
+      })
+      .catch(() => { if (!off) setLiveTherapists([]); });
+    return () => { off = true; };
+  }, [cmsTherapists.length]);
+
+  const therapists = useMemo(
+    () => (cmsTherapists.length ? cmsTherapists : liveTherapists),
+    [cmsTherapists, liveTherapists]
+  );
 
   const faqs = d.faqs.filter(
     (f) => !query || (f.q + f.a).toLowerCase().includes(query.toLowerCase())
@@ -174,24 +206,23 @@ export default function ConditionPageTemplate({ data }) {
 
       {/* ── Therapists ─────────────────────────────────────────────────── */}
       <Section bg="#F5FFF6">
-        <p className="kct-kicker">{d.therapists.eyebrow}</p>
+        {/* The design is the heading, the cards, then one button. There is no
+            filter row on it, and the dropdowns that used to sit here were
+            decorative — buttons with no handler — so they are gone rather than
+            restyled. Filtering lives on /book-malayali-psychologists, which the
+            button below leads to. */}
+        {d.therapists.eyebrow && <p className="kct-kicker">{d.therapists.eyebrow}</p>}
         <h2 className="kct-h2 kct-center">{d.therapists.title}</h2>
-
-        <div className="kct-filters">
-          {d.therapists.filters.map((f) => (
-            <button key={f} type="button" className="kct-select">
-              {f}<span aria-hidden>⌄</span>
-            </button>
-          ))}
-        </div>
 
         <div className="kct-therapists">
           <ResumeBooking />
-          {d.therapists.items.map((t, i) => (
-            <TherapistCard key={i} t={t} />
+          {therapists.map((t, i) => (
+            <TherapistCard key={t.id || i} t={t} />
           ))}
         </div>
-        <p className="kct-more"><a href="/counselling">View More</a></p>
+        <p className="kct-more">
+          <a href="/book-malayali-psychologists" className="kct-btn-ghost">View more therapists</a>
+        </p>
       </Section>
 
       {/* ── How it works ───────────────────────────────────────────────── */}
@@ -623,27 +654,22 @@ const CSS = `
 /* therapists ------------------------------------------------------------ */
 /* Filter selects — 233x41 at radius 15 matches the live page's <select>; the
    grey chrome there is themed green here to sit with the rest of the palette. */
-.kct-filters{display:flex;gap:13px;justify-content:center;margin:22px 0 26px;flex-wrap:wrap;}
-.kct-select{
-  display:inline-flex;align-items:center;justify-content:space-between;gap:8px;
-  width:233px;min-width:233px;height:41px;padding:0 18px;
-  background:#fff;border:1px solid rgba(61,152,92,.35);border-radius:15px;
-  font-family:var(--body)!important;font-size:14px;font-weight:400;
-  color:var(--deep2);text-align:left;cursor:pointer;
-  transition:border-color .2s ease,background-color .2s ease,box-shadow .2s ease;
-}
-.kct-select > span{color:var(--accent);font-size:12px;line-height:1;flex:none;}
-.kct-select:hover{border-color:var(--accent);background:#F5FFF6;}
-.kct-select:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(61,152,92,.18);}
-@media (max-width:560px){
-  .kct-select{width:100%;min-width:0;}
-}
 /* therapist cards — the card itself lives in components/TherapistCard.jsx so the
    listing page and this template stay identical; only the grid is local. */
-.kct-therapists{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+/* The design draws this strip at 1180, wider than the 1140 the rest of the
+   page uses, which is what puts each card at 377 rather than 348. */
+.kct-therapists{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:24px;
+}
+/* .kct-in holds the page at 1140 less its 24 gutters, so the strip has to step
+   outside it to reach 1180. Only once the viewport can take it. */
+@media (min-width:1228px){
+  .kct-therapists{margin-left:calc(50% - 590px);margin-right:calc(50% - 590px);}
+}
+.kct-more{display:flex;justify-content:center;margin:24px 0 0;}
 /* The live grid spans the full 980 column, outside .kct-in's 20px gutter,
    which is what puts each card at 480 rather than 460. */
-@media (min-width:1020px){.kct-therapists{margin-left:-20px;margin-right:-20px;}}
+
 
 .kct-more{text-align:center;margin:26px 0 0;}
 .kct-more a{font-family:var(--sans)!important;font-size:15px;color:var(--deep2)!important;text-decoration:none;}
@@ -873,6 +899,53 @@ const CSS = `
   font-family:var(--sans)!important;font-size:22px!important;font-weight:500!important;
   line-height:1.4em!important;letter-spacing:-.03em!important;color:var(--ink)!important;margin:0 0 22px;
 }
+
+
+/* Therapist card, from the Figma -------------------------------------------
+   The card is shared with the home page, the booking listing and the resume
+   card, so the design is applied here rather than in TherapistCard itself —
+   those three keep the card they have until their own designs land. Most of it
+   is re-pointing the card's own variables; the rest are the handful of shapes
+   the design changes. */
+.kct .ktc{
+  --ktc-primary:var(--p-main);
+  --ktc-primary-soft:var(--p-light);
+  --ktc-ink:var(--t-primary);
+  --ktc-ink-soft:#5C5C5C;          /* Typography/Tertiary */
+  --ktc-line:var(--s-1);
+  --ktc-bg:var(--bg-soft);
+  --ktc-surface:#fff;
+  border-width:1px;border-radius:16px;padding:20px;
+}
+.kct .ktc-name{font-size:16px!important;font-weight:500!important;line-height:24px!important;}
+.kct .ktc-role{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
+.kct .ktc-panel{border-radius:12px;padding:12px;margin-bottom:16px;}
+.kct .ktc-bio{
+  font-size:12px!important;line-height:18px!important;margin:0;
+  max-height:calc(18px * 3);
+}
+.kct .ktc-chip{
+  height:24px;padding:3px 10px;
+  font-size:12px!important;font-weight:500!important;line-height:18px!important;
+  color:var(--t-body)!important;
+}
+.kct .ktc-tags{gap:6px;}
+.kct .ktc-stats{gap:23px;margin-bottom:16px;}
+.kct .ktc-stat{border-radius:12px;padding:8px;}
+.kct .ktc-stat-v{font-size:12px!important;font-weight:500!important;line-height:18px!important;}
+.kct .ktc-stat-l{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
+/* The foot is a tinted panel in the design, not a hairline above the row. */
+.kct .ktc-foot{
+  background:#F0F5ED;border:1px solid #DDEED8;border-radius:12px;
+  padding:12px;border-top:0;margin-top:auto;
+}
+.kct .ktc-avail-l{font-size:12px!important;line-height:18px!important;color:var(--t-body)!important;}
+.kct .ktc-avail{font-size:12px!important;font-weight:500!important;line-height:18px!important;margin:2px 0 0;}
+.kct .ktc-book{
+  height:40px;padding:8px 22px;border-radius:8px;
+  font-size:16px!important;font-weight:500!important;line-height:24px!important;
+}
+.kct .ktc-book:hover{background:var(--p-dark);}
 
 /* responsive -------------------------------------------------------------
    Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is

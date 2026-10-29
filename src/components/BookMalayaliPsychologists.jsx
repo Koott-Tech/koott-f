@@ -27,8 +27,14 @@ import { whenLabel } from '@/lib/nextAvailable';
 
 const ALL = 'All';
 
-/** Map an API psychologist onto the card's shape. */
-function toCard(p) {
+/**
+ * Map an API psychologist onto the card's shape.
+ *
+ * Exported because the condition pages show the same cards and must not drift
+ * from this listing — two mappings would mean a therapist reading differently
+ * depending on which page found them.
+ */
+export function toCard(p) {
   const years = Number(p.experience_years) || 0;
   return {
     id: p.id,
@@ -39,7 +45,11 @@ function toCard(p) {
     // Numbers, not sentences: the card sets its own tiles ("7 yrs", "₹1,499").
     years,
     price: Number(p.price) || 0,
-    languages: ['English', 'Malayalam'],
+    // Real languages once the therapist has them; the old hardcoded pair is
+    // kept only as the fallback for a row that predates migration 0020.
+    languages: Array.isArray(p.languages) && p.languages.length
+      ? p.languages
+      : ['Malayalam', 'English'],
     experience: years > 0 ? `${years}+ years of experience` : '',
     priceFrom: p.price ? `Starting from INR${p.price}` : '',
     bio: introOf(p),
