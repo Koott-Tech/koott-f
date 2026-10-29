@@ -226,23 +226,20 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── How it works ───────────────────────────────────────────────── */}
+      {/* A centred heading over a two-by-two grid of numbered steps. The design
+          gives each card an illustration — a row of faces, a date picker — but
+          those are art, not content: no step in the CMS carries an image, so
+          the card is the number, the title and the body. */}
       <Section>
-        <div className="kct-split">
-          <div>
-            <h2 className="kct-h2">{d.howItWorks.title}</h2>
-            <p className="kct-sub">{d.howItWorks.subtitle}</p>
-            <div className="kct-steps">
-              {d.howItWorks.steps.map((s, i) => (
-                <div key={i} className="kct-card kct-card--plain">
-                  <h3 className="kct-card-t"><span className="kct-num">{i + 1}.</span>{s.title}</h3>
-                  <p className="kct-card-b">{s.body}</p>
-                </div>
-              ))}
+        <h2 className="kct-h2 kct-center">{d.howItWorks.title}</h2>
+        {d.howItWorks.subtitle && <p className="kct-sub kct-center">{d.howItWorks.subtitle}</p>}
+        <div className="kct-steps">
+          {d.howItWorks.steps.map((s, i) => (
+            <div key={i} className="kct-step">
+              <h3 className="kct-step-t"><span className="kct-num">{i + 1}</span>{s.title}</h3>
+              <p className="kct-step-b">{s.body}</p>
             </div>
-          </div>
-          <div className="kct-figure kct-figure--tall kct-figure--video" aria-hidden>
-            <span className="kct-fig-play">▶</span>
-          </div>
+          ))}
         </div>
       </Section>
 
@@ -947,6 +944,34 @@ const CSS = `
 }
 .kct .ktc-book:hover{background:var(--p-dark);}
 
+
+/* How it works ------------------------------------------------------------
+   Two by two, white on a hairline, with the step number in its own small
+   square rather than running into the title. */
+.kct-steps{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:32px;
+}
+.kct-step{
+  background:#fff;border:1px solid var(--s-1);border-radius:16px;padding:20px;
+}
+.kct-step-t,.kct-step-t:not(#_){
+  display:flex;align-items:center;gap:12px;margin:0;
+  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+}
+.kct-num{
+  flex:none;display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:6px;
+  border:1px solid var(--s-1);background:#fff;
+  font-family:var(--body)!important;font-size:12px!important;font-weight:500!important;
+  line-height:18px!important;color:var(--t-body)!important;
+}
+.kct-step-b{
+  margin:8px 0 0;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
+}
+
 /* responsive -------------------------------------------------------------
    Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is
    not in the design, so it is derived — the hero stacks and the four-across
@@ -983,7 +1008,7 @@ const CSS = `
   .kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:24px;}
   .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
   .kct-stat-l{font-size:12px!important;line-height:18px!important;}
-  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-therapists,.kct-why-grid{grid-template-columns:1fr;}
+  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-therapists,.kct-why-grid,.kct-steps{grid-template-columns:1fr;}
   .kct-therapists{margin-left:0;margin-right:0;gap:16px;}
   .kct-band{flex-direction:column;text-align:center;}
   .kct-band-art{display:none;}
