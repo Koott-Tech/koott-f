@@ -119,6 +119,7 @@ export default function ConditionPageTemplate({ data }) {
   // The symptom checklist: which signs are ticked, and which one is open.
   const [checked, setChecked] = useState([]);
   const [openSign, setOpenSign] = useState(0);
+  const [openSeek, setOpenSeek] = useState(0);
   const [query, setQuery] = useState('');
   const [liveTherapists, setLiveTherapists] = useState([]);
   const d = data;
@@ -419,21 +420,43 @@ export default function ConditionPageTemplate({ data }) {
       <Section>
         <h2 className="kct-h2 kct-center">{d.seekHelp.title}</h2>
         <p className="kct-sub kct-center">{d.seekHelp.subtitle}</p>
-        <div className="kct-stack">
-          {d.seekHelp.items.map((it, i) => (
-            <Card key={i} {...it} icon="chevron" iconSize={15} variant="kct-card--seek" />
-          ))}
-        </div>
+        {/* Accordions in a narrow column, one open at a time. These read
+            larger than the signs checklist above — the design sets them at 24
+            against its 14. */}
+        <ul className="kct-seek">
+          {d.seekHelp.items.map((it, i) => {
+            const open = openSeek === i;
+            return (
+              <li key={i} className={`kct-seek-row ${open ? 'is-open' : ''}`}>
+                <button
+                  type="button"
+                  className="kct-seek-head"
+                  aria-expanded={open}
+                  onClick={() => setOpenSeek(open ? -1 : i)}
+                >
+                  <span className="kct-seek-t">{it.title}</span>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                {open && <p className="kct-seek-b">{it.body}</p>}
+              </li>
+            );
+          })}
+        </ul>
       </Section>
 
       {/* ── Book band ──────────────────────────────────────────────────── */}
       <Section>
-        <div className="kct-band kct-band--stack">
-          <div>
+        {/* A soft green strip: a picture, the line, and the button on the end. */}
+        <div className="kct-bookband">
+          <span className="kct-bookband-art" aria-hidden />
+          <div className="kct-bookband-copy">
             <h4 className="kct-band-h">{d.bookBand.title}</h4>
             <p className="kct-band-p">{d.bookBand.text}</p>
           </div>
-          <OutlineButton href={d.bookBand.cta.href}>{d.bookBand.cta.label}</OutlineButton>
+          <BookButton href={d.bookBand.cta.href}>{d.bookBand.cta.label}</BookButton>
         </div>
       </Section>
 
@@ -1139,6 +1162,55 @@ const CSS = `
 }
 @media (max-width:640px){
   .kct-symptoms{padding:24px 16px;border-radius:16px;}
+}
+
+
+/* When to seek help -------------------------------------------------------
+   A narrow column of accordions, one open at a time. The titles are larger
+   here than in the signs checklist: 24 against 14, as the design sets them. */
+.kct-seek{list-style:none;margin:24px auto 0;padding:0;max-width:640px;display:flex;flex-direction:column;gap:12px;}
+.kct-seek-row{background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:14px 18px;}
+.kct-seek-row.is-open{border-color:var(--s-green-1);}
+.kct-seek-head{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--t-muted);
+}
+.kct-seek-t{
+  font-family:var(--sans)!important;font-size:24px!important;font-weight:600!important;
+  line-height:32px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+}
+.kct-seek-head svg{flex:none;transition:transform .15s ease;}
+.kct-seek-row.is-open .kct-seek-head svg{transform:rotate(180deg);}
+.kct-seek-b{
+  margin:8px 0 0;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
+}
+
+/* Book band ---------------------------------------------------------------
+   Picture, line, button — on one soft green strip. */
+.kct-bookband{
+  display:flex;align-items:center;gap:24px;
+  background:linear-gradient(180deg,#F4FBF0 0%,#EAF7E4 100%);
+  border:1px solid var(--s-green-2);border-radius:16px;padding:16px;
+}
+.kct-bookband-art{
+  flex:none;width:104px;height:72px;border-radius:10px;
+  background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+}
+.kct-bookband-copy{flex:1;min-width:0;}
+.kct-bookband .kct-band-h,.kct-bookband .kct-band-h:not(#_){
+  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
+}
+.kct-bookband .kct-band-p{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:2px 0 0;
+}
+@media (max-width:640px){
+  .kct-bookband{flex-direction:column;align-items:stretch;text-align:center;}
+  .kct-bookband-art{width:100%;height:120px;}
+  .kct-seek-t{font-size:18px!important;line-height:26px!important;}
 }
 
 /* responsive -------------------------------------------------------------
