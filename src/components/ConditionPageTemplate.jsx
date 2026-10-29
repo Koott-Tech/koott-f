@@ -244,7 +244,7 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Why ────────────────────────────────────────────────────────── */}
-      <Section bg="#012F23" className="kct-on-dark">
+      <Section bg="var(--p-darkest)" className="kct-on-dark">
         <div className="kct-split kct-split--rev">
           <div className="kct-figure kct-figure--tall" aria-hidden />
           <div>
@@ -261,7 +261,7 @@ export default function ConditionPageTemplate({ data }) {
 
       {/* ── Plans ──────────────────────────────────────────────────────── */}
       <Section>
-        <h2 className="kct-h2 kct-center kct-h2--deep">{d.plans.title}</h2>
+        <h2 className="kct-h2 kct-center">{d.plans.title}</h2>
         <p className="kct-sub kct-center">{d.plans.subtitle}</p>
         <div className="kct-grid-4 kct-grid-4--plans">
           {d.plans.items.map((p, i) => (
@@ -972,6 +972,53 @@ const CSS = `
   line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
 }
 
+
+/* Why Koott ---------------------------------------------------------------
+   A Primary Darkest band: the video on the left, the heading, its line and a
+   two-by-two grid on the right. The cards are a lift off the band rather than
+   a different colour, which is what keeps them legible on it. */
+.kct-on-dark .kct-h2,.kct-on-dark .kct-h2:not(#_){color:#fff!important;}
+.kct-on-dark .kct-sub{color:rgba(255,255,255,.82)!important;font-size:16px!important;line-height:24px!important;}
+.kct-why-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px;}
+.kct-on-dark .kct-card--solid{
+  background:linear-gradient(135deg,rgba(24,158,79,.22) 0%,rgba(24,158,79,.08) 100%);
+  border:1px solid rgba(191,227,203,.18);border-radius:10px;padding:16px;
+}
+.kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
+  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  line-height:26px!important;letter-spacing:0!important;color:#fff!important;margin:0;
+}
+.kct-on-dark .kct-card-b{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:rgba(255,255,255,.78)!important;margin:8px 0 0;
+}
+
+/* Plans -------------------------------------------------------------------
+   Four across, white on a hairline, with the price as a pill at the foot. The
+   cards stretch so the pills line up however long the copy runs. */
+.kct-grid-4--plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin-top:32px;align-items:stretch;}
+.kct-card--plan{
+  display:flex;flex-direction:column;
+  background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:20px;
+}
+.kct-card--plan .kct-card-t,.kct-card--plan .kct-card-t:not(#_){
+  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
+}
+.kct-card--plan .kct-card-b{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:8px 0 0;
+}
+.kct-price{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-top:auto;padding-top:0;
+  background:#fff;border:1px solid var(--s-green-1);border-radius:999px;
+  height:40px;padding:8px 18px;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:500!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--p-dark)!important;
+}
+.kct-card--plan .kct-price{margin-top:auto;}
+
 /* responsive -------------------------------------------------------------
    Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is
    not in the design, so it is derived — the hero stacks and the four-across
@@ -988,7 +1035,7 @@ const CSS = `
   .kct-split--rev .kct-figure{order:2;}
   .kct-figure--tall{min-height:260px;}
   .kct-grid-3,.kct-grid-3--wide,.kct-therapists{grid-template-columns:repeat(2,minmax(0,1fr));}
-  .kct-grid-4,.kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .kct-grid-4,.kct-grid-4--plans,.kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 
 /* Phone, from the 390 frame: 16px gutters, heading steps to H2/Mob 24/32,
@@ -1008,7 +1055,7 @@ const CSS = `
   .kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:24px;}
   .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
   .kct-stat-l{font-size:12px!important;line-height:18px!important;}
-  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-therapists,.kct-why-grid,.kct-steps{grid-template-columns:1fr;}
+  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-grid-4--plans,.kct-therapists,.kct-why-grid,.kct-steps{grid-template-columns:1fr;}
   .kct-therapists{margin-left:0;margin-right:0;gap:16px;}
   .kct-band{flex-direction:column;text-align:center;}
   .kct-band-art{display:none;}
