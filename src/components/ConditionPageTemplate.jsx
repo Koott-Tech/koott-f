@@ -430,17 +430,52 @@ export default function ConditionPageTemplate({ data }) {
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
+/* Design tokens, read from the Figma file "Koott 20-10-26" through the Figma
+   MCP connector — these are the designer's own variable values, not colours
+   sampled off a screenshot. See figma-ref/design-tokens.md.
+
+   Titles are Poppins, body is Inter, which is what globals.css already
+   enforces; the sizes are this page's own and are set below. */
 .kct{
-  --ink:#100E0E;
-  --green:#4FAB69;
-  --green-hover:#025545;
-  --accent:#3D985C;
-  --deep:#012F23;
-  --deep2:#29653D;
+  /* brand */
+  --p-main:#189E4F;
+  --p-light:#EFFFEA;
+  --p-dark:#1B6930;
+  --p-darkest:#063327;
+  /* text */
+  --t-primary:#0F0F0F;
+  --t-secondary:#374151;
+  --t-body:#373737;        /* Typography/Secondary as used on this page */
+  --t-muted:#6B7280;
+  --t-soft:#7C7C7C;        /* the verified-by line */
+  --t-disabled:#9CA3AF;
+  --t-alt:#FFFFFF;
+  /* surface */
+  --bg-soft:#F9F9F9;
+  /* stroke */
+  --s-1:#E3E2E2;
+  --s-2:#E5E5EA;
+  --s-green-1:#BFE3CB;
+  --s-green-2:#E8EFE5;
+  /* status */
+  --ok:#059669;
+  --warn:#D97706;
+  --err:#DC2626;
+  --info:#2563EB;
+
+  /* Kept so the sections not yet restyled keep rendering while the page is
+     migrated across; they map onto the tokens above rather than the old
+     Wix-derived palette. */
+  --ink:#0F0F0F;
+  --green:#189E4F;
+  --green-hover:#1B6930;
+  --accent:#189E4F;
+  --deep:#063327;
+  --deep2:#1B6930;
   --icon:#189E4F;
-  --line:rgba(38,34,34,.13);
-  --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
-  --body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
+  --line:#E3E2E2;
+  --sans:'Poppins',ui-sans-serif,system-ui,sans-serif;
+  --body:'Inter',ui-sans-serif,system-ui,sans-serif;
   --band:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
   /* The site header (components/Header.jsx) is position:fixed and h-16, so it
      occupies no space in flow — without this the hero's first 64px render
@@ -455,27 +490,35 @@ const CSS = `
 .kct *{box-sizing:border-box;}
 .kct span,.kct a,.kct button,.kct li,.kct input{letter-spacing:0!important;}
 
+/* The design lays the page out on a 1140 column inside a 1920 frame. Below
+   1180 it shrinks with the viewport, and at tablet and phone the gutter
+   narrows to the 16px the mobile frame uses (358 inside 390). */
 .kct-sec{padding:64px 0;}
-.kct-in{max-width:980px;margin:0 auto;padding:0 20px;}
+.kct-in{max-width:1140px;margin:0 auto;padding:0 24px;}
 .kct-center{text-align:center!important;}
 
-/* type scale ------------------------------------------------------------ */
-.kct-h1{
-  font-family:var(--sans)!important;font-size:32px!important;font-weight:500!important;
-  line-height:1.3em!important;letter-spacing:-.05em!important;color:var(--ink)!important;margin:0 0 14px;
+/* Type, from the Figma text styles. H2/Web is 32 and H2/Mob is 24/32, so the
+   page heading steps down at the phone breakpoint rather than scaling.
+
+   :not(#_) is how globals.css raises its own heading rules above component
+   CSS; matching it here is what lets this page set its sizes without editing
+   that file and changing every other page. */
+.kct-h1,.kct-h1:not(#_){
+  font-family:var(--sans)!important;font-size:32px!important;font-weight:600!important;
+  line-height:normal!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
 }
-.kct-h2{
-  font-family:var(--sans)!important;font-size:26px!important;font-weight:500!important;
-  line-height:1.4em!important;letter-spacing:-.05em!important;color:var(--ink)!important;margin:0;
+.kct-h2,.kct-h2:not(#_){
+  font-family:var(--sans)!important;font-size:32px!important;font-weight:600!important;
+  line-height:normal!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
 }
 .kct-h2--deep{color:var(--deep)!important;line-height:1.3em!important;}
-.kct-eyebrow{
+.kct-eyebrow,.kct-eyebrow:not(#_){
   font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:1.4em!important;color:var(--ink)!important;margin:0 0 12px;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:0;
 }
 .kct-lede{
-  font-family:var(--body)!important;font-size:15px!important;font-weight:400!important;
-  line-height:1.6em!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;max-width:34em;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:400!important;
+  line-height:24px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:0;
 }
 .kct-sub{
   font-family:var(--body)!important;font-size:16px!important;font-weight:400!important;
@@ -489,42 +532,63 @@ const CSS = `
 }
 
 /* hero ------------------------------------------------------------------ */
-.kct-hero{padding-top:56px;}
-.kct-hero-grid{display:grid;grid-template-columns:1fr 351px;gap:56px;align-items:center;}
-.kct-hero-cta{display:flex;align-items:center;gap:18px;margin:26px 0 20px;flex-wrap:wrap;}
+.kct-hero{padding-top:56px;padding-bottom:80px;}
+.kct-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 374px;gap:56px;align-items:center;}
+/* The text column stacks 8 / 12 / 11.3 in the design; the heading and lede
+   carry no margin of their own so the gaps come only from here. */
+.kct-hero-grid > div:first-child{display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
+.kct-hero-cta{display:flex;align-items:center;gap:14px 16px;margin:11px 0 0;flex-wrap:wrap;}
 .kct-verified{
-  font-family:var(--body)!important;font-size:13px!important;font-weight:400!important;
-  line-height:1.4em!important;letter-spacing:0!important;color:var(--ink)!important;
-  margin:23px 0 0;
+  font-family:var(--body)!important;font-size:12px!important;font-weight:400!important;
+  line-height:18px!important;letter-spacing:0!important;color:var(--t-soft)!important;
+  margin:4px 0 0;
 }
-.kct-tick{color:var(--accent);}
+.kct-tick{color:var(--p-main);}
 .kct-hero-media{
-  position:relative;width:351px;height:374px;border-radius:10px;
+  position:relative;width:374px;height:374px;border-radius:10px;overflow:hidden;
   background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
   display:flex;align-items:center;justify-content:center;
 }
 .kct-play{
-  width:56px;height:56px;border-radius:50%;background:var(--green);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:18px;padding-left:4px;
-  box-shadow:0 6px 20px rgba(2,85,69,.25);
+  width:56px;height:56px;border-radius:28px;background:#4FAB69;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;line-height:27px;padding-left:4px;
+  filter:drop-shadow(0 6px 10px rgba(2,85,69,.25));
 }
-.kct-media-label{position:absolute;bottom:14px;font-size:12px;color:#5b6a5f;}
+.kct-media-label{
+  position:absolute;left:20px;right:20px;bottom:16px;z-index:1;
+  font-size:12px;line-height:18px;color:#fff;
+}
+/* The caption is white over the video still in the design. Until a still is
+   set it would sit on the pale gradient and vanish, so the foot of the frame
+   carries a scrim — invisible once a dark image is behind it. */
+.kct-hero-media::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:72px;
+  background:linear-gradient(180deg,rgba(6,51,39,0) 0%,rgba(6,51,39,.55) 100%);
+  pointer-events:none;
+}
 
 /* buttons --------------------------------------------------------------- */
+/* Button/Medium from the Figma component: 40 tall, 8 radius, Inter Medium
+   16/24. Primary fills Primary Main; the secondary is white on a green
+   hairline rather than a bare link. */
 .kct-btn-solid{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:152px;height:40px;padding:0 20px;border-radius:10px;
-  background:var(--green);color:#fff!important;text-decoration:none;
-  font-family:var(--sans)!important;font-size:15px;font-weight:400;
-  transition:background-color .4s ease,color .4s ease;
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;white-space:nowrap;
+  height:40px;padding:8px 22px;border-radius:8px;
+  background:var(--p-main);color:#fff!important;text-decoration:none;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:500;line-height:24px;
+  transition:background-color .2s ease;
 }
-.kct-btn-solid:hover{background:var(--green-hover);}
+.kct-btn-solid:hover{background:var(--p-dark);}
 .kct-btn-ghost{
-  display:inline-flex;align-items:center;gap:4px;text-decoration:none;
-  font-family:var(--sans)!important;font-size:15px;color:#282626!important;
-  padding:6px 4px;border-radius:8px;transition:all .2s ease;
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;white-space:nowrap;
+  height:40px;padding:7px 18px;border-radius:8px;
+  background:#fff;border:1px solid var(--s-green-1);
+  font-family:var(--body)!important;font-size:16px!important;font-weight:500;line-height:24px;
+  color:var(--t-primary)!important;transition:all .2s ease;
 }
-.kct-btn-ghost:hover{color:var(--accent)!important;}
+.kct-btn-ghost:hover{border-color:var(--p-main);color:var(--p-dark)!important;}
+.kct-btn-ghost svg{width:24px;height:24px;flex:none;}
 .kct-btn-pill{
   display:inline-flex;align-items:center;gap:6px;flex:none;
   padding:9px 18px;border-radius:15px;background:#fff;border:1px solid #025545;
@@ -536,22 +600,24 @@ const CSS = `
 .kct-btn-pill.is-dark:hover{color:#fff!important;}
 
 /* stats ----------------------------------------------------------------- */
-.kct-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:44px;}
+.kct-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin-top:40px;}
+/* Impact metric from the design: soft grey on a green hairline, 15 radius,
+   16 padding, 4 between the figure and its line. */
 .kct-stat{
-  border-radius:15px;padding:15px 12px 20px 20px;
-  background:linear-gradient(180deg,rgba(240,255,236,.3172) 0%,rgba(212,255,194,.52) 100%);
+  display:flex;flex-direction:column;gap:4px;align-items:flex-start;
+  border-radius:15px;padding:16px;
+  background:var(--bg-soft);border:1px solid var(--s-green-2);
   transition:transform .2s ease-in-out;
 }
-.kct-stat:hover{transform:translateY(-10px);}
-.kct-stat-v{
-  font-family:var(--sans)!important;font-size:20px!important;font-weight:600!important;
-  line-height:1.6em!important;letter-spacing:-.05em!important;color:#3D995C!important;
-  text-align:center;margin:0 0 4px;
+.kct-stat:hover{transform:translateY(-4px);}
+.kct-stat-v,.kct-stat-v:not(#_){
+  font-family:var(--sans)!important;font-size:24px!important;font-weight:600!important;
+  line-height:normal!important;letter-spacing:0!important;color:var(--p-dark)!important;
+  text-align:left;margin:0;
 }
 .kct-stat-l{
-  font-family:var(--body)!important;font-size:13px!important;font-weight:400!important;
-  line-height:1.4em!important;letter-spacing:0!important;color:var(--ink)!important;
-  text-align:center;margin:0;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:0;
 }
 
 /* therapists ------------------------------------------------------------ */
@@ -808,22 +874,44 @@ const CSS = `
   line-height:1.4em!important;letter-spacing:-.03em!important;color:var(--ink)!important;margin:0 0 22px;
 }
 
-/* responsive ------------------------------------------------------------ */
-@media (max-width:900px){
+/* responsive -------------------------------------------------------------
+   Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is
+   not in the design, so it is derived — the hero stacks and the four-across
+   rows halve, which is the same reflow the phone frame makes, just earlier and
+   two-up rather than one. Nothing below invents a size the design does not
+   use. */
+
+/* Tablet: the hero's 374 media and 1140 column no longer fit side by side. */
+@media (max-width:1024px){
   .kct-hero-grid,.kct-split,.kct-split--rev{grid-template-columns:1fr;gap:32px;}
-  .kct-hero-media{width:100%;}
+  /* Square at 374 is right beside the text; stacked it would be half the
+     fold. It becomes a band at the ratio the phone frame uses (358/230). */
+  .kct-hero-media{width:100%;max-width:none;height:auto;aspect-ratio:358/230;}
   .kct-split--rev .kct-figure{order:2;}
   .kct-figure--tall{min-height:260px;}
-  .kct-grid-3,.kct-grid-3--wide,.kct-therapists{grid-template-columns:repeat(2,1fr);}
-  .kct-grid-4,.kct-stats{grid-template-columns:repeat(2,1fr);}
+  .kct-grid-3,.kct-grid-3--wide,.kct-therapists{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .kct-grid-4,.kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
+
+/* Phone, from the 390 frame: 16px gutters, heading steps to H2/Mob 24/32,
+   the metric line drops to Caption 12/18, and the stats sit two-up at an 8px
+   gap rather than collapsing to one column. */
 @media (max-width:640px){
   .kct-sec{padding:44px 0;}
-  .kct-h1{font-size:20px!important;}
-  .kct-h2{font-size:20px!important;}
-  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-stats,.kct-therapists,.kct-why-grid{grid-template-columns:1fr;}
-  /* therapist cards run 12px from the screen edge rather than the 20px gutter */
-  .kct-therapists{margin-left:-8px;margin-right:-8px;gap:16px;}
+  .kct-in{padding:0 16px;}
+  .kct-hero{padding-top:32px;padding-bottom:48px;}
+  .kct-h1,.kct-h1:not(#_){font-size:24px!important;line-height:32px!important;}
+  .kct-h2,.kct-h2:not(#_){font-size:24px!important;line-height:32px!important;}
+  /* The video sits above the words on the phone, as the frame shows. */
+  .kct-hero-grid > div:first-child{order:2;}
+  .kct-hero-media{order:1;max-width:none;aspect-ratio:358/230;}
+  .kct-hero-cta{gap:12px;}
+  .kct-hero-cta > *{flex:1 1 auto;}
+  .kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:24px;}
+  .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
+  .kct-stat-l{font-size:12px!important;line-height:18px!important;}
+  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-therapists,.kct-why-grid{grid-template-columns:1fr;}
+  .kct-therapists{margin-left:0;margin-right:0;gap:16px;}
   .kct-band{flex-direction:column;text-align:center;}
   .kct-band-art{display:none;}
   .kct-faq-head{flex-direction:column;align-items:flex-start;gap:8px;}
