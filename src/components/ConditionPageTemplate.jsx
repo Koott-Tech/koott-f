@@ -532,8 +532,13 @@ export default function ConditionPageTemplate({ data }) {
 
       {/* ── FAQs (Wix "line" theme: search + underlined rows) ──────────── */}
       <Section className="kct-faq-sec">
+        <h2 className="kct-h2 kct-center">{d.faqsTitle || 'Frequently Asked Questions'}</h2>
+        {/* The design puts category tabs here — General, Appointments, Therapy,
+            Payments, Privacy. Nothing in the CMS carries a category: a FAQ is
+            a question and an answer, so tabs would be five buttons that all
+            show the same list. The search stays instead; it narrows the list
+            for real. Add a category per FAQ and the tabs can replace it. */}
         <div className="kct-faq-head">
-          <p className="kct-faq-label">FAQ&rsquo;s</p>
           <input
             type="text"
             className="kct-faq-search"
@@ -1276,6 +1281,36 @@ const CSS = `
   .kct-types{grid-template-columns:1fr;gap:24px;}
   .kct-types-art{min-height:240px;}
 }
+
+
+/* FAQ ---------------------------------------------------------------------
+   A narrow column of white rows with a plus on the end, under a centred
+   heading. It was the Wix line theme: a left-hand label and underlined rows. */
+.kct-faq-sec{background:var(--bg-soft);}
+.kct-faq-head{display:flex;justify-content:center;margin:20px 0 0;}
+.kct-faq-search{
+  width:100%;max-width:420px;height:40px;padding:8px 16px;
+  background:#fff;border:1px solid var(--s-1);border-radius:999px;
+  font-family:var(--body)!important;font-size:14px!important;color:var(--t-primary)!important;
+}
+.kct-faq-search:focus{outline:none;border-color:var(--p-main);box-shadow:0 0 0 3px rgba(24,158,79,.15);}
+.kct-faq{max-width:640px;margin:20px auto 0;display:flex;flex-direction:column;gap:12px;}
+.kct-faq-row{background:#fff;border:1px solid var(--s-1);border-radius:10px;padding:14px 18px;}
+.kct-faq-row button{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  background:none;border:0;padding:0;cursor:pointer;text-align:left;
+}
+.kct-faq-row button > span:first-child{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+}
+.kct-faq-sign{flex:none;font-size:18px;line-height:1;color:var(--t-muted);}
+.kct-faq-row p{
+  margin:10px 0 0;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
+}
+.kct-faq-empty{text-align:center;color:var(--t-muted)!important;}
 
 /* responsive -------------------------------------------------------------
    Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is
