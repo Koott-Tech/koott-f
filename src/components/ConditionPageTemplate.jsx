@@ -316,23 +316,26 @@ export default function ConditionPageTemplate({ data }) {
         </div>
       </section>
 
-      {/* ── About the condition ────────────────────────────────────────── */}
-      <Section bg="#FBFFF9" className="kct-about">
-        <h2 className="kct-h2 kct-center">{d.about.title}</h2>
-        <div className="kct-prose">
-          {d.about.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+      {/* ── About the condition ──────────────────────────────────────────
+          One band in the design: the explanation in a card beside a photo,
+          then the four pillars two-up underneath. They were two sections with
+          a seam between them, which is why the heading sat centred over the
+          prose instead of inside the card. */}
+      <Section bg="var(--bg-soft)" className="kct-about">
+        <div className="kct-about-top">
+          <div className="kct-about-card">
+            <h2 className="kct-h2">{d.about.title}</h2>
+            <div className="kct-prose">
+              {d.about.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+            </div>
+          </div>
+          <div className="kct-about-media" aria-hidden />
         </div>
-      </Section>
 
-      {/* ── Pillars (Mind / Emotions / Energy / Life) ──────────────────── */}
-      <Section bg="#FBFFF9" className="kct-pillars-sec">
-        <div className="kct-grid-4">
+        <div className="kct-pillars">
           {d.about.pillars.map((p, i) => (
             <div key={i} className="kct-pillar">
-              <div className="kct-pillar-head">
-                <h3 className="kct-pillar-t">{p.title}</h3>
-                <Icon name="leaf" size={19} fill="#189E4F" />
-              </div>
+              <h3 className="kct-pillar-t">{p.title}</h3>
               <p className="kct-pillar-b">{p.body}</p>
             </div>
           ))}
@@ -835,34 +838,10 @@ const CSS = `
 }
 
 /* about ----------------------------------------------------------------- */
-.kct-prose{max-width:568px;margin:22px auto 0;}
-.kct-prose p{
-  font-family:var(--body)!important;font-size:15px!important;font-weight:400!important;
-  line-height:1.4em!important;letter-spacing:0!important;color:var(--ink)!important;
-  text-align:center;margin:0 0 18px;
-}
-
-/* Pillar cards (Mind / Emotions / Energy / Life) -------------------------
-   Live: 216x188 at radius 10, 20px gutters, title 17/700 with the leaf icon
-   right-aligned, and a 205x128 radius-7 panel holding the body copy. */
-.kct-pillar{
-  display:flex;flex-direction:column;min-height:188px;
-  background:#fff;border:1px solid var(--line);border-radius:10px;padding:15px 0 5px;
-}
-.kct-pillar-head{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:0 16px;
-}
-.kct-pillar-t{
-  font-family:var(--body)!important;font-size:17px!important;font-weight:700!important;
-  line-height:1.2em!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;
-}
-.kct-pillar-b{
-  flex:1;margin:20px 6px 0;padding:17px 10px;border-radius:7px;background:var(--band);
-  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:1.5em!important;letter-spacing:0!important;color:var(--ink)!important;
-}
-.kct-about{padding-bottom:0;}
-.kct-pillars-sec{padding-top:32px;}
+/* The prose and the pillars are styled with the rest of the design, further
+   down. What stood here was the Wix layout: centred body copy, and a pillar
+   whose text sat in a green panel inside the card. */
+.kct-prose{margin:0;}
 
 /* FAQ ------------------------------------------------------------------- */
 .kct-faq-head{display:flex;align-items:center;gap:24px;margin-bottom:8px;}
@@ -1019,6 +998,32 @@ const CSS = `
 }
 .kct-card--plan .kct-price{margin-top:auto;}
 
+
+/* About the condition -----------------------------------------------------
+   The explanation sits in a white card beside a photo, and the pillars run
+   two-up below it. The heading lives inside the card, not centred above the
+   band, which is what the design draws. */
+.kct-about-top{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;align-items:start;}
+.kct-about-card{background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:24px;}
+.kct-about-media{
+  border-radius:12px;min-height:300px;align-self:stretch;
+  background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+}
+.kct-about .kct-prose p{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:12px 0 0;
+}
+.kct-pillars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:24px;}
+.kct-pillar{background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:20px;}
+.kct-pillar-t,.kct-pillar-t:not(#_){
+  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
+}
+.kct-pillar-b{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:8px 0 0;
+}
+
 /* responsive -------------------------------------------------------------
    Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is
    not in the design, so it is derived — the hero stacks and the four-across
@@ -1035,6 +1040,8 @@ const CSS = `
   .kct-split--rev .kct-figure{order:2;}
   .kct-figure--tall{min-height:260px;}
   .kct-grid-3,.kct-grid-3--wide,.kct-therapists{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .kct-about-top{grid-template-columns:1fr;}
+  .kct-about-media{min-height:220px;}
   .kct-grid-4,.kct-grid-4--plans,.kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 
@@ -1055,7 +1062,8 @@ const CSS = `
   .kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:24px;}
   .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
   .kct-stat-l{font-size:12px!important;line-height:18px!important;}
-  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-grid-4--plans,.kct-therapists,.kct-why-grid,.kct-steps{grid-template-columns:1fr;}
+  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-grid-4--plans,.kct-therapists,.kct-why-grid,.kct-steps,.kct-pillars{grid-template-columns:1fr;}
+  .kct-about-card{padding:20px;}
   .kct-therapists{margin-left:0;margin-right:0;gap:16px;}
   .kct-band{flex-direction:column;text-align:center;}
   .kct-band-art{display:none;}
