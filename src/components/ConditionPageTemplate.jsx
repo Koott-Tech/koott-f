@@ -116,6 +116,9 @@ const OutlineButton = ({ href = '#', children, dark = false }) => (
 
 export default function ConditionPageTemplate({ data }) {
   const [openFaq, setOpenFaq] = useState(-1);
+  // The symptom checklist: which signs are ticked, and which one is open.
+  const [checked, setChecked] = useState([]);
+  const [openSign, setOpenSign] = useState(0);
   const [query, setQuery] = useState('');
   const [liveTherapists, setLiveTherapists] = useState([]);
   const d = data;
@@ -342,12 +345,64 @@ export default function ConditionPageTemplate({ data }) {
         </div>
       </Section>
 
-      {/* ── Symptoms ───────────────────────────────────────────────────── */}
-      <Section>
-        <h2 className="kct-h2 kct-center">{d.symptoms.title}</h2>
-        <p className="kct-sub kct-center">{d.symptoms.subtitle}</p>
-        <div className="kct-grid-3">
-          {d.symptoms.items.map((it, i) => <Card key={i} {...it} icon="bubble" />)}
+      {/* ── Symptoms ─────────────────────────────────────────────────────
+          A checklist rather than a grid of cards. Each sign ticks on its own
+          and opens to read why, and the panel underneath responds to how many
+          are ticked. The design shows it mid-use — some ticked, one open. */}
+      <Section className="kct-symptoms-sec">
+        <div className="kct-symptoms">
+          <h2 className="kct-h2 kct-center">{d.symptoms.title}</h2>
+          <p className="kct-sub kct-center">{d.symptoms.subtitle}</p>
+
+          <ul className="kct-signs">
+            {d.symptoms.items.map((it, i) => {
+              const on = checked.includes(i);
+              const open = openSign === i;
+              return (
+                <li key={i} className={`kct-sign ${open ? 'is-open' : ''}`}>
+                  <div className="kct-sign-row">
+                    <label className="kct-sign-tick">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        onChange={() => setChecked((p) => (on ? p.filter((x) => x !== i) : [...p, i]))}
+                      />
+                      <span aria-hidden />
+                      <span className="kct-sign-t">{it.title}</span>
+                    </label>
+                    <button
+                      type="button"
+                      className="kct-sign-more"
+                      aria-expanded={open}
+                      aria-label={open ? `Hide what ${it.title} means` : `What ${it.title} means`}
+                      onClick={() => setOpenSign(open ? -1 : i)}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
+                  </div>
+                  {open && <p className="kct-sign-b">{it.body}</p>}
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="kct-signs-out">
+            <span className="kct-signs-ico" aria-hidden>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+                stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16.5v.01" />
+              </svg>
+            </span>
+            <p>
+              {checked.length === 0
+                ? 'Tick the signs you notice to see what they might mean.'
+                : `You ticked ${checked.length} of ${d.symptoms.items.length}. Talking it through with a therapist is a good next step.`}
+            </p>
+            <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
+          </div>
         </div>
       </Section>
 
@@ -1022,6 +1077,68 @@ const CSS = `
 .kct-pillar-b{
   font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
   line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:8px 0 0;
+}
+
+
+/* Signs checklist ---------------------------------------------------------
+   A narrow column on a soft cream card. Each row is a tick and a title with a
+   chevron; opening one shows what it means. The panel at the foot answers how
+   many are ticked. */
+.kct-symptoms-sec{background:#fff;}
+.kct-symptoms{
+  max-width:640px;margin:0 auto;padding:40px 24px;
+  background:#FFFBF5;border:1px solid #F3E7D6;border-radius:24px;
+}
+.kct-symptoms .kct-sub{margin-bottom:24px;}
+.kct-signs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+.kct-sign{background:#fff;border:1px solid var(--s-1);border-radius:10px;padding:12px 14px;}
+.kct-sign.is-open{border-color:var(--s-green-1);}
+.kct-sign-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.kct-sign-tick{display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;}
+.kct-sign-tick input{position:absolute;opacity:0;width:0;height:0;}
+/* The box is drawn rather than native so the tick can be the brand green. */
+.kct-sign-tick > span[aria-hidden]{
+  flex:none;width:18px;height:18px;border-radius:4px;
+  border:1.5px solid var(--s-1);background:#fff;
+  display:inline-flex;align-items:center;justify-content:center;transition:all .12s ease;
+}
+.kct-sign-tick input:checked + span[aria-hidden]{background:var(--p-main);border-color:var(--p-main);}
+.kct-sign-tick input:checked + span[aria-hidden]::after{
+  content:'';width:5px;height:9px;margin-top:-2px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+}
+.kct-sign-tick input:focus-visible + span[aria-hidden]{box-shadow:0 0 0 3px rgba(24,158,79,.25);}
+.kct-sign-t{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:500!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.kct-sign-more{
+  flex:none;display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border:0;background:none;cursor:pointer;color:var(--t-muted);
+  transition:transform .15s ease;
+}
+.kct-sign.is-open .kct-sign-more{transform:rotate(180deg);}
+.kct-sign-b{
+  margin:8px 0 0;
+  font-family:var(--body)!important;font-size:12px!important;font-weight:400!important;
+  line-height:18px!important;letter-spacing:0!important;color:var(--t-body)!important;
+}
+.kct-signs-out{
+  display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;
+  margin-top:20px;padding:20px;background:#fff;border:1px solid var(--s-1);border-radius:12px;
+}
+.kct-signs-ico{
+  display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;
+  border-radius:8px;border:1px solid #F0D9B8;background:#FFF8EE;color:#D97706;
+}
+.kct-signs-out p{
+  margin:0;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
+}
+@media (max-width:640px){
+  .kct-symptoms{padding:24px 16px;border-radius:16px;}
 }
 
 /* responsive -------------------------------------------------------------
