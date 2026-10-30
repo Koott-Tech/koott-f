@@ -1143,8 +1143,8 @@ const CSS = `
   background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:20px;
 }
 .kct-card--plan .kct-card-t,.kct-card--plan .kct-card-t:not(#_){
-  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
-  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
+  font-family:var(--sans)!important;font-size:20px!important;font-weight:600!important;
+  line-height:28px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
 }
 .kct-card--plan .kct-card-b{
   font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
@@ -1216,8 +1216,8 @@ const CSS = `
 }
 .kct-sign-tick input:focus-visible + span[aria-hidden]{box-shadow:0 0 0 3px rgba(24,158,79,.25);}
 .kct-sign-t{
-  font-family:var(--body)!important;font-size:14px!important;font-weight:500!important;
-  line-height:22px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+  font-family:var(--body)!important;font-size:18px!important;font-weight:500!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;
   overflow:hidden;text-overflow:ellipsis;
 }
 .kct-sign-more{
@@ -1302,7 +1302,7 @@ const CSS = `
    body size. Used by "how therapy helps". */
 .kct-seek--soft .kct-seek-row{background:var(--bg-soft);border-color:transparent;}
 .kct-seek--soft .kct-seek-row.is-open{background:var(--bg-soft);border-color:var(--s-1);}
-.kct-seek--soft .kct-seek-t{font-size:16px!important;line-height:24px!important;font-weight:500!important;}
+.kct-seek--soft .kct-seek-t{font-size:18px!important;line-height:26px!important;font-weight:500!important;}
 .kct-band-p--lead{font-size:16px!important;line-height:24px!important;color:var(--t-primary)!important;}
 
 
@@ -1340,8 +1340,8 @@ const CSS = `
   background:none;border:0;padding:0;cursor:pointer;text-align:left;
 }
 .kct-faq-row button > span:first-child{
-  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:22px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+  font-family:var(--body)!important;font-size:18px!important;font-weight:400!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;
 }
 .kct-faq-sign{flex:none;font-size:18px;line-height:1;color:var(--t-muted);}
 .kct-faq-row p{
@@ -1437,8 +1437,8 @@ const CSS = `
 .kct-blog-img--ph{background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);}
 .kct-blog-t{
   margin:12px 0 0;
-  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:22px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:400!important;
+  line-height:24px!important;letter-spacing:0!important;color:var(--t-primary)!important;
 }
 .kct-blog-more{
   display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:14px;
