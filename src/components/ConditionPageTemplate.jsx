@@ -1216,7 +1216,7 @@ const CSS = `
 .kct-on-dark{padding:40px 0;}
 .kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:center;}
 .kct-why-media{
-  position:relative;height:420px;border-radius:12px;overflow:hidden;
+  position:relative;height:400px;border-radius:12px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 100%);
 }
@@ -1225,8 +1225,8 @@ const CSS = `
 .kct-on-dark .kct-sub{color:#fff!important;font-size:16px!important;line-height:24px!important;margin-top:11px;}
 .kct-why-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(2,minmax(141.5px,auto));grid-auto-flow:column;
-  gap:16px;margin-top:24px;
+  grid-template-rows:repeat(2,minmax(120px,auto));grid-auto-flow:column;
+  column-gap:16px;row-gap:12px;margin-top:20px;
 }
 .kct-why .kct-fig-play{
   position:absolute;width:72px;height:72px;border-radius:50%;
@@ -1236,7 +1236,7 @@ const CSS = `
 }
 .kct-on-dark .kct-card--solid{
   background:linear-gradient(180deg,#094334 0%,#0E765C 100%);
-  border:0;border-radius:10px;padding:16px;min-height:141.5px;
+  border:0;border-radius:10px;padding:14px 16px;min-height:120px;
 }
 .kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
   font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
