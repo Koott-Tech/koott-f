@@ -332,12 +332,14 @@ export default function ConditionPageTemplate({ data }) {
         <div className="kct-steps">
           {d.howItWorks.steps.map((s, i) => (
             <div key={i} className="kct-step">
-              <span className="kct-num" aria-hidden>{i + 1}</span>
-              <div className="kct-step-copy">
-                <h3 className="kct-step-t">{s.title}</h3>
-                <p className="kct-step-b">{s.body}</p>
-                <StepMedia step={i} therapists={therapists} />
+              <div className="kct-step-head">
+                <span className="kct-num" aria-hidden>{i + 1}</span>
+                <div className="kct-step-copy">
+                  <h3 className="kct-step-t">{s.title}</h3>
+                  <p className="kct-step-b">{s.body}</p>
+                </div>
               </div>
+              <StepMedia step={i} therapists={therapists} />
             </div>
           ))}
         </div>
@@ -1175,10 +1177,14 @@ const CSS = `
   display:grid;grid-template-columns:repeat(2,minmax(0,374px));gap:24px;margin-top:32px;
   justify-content:center;
 }
+/* The card is a column: the number beside the copy, then the picture under
+   both. The picture starts where the number starts — x=600 against a card at
+   574 with 24 padding — not where the title does. */
 .kct-step{
-  display:flex;align-items:flex-start;gap:11px;
+  display:flex;flex-direction:column;
   background:#fff;border:1px solid var(--s-1);border-radius:16px;padding:24px;
 }
+.kct-step-head{display:flex;align-items:flex-start;gap:11px;}
 .kct-step-copy{min-width:0;}
 .kct-step-t,.kct-step-t:not(#_){
   margin:0;
@@ -1536,7 +1542,7 @@ const CSS = `
 
 /* The illustration at the foot of each step card. Sizes are the design's:
    ~58 faces, a 70-tall media row, 8 radius on the tiles. */
-.kct-step-media{margin-top:20px;display:flex;align-items:center;gap:7px;}
+.kct-step-media{margin-top:auto;padding-top:28px;display:flex;align-items:center;gap:8px;}
 .kct-step-faces img{
   width:58px;height:58px;border-radius:999px;object-fit:cover;flex:none;
   background:#EFF4F0;
