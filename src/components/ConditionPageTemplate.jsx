@@ -1213,10 +1213,10 @@ const CSS = `
 
    The cards are a lift off the band rather than a different colour, which is
    what keeps them legible on it. */
-.kct-on-dark{padding:57px 0;}
+.kct-on-dark{padding:40px 0;}
 .kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:center;}
 .kct-why-media{
-  position:relative;height:474px;border-radius:12px;overflow:hidden;
+  position:relative;height:420px;border-radius:12px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 100%);
 }
