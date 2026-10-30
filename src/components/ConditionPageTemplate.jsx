@@ -1214,7 +1214,7 @@ const CSS = `
    The cards are a lift off the band rather than a different colour, which is
    what keeps them legible on it. */
 .kct-on-dark{padding:57px 0;}
-.kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:start;}
+.kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:center;}
 .kct-why-media{
   position:relative;height:474px;border-radius:12px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
@@ -1235,7 +1235,8 @@ const CSS = `
   filter:drop-shadow(0 6px 10px rgba(2,85,69,.3));
 }
 .kct-on-dark .kct-card--solid{
-  background:#0A4636;border:0;border-radius:10px;padding:16px;min-height:141.5px;
+  background:linear-gradient(180deg,#094334 0%,#0E765C 100%);
+  border:0;border-radius:10px;padding:16px;min-height:141.5px;
 }
 .kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
   font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
