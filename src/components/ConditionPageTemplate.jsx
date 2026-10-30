@@ -1213,6 +1213,7 @@ const CSS = `
 
    The cards are a lift off the band rather than a different colour, which is
    what keeps them legible on it. */
+.kct-on-dark{padding:57px 0;}
 .kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:start;}
 .kct-why-media{
   position:relative;height:474px;border-radius:12px;overflow:hidden;
@@ -1222,7 +1223,11 @@ const CSS = `
 .kct-why-body{min-width:0;}
 .kct-on-dark .kct-h2,.kct-on-dark .kct-h2:not(#_){color:#fff!important;}
 .kct-on-dark .kct-sub{color:rgba(255,255,255,.82)!important;font-size:16px!important;line-height:24px!important;}
-.kct-why-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px;}
+.kct-why-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(141.5px,auto));grid-auto-flow:column;
+  gap:16px;margin-top:24px;
+}
 .kct-why .kct-fig-play{
   position:absolute;width:72px;height:72px;border-radius:50%;
   background:var(--p-main);color:#fff;display:flex;align-items:center;justify-content:center;
@@ -1230,8 +1235,7 @@ const CSS = `
   filter:drop-shadow(0 6px 10px rgba(2,85,69,.3));
 }
 .kct-on-dark .kct-card--solid{
-  background:linear-gradient(135deg,rgba(24,158,79,.22) 0%,rgba(24,158,79,.08) 100%);
-  border:1px solid rgba(191,227,203,.18);border-radius:10px;padding:16px;
+  background:#0A4636;border:0;border-radius:10px;padding:16px;min-height:141.5px;
 }
 .kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
   font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
@@ -1648,6 +1652,8 @@ const CSS = `
   .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
   .kct-stat-l{font-size:12px!important;line-height:18px!important;}
   .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-grid-4--plans,.kct-therapists,.kct-why-grid,.kct-pillars{grid-template-columns:1fr;}
+  .kct-why-grid{grid-template-rows:auto;grid-auto-flow:row;}
+  .kct-on-dark .kct-card--solid{min-height:0;}
   .kct-steps{grid-template-columns:minmax(0,1fr);}
   .kct-about-card{padding:20px;}
   .kct-therapists{margin-left:0;margin-right:0;gap:16px;}
