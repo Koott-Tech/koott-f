@@ -347,9 +347,11 @@ export default function ConditionPageTemplate({ data }) {
 
       {/* ── Why ────────────────────────────────────────────────────────── */}
       <Section bg="var(--p-darkest)" className="kct-on-dark">
-        <div className="kct-split kct-split--rev">
-          <div className="kct-figure kct-figure--tall" aria-hidden />
-          <div>
+        <div className="kct-why">
+          <div className="kct-why-media" aria-hidden>
+            <span className="kct-fig-play">▶</span>
+          </div>
+          <div className="kct-why-body">
             <h2 className="kct-h2">{d.why.title}</h2>
             <p className="kct-sub">{d.why.subtitle}</p>
             <div className="kct-why-grid">
@@ -771,7 +773,11 @@ const CSS = `
    1180 it shrinks with the viewport, and at tablet and phone the gutter
    narrows to the 16px the mobile frame uses (358 inside 390). */
 .kct-sec{padding:64px 0;}
-.kct-in{max-width:1140px;margin:0 auto;padding:0 24px;}
+/* 1140 of content, not 1140 including the gutter. Every section in the design
+   runs 390 to 1530 on a 1920 frame — the plans row is four 267 cards 24 apart,
+   the blogs three 358.7 cards 32 apart, both exactly 1140 — and the column was
+   24 short on each side of that. */
+.kct-in{max-width:1188px;margin:0 auto;padding:0 24px;}
 .kct-center{text-align:center!important;}
 
 /* Type, from the Figma text styles. H2/Web is 32 and H2/Mob is 24/32, so the
@@ -910,7 +916,7 @@ const CSS = `
 /* .kct-in holds the page at 1140 less its 24 gutters, so the strip has to step
    outside it to reach 1180. Only once the viewport can take it. */
 @media (min-width:1228px){
-  .kct-therapists{margin-left:calc(50% - 590px);margin-right:calc(50% - 590px);}
+  .kct-therapists{margin-left:-20px;margin-right:-20px;}
 }
 .kct-more{display:flex;justify-content:center;margin:24px 0 0;}
 /* The live grid spans the full 980 column, outside .kct-in's 20px gutter,
@@ -920,12 +926,7 @@ const CSS = `
 .kct-more{text-align:center;margin:26px 0 0;}
 .kct-more a{font-family:var(--sans)!important;font-size:15px;color:var(--deep2)!important;text-decoration:none;}
 
-/* split sections (how it works / why) ----------------------------------- */
-.kct-split{display:grid;grid-template-columns:1fr 330px;gap:74px;align-items:start;
-  max-width:890px;margin-left:auto;margin-right:auto;}
-.kct-split--rev{grid-template-columns:316px 1fr;}
 .kct-figure{border-radius:10px;background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);}
-.kct-figure--tall{min-height:456px;}
 .kct-figure--video{
   background:var(--deep);position:relative;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
@@ -936,7 +937,6 @@ const CSS = `
   background:var(--accent);color:#fff;display:flex;align-items:center;
   justify-content:center;font-size:24px;padding-left:5px;
 }
-.kct-on-dark .kct-figure{background:rgba(255,255,255,.08);min-height:431px;}
 .kct-on-dark .kct-h2,.kct-on-dark .kct-sub{color:#fff!important;}
 .kct-steps{display:flex;flex-direction:column;gap:13px;margin-top:24px;}
 .kct-why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:20px;}
@@ -1206,12 +1206,29 @@ const CSS = `
 
 
 /* Why Koott ---------------------------------------------------------------
-   A Primary Darkest band: the video on the left, the heading, its line and a
-   two-by-two grid on the right. The cards are a lift off the band rather than
-   a different colour, which is what keeps them legible on it. */
+   Measured off the design: a 316x474 portrait video, 40 from a 784 column
+   holding the heading, its line and four 384x141 cards 16 apart. The whole
+   block is 1140 — the page column — where it had been running at the old Wix
+   890 with a 74 gutter and 242 cards.
+
+   The cards are a lift off the band rather than a different colour, which is
+   what keeps them legible on it. */
+.kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:start;}
+.kct-why-media{
+  position:relative;height:474px;border-radius:12px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 100%);
+}
+.kct-why-body{min-width:0;}
 .kct-on-dark .kct-h2,.kct-on-dark .kct-h2:not(#_){color:#fff!important;}
 .kct-on-dark .kct-sub{color:rgba(255,255,255,.82)!important;font-size:16px!important;line-height:24px!important;}
 .kct-why-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px;}
+.kct-why .kct-fig-play{
+  position:absolute;width:72px;height:72px;border-radius:50%;
+  background:var(--p-main);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:24px;padding-left:5px;
+  filter:drop-shadow(0 6px 10px rgba(2,85,69,.3));
+}
 .kct-on-dark .kct-card--solid{
   background:linear-gradient(135deg,rgba(24,158,79,.22) 0%,rgba(24,158,79,.08) 100%);
   border:1px solid rgba(191,227,203,.18);border-radius:10px;padding:16px;
@@ -1256,7 +1273,7 @@ const CSS = `
    The explanation sits in a white card beside a photo, and the pillars run
    two-up below it. The heading lives inside the card, not centred above the
    band, which is what the design draws. */
-.kct-about-top{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;align-items:start;}
+.kct-about-top{display:grid;grid-template-columns:minmax(0,1fr) 412px;gap:24px;align-items:start;}
 .kct-about-card{background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:24px;}
 .kct-about-media{
   border-radius:12px;min-height:300px;align-self:stretch;
@@ -1515,7 +1532,7 @@ const CSS = `
 /* Blogs & Events ----------------------------------------------------------
    Three cards: a cover, the title, and a "Read more" that sits at the foot
    however long the title runs. */
-.kct-blogs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:28px;}
+.kct-blogs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:28px;}
 .kct-blog{
   display:flex;flex-direction:column;text-decoration:none;
   background:var(--bg-soft);border:1px solid var(--s-green-2);border-radius:12px;padding:12px;
@@ -1601,11 +1618,11 @@ const CSS = `
 
 /* Tablet: the hero's 374 media and 1140 column no longer fit side by side. */
 @media (max-width:1024px){
-  .kct-hero-grid,.kct-split,.kct-split--rev{grid-template-columns:1fr;gap:32px;}
+  .kct-hero-grid,.kct-why{grid-template-columns:1fr;gap:32px;}
+  .kct-why-media{height:auto;aspect-ratio:358/230;}
   /* Square at 374 is right beside the text; stacked it would be half the
      fold. It becomes a band at the ratio the phone frame uses (358/230). */
   .kct-hero-media{width:100%;max-width:none;height:auto;aspect-ratio:358/230;}
-  .kct-split--rev .kct-figure{order:2;}
   .kct-figure--tall{min-height:260px;}
   .kct-grid-3,.kct-grid-3--wide,.kct-therapists{grid-template-columns:repeat(2,minmax(0,1fr));}
   .kct-about-top{grid-template-columns:1fr;}
