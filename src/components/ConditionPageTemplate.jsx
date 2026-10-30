@@ -69,6 +69,77 @@ const ModeIcon = ({ name }) =>
     </svg>
   );
 
+/**
+ * The illustration at the foot of each "how it works" card.
+ *
+ * The design draws a different one per step — faces, a date strip, a call, two
+ * avatars — and every one of the 45 pages carries the same four steps in the
+ * same order, so they are keyed by position rather than authored per page.
+ *
+ * They are built from the therapists the page already loaded and from markup,
+ * not from stock art: a slot that needed an asset nobody has would be an empty
+ * frame on every page.
+ */
+function StepMedia({ step, therapists }) {
+  const faces = therapists.filter((t) => t.photo).slice(0, 5);
+
+  if (step === 0) {
+    if (faces.length < 2) return null;
+    return (
+      <div className="kct-step-media kct-step-faces" aria-hidden>
+        {faces.map((t, i) => <img key={i} src={t.photo} alt="" loading="lazy" />)}
+      </div>
+    );
+  }
+
+  if (step === 1) {
+    // Real dates, so the strip is never showing a day that has gone by.
+    const today = new Date();
+    const days = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      return {
+        label: d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'Asia/Kolkata' }),
+        day: d.toLocaleDateString('en-GB', { day: '2-digit', timeZone: 'Asia/Kolkata' }),
+      };
+    });
+    return (
+      <div className="kct-step-media kct-step-dates" aria-hidden>
+        <div className="kct-step-days">
+          {days.map((d, i) => (
+            <span key={i} className={i === 1 ? 'is-on' : ''}>
+              <small>{d.label}</small><b>{d.day}</b>
+            </span>
+          ))}
+        </div>
+        <div className="kct-step-slot"><small>Today</small><b>4 PM</b></div>
+      </div>
+    );
+  }
+
+  if (step === 2) {
+    const who = faces[0];
+    return (
+      <div className="kct-step-media kct-step-call" aria-hidden>
+        <span className="kct-step-tile" />
+        <span className="kct-step-tile kct-step-tile--call">
+          {who && <img src={who.photo} alt="" loading="lazy" />}
+          <span className="kct-step-dots"><i /><i /><i /></span>
+        </span>
+      </div>
+    );
+  }
+
+  if (faces.length < 2) return null;
+  return (
+    <div className="kct-step-media kct-step-pair" aria-hidden>
+      <img className="kct-step-mark" src="/logo.png" alt="" loading="lazy" />
+      <img src={faces[0].photo} alt="" loading="lazy" />
+      <img src={faces[1].photo} alt="" loading="lazy" />
+    </div>
+  );
+}
+
 /* ---------- building blocks ---------- */
 
 const Section = ({ children, bg, className = '', id }) => (
@@ -161,7 +232,9 @@ export default function ConditionPageTemplate({ data }) {
       .then((res) => {
         if (off) return;
         const rows = res?.data?.psychologists || res?.data || [];
-        setLiveTherapists(Array.isArray(rows) ? rows.slice(0, 3).map(toCard) : []);
+        // More than the three cards need: the "choose a therapist" step shows a
+        // row of faces, and the design puts five in it.
+        setLiveTherapists(Array.isArray(rows) ? rows.slice(0, 8).map(toCard) : []);
       })
       .catch(() => { if (!off) setLiveTherapists([]); });
     return () => { off = true; };
@@ -239,7 +312,7 @@ export default function ConditionPageTemplate({ data }) {
 
         <div className="kct-therapists">
           <ResumeBooking />
-          {therapists.map((t, i) => (
+          {therapists.slice(0, 3).map((t, i) => (
             <TherapistCard key={t.id || i} t={t} />
           ))}
         </div>
@@ -263,6 +336,7 @@ export default function ConditionPageTemplate({ data }) {
               <div className="kct-step-copy">
                 <h3 className="kct-step-t">{s.title}</h3>
                 <p className="kct-step-b">{s.body}</p>
+                <StepMedia step={i} therapists={therapists} />
               </div>
             </div>
           ))}
@@ -1458,6 +1532,59 @@ const CSS = `
 }
 @media (max-width:1024px){ .kct-blogs{grid-template-columns:repeat(2,minmax(0,1fr));} }
 @media (max-width:640px){ .kct-blogs{grid-template-columns:1fr;} }
+
+
+/* The illustration at the foot of each step card. Sizes are the design's:
+   ~58 faces, a 70-tall media row, 8 radius on the tiles. */
+.kct-step-media{margin-top:20px;display:flex;align-items:center;gap:7px;}
+.kct-step-faces img{
+  width:58px;height:58px;border-radius:999px;object-fit:cover;flex:none;
+  background:#EFF4F0;
+}
+.kct-step-dates{gap:12px;}
+.kct-step-days{
+  flex:1;min-width:0;display:flex;align-items:center;gap:2px;
+  /* The design fades the strip at both ends, as a scroller would. */
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);
+}
+.kct-step-days span{
+  flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;
+}
+.kct-step-days small{font-size:11px;line-height:16px;color:var(--t-muted);}
+.kct-step-days b{
+  font-size:11px;line-height:20px;font-weight:500;color:var(--t-body);
+  width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;
+}
+.kct-step-days .is-on b{background:var(--p-dark);color:#fff;}
+.kct-step-days .is-on small{color:var(--t-primary);}
+.kct-step-slot{
+  flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:8px 14px;border-radius:10px;background:var(--bg-soft);
+}
+.kct-step-slot small{font-size:11px;line-height:16px;color:var(--t-body);}
+.kct-step-slot b{font-size:15px;line-height:22px;font-weight:600;color:var(--p-dark);}
+.kct-step-call{gap:8px;}
+.kct-step-tile{
+  position:relative;flex:1;height:70px;border-radius:8px;overflow:hidden;
+  background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+}
+.kct-step-tile img{width:100%;height:100%;object-fit:cover;display:block;}
+.kct-step-dots{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;}
+.kct-step-dots i{width:14px;height:14px;border-radius:999px;background:rgba(255,255,255,.9);display:block;}
+.kct-step-pair{position:relative;justify-content:center;gap:28px;min-height:76px;}
+.kct-step-pair img:not(.kct-step-mark){
+  width:62px;height:62px;border-radius:999px;object-fit:cover;background:#EFF4F0;position:relative;z-index:1;
+}
+/* The mark sits behind the two faces, barely there, as the design has it. */
+.kct-step-mark{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:190px;height:auto;opacity:.08;z-index:0;
+}
+@media (max-width:640px){
+  .kct-step-faces img{width:46px;height:46px;}
+  .kct-step-mark{width:150px;}
+}
 
 /* responsive -------------------------------------------------------------
    Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is
