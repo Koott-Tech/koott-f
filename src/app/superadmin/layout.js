@@ -68,7 +68,7 @@ export default function SuperAdminLayout({ children }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
-      const cmsPaths = ['/superadmin/blogs', '/superadmin/counselling', '/superadmin/assessments', '/superadmin/better-parenting'];
+      const cmsPaths = ['/superadmin/blogs', '/superadmin/assessments', '/superadmin/better-parenting'];
       const isOnCmsPage = cmsPaths.some(path => currentPath.startsWith(path));
       if (isOnCmsPage) {
         setIsCmsMenuOpen(true);
@@ -155,7 +155,6 @@ export default function SuperAdminLayout({ children }) {
       hasSubmenu: true,
       submenu: [
         { name: 'Blogs', href: '/superadmin/blogs', icon: FileText },
-        { name: 'Counselling Pages', href: '/superadmin/counselling', icon: MessageSquare },
         { name: 'Assessment Pages', href: '/superadmin/assessments', icon: FileText },
         { name: 'Better Parenting', href: '/superadmin/better-parenting', icon: FileText },
       ]

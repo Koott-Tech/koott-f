@@ -84,7 +84,7 @@ export default function AdminLayout({ children }) {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
-      const cmsPaths = ['/admin/blogs', '/admin/counselling', '/admin/site-pages', '/admin/careers', '/admin/events-cms'];
+      const cmsPaths = ['/admin/blogs', '/admin/careers', '/admin/events-cms'];
       const isOnCmsPage = cmsPaths.some(path => currentPath.startsWith(path));
       if (isOnCmsPage) {
         setIsCmsMenuOpen(true);
@@ -114,12 +114,14 @@ export default function AdminLayout({ children }) {
       name: 'CMS',
       icon: Layers,
       hasSubmenu: true,
+      // What is still written here. The condition pages, the home page, about
+      // and the FAQ left the CMS: their copy is in the repository now
+      // (data/conditionPages.js and the rest of data/), so editing them is a
+      // commit. Their routes still exist and still read the database, so an
+      // old link opens an editor whose changes no longer reach the site —
+      // which is why they are not in this menu.
       submenu: [
         { name: 'Blogs', href: '/admin/blogs', icon: FileText },
-        // One universal page editor for every page (one design site-wide). The
-        // per-menu Assessment / Better Parenting editors were little.care leftovers;
-        // their routes still exist but are no longer in the menu.
-        { name: 'Pages', href: '/admin/counselling', icon: MessageSquare },
         { name: 'Careers', href: '/admin/careers', icon: Briefcase },
         { name: 'Event pages', href: '/admin/events-cms', icon: Ticket },
       ]

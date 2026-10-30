@@ -282,8 +282,8 @@ export default function ConditionPageTemplate({ data }) {
 
       {/* ── Reviews ────────────────────────────────────────────────────── */}
       <Section className="kct-reviews-sec">
-        <p className="kct-kicker">{d.reviews.eyebrow}</p>
-        <h3 className="kct-reviews-h">{d.reviews.title}</h3>
+        {d.reviews.eyebrow && <p className="kct-kicker">{d.reviews.eyebrow}</p>}
+        <h2 className="kct-h2 kct-center kct-reviews-h">{d.reviews.title}</h2>
         <div className="kct-reviews">
           {d.reviews.items.map((r, i) => (
             <figure key={i} className="kct-review">
@@ -411,10 +411,12 @@ export default function ConditionPageTemplate({ data }) {
 
       {/* ── Mid CTA band ───────────────────────────────────────────────── */}
       <Section>
-        <div className="kct-band">
-          <div className="kct-band-art" aria-hidden />
-          <h5 className="kct-band-title">{d.midCta.text}</h5>
-          <OutlineButton href={d.midCta.cta.href}>{d.midCta.cta.label}</OutlineButton>
+        <div className="kct-bookband">
+          <span className="kct-bookband-art" aria-hidden />
+          <div className="kct-bookband-copy">
+            <p className="kct-band-p kct-band-p--lead">{d.midCta.text}</p>
+          </div>
+          <BookButton href={d.midCta.cta.href}>{d.midCta.cta.label}</BookButton>
         </div>
       </Section>
 
@@ -566,11 +568,13 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Closing CTA ────────────────────────────────────────────────── */}
-      <Section bg="#FFFFFF" className="kct-end">
-        <h4 className="kct-end-h">
-          We have supported over 1 million lives,<br />with 4.9 star reviews
-        </h4>
-        <BookButton href={d.hero.primaryCta.href}>{d.hero.primaryCta.label}</BookButton>
+      <Section bg="var(--bg-soft)" className="kct-end">
+        <h2 className="kct-h2 kct-center">
+          We have supported over 1 million lives, with 4.9 star reviews
+        </h2>
+        <div className="kct-end-cta">
+          <BookButton href={d.hero.primaryCta.href}>{d.hero.primaryCta.label}</BookButton>
+        </div>
       </Section>
     </main>
   );
@@ -1311,6 +1315,77 @@ const CSS = `
   line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
 }
 .kct-faq-empty{text-align:center;color:var(--t-muted)!important;}
+
+
+/* Reviews -----------------------------------------------------------------
+   A Primary Darkest band with the quotes in a column layout, as the design
+   draws it: cards of different heights packed into four columns rather than a
+   row of equal boxes. The cards are a lift off the band, like the Why ones. */
+.kct-reviews-sec{background:var(--p-darkest);}
+.kct-reviews-sec .kct-kicker{color:rgba(255,255,255,.72)!important;}
+.kct-reviews-h,.kct-reviews-h:not(#_){color:#fff!important;margin:0 0 28px;}
+.kct-reviews{
+  columns:4;column-gap:20px;
+}
+.kct-review{
+  break-inside:avoid;margin:0 0 20px;padding:18px;
+  background:linear-gradient(135deg,rgba(24,158,79,.20) 0%,rgba(24,158,79,.07) 100%);
+  border:1px solid rgba(191,227,203,.16);border-radius:12px;
+}
+.kct-review-quote{
+  margin:0;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:rgba(255,255,255,.88)!important;
+}
+.kct-review-person{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.kct-review-avatar{
+  flex:none;width:36px;height:36px;border-radius:999px;overflow:hidden;
+  background:rgba(255,255,255,.14);display:inline-flex;
+}
+.kct-review-avatar img{width:100%;height:100%;object-fit:cover;}
+.kct-review-who{display:flex;flex-direction:column;min-width:0;}
+.kct-review-name{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:500!important;
+  line-height:22px!important;color:#fff!important;
+}
+.kct-review-age{
+  font-family:var(--body)!important;font-size:12px!important;font-weight:400!important;
+  line-height:18px!important;color:rgba(255,255,255,.62)!important;
+}
+.kct-review-src{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:999px;margin-bottom:10px;
+  background:#fff;color:var(--t-primary);font-size:12px;font-weight:600;
+}
+.kct-review-src img{width:14px;height:14px;object-fit:contain;}
+
+/* CTA bands ---------------------------------------------------------------
+   The full-bleed green strip, and the mid-page one, both become the same
+   soft band the design uses elsewhere on the page. */
+.kct-ctaband{background:var(--p-light);padding:28px 0;}
+.kct-ctaband-in{
+  max-width:1140px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;
+}
+.kct-cta-text{
+  margin:0;
+  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+}
+.kct-btn-cta{
+  display:inline-flex;align-items:center;gap:10px;height:40px;padding:8px 22px;
+  border-radius:8px;background:var(--p-main);color:#fff!important;text-decoration:none;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:500;line-height:24px;
+  transition:background-color .2s ease;
+}
+.kct-btn-cta:hover{background:var(--p-dark);}
+
+@media (max-width:1024px){ .kct-reviews{columns:2;} }
+@media (max-width:640px){ .kct-reviews{columns:1;} }
+
+
+/* Closing line ------------------------------------------------------------ */
+.kct-end-cta{display:flex;justify-content:center;margin-top:20px;}
 
 /* responsive -------------------------------------------------------------
    Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is
