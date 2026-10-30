@@ -228,7 +228,7 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Therapists ─────────────────────────────────────────────────── */}
-      <Section bg="#F5FFF6">
+      <Section bg="linear-gradient(180deg,#E5F0DD 0%,#FFFFFF 100%)">
         {/* The design is the heading, the cards, then one button. There is no
             filter row on it, and the dropdowns that used to sit here were
             decorative — buttons with no handler — so they are gone rather than
@@ -612,15 +612,10 @@ export default function ConditionPageTemplate({ data }) {
         </div>
       </Section>
 
-      {/* ── Closing CTA ────────────────────────────────────────────────── */}
-      <Section bg="var(--bg-soft)" className="kct-end">
-        <h2 className="kct-h2 kct-center">
-          We have supported over 1 million lives, with 4.9 star reviews
-        </h2>
-        <div className="kct-end-cta">
-          <BookButton href={d.hero.primaryCta.href}>{d.hero.primaryCta.label}</BookButton>
-        </div>
-      </Section>
+      {/* The design runs FAQ straight into the footer. What stood here was a
+          closing panel the Wix page had — "We have supported over 1 million
+          lives" above a Book button — which the design does not draw, and the
+          page already asks three times above this. */}
     </main>
   );
 }
@@ -1042,11 +1037,6 @@ const CSS = `
 .kct-faq-empty{font-family:var(--body)!important;font-size:14px!important;padding:22px 0;}
 
 /* closing --------------------------------------------------------------- */
-.kct-end{text-align:center;}
-.kct-end-h{
-  font-family:var(--sans)!important;font-size:22px!important;font-weight:500!important;
-  line-height:1.4em!important;letter-spacing:-.03em!important;color:var(--ink)!important;margin:0 0 22px;
-}
 
 
 /* Therapist card, from the Figma -------------------------------------------
@@ -1429,8 +1419,6 @@ const CSS = `
 @media (max-width:640px){ .kct-reviews{columns:1;} }
 
 
-/* Closing line ------------------------------------------------------------ */
-.kct-end-cta{display:flex;justify-content:center;margin-top:20px;}
 
 
 /* Blogs & Events ----------------------------------------------------------
