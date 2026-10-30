@@ -259,8 +259,11 @@ export default function ConditionPageTemplate({ data }) {
         <div className="kct-steps">
           {d.howItWorks.steps.map((s, i) => (
             <div key={i} className="kct-step">
-              <h3 className="kct-step-t"><span className="kct-num">{i + 1}</span>{s.title}</h3>
-              <p className="kct-step-b">{s.body}</p>
+              <span className="kct-num" aria-hidden>{i + 1}</span>
+              <div className="kct-step-copy">
+                <h3 className="kct-step-t">{s.title}</h3>
+                <p className="kct-step-b">{s.body}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -1087,28 +1090,36 @@ const CSS = `
 
 
 /* How it works ------------------------------------------------------------
-   Two by two, white on a hairline, with the step number in its own small
-   square rather than running into the title. */
+   Measured off the design: two 374 cards 24 apart, so the grid is 772 rather
+   than the page's 1140 — it sits in from the column on both sides. Card
+   padding 24, the number a 34 square on a green hairline, and 12 between it
+   and the title.
+
+   The number is beside the copy, not inside the title, so the body lines up
+   under the title rather than under the number. */
 .kct-steps{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:32px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,374px));gap:24px;margin-top:32px;
+  justify-content:center;
 }
 .kct-step{
-  background:#fff;border:1px solid var(--s-1);border-radius:16px;padding:20px;
+  display:flex;align-items:flex-start;gap:11px;
+  background:#fff;border:1px solid var(--s-1);border-radius:16px;padding:24px;
 }
+.kct-step-copy{min-width:0;}
 .kct-step-t,.kct-step-t:not(#_){
-  display:flex;align-items:center;gap:12px;margin:0;
+  margin:0;
   font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;
 }
 .kct-num{
   flex:none;display:inline-flex;align-items:center;justify-content:center;
-  width:24px;height:24px;border-radius:6px;
-  border:1px solid var(--s-1);background:#fff;
+  width:34px;height:34px;border-radius:8px;
+  border:1px solid var(--s-green-1);background:#fff;
   font-family:var(--body)!important;font-size:12px!important;font-weight:500!important;
-  line-height:18px!important;color:var(--t-body)!important;
+  line-height:18px!important;color:var(--t-primary)!important;
 }
 .kct-step-b{
-  margin:8px 0 0;
+  margin:4px 0 0;
   font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
   line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
 }
@@ -1486,7 +1497,8 @@ const CSS = `
   .kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:24px;}
   .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
   .kct-stat-l{font-size:12px!important;line-height:18px!important;}
-  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-grid-4--plans,.kct-therapists,.kct-why-grid,.kct-steps,.kct-pillars{grid-template-columns:1fr;}
+  .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-grid-4--plans,.kct-therapists,.kct-why-grid,.kct-pillars{grid-template-columns:1fr;}
+  .kct-steps{grid-template-columns:minmax(0,1fr);}
   .kct-about-card{padding:20px;}
   .kct-therapists{margin-left:0;margin-right:0;gap:16px;}
   .kct-band{flex-direction:column;text-align:center;}
