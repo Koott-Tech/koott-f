@@ -5,6 +5,7 @@ import TherapistCard, { THERAPIST_CARD_CSS } from './TherapistCard';
 import { toCard } from './BookMalayaliPsychologists';
 import { ResumeBooking } from './ResumeBookingCard';
 import { publicApi } from '@/lib/backendApi';
+import { blogApi } from '@/lib/blogApi';
 
 /**
  * ConditionPageTemplate — layout for condition / counselling landing pages.
@@ -122,6 +123,22 @@ export default function ConditionPageTemplate({ data }) {
   const [openSeek, setOpenSeek] = useState(0);
   const [openHelp, setOpenHelp] = useState(0);
   const [openType, setOpenType] = useState(0);
+  const [posts, setPosts] = useState([]);
+
+  /**
+   * The blogs strip near the foot of the page. The condition pages carry no
+   * posts of their own — there is no `related` on any of them — so it shows
+   * the three most recent, which is what the design's three cards are. It
+   * renders nothing at all rather than three empty frames if the blog API is
+   * unreachable; this page is static and must not depend on it.
+   */
+  useEffect(() => {
+    let off = false;
+    blogApi.list({ limit: 3 })
+      .then((rows) => { if (!off) setPosts((Array.isArray(rows) ? rows : []).slice(0, 3)); })
+      .catch(() => { if (!off) setPosts([]); });
+    return () => { off = true; };
+  }, []);
   const [query, setQuery] = useState('');
   const [liveTherapists, setLiveTherapists] = useState([]);
   const d = data;
@@ -531,6 +548,34 @@ export default function ConditionPageTemplate({ data }) {
           <BookButton href={d.finalCta.cta.href}>{d.finalCta.cta.label}</BookButton>
         </div>
       </Section>
+
+      {/* ── Blogs & Events ───────────────────────────────────────────────
+          Three recent posts, as the design draws them: cover, title, and a
+          "Read more" with an arrow. Hidden entirely when there are none, so a
+          page that cannot reach the blog API shows no empty frames. */}
+      {posts.length > 0 && (
+        <Section bg="#fff" className="kct-blogs-sec">
+          <p className="kct-kicker">Blogs &amp; Events</p>
+          <h2 className="kct-h2 kct-center">We touch millions of life every year</h2>
+          <div className="kct-blogs">
+            {posts.map((b) => (
+              <a key={b.slug} className="kct-blog" href={`/blog/${b.slug}`}>
+                {b.featured_image_url
+                  ? <img className="kct-blog-img" src={b.featured_image_url} alt="" loading="lazy" />
+                  : <span className="kct-blog-img kct-blog-img--ph" aria-hidden />}
+                <span className="kct-blog-t">{b.title}</span>
+                <span className="kct-blog-more">
+                  Read more
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M7 17L17 7M8 7h9v9" />
+                  </svg>
+                </span>
+              </a>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* ── FAQs (Wix "line" theme: search + underlined rows) ──────────── */}
       <Section className="kct-faq-sec">
@@ -1386,6 +1431,34 @@ const CSS = `
 
 /* Closing line ------------------------------------------------------------ */
 .kct-end-cta{display:flex;justify-content:center;margin-top:20px;}
+
+
+/* Blogs & Events ----------------------------------------------------------
+   Three cards: a cover, the title, and a "Read more" that sits at the foot
+   however long the title runs. */
+.kct-blogs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:28px;}
+.kct-blog{
+  display:flex;flex-direction:column;text-decoration:none;
+  background:var(--bg-soft);border:1px solid var(--s-green-2);border-radius:12px;padding:12px;
+  transition:border-color .15s ease,transform .15s ease;
+}
+.kct-blog:hover{border-color:var(--s-green-1);transform:translateY(-2px);}
+.kct-blog-img{
+  display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:#EFF4F0;
+}
+.kct-blog-img--ph{background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);}
+.kct-blog-t{
+  margin:12px 0 0;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-primary)!important;
+}
+.kct-blog-more{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:14px;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:500!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--p-dark)!important;
+}
+@media (max-width:1024px){ .kct-blogs{grid-template-columns:repeat(2,minmax(0,1fr));} }
+@media (max-width:640px){ .kct-blogs{grid-template-columns:1fr;} }
 
 /* responsive -------------------------------------------------------------
    Two frames were drawn: 1920 (content 1140) and 390 (content 358). Tablet is
