@@ -7,11 +7,12 @@
  */
 
 import { useState } from "react";
-import { useSiteContent } from "@/lib/useSiteContent";
+import { mergeSiteContent } from "@/lib/siteContent";
 import FAQ_DEFAULTS from "@/data/faqContent";
 
 export default function FaqPage({ content: override } = {}) {
-  const { intro, items } = useSiteContent("site_faq", FAQ_DEFAULTS, override);
+  // Static: the copy is data/faqContent.js and nothing is fetched for it.
+  const { intro, items } = override ? mergeSiteContent(FAQ_DEFAULTS, override) : FAQ_DEFAULTS;
   const [openId, setOpenId] = useState("");
 
   return (

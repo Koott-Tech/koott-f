@@ -21,16 +21,16 @@
  * next.config.mjs) — open migration task #4 is to move them to our own storage.
  */
 
-import { useSiteContent } from '@/lib/useSiteContent';
+import { mergeSiteContent } from '@/lib/siteContent';
 import ABOUT_DEFAULTS from '@/data/aboutContent';
 
 /**
- * Copy lives in data/aboutContent.js; the admin "Pages → About" editor stores
- * changes under site-config `site_about`. `content` (the editor's live preview)
- * replaces the stored copy.
+ * Static: the copy is data/aboutContent.js and nothing is fetched for it.
+ * `content` is still honoured so a preview can pass copy in.
  */
 export default function AboutPage({ content: override } = {}) {
-  const { mission, story, trust, advisors, leadership, closing } = useSiteContent('site_about', ABOUT_DEFAULTS, override);
+  const { mission, story, trust, advisors, leadership, closing } =
+    override ? mergeSiteContent(ABOUT_DEFAULTS, override) : ABOUT_DEFAULTS;
   const founder = leadership.founder || {};
 
   return (

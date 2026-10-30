@@ -41,7 +41,7 @@ import {
   HERO, THERAPISTS_SECTION, HOW_IT_WORKS, OFFERS, CARE,
   REVIEWS, EXPERTS, SERVICES, FAQ, BLOGS, FINAL_CTA, HOME_DEFAULTS,
 } from '@/data/koottHomeContent';
-import { useSiteContent } from '@/lib/useSiteContent';
+import { mergeSiteContent } from '@/lib/siteContent';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 const BOOK = '/book-malayali-psychologists';
@@ -371,12 +371,14 @@ const faceUrl = (seed, i) =>
 
 export default function KoottHome({ content } = {}) {
   // Copy from data/koottHomeContent.js, with whatever the admin "Pages → Home"
-  // editor stored (site-config `site_home`) merged over it; `content` is that
-  // editor's live preview. These shadow the module imports of the same name.
+  // The home page is static: its copy is data/koottHomeContent.js and nothing
+  // is fetched for it. `content` is still honoured so a preview can pass copy
+  // in, but there is no stored version to merge any more. These shadow the
+  // module imports of the same name.
   const {
     HERO, THERAPISTS_SECTION, HOW_IT_WORKS, OFFERS, CARE,
     REVIEWS, EXPERTS, SERVICES, FAQ, BLOGS, FINAL_CTA,
-  } = useSiteContent('site_home', HOME_DEFAULTS, content);
+  } = useMemo(() => (content ? mergeSiteContent(HOME_DEFAULTS, content) : HOME_DEFAULTS), [content]);
   const therapists = useTherapists(60);
   // The home page's therapist cards count as a counsellor list view once loaded.
   const listSeen = useRef(false);

@@ -5,34 +5,40 @@
  *
  * Next resolves static segments before dynamic ones, so every real folder under
  * app/ (about-us, blog, admin, …) still wins; this only picks up what is left,
- * and calls notFound() when the slug is not a published row in the CMS.
+ * and calls notFound() when the slug is not one of ours.
  *
- * The page body comes from counselling_services.content, which is stored in the
- * exact shape ConditionPageTemplate renders.
+ * These are static. The copy lives in data/conditionPages.js — the same pages,
+ * exported from counselling_services rather than retyped — so the page no
+ * longer waits on the API, and a change to it is a commit rather than a form.
+ * Blog posts and careers stay in the CMS: those are written continuously by
+ * people who should not need a deploy.
  */
 
 import { notFound } from 'next/navigation';
 import ConditionPageTemplate from '@/components/ConditionPageTemplate';
 import StaticPageTemplate from '@/components/StaticPageTemplate';
-import { fetchCondition } from '@/lib/conditionApi';
-import { findStaticPage } from '@/data/koottStaticPages';
+import { findConditionPage, CONDITION_SLUGS } from '@/data/conditionPages';
+import { findStaticPage, KOOTT_STATIC_PAGES } from '@/data/koottStaticPages';
 
-// Rendered per request so a CMS edit shows up immediately. Deliberately no
-// generateStaticParams: it would make every build depend on the API being
-// reachable, and buys nothing for a page that is already fully dynamic.
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const dynamicParams = true;
+// Built at build time now that the content ships with the app. dynamicParams
+// stays false so a slug nobody wrote is a 404 rather than a render attempt.
+export const dynamic = 'force-static';
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  const ported = Object.keys(KOOTT_STATIC_PAGES || {});
+  return [...new Set([...CONDITION_SLUGS, ...ported])].map((conditionSlug) => ({ conditionSlug }));
+}
 
 const SITE = 'https://www.koott.in';
 
 export async function generateMetadata({ params }) {
   const { conditionSlug } = await params;
 
-  // Ported content pages (city landings, /business, /selfhelp …) are not in the
-  // CMS; they are checked after it so a CMS row always wins on a slug clash.
+  // Ported content pages (city landings, /business, /selfhelp …) are a separate
+  // set; a condition page wins on a slug clash, as it did when one was a CMS row.
   const stat = findStaticPage(conditionSlug);
-  const row = await fetchCondition(conditionSlug);
+  const row = findConditionPage(conditionSlug);
   if (!row && stat) {
     const url = `${SITE}/${conditionSlug}`;
     const title = stat.seo.title || stat.title;
@@ -73,7 +79,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ConditionPage({ params }) {
   const { conditionSlug } = await params;
-  const row = await fetchCondition(conditionSlug);
+  const row = findConditionPage(conditionSlug);
 
   if (!row?.content) {
     const stat = findStaticPage(conditionSlug);
