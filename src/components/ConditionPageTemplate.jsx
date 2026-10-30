@@ -1222,7 +1222,7 @@ const CSS = `
 }
 .kct-why-body{min-width:0;}
 .kct-on-dark .kct-h2,.kct-on-dark .kct-h2:not(#_){color:#fff!important;}
-.kct-on-dark .kct-sub{color:rgba(255,255,255,.82)!important;font-size:16px!important;line-height:24px!important;}
+.kct-on-dark .kct-sub{color:#fff!important;font-size:16px!important;line-height:24px!important;margin-top:11px;}
 .kct-why-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
   grid-template-rows:repeat(2,minmax(141.5px,auto));grid-auto-flow:column;
@@ -1243,7 +1243,7 @@ const CSS = `
 }
 .kct-on-dark .kct-card-b{
   font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:22px!important;letter-spacing:0!important;color:rgba(255,255,255,.78)!important;margin:8px 0 0;
+  line-height:22px!important;letter-spacing:0!important;color:#fff!important;margin:8px 0 0;
 }
 
 /* Plans -------------------------------------------------------------------
