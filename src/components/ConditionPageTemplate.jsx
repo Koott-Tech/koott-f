@@ -1542,19 +1542,23 @@ const CSS = `
 .kct-reviews-sec .kct-kicker{color:rgba(255,255,255,.72)!important;}
 .kct-reviews-h,.kct-reviews-h:not(#_){color:#fff!important;margin:0 0 28px;}
 .kct-reviews{
-  columns:4;column-gap:20px;
+  display:flex;gap:24px;overflow-x:auto;overscroll-behavior-x:contain;
+  margin-right:calc(50% - 50vw);padding:0 24px 0 0;
+  scrollbar-width:none;-ms-overflow-style:none;
 }
+.kct-reviews::-webkit-scrollbar{display:none;}
 .kct-review{
-  break-inside:avoid;margin:0 0 20px;padding:18px;
-  background:linear-gradient(135deg,rgba(24,158,79,.20) 0%,rgba(24,158,79,.07) 100%);
-  border:1px solid rgba(191,227,203,.16);border-radius:12px;
+  flex:none;width:452px;min-height:415px;margin:0;padding:20px;
+  display:flex;flex-direction:column;
+  background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+  border:0;border-radius:16px;
 }
 .kct-review-quote{
-  margin:0;
-  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:22px!important;letter-spacing:0!important;color:rgba(255,255,255,.88)!important;
+  margin:0;padding:0;background:none;border-radius:0;display:block;text-align:left;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:500!important;
+  line-height:24px!important;letter-spacing:0!important;color:#fff!important;
 }
-.kct-review-person{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.kct-review-person{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:16px;}
 .kct-review-avatar{
   flex:none;width:36px;height:36px;border-radius:999px;overflow:hidden;
   background:rgba(255,255,255,.14);display:inline-flex;
@@ -1726,6 +1730,8 @@ const CSS = `
   .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
   .kct-stat-l{font-size:12px!important;line-height:18px!important;}
   .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-grid-4--plans,.kct-therapists,.kct-why-grid,.kct-pillars{grid-template-columns:1fr;}
+  /* a 452 card is wider than the phone; one card to a screen instead */
+  .kct-review{width:calc(100vw - 48px);min-height:0;}
   .kct-helps-media{grid-template-columns:1fr;}
   .kct-why-grid{grid-template-rows:auto;grid-auto-flow:row;}
   .kct-on-dark .kct-card--solid{min-height:0;}
