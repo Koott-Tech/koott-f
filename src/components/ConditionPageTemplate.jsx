@@ -1326,7 +1326,7 @@ const CSS = `
 .kct-review--big::before{
   content:"";position:absolute;inset:0;border-radius:inherit;
   z-index:0;pointer-events:none;opacity:.25;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.34 0.33 0.33 0 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
   background-size:160px 160px;
 }
 .kct-on-dark .kct-card--solid > *,
