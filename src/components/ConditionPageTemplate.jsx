@@ -458,12 +458,6 @@ export default function ConditionPageTemplate({ data }) {
               </div>
             ))}
           </div>
-          {/* The file fades the ends with blurred plates, not a mask:
-              189x604 of #063327 at 88% under an 87 blur, one on the left
-              at x-40 and two stacked on the right at x1784. */}
-          <span className="kct-rev-fade kct-rev-fade--l" aria-hidden />
-          <span className="kct-rev-fade kct-rev-fade--r" aria-hidden />
-          <span className="kct-rev-fade kct-rev-fade--r" aria-hidden />
         </div>
       </Section>
 
@@ -1930,18 +1924,10 @@ const CSS = `
   position:relative;display:block;overflow:hidden;padding:0;
   margin:80px calc(50% - 50vw) 0 calc(50% - 50vw);
 }
-/* The file's plate is 189 wide with an 87 blur on a 1920 frame — about
-   a tenth of the width each side. Fixed pixels keep that size as the
-   window narrows, so by 1024 the pair covers a quarter of the band and
-   reads as a second background rather than a fade. Expressed as a
-   fraction of the viewport, it holds the design's proportion at any
-   width: 189/1920, 87/1920, -40/1920, -53/1920. */
-.kct-rev-fade{
-  position:absolute;top:-22px;width:9.84vw;height:604px;pointer-events:none;
-  background:rgba(6,51,39,.88);filter:blur(4.53vw);
-}
-.kct-rev-fade--l{left:-2.08vw;}
-.kct-rev-fade--r{right:-2.76vw;}
+/* The file ends the strip with blurred plates — 189x604 of #063327 at
+   88% under an 87 blur, one left and two stacked right. Taken out on
+   request: they are a tinted overlay over the band, and the band is to
+   carry nothing but the cards. The numbers are here if they come back. */
 .kct-rev-track{display:flex;width:max-content;animation:kct-rev-roll 72s linear infinite;}
 .kct-rev-track:hover{animation-play-state:paused;}
 .kct-rev-set{display:flex;align-items:flex-start;gap:24px;flex:none;margin-right:24px;}
@@ -2010,10 +1996,6 @@ const CSS = `
   .kct-rev-col--a,.kct-rev-col--b{width:calc(100vw - 48px);}
   .kct-review--big{width:calc(100vw - 48px);min-height:0;}
   .kct-reviews{margin-left:calc(50% - 50vw + 16px);}
-  /* a tenth of a phone is too little to read; give it a floor */
-  .kct-rev-fade{width:56px;filter:blur(28px);}
-  .kct-rev-fade--l{left:-20px;}
-  .kct-rev-fade--r{right:-20px;}
 }
 
 
