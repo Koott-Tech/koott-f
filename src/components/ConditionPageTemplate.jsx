@@ -982,7 +982,7 @@ const CSS = `
 
 
 .kct-more{text-align:center;margin:26px 0 0;}
-.kct-more a{font-family:var(--sans)!important;font-size:15px;color:var(--deep2)!important;text-decoration:none;}
+.kct-more a{font-family:var(--body)!important;font-size:16px;color:var(--t-primary)!important;text-decoration:none;}
 
 .kct-figure{border-radius:10px;background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);}
 .kct-figure--video{
@@ -1207,6 +1207,8 @@ const CSS = `
 .kct .ktc-head{margin-bottom:16px;}
 .kct .ktc-panel{min-height:60px;}
 .kct .ktc-voice{display:none;}
+/* the card's own 11.5 is below anything the design uses */
+.kct .ktc-view{font-size:12px!important;line-height:18px!important;}
 .kct .ktc-tags-wrap{height:24px;overflow:hidden;}
 .kct .ktc-stats,.kct .ktc-stats:not(#_){margin-bottom:20px;}
 .kct .ktc-foot a,.kct .ktc-foot button{background:var(--p-dark);}
@@ -1369,7 +1371,7 @@ const CSS = `
 .kct-pillars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:24px;}
 .kct-pillar{background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:20px;}
 .kct-pillar-t,.kct-pillar-t:not(#_){
-  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
 }
 .kct-pillar-b{
@@ -1712,9 +1714,9 @@ const CSS = `
 .kct-step-days span{
   flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;
 }
-.kct-step-days small{font-size:11px;line-height:16px;color:var(--t-muted);}
+.kct-step-days small{font-size:12px;line-height:18px;color:var(--t-disabled,#9CA3AF);}
 .kct-step-days b{
-  font-size:11px;line-height:20px;font-weight:500;color:var(--t-body);
+  font-size:12px;line-height:18px;font-weight:500;color:var(--t-primary);
   width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;
 }
 .kct-step-days .is-on b{background:var(--p-dark);color:#fff;}
@@ -1723,8 +1725,8 @@ const CSS = `
   flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;
   padding:8px 14px;border-radius:10px;background:var(--bg-soft);
 }
-.kct-step-slot small{font-size:11px;line-height:16px;color:var(--t-body);}
-.kct-step-slot b{font-size:15px;line-height:22px;font-weight:600;color:var(--p-dark);}
+.kct-step-slot small{font-size:12px;line-height:18px;color:var(--t-primary);}
+.kct-step-slot b{font-size:16px;line-height:24px;font-weight:500;color:var(--p-dark);}
 .kct-step-call{gap:8px;}
 .kct-step-tile{
   position:relative;flex:1;height:70px;border-radius:8px;overflow:hidden;
