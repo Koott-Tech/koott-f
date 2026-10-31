@@ -458,6 +458,12 @@ export default function ConditionPageTemplate({ data }) {
               </div>
             ))}
           </div>
+          {/* The file fades the ends with blurred plates, not a mask:
+              189x604 of #063327 at 88% under an 87 blur, one on the left
+              at x-40 and two stacked on the right at x1784. */}
+          <span className="kct-rev-fade kct-rev-fade--l" aria-hidden />
+          <span className="kct-rev-fade kct-rev-fade--r" aria-hidden />
+          <span className="kct-rev-fade kct-rev-fade--r" aria-hidden />
         </div>
       </Section>
 
@@ -1921,11 +1927,15 @@ const CSS = `
   /* a carousel, not a scroller: the set is rendered twice and the track
      slides exactly one set's width, so the loop is seamless and there is
      no scroll container to clip a card or show a bar. */
-  display:block;overflow:hidden;padding:0;
+  position:relative;display:block;overflow:hidden;padding:0;
   margin:80px calc(50% - 50vw) 0 calc(50% - 50vw);
-  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 160px,#000 calc(100% - 160px),transparent 100%);
-          mask-image:linear-gradient(90deg,transparent 0,#000 160px,#000 calc(100% - 160px),transparent 100%);
 }
+.kct-rev-fade{
+  position:absolute;top:-22px;width:189px;height:604px;pointer-events:none;
+  background:rgba(6,51,39,.88);filter:blur(87px);
+}
+.kct-rev-fade--l{left:-40px;}
+.kct-rev-fade--r{right:-53px;}
 .kct-rev-track{display:flex;width:max-content;animation:kct-rev-roll 72s linear infinite;}
 .kct-rev-track:hover{animation-play-state:paused;}
 .kct-rev-set{display:flex;align-items:flex-start;gap:24px;flex:none;margin-right:24px;}
@@ -1993,11 +2003,11 @@ const CSS = `
 @media (max-width:640px){
   .kct-rev-col--a,.kct-rev-col--b{width:calc(100vw - 48px);}
   .kct-review--big{width:calc(100vw - 48px);min-height:0;}
-  .kct-reviews{
-    margin-left:calc(50% - 50vw + 16px);
-    -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 40px),transparent 100%);
-            mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 40px),transparent 100%);
-  }
+  .kct-reviews{margin-left:calc(50% - 50vw + 16px);}
+  /* 189 of plate under an 87 blur swallows a phone; scale both down */
+  .kct-rev-fade{width:72px;filter:blur(36px);}
+  .kct-rev-fade--l{left:-28px;}
+  .kct-rev-fade--r{right:-28px;}
 }
 
 
