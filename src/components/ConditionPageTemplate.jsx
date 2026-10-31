@@ -1325,9 +1325,11 @@ const CSS = `
 .kct-on-dark .kct-card--solid::before,
 .kct-review--big::before{
   content:"";position:absolute;inset:0;border-radius:inherit;
-  z-index:0;pointer-events:none;opacity:.25;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.34 0.33 0.33 0 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
-  background-size:160px 160px;
+  z-index:0;pointer-events:none;
+  /* 3px cells in a 300 tile, drawn at 150 so each grain lands on 1.5px,
+     black with the alpha carrying the noise up to 25%. A turbulence
+     filter smoothed the grain away; this is the grid the panel shows. */
+  background:url('/design/noise.png') 0 0/150px 150px repeat;
 }
 .kct-on-dark .kct-card--solid > *,
 .kct-review--big > *{position:relative;z-index:1;}
