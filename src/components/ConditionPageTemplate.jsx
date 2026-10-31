@@ -1293,7 +1293,12 @@ const CSS = `
    what keeps them legible on it. */
 /* asked to sit under the design's 587.72: 56 of padding, not 80 */
 .kct-on-dark{padding:56px 0;}
-.kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:stretch;}
+/* asked to pull the band in from the sides: 80 either side of the 1140
+   column, so the block runs 980 and the cards narrow with it. */
+.kct-why{
+  display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:stretch;
+  max-width:980px;margin-left:auto;margin-right:auto;
+}
 .kct-why-media{
   position:relative;height:auto;min-height:0;border-radius:10px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
