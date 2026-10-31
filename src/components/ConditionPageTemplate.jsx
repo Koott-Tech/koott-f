@@ -440,13 +440,17 @@ export default function ConditionPageTemplate({ data }) {
         {/* Two stacked 192s, a 415 on its own, two more stacked — the mix the
             design runs, and exactly the five reviews the CMS carries. */}
         <div className="kct-reviews">
-          <div className="kct-rev-col kct-rev-col--a">
-            {d.reviews.items.slice(0, 2).map((r, i) => <ReviewCard key={i} r={r} />)}
-          </div>
-          {d.reviews.items[2] && <ReviewCard r={d.reviews.items[2]} big />}
-          <div className="kct-rev-col kct-rev-col--b">
-            {d.reviews.items.slice(3, 5).map((r, i) => <ReviewCard key={i} r={r} />)}
-          </div>
+          {[0, 1].map((pass) => (
+            <div className="kct-rev-set" key={pass} aria-hidden={pass === 1 || undefined}>
+              <div className="kct-rev-col kct-rev-col--a">
+                {d.reviews.items.slice(0, 2).map((r, i) => <ReviewCard key={i} r={r} />)}
+              </div>
+              {d.reviews.items[2] && <ReviewCard r={d.reviews.items[2]} big />}
+              <div className="kct-rev-col kct-rev-col--b">
+                {d.reviews.items.slice(3, 5).map((r, i) => <ReviewCard key={i} r={r} />)}
+              </div>
+            </div>
+          ))}
         </div>
       </Section>
 
@@ -1879,10 +1883,18 @@ const CSS = `
 .kct-reviews-score em{font-style:normal;font-size:14px;line-height:22px;color:#F5A623;}
 
 .kct-reviews{
+  /* 2349 wide inside a 1920 frame in the .fig: cut at BOTH edges, both
+     ends faded. Five reviews only make 1411, so the set repeats to fill,
+     and the row starts 140 off-screen so the left card is cut like the
+     design's rather than sitting flush. */
   display:flex;align-items:flex-start;gap:24px;overflow-x:auto;
-  overscroll-behavior-x:contain;margin:80px calc(50% - 50vw) 0 0;padding:0 24px 0 0;
+  overscroll-behavior-x:contain;padding:0;
+  margin:80px calc(50% - 50vw) 0 calc(50% - 50vw - 140px);
   scrollbar-width:none;-ms-overflow-style:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 160px,#000 calc(100% - 160px),transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 160px,#000 calc(100% - 160px),transparent 100%);
 }
+.kct-rev-set{display:flex;align-items:flex-start;gap:24px;flex:none;}
 .kct-reviews::-webkit-scrollbar{display:none;}
 .kct-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;}
 .kct-rev-col--a{width:473px;}
@@ -1944,6 +1956,12 @@ const CSS = `
 @media (max-width:640px){
   .kct-rev-col--a,.kct-rev-col--b{width:calc(100vw - 48px);}
   .kct-review--big{width:calc(100vw - 48px);min-height:0;}
+  /* a 140 head start hides most of the first card on a phone */
+  .kct-reviews{
+    margin-left:calc(50% - 50vw + 16px);
+    -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 40px),transparent 100%);
+            mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 40px),transparent 100%);
+  }
 }
 
 

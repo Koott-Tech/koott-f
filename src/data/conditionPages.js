@@ -234,7 +234,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -688,7 +688,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -1106,7 +1106,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -1505,7 +1505,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -1904,7 +1904,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -2299,7 +2299,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -2703,7 +2703,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -3106,7 +3106,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -3523,7 +3523,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -3922,7 +3922,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -4337,7 +4337,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -4736,7 +4736,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -5140,7 +5140,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -5567,7 +5567,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -5966,7 +5966,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -6370,7 +6370,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -6765,7 +6765,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -7196,7 +7196,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -7586,7 +7586,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -7991,7 +7991,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -8390,7 +8390,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -8785,7 +8785,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -9188,7 +9188,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -9593,7 +9593,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -10002,7 +10002,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -10405,7 +10405,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -10810,7 +10810,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -11198,7 +11198,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -11608,7 +11608,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -12010,7 +12010,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -12407,7 +12407,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -12802,7 +12802,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -13206,7 +13206,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -13610,7 +13610,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -13991,7 +13991,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -14386,7 +14386,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -14800,7 +14800,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -15180,7 +15180,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -15558,7 +15558,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -15942,7 +15942,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -16324,7 +16324,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -16731,7 +16731,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -17134,7 +17134,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -17511,7 +17511,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -17931,7 +17931,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
+"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made — we understand each other much better now.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
