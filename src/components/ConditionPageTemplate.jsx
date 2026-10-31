@@ -1454,7 +1454,6 @@ const CSS = `
 .kct-blogs-sec .kct-blogs{text-align:left;margin-top:40px;}
 .kct-blog{min-height:346px;}
 .kct-faq-row{padding:17px;min-height:60px;}
-.kct-faq-head{margin-top:16px;min-height:56px;}
 .kct-reviews-sec .kct-kicker{display:none;}
 .kct-reviews{margin-top:80px;min-height:415px;}
 .kct-therapists{margin-top:24px;}
@@ -1491,6 +1490,13 @@ const CSS = `
   background:#EFF4F0 url('/design/types.webp') center/cover no-repeat;
 }
 .kct-types-body .kct-sub{margin:8px 0 0;}
+.kct-types-body .kct-seek{max-width:none;margin:24px 0 0;gap:16px;}
+.kct-types-body .kct-seek-row,.kct-types-body .kct-seek-row.is-open{
+  background:linear-gradient(180deg,#E2E8E7 0%,#FFFFFF 100%);
+  border:1px solid #FFFFFF;border-radius:8px;padding:15px 16px;
+  box-shadow:0 2px 4px rgba(0,0,0,.04);
+}
+.kct-types-body .kct-seek-row.is-open{border-radius:12px;}
 .kct-seek--flush{max-width:none;margin-left:0;margin-right:0;}
 @media (max-width:1024px){
   .kct-types{grid-template-columns:1fr;gap:24px;}
@@ -1502,7 +1508,7 @@ const CSS = `
    A narrow column of white rows with a plus on the end, under a centred
    heading. It was the Wix line theme: a left-hand label and underlined rows. */
 .kct-faq-sec{background:var(--bg-soft);}
-.kct-faq-head{display:flex;justify-content:center;margin:20px 0 0;}
+.kct-faq-head{display:flex;justify-content:center;margin:16px 0 0;min-height:56px;align-items:center;}
 .kct-faq-search{
   width:100%;max-width:420px;height:40px;padding:8px 16px;
   background:#fff;border:1px solid var(--s-1);border-radius:999px;
@@ -1510,20 +1516,20 @@ const CSS = `
 }
 .kct-faq-search:focus{outline:none;border-color:var(--p-main);box-shadow:0 0 0 3px rgba(24,158,79,.15);}
 .kct-faq{max-width:860px;margin:40px auto 0;display:flex;flex-direction:column;gap:16px;}
-.kct-faq-row{background:#fff;border:1px solid var(--s-1);border-radius:10px;padding:14px 18px;}
+.kct-faq-row{background:#fff;border:1px solid #F4F4F4;border-radius:16px;padding:15px 16px;}
 .kct-faq-row button{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
   background:none;border:0;padding:0;cursor:pointer;text-align:left;
 }
 .kct-faq-row button > span:first-child{
-  font-family:var(--body)!important;font-size:18px!important;font-weight:400!important;
+  font-family:var(--body)!important;font-size:18px!important;font-weight:500!important;
   line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;
 }
 .kct-faq-sign{flex:none;font-size:18px;line-height:1;color:var(--t-muted);}
 .kct-faq-row p{
-  margin:10px 0 0;
-  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
+  margin:16px 0 0;
+  font-family:var(--body)!important;font-size:18px!important;font-weight:400!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--t-body)!important;
 }
 .kct-faq-empty{text-align:center;color:var(--t-muted)!important;}
 
