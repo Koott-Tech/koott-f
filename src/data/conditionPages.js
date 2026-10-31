@@ -2501,7 +2501,7 @@ export const CONDITION_PAGES = [
 },
 {
 "a":"The therapist will explain all the possible side effects of the treatment measures for recovery from addiction, which may include medication side effects and emotional pain during therapy sessions. They will also advise how to deal with any kind of discomfort.",
-"q":"Are there any potential side effects or risks associated with the treatment methods you suggest?"
+"q":"Are there side effects or risks with the treatment methods you suggest?"
 },
 {
 "a":"The therapist will assist you in coping with craving and withdrawal symptoms through different methods that include mindfulness, relaxation practices, and distraction, among others.",
@@ -7016,7 +7016,7 @@ export const CONDITION_PAGES = [
 "types":{
 "items":[
 {
-"body":"Anorexia nervosa is a condition that involves severely limiting your food intake and living with intense fear of gaining weight. This means eating very little, seeing oneself as overweight even when actually underweight.",
+"body":"Anorexia nervosa involves severely limiting food intake and an intense fear of gaining weight, and seeing oneself as overweight even when underweight.",
 "title":"Anorexia Nervosa"
 },
 {
@@ -7032,7 +7032,7 @@ export const CONDITION_PAGES = [
 "title":"Other Specified Feeding or Eating Disorders (OSFED)"
 },
 {
-"body":"Binge eating disorder involves episodes of eating large amounts of food in a short amount of time. This habit resurfaces repeatedly and is accompanied by a feeling of loss of control, followed by guilt or distress",
+"body":"Binge eating disorder involves repeated episodes of eating large amounts of food quickly, with a loss of control followed by guilt or distress.",
 "title":"Binge Eating Disorder"
 },
 {
@@ -9693,11 +9693,11 @@ export const CONDITION_PAGES = [
 },
 {
 "a":"Emotional self-regulation positively influences relationships by fostering effective communication and conflict resolution skills. In the workplace, it ensures effective stress management and productivity.",
-"q":"How does emotional self-regulation impact various aspects of my life, such as relationships and work?"
+"q":"How does emotional self-regulation affect my relationships and work?"
 },
 {
 "a":"There are many helpful activities, such as practising mindfulness meditation, progressive muscle relaxation, keeping journals, and engaging in physical activity, that can assist in improving your emotional self-regulation ability.",
-"q":"Are there any exercises or practices I can incorporate into my daily routine to enhance emotional self-regulation?"
+"q":"What daily exercises can improve emotional self-regulation?"
 },
 {
 "a":"Yes, it’s true that some people are naturally inclined to exhibit emotional self-regulation, but this is also a skill that one can acquire with the support of experts, persistence and dedication.",
@@ -10493,7 +10493,7 @@ export const CONDITION_PAGES = [
 },
 {
 "a":"Therapy provides professional guidance, support, and accountability that may be lacking in self-help approaches. Therapists offer personalized interventions tailored to your unique needs, address underlying psychological factors contributing to communication challenges, and provide ongoing feedback and encouragement throughout the process.",
-"q":"What are the benefits of seeking therapy for communication difficulties compared to self-help methods?"
+"q":"Why choose therapy for communication difficulties over self-help?"
 },
 {
 "a":"The duration of therapy varies depending on individual factors such as the severity of communication difficulties, personal goals, and level of commitment to the therapeutic process. While some individuals may experience noticeable improvements within a few sessions, others may require longer-term therapy to achieve desired outcomes.",
@@ -10884,7 +10884,7 @@ export const CONDITION_PAGES = [
 },
 {
 "a":"Initiating premarital counselling process might come from one of you or even from both partners at the same time. It is important to discuss your expectations to start counselling in a positive way by focusing on your relationship development.",
-"q":"Who typically initiates the idea of premarital counseling, and how do we approach it as a couple?"
+"q":"Who usually suggests premarital counselling, and how do we start?"
 },
 {
 "a":"No, you don't have to wait until you encounter some difficulties to begin premarital counselling. If you are a happy couple and want to improve communication or just strengthen your relationship, counselling will definitely bring you more benefits.",
@@ -10892,7 +10892,7 @@ export const CONDITION_PAGES = [
 },
 {
 "a":"To get the best out of premarital counselling, you should be open-minded, honest, and willing to work through the process. Take an active role in the sessions, use what you have learned in them to communicate effectively with your significant other, and apply the knowledge you gain during the process. Remember that premarital counselling is an investment in your future, and yand opportunity to grow.",
-"q":"How can we ensure that premarital counseling strengthens our relationship and prepares us for marriage?"
+"q":"How does premarital counselling prepare us for marriage?"
 },
 {
 "a":"When dealing with resistance, communication is the key to success. You need to sit down with your partner and have an honest conversation with them about the topic. Listen to them when they speak and try to see their point of view. Remind your partner about the positive aspects of premarital counselling.",
@@ -12076,7 +12076,7 @@ export const CONDITION_PAGES = [
 },
 {
 "a":"While divorce counselling can sometimes help couples reconcile and save their marriage, its primary focus is to support couples in navigating the divorce process with respect, dignity, and minimal conflict. The goal is to facilitate healthy communication, emotional healing, and constructive decision-making, whether the outcome is divorce or reconciliation.",
-"q":"Will divorce counselling save my marriage, or is it focused on facilitating the divorce process?"
+"q":"Will divorce counselling save my marriage, or help me through it?"
 },
 {
 "a":"While it's ideal for both spouses to participate in divorce counselling, it's not always possible if one party is unwilling to attend. In such cases, you can still benefit from individual counselling to address your own needs, emotions, and concerns related to the divorce. Additionally, a skilled therapist or mediator can offer guidance on how to navigate the process effectively despite your spouse's resistance.",
@@ -15885,7 +15885,7 @@ export const CONDITION_PAGES = [
 "why":{
 "items":[
 {
-"body":"You will have the support of a trained therapist who understands the sensitivity of sexual trauma and provides genuine care, empathy, and professional support.",
+"body":"You will have a trained therapist who understands the sensitivity of sexual trauma and offers genuine care and empathy.",
 "title":"Experienced Therapist"
 },
 {
@@ -15893,7 +15893,7 @@ export const CONDITION_PAGES = [
 "title":"Immediate Focus on Safety"
 },
 {
-"body":"Every healing journey is different and unique, so your therapy support is carefully designed around your comfort, pace, and your individual needs.",
+"body":"Every healing journey is different, so your therapy is designed around your comfort, pace, and needs.",
 "title":"Continuous Support"
 },
 {

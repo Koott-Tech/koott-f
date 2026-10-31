@@ -517,7 +517,8 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── When to seek help ──────────────────────────────────────────── */}
-      <Section>
+      <Section className="kct-seek-sec">
+        <div className="kct-seekhelp">
         <h2 className="kct-h2 kct-center">{d.seekHelp.title}</h2>
         <p className="kct-sub kct-center">{d.seekHelp.subtitle}</p>
         {/* Accordions in a narrow column, one open at a time. These read
@@ -545,6 +546,7 @@ export default function ConditionPageTemplate({ data }) {
             );
           })}
         </ul>
+        </div>
       </Section>
 
       {/* ── Book band ──────────────────────────────────────────────────── */}
@@ -1743,4 +1745,60 @@ const CSS = `
   .kct-faq-head{flex-direction:column;align-items:flex-start;gap:8px;}
   .kct-faq-search{width:100%;}
 }
+/* ── the article block, measured off the .fig ─────────────────────────────
+   Three frames in a 3047 stack with 80 between them:
+     About     1920x843.04  #F9F9F9, 80 padding — a 704x366 card beside a
+               396x366 picture on a 40 gutter, then four 562x134.52 cards
+               two-up 16 apart, 32 under the row above.
+     Symptoms  1920x1126    a 1140 card, radius 32, white, with an inner
+               #F6D9C4 glow; 64/16 of padding, a 677 heading block, then a
+               663 list of 52-tall rows (82 open) 16 apart.
+     Seek help 1920x918     a 1140 box at radius 24 with 40 of padding, an
+               812 heading block, then 660 rows 66 tall (122 open).
+   The 80 gaps land as padding on the lower section of each pair.          */
+.kct-about-top{grid-template-columns:704px 396px;gap:40px;align-items:stretch;}
+.kct-about-card{
+  min-height:366px;background:#fff;border:1px solid var(--s-green-2);
+  border-radius:12px;padding:24px;
+}
+.kct-about-card .kct-prose p{font-size:18px!important;line-height:26px!important;color:var(--t-body)!important;}
+.kct-about-media{min-height:366px;border-radius:0;}
+.kct-pillars{grid-template-columns:repeat(2,562px);gap:16px;margin-top:32px;justify-content:space-between;}
+.kct-pillar{
+  min-height:134.52px;background:#fff;border:1px solid var(--s-green-2);
+  border-radius:12px;padding:24px;
+}
+
+.kct-symptoms-sec{padding:0 0 80px;}
+.kct-symptoms{
+  max-width:1140px;margin:0 auto;padding:64px 16px;
+  background:#fff;border:0;border-radius:32px;
+  box-shadow:inset 0 0 31px #F6D9C4;
+}
+.kct-symptoms .kct-sub{max-width:677px;}
+.kct-signs{max-width:663px;margin:40px auto 0;gap:16px;}
+.kct-sign{
+  min-height:52px;background:#fff;border:1px solid var(--s-green-2);
+  border-radius:8px;padding:12px;
+}
+.kct-sign.is-open{border-radius:12px;min-height:82px;}
+.kct-sign-t,.kct-sign-t:not(#_){
+  font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
+  line-height:26px!important;color:var(--t-primary)!important;
+}
+
+.kct-seek-sec{padding:0 0 80px;}
+.kct-seekhelp{max-width:1140px;margin:0 auto;padding:40px;border-radius:24px;}
+.kct-seekhelp .kct-sub{max-width:812px;}
+.kct-seekhelp .kct-seek{max-width:660px;margin:40px auto 0;gap:16px;}
+.kct-seekhelp .kct-seek-row{
+  min-height:66px;background:#fff;border:1px solid var(--s-green-2);
+  border-radius:8px;padding:12px;
+}
+.kct-seekhelp .kct-seek-row.is-open{border-radius:12px;min-height:122px;}
+.kct-seekhelp .kct-seek-head{min-height:40px;}
+.kct-seekhelp .kct-seek-t,.kct-seekhelp .kct-seek-t:not(#_){
+  font-size:18px!important;line-height:26px!important;font-weight:600!important;
+}
+
 `;
