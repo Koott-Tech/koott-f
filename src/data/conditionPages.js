@@ -53,22 +53,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"If you feel like anxiety is significantly affecting your relationship, everyday life or well-being, you may want to try working with a mental health professional to ensure long-term benefit.",
+"cat":"General",
 "q":"How do I know if I need professional help for my anxiety?"
 },
 {
 "a":"In terms of therapy for anxiety disorders, the first step is always the discussion of anxiety-related symptoms and potential stressors. You will also learn some helpful coping mechanisms.",
+"cat":"General",
 "q":"What can I expect during therapy sessions for anxiety?"
 },
 {
 "a":"There are two approaches to dealing with anxiety: medication-based treatment and psychotherapy. Depending on the case, you may choose one of them or combine both of them.",
+"cat":"Therapy",
 "q":"Are medications necessary for treating anxiety, or can therapy alone be effective?"
 },
 {
 "a":"The duration of anxiety disorder treatment depends highly on the individual case. It may vary between several weeks and months or longer.",
+"cat":"General",
 "q":"How long does anxiety treatment typically last?"
 },
 {
 "a":"If you or someone close to you experiences severe anxiety attacks, it is essential to stay calm and help the person by encouraging them to breathe deeply. Seek professional help if it happens frequently or if the situation is urgent; call the emergency service.",
+"cat":"General",
 "q":"What should I do if I or someone I know is experiencing a severe anxiety attack?"
 }
 ],
@@ -213,7 +218,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -221,7 +226,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -229,7 +234,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -237,7 +242,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -251,7 +256,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -471,7 +476,7 @@ export const CONDITION_PAGES = [
 },
 {
 "a":"Yes, adopting a healthy lifestyle can complement traditional treatments. Regular exercise, balanced nutrition, sufficient sleep, and social support can positively impact mood.",
-"cat":"General",
+"cat":"Therapy",
 "q":"Can lifestyle changes help manage depression?"
 },
 {
@@ -481,7 +486,7 @@ export const CONDITION_PAGES = [
 },
 {
 "a":"Yes, online therapy can be an effective option, providing accessibility and convenience for individuals seeking mental health support. However, the severity of depression may influence the choice of intervention.",
-"cat":"Appointments",
+"cat":"General",
 "q":"Can online therapy be effective for treating depression?"
 }
 ],
@@ -910,30 +915,37 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Trauma refers to deeply distressing or disturbing past experiences that damage your ability to cope at your own. Trauma can happen due to any unpleasant event, including accidents, abuse, natural calamities, and other causes, which leave a negative impact on your emotional, psychological, and even physical aspects of life.",
+"cat":"General",
 "q":"What is trauma, and how does it affect individuals?"
 },
 {
 "a":"Symptoms of trauma can be seen in many forms, such as flashbacks, nightmares, hyperalertness, avoidance behaviour, mood swings, and changes in your confidence towards yourself or the whole world.",
+"cat":"General",
 "q":"What are the common symptoms of trauma?"
 },
 {
 "a":"Therapy provides a safe and supportive environment for individuals to express and process traumatic experiences, share their emotions, and learn healthy coping strategies. Our koott therapists use evidence-based techniques such as cognitive-behavioural therapy (CBT), eye movement desensitisation and reprocessing (EMDR), and somatic experiencing to help you heal from trauma you have been carrying.",
+"cat":"General",
 "q":"How can therapy help in addressing trauma?"
 },
 {
 "a":"During an online therapy session for trauma, you are encouraged to discuss your experiences, emotions, and symptoms related to your past trauma. Therapists may use various proven techniques tailored to your needs to help you process your feelings, challenge negative beliefs, and develop healthier coping mechanisms gradually.",
+"cat":"General",
 "q":"What can I expect during a therapy session for trauma?"
 },
 {
 "a":"Therapy creates a safe space where people can work through their emotional response to their trauma and learn healthy mechanisms to cope. The therapists apply methods such as cognitive-behavioural therapy, EMDR, and somatic experiencing as proven ways to overcome trauma.",
+"cat":"General",
 "q":"How long does it take to see progress in trauma therapy?"
 },
 {
 "a":"You can talk about your experiences with trauma and its effects on you, and your deep struggles in your online therapy session for trauma. Various techniques can help you overcome your trauma by challenging your thoughts and emotions.",
+"cat":"General",
 "q":"What should I look for in a therapist for trauma treatment?"
 },
 {
 "a":"There are several online counselling platforms in India. Koott Care™ is one of the leading mental health platforms that provides a secure environment for trauma-informed counselling. We offer culturally sensitive and gentle forms of healing for long-term emotional well-being. Here at Koott, our team of trauma therapists employs evidence-based methods of treatment that include trauma-focused cognitive behaviour therapy, somatic therapies, inner child work, and attachment therapy. You can easily book your session through our website and connect with a trained Malayali psychologist from the comfort of your home.",
+"cat":"General",
 "q":"Where can I access trauma counseling online in India?"
 }
 ],
@@ -981,7 +993,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Trauma refers to a deep emotional and psychological response to distressing or overwhelming experiences. It can happen after events like accidents, abuse, loss, or any situation that makes you feel unsafe, helpless, or out of control. It is more than just a difficult memory. Trauma is not simply remembering a bad event; rather, it involves the feelings, memories, and behaviours associated with the event itself. In Kerala, people may describe it as “shock,” “fear,” or “mental pain,” but it is a valid mental health experience, not a weakness. Trauma can show up in different ways, such as anxiety, fear, emotional numbness, or constant alertness. The positive aspect is that it can be treated with therapy and support, and healing is possible over time."
+"Trauma refers to a deep emotional and psychological response to distressing or overwhelming experiences. It can happen after events like accidents, abuse, loss, or any situation that makes you feel unsafe, helpless, or out of control. It is more than just a difficult memory. Trauma is not simply remembering a bad event; rather, it involves the feelings, memories, and behaviours associated with the event itself. In Kerala, people may describe it as “shock,” “fear,” or “mental pain,” but it is a valid mental health experience, not a weakness. The positive aspect is that it can be treated with therapy and support, and healing is possible over time."
 ]
 },
 "plans":{
@@ -1078,7 +1090,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -1086,7 +1098,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -1094,7 +1106,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -1102,7 +1114,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -1116,7 +1128,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -1312,22 +1324,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Possible treatments for panic attacks can include therapy such as cognitive-behavioural therapy and exposure therapy or medication such as selective serotonin reuptake inhibitors or benzodiazepines, changes of lifestyle and self-help strategies.",
+"cat":"General",
 "q":"What treatment options are available for panic attacks?"
 },
 {
 "a":"Therapy, specifically cognitive-behavioural therapy (CBT), has proven to be highly effective in treating panic attack disorders. It helps you to identify and break negative thought patterns and learn new coping skills to manage symptoms.",
+"cat":"General",
 "q":"How effective is therapy for treating panic attacks?"
 },
 {
 "a":"While medications are proven to be beneficial for some individuals, but it is not always necessary for panic attack treatment. Therapy alone or sometimes a combination of therapy and medication may be recommended, depending on the intensity of symptoms and individual preferences.",
+"cat":"Therapy",
 "q":"Are medications necessary for treating panic attacks?"
 },
 {
 "a":"Yes, online therapy is proven to be effective for treating panic attack disorders. Particularly if you may have difficulty accessing in-person therapy or prefer the convenience of remote therapy. There are many online therapy platforms that offer evidence-based treatments and licensed therapists who are specialized in treating anxiety disorders.",
+"cat":"General",
 "q":"Can online therapy be effective for treating panic attacks?"
 },
 {
 "a":"Panic attacks may return, especially during intense situation of stress. This does not mean you are back to where you started. With therapy, most people learn to understand their triggers and use practical coping tools to manage symptoms confidently. Over time, panic attacks feel less frequent and less intense.",
+"cat":"General",
 "q":"Can personality disorder treatment include cuddle therapy with puppies?"
 }
 ],
@@ -1375,7 +1392,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Panic attacks are sudden feelings of extreme fear, threat or distress which affect your body, thoughts, and everyday functioning. They are more than just anxiety and stress. During a panic attack, you may feel rapid heartbeat, shortness of breath, dizziness or a feeling that you may lose control. In Kerala, people mostly describe it as “sudden tension,” “heart racing,” or “breathlessness,” but panic attacks are a recognized medical condition and not a personal weakness. Panic attacks are clinically classified under anxiety disorders in the ICD-10. Millions of people around the world experience panic attacks every year, making it the most common mental health concerns. The good news is that panic attacks are treatable with the right care, therapy, and coping strategies"
+"Panic attacks are sudden feelings of extreme fear, threat or distress which affect your body, thoughts, and everyday functioning. During a panic attack, you may feel rapid heartbeat, shortness of breath, dizziness or a feeling that you may lose control. In Kerala, people mostly describe it as “sudden tension,” “heart racing,” or “breathlessness,” but panic attacks are a recognized medical condition and not a personal weakness. Panic attacks are clinically classified under anxiety disorders in the ICD-10. Millions of people around the world experience panic attacks every year, making it the most common mental health concerns. The good news is that panic attacks are treatable with the right care, therapy, and coping strategies"
 ]
 },
 "plans":{
@@ -1472,7 +1489,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -1480,7 +1497,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -1488,7 +1505,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -1496,7 +1513,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -1510,7 +1527,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -1664,7 +1681,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "title":"How Does Therapy Help with Panic Attack",
-"subtitle":"With gentle guidance, therapy helps you to ease the fear and tension of panic attacks. It restores calm, rebuilds confidence, and brings moments of calmness and relief in your daily life."
+"subtitle":"With gentle guidance, therapy eases the fear and tension of panic attacks, restoring calm and rebuilding confidence."
 }
 },
 "schema_enabled":false
@@ -1706,22 +1723,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Cognitive Behavioral Therapy (CBT) is regarded as one of the best therapies for burnout issues. At the beginning you connect with highly qualified therapists, who will conduct personalized or group therapy sessions to manage burnout related issues successfully. Moreover, many companies organise weekly or monthly therapy sessions for their employees to cope with burnout and be highly productive.",
+"cat":"General",
 "q":"What is the best therapy for burnout?"
 },
 {
 "a":"Recovery period from burnout is different for everyone, depending on the level of burnout, your resilience to handle situations, and many other factors that can influence this process. While some people manage to recover relatively quickly, others will need more time and support.",
+"cat":"General",
 "q":"How long does it take to recover from burnout?"
 },
 {
 "a":"Although burnout has similar conditions to certain mental illnesses like depression and anxiety, it is not considered to be a mental disorder. It is a state involving exhaustion, cynicism, and low performance due to chronic work-related stress. Nevertheless, it is essential to consult professionals in case of burnout and avoid developing more serious mental disorders because of it.",
+"cat":"General",
 "q":"Does burnout ever go away?"
 },
 {
 "a":"While burnout shares similarities with mental health conditions such as depression and anxiety, it is not classified as a distinct mental illness. Burnout is characterized by feelings of exhaustion, cynicism, and reduced professional efficacy resulting from chronic workplace stress. However, it is essential to seek professional help if experiencing symptoms of burnout to prevent it from escalating into more severe mental health issues.",
+"cat":"General",
 "q":"Is burnout a mental illness?"
 },
 {
 "a":"It is important to look for help in case you have been experiencing persistent burnout-related symptoms that disrupt your normal life activities. Consulting a mental health expert will ensure that you receive adequate assistance with addressing your condition.",
+"cat":"General",
 "q":"When should I seek help for burnout?"
 }
 ],
@@ -1769,7 +1791,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Burnout is defined as exhaustion that arises due to chronic stress, primarily as a result of working conditions or other daily responsibilities. This does not only imply being tired for a few days. Instead, it involves being physically, mentally, and emotionally exhausted, and you may lack motivation and connection from your daily routines. One who suffers from burnout will experience changes in concentration, productivity, and mood, among other issues. You may easily feel stressed, lose interest, and even be unable to complete simple tasks. In Kerala, such conditions can be referred to as \"stress\" or even \"complete tiredness.\" Nonetheless, it is recognised as a condition that needs serious attention. If left unaddressed, burnout can impact your work performance, productivity, relationships, and health in the long term. The good news is that with the right support, proper rest, and guidance, burnout is manageable, and you can gradually regain energy, balance, and a sense of control in your life."
+"Burnout is defined as exhaustion that arises due to chronic stress, primarily as a result of working conditions or other daily responsibilities. This does not only imply being tired for a few days. Instead, it involves being physically, mentally, and emotionally exhausted, and you may lack motivation and connection from your daily routines. You may easily feel stressed, lose interest, and even be unable to complete simple tasks. If left unaddressed, burnout can impact your work performance, productivity, relationships, and health in the long term. The good news is that with the right support, proper rest, and guidance, burnout is manageable, and you can gradually regain energy, balance, and a sense of control in your life."
 ]
 },
 "plans":{
@@ -1866,7 +1888,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -1874,7 +1896,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -1882,7 +1904,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -1890,7 +1912,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -1904,7 +1926,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -2096,22 +2118,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"There is no standard period for how long it will last. Grief is a personal journey that depends on various factors, including the cause of the bereavement, personal coping skills, and the available support. As the days pass, grief can become less intense but flare up during some life events or anniversaries.",
+"cat":"General",
 "q":"How long does grief last?"
 },
 {
 "a":"In therapy sessions, you can express your feelings, cope with your emotions, and receive help in processing the loss. Loss therapy can also be of great importance in dealing with grief.",
+"cat":"General",
 "q":"How can loss and grief counseling help?"
 },
 {
 "a":"If you feel adeep emotional loss caused by losing something or someone you loved, ending an intimate relationship, or going through any type of loss, loss and grief counselling can be extremely beneficial.",
+"cat":"General",
 "q":"Who can benefit from loss and grief counseling?"
 },
 {
 "a":"Grief and loss counselling can use different techniques such as talk therapy, cognitive-behavioural therapy, mindfulness exercises, and relaxation techniques to cope with your grief symptoms. The therapist can also use creative exercises, journaling, or group counseling to facilitate your healing.",
+"cat":"Therapy",
 "q":"What techniques are used in loss and grief counseling?"
 },
 {
 "a":"The consequences of not addressing grief could be experienced in different forms such as prolonged sadness, inability to perform well at work or school, problems with interpersonal relationships, and sometimes even some physical health problems.",
+"cat":"General",
 "q":"What happens if grief is not treated?"
 }
 ],
@@ -2159,7 +2186,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Grief is a natural human emotion that happens due to losing something or someone which is very important. Grief influences us both mentally and emotionally and can make our activities tough and overwhelming. It is different from feeling sed just for a few days together. It brings many other complexities to deal with, and makes performing simple tasks hard to manage. In the state of Kerala, the experience of grief is often described as “dukkham” or “nashtam” or emotional sorrow, but it’s a human emotion and not personal weakness. Grief is caused due to various factors like losing a loved one, a relationship, a career, or anything significant to our lives. However, there is a silver lining to all this grief; we just need to be patient to overcome it."
+"Grief is a natural human emotion that happens due to losing something or someone which is very important. Grief influences us both mentally and emotionally and can make our activities tough and overwhelming. It is different from feeling sed just for a few days together. In the state of Kerala, the experience of grief is often described as “dukkham” or “nashtam” or emotional sorrow, but it’s a human emotion and not personal weakness. Grief is caused due to various factors like losing a loved one, a relationship, a career, or anything significant to our lives. However, there is a silver lining to all this grief; we just need to be patient to overcome it."
 ]
 },
 "plans":{
@@ -2256,7 +2283,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -2264,7 +2291,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -2272,7 +2299,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -2280,7 +2307,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -2294,7 +2321,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -2490,26 +2517,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"When you cannot stop using substances and engaging in harmful activities even when facing adverse outcomes, you might benefit from addiction treatment. This may present itself through withdrawal symptoms, cravings, and challenges with performing your daily tasks.",
+"cat":"General",
 "q":"How do I know if I need addiction treatment?"
 },
 {
 "a":"Usually, the procedure includes evaluating your health condition, detoxification when required, therapy sessions to identify the underlying problems and adopt better coping mechanisms, receiving medications when needed, and continuing your recovery journey.",
+"cat":"General",
 "q":"What happens during addiction treatment?"
 },
 {
 "a":"Yes, there are a number of platforms offering addiction treatment online, allowing effective treatment from the comfort of home. So if you cannot visit a clinic due to certain circumstances, there is still a possibility of getting treatments. Treatment includes teletherapy, online support groups, and virtual consultations with healthcare professionals.",
+"cat":"General",
 "q":"Can I receive addiction treatment remotely?"
 },
 {
 "a":"If you suspect that your loved one is addicted to something, then recommending them to go to a certified healthcare professional or an addiction treatment centre. Support them by finding the right treatment options.",
+"cat":"General",
 "q":"What should I do if a loved one needs addiction treatment?"
 },
 {
 "a":"The therapist will explain all the possible side effects of the treatment measures for recovery from addiction, which may include medication side effects and emotional pain during therapy sessions. They will also advise how to deal with any kind of discomfort.",
+"cat":"Therapy",
 "q":"Are there side effects or risks with the treatment methods you suggest?"
 },
 {
 "a":"The therapist will assist you in coping with craving and withdrawal symptoms through different methods that include mindfulness, relaxation practices, and distraction, among others.",
+"cat":"General",
 "q":"How can I manage cravings and withdrawal symptoms during treatment?"
 }
 ],
@@ -2557,7 +2590,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Addiction is a condition in which a person becomes so reliant on a substance or certain behaviour that it becomes increasingly hard for them to resist or control. Addiction goes beyond mere dependency; it involves the psychological, behavioural, and physiological aspects of addiction. Addiction can involve substances like drugs or alcohol abuse, as well as behaviours, including gaming, internet addiction, and gambling. It generally starts as a coping mechanism to deal with stress, emotions, and situations, but slowly turns into something which the individual feels they cannot live without. Addiction is usually perceived as a lack of willpower among the people of Kerala, but in reality, it is recognised as a medical condition. Clinically, addiction is classified under ICD-10 codes F10–F19 (substance-related disorders). If left untreated, it can affect physical health, relationships, work, and other aspects of life. The good news is that with the right care, therapy, and structured support, recovery is possible and sustainable over time."
+"Addiction is a condition in which a person becomes so reliant on a substance or certain behaviour that it becomes increasingly hard for them to resist or control. Addiction goes beyond mere dependency; it involves the psychological, behavioural, and physiological aspects of addiction. Addiction is usually perceived as a lack of willpower among the people of Kerala, but in reality, it is recognised as a medical condition. Clinically, addiction is classified under ICD-10 codes F10–F19 (substance-related disorders). If left untreated, it can affect physical health, relationships, work, and other aspects of life. The good news is that with the right care, therapy, and structured support, recovery is possible and sustainable over time."
 ]
 },
 "plans":{
@@ -2654,7 +2687,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -2662,7 +2695,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -2670,7 +2703,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -2678,7 +2711,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -2692,7 +2725,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -2892,22 +2925,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"The usual forms of treatment for Sleep Disorders include lifestyle modifications, therapy, and medications. Lifestyle modification could mean enhancing your sleep hygiene, while therapy could include CBT for insomnia. In some cases, sleeping pills might also be prescribed.",
+"cat":"General",
 "q":"What are the common treatments for Sleep Disorders?"
 },
 {
 "a":"Cognitive Behavioural Therapy (CBT) is very effective in treating Sleep Disorders, especially insomnia. The main reason is to modify your behaviour and thoughts to help you achieve better sleep.",
+"cat":"Therapy",
 "q":"How effective is Cognitive Behavioral Therapy (CBT) for treating Sleep Disorders?"
 },
 {
 "a":"There are several lifestyle modifications which can be made to improve Sleep Disorders, and they include having a regular sleep pattern, making the bedroom conducive for sleeping, reducing intake of caffeine and alcohol, and adopting relaxing techniques prior to going to bed.",
+"cat":"Therapy",
 "q":"What lifestyle changes can help improve Sleep Disorders?"
 },
 {
 "a":"Although there are various treatments for Sleep Disorders, such as lifestyle modifications and therapy, there are other natural remedies that can also be used in the treatment of Sleep Disorders. They include melatonin, valerian root, and chamomile tea.",
+"cat":"General",
 "q":"Are there natural remedies or supplements that can aid in Sleep Disorder treatment?"
 },
 {
 "a":"During Sleep Disorder treatment, you can look forward to working together with a healthcare professional who will assist you in creating a customised treatment plan based on your particular requirements. This can include changes in lifestyle habits, attending therapy sessions, and even taking medication in some cases.",
+"cat":"General",
 "q":"What should I expect during Sleep Disorder treatment?"
 }
 ],
@@ -2955,7 +2993,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Sleep disorders refer to the condition where you experience difficulties in sleeping normally, effectively, and at the appropriate time. Sleep disorders affect your productivity, energy, mood, and general behaviour. It is more than just having a few restless nights without sleep. Prolonged sleep problems become unbearable when you are unable to carry out even the simplest activities because they leave you exhausted. In Kerala, people may describe sleep disorder as “sleep illa,” “overthinking at night,” or “tension,” but it is a recognised medical condition, not a personal weakness. Clinically, sleep disorders include conditions such as insomnia, sleep apnea, and circadian rhythm disorders. Globally, many people experience sleep issues, making it a common health concern. The good news is that sleep disorders are treatable with the right support, therapy, and lifestyle changes."
+"Sleep disorders refer to the condition where you experience difficulties in sleeping normally, effectively, and at the appropriate time. It is more than just having a few restless nights without sleep. In Kerala, people may describe sleep disorder as “sleep illa,” “overthinking at night,” or “tension,” but it is a recognised medical condition, not a personal weakness. Clinically, sleep disorders include conditions such as insomnia, sleep apnea, and circadian rhythm disorders. Globally, many people experience sleep issues, making it a common health concern. The good news is that sleep disorders are treatable with the right support, therapy, and lifestyle changes."
 ]
 },
 "plans":{
@@ -3052,7 +3090,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -3060,7 +3098,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -3068,7 +3106,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -3076,7 +3114,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -3090,7 +3128,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -3286,22 +3324,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Obsessive-Compulsive Disorder, or OCD, is a type of anxiety disorder affecting your mental health. Seeking professional assistance is essential for managing and treating OCD effectively. If you are experiencing any symptoms of OCD, then approaching a professional through Koott can help you understand and address your condition. Remember, reaching out for help is a positive step for your mental well-being.",
+"cat":"General",
 "q":"What is OCD ?"
 },
 {
 "a":"Obsessive-Compulsive Disorder (OCD) is said to be caused by genetics, brain structure and function, imbalances of neurotransmitters, environmental factors and cognitive-behavioral impacts. These factors engage in a very complex way and add to the development of OCD symptoms. Treatment of OCD mainly involves a set of medication, therapy and support to manage the symptoms effectively.",
+"cat":"General",
 "q":"What Causes OCD?"
 },
 {
 "a":"There are several factors that can cause Obsessive-Compulsive Disorder (OCD): Stress: If the level of stress or anxiety is high, it can increase the symptoms of OCD. Lack of Treatment: Lack of proper treatment and care can worsen symptoms over time. Triggering Situations: Some specific situations or environments can trigger OCD symptoms. Substance Abuse: Excessive use of drugs and alcohol may worsen OCD symptoms and make treatment less helpful. Lack of Coping Mechanisms: Inadequate coping strategies and support systems may worsen OCD symptoms. Managing these factors through therapy, medication, stress reduction techniques, and changes in lifestyle can help mitigate the worsening of OCD symptoms.",
+"cat":"General",
 "q":"What makes OCD worse?"
 },
 {
 "a":"OCD is diagnosed by conducting a clinical interview, assessing symptoms according to DSM-5 criteria, eliminating other conditions, evaluating symptom duration and impact on daily life, and considering collateral information.",
+"cat":"General",
 "q":"How is OCD diagnosed?"
 },
 {
 "a":"It is important to learn about their disorder and encourage them to undergo treatment. Be compassionate and patient. Help them cope positively and create boundaries to ensure that you do not neglect yourself during the process. Refrain from participating in their rituals.",
+"cat":"General",
 "q":"How can I support someone with OCD?"
 }
 ],
@@ -3349,8 +3392,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Obsessive-Compulsive Disorder (OCD) is a type of mental health condition that affects your thoughts, behaviors, and daily functioning. You experience unwanted and repetitive thoughts (obsessions) and compulsions to perform certain actions to reduce anxiety. It is more than just being clean, neat or organised. When OCD becomes intense, simple daily routines such as working, studying, or interacting with other people can feel difficult to manage.",
-"In Kerala, people may describe it as “overthinking,” “checking again and again,” or “fear-based habits,” but it is a recognized medical condition, not an individual weakness. Clinically, OCD is classified under the ICD-10 code F42. Globally, millions of people live with OCD. It is a common anxiety-related condition. The good news is that OCD is treatable with the right support, therapy and structured guidance."
+"Obsessive-Compulsive Disorder (OCD) is a type of mental health condition that affects your thoughts, behaviors, and daily functioning. When OCD becomes intense, simple daily routines such as working, studying, or interacting with other people can feel difficult to manage.",
+"Clinically, OCD is classified under the ICD-10 code F42. Globally, millions of people live with OCD. It is a common anxiety-related condition. The good news is that OCD is treatable with the right support, therapy and structured guidance."
 ]
 },
 "plans":{
@@ -3464,7 +3507,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -3472,7 +3515,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -3480,7 +3523,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -3488,7 +3531,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -3502,7 +3545,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -3698,22 +3741,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"There are many naturally energetic kids. But, ADHD can be accompanied by difficulties with attention, hyperactivity, impulsiveness, and disorganisation. If you feel that these symptoms are having a significant impact on your child's daily activities, consult a paediatrician.",
+"cat":"General",
 "q":"Is my child just energetic, or could it be ADHD?"
 },
 {
 "a":"No one knows for sure, but it appears to be caused by both genetic and environmental factors.",
+"cat":"General",
 "q":"What causes ADHD?"
 },
 {
 "a":"The symptoms of the condition may diminish, yet ADHD never goes away as it's a lifetime condition. With timely treatment and care, people struggling with ADHD can develop properly.",
+"cat":"General",
 "q":"Will my child outgrow ADHD?"
 },
 {
 "a":"The symptoms of the condition may diminish, yet ADHD never goes away. With timely treatment and care, people suffering from ADHD can develop properly.",
+"cat":"General",
 "q":"How can I help my child at home?"
 },
 {
 "a":"ADHD can persist into adulthood. Talk to your doctor about a possible diagnosis and treatment options.",
+"cat":"General",
 "q":"What if I suspect I have ADHD myself?"
 }
 ],
@@ -3761,7 +3809,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"ADHD (Attention-Deficit/Hyperactivity Disorder) is one of the most common neurodevelopmental conditions that affects focus, attention, impulse control, and daily functioning. It is more than just being distracted or restless for a short period of time. When ADHD continues over time, tasks like studying, working, organising, or managing routines can feel difficult. In Kerala, it may be described as “lack of focus,” “easily distracted,” or “too active,” but ADHD is a recognised medical condition, not a lack of discipline or effort. Clinically, ADHD is classified under the ICD-10 code F90. Globally, millions of children and adults live with ADHD, and it can continue into adulthood if not addressed. The good news is that ADHD can be effectively managed with the right support, therapy, and structured strategies."
+"ADHD (Attention-Deficit/Hyperactivity Disorder) is one of the most common neurodevelopmental conditions that affects focus, attention, impulse control, and daily functioning. When ADHD continues over time, tasks like studying, working, organising, or managing routines can feel difficult. In Kerala, it may be described as “lack of focus,” “easily distracted,” or “too active,” but ADHD is a recognised medical condition, not a lack of discipline or effort. Clinically, ADHD is classified under the ICD-10 code F90. Globally, millions of children and adults live with ADHD, and it can continue into adulthood if not addressed. The good news is that ADHD can be effectively managed with the right support, therapy, and structured strategies."
 ]
 },
 "plans":{
@@ -3858,7 +3906,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -3866,7 +3914,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -3874,7 +3922,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -3882,7 +3930,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -3896,7 +3944,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -4096,22 +4144,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Abuse counselling can be defined as a process that helps individuals cope with the consequences of the abuse they experienced in the past or are currently experiencing, with the support of qualified professionals who guide them towards recovering from the trauma and overcoming their difficulties.",
+"cat":"General",
 "q":"What is abuse counseling, and how can it help me?"
 },
 {
 "a":"Abuse counselling is aimed at helping people deal with different types of abuse, such as physical, emotional, sexual, and verbal abuse. This type of counselling is tailored according to the individual needs of clients.",
+"cat":"General",
 "q":"What types of abuse can abuse counseling help with?"
 },
 {
 "a":"If you suffered any form of abuse and cannot manage the trauma and cope with it alone, then counselling can be an excellent way for you to recover. Anyone suffering from abuse can benefit from counselling, since it does not matter whether they are currently experiencing some form of abuse or were abused in the past.",
+"cat":"General",
 "q":"How do I know if abuse counseling is right for me?"
 },
 {
 "a":"During counselling, you can engage in confidential conversations that aim to address abuse in one way or another. There are many methods counsellors use in order to help people handle their emotions and behaviours.",
+"cat":"General",
 "q":"What can I expect during an abuse counseling session?"
 },
 {
 "a":"There is no doubt about the fact that abuse counselling sessions can be helpful not only for the survivors but also for perpetrators.",
+"cat":"General",
 "q":"Can perpetrators also seek help through abuse counseling, or is it only for survivors?"
 }
 ],
@@ -4268,7 +4321,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -4276,7 +4329,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -4284,7 +4337,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -4292,7 +4345,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -4306,7 +4359,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -4502,22 +4555,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Treatment for personality disorders refers to psychological therapies that aim at tackling maladaptive patterns of cognition, emotion, and behaviour in people suffering from personality disorders.",
+"cat":"General",
 "q":"What is personality disorder treatment?"
 },
 {
 "a":"The objective of treatment typically includes increasing self-knowledge, bettering social functioning, managing emotions, and using coping mechanisms, among others.",
+"cat":"General",
 "q":"What are the goals of personality disorder treatment?"
 },
 {
 "a":"Common therapeutic approaches include cognitive-behavioural therapy (CBT), dialectical behaviour therapy (DBT), schema therapy, psychodynamic therapy, and interpersonal therapy are some of the treatments to help you manage your conditions.",
+"cat":"General",
 "q":"What types of therapy are used in treating personality disorders?"
 },
 {
 "a":"While medications are often used to deal with personality disorders because they may help relieve symptoms like depression, anxiety, and impulse control issues. Nevertheless, medication alone is never enough; it is used as an addition to psychotherapy",
+"cat":"Therapy",
 "q":"Can medication be helpful in treating personality disorders?"
 },
 {
 "a":"While personality disorders are chronic conditions, treatment can help you learn to manage symptoms efficiently and improve your quality of life. Recovery is often characterized by reduced symptoms and enhanced functioning rather than complete elimination of symptoms.",
+"cat":"General",
 "q":"Can personality disorders be cured with treatment?"
 }
 ],
@@ -4565,7 +4623,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Personality disorders are mental health conditions that influence your thoughts and behaviours related to others. It is considered more than just certain personality traits. These complex patterns of behaviours that are persistent and rigid, they can impact relationships, work, and daily life. People may struggle with emotions, self-image, or understanding others. These challenges are generally misunderstood as “stubborn behavior,” “overreacting,” or “attitude issues,” but they are recognized as genuine medical conditions, not personal flaws. Clinically, these personality disorders are classified under ICD-10 codes F60–F69, for different types and patterns. Many people around the globe live with personality disorders, making them one of the significant mental health concerns. The good news is that with the right support and therapy, these patterns of personality disorder can be understood and managed effectively."
+"Personality disorders are mental health conditions that influence your thoughts and behaviours related to others. It is considered more than just certain personality traits. These complex patterns of behaviours that are persistent and rigid, they can impact relationships, work, and daily life. People may struggle with emotions, self-image, or understanding others. Many people around the globe live with personality disorders, making them one of the significant mental health concerns. The good news is that with the right support and therapy, these patterns of personality disorder can be understood and managed effectively."
 ]
 },
 "plans":{
@@ -4662,7 +4720,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -4670,7 +4728,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -4678,7 +4736,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -4686,7 +4744,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -4700,7 +4758,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -4896,26 +4954,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"The way that therapy assists in the treatment of PTSD is by creating an environment in which the individual can work through their trauma, cope with their emotions, change their thinking patterns, and ultimately respond better to future stresses.",
+"cat":"General",
 "q":"How does therapy help in treating PTSD?"
 },
 {
 "a":"Cognitive-behavioural therapy (CBT) is a type of psychotherapy for those suffering from PTSD. The way that CBT works is by addressing the harmful thoughts and actions brought about by the trauma. One specific form of CBT is called exposure therapy.",
+"cat":"Therapy",
 "q":"What is cognitive-behavioral therapy (CBT) for PTSD?"
 },
 {
 "a":"Eye movement desensitisation and reprocessing (EMDR) therapy is an advanced form of therapy that assists in reprocessing traumatic memories with the help of bilateral stimulation, such as eye movements or tapping, which enables the brain to reprocess the traumatic event without experiencing as much discomfort.",
+"cat":"General",
 "q":"What is eye movement desensitization and reprocessing (EMDR) therapy?"
 },
 {
 "a":"Medications, including selective serotonin reuptake inhibitors (SSRIs) and serotonin-norepinephrine reuptake inhibitors (SNRIs), are known for their efficacy in treating PTSD. They help alleviate symptoms of PTSD when used in combination with psychotherapy; however, the effectiveness of these medications depends on the person's individual response.",
+"cat":"Therapy",
 "q":"Are medications effective in treating PTSD?"
 },
 {
 "a":"It depends on various factors, including individual circumstances, the degree of suffering experienced by an individual, and the kind of treatment that is prescribed. For some patients, significant improvement is observed within several months, while other cases may demand prolonged treatment.",
+"cat":"General",
 "q":"How long does PTSD treatment typically last?"
 },
 {
 "a":"Yes, online therapy is beneficial when it comes to the treatment of PTSD, as it provides access, anonymity, safety, and many other benefits. It can be a valuable option for those seeking treatment for PTSD. It's essential to choose a reputable online therapy platform such as Koott that offers evidence-based treatments and prioritises privacy and security.",
+"cat":"General",
 "q":"Is online therapy helpful for PTSD?"
 }
 ],
@@ -4963,7 +5027,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Post-Traumatic Stress Disorder (PTSD) is a mental health condition that occurs after experiencing or witnessing a distressing or traumatising event. It affects your thoughts, emotions, memory, and everyday functioning. While being distressed and scared due to a traumatising incident might be temporary, if the symptoms persist beyond several weeks or months, they may interfere with your ability to function in your everyday activities In Kerala, people may refer to it as “overthinking,” “shock,” or “manasika vedana,” but it is a recognised medical condition related to mental health, not a personal weakness. Clinically, PTSD is classified under ICD-10 code F43.1. Globally, millions of people experience PTSD, making it an important mental health concern. The good news is that PTSD is treatable with the right support, therapy, and care."
+"Post-Traumatic Stress Disorder (PTSD) is a mental health condition that occurs after experiencing or witnessing a distressing or traumatising event. It affects your thoughts, emotions, memory, and everyday functioning. Clinically, PTSD is classified under ICD-10 code F43.1. Globally, millions of people experience PTSD, making it an important mental health concern. The good news is that PTSD is treatable with the right support, therapy, and care."
 ]
 },
 "plans":{
@@ -5060,7 +5124,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -5068,7 +5132,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -5076,7 +5140,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -5084,7 +5148,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -5098,7 +5162,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -5294,30 +5358,37 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Mood disorder is a mental health condition where a you experience long-lasting changes in mood, affecting your daily life, behavior and activities.",
+"cat":"General",
 "q":"What is a mood disorder?"
 },
 {
 "a":"Mood disorders are quite common around the world, affecting a large number of people. In India, studies shows that over 5% of the population experiences depression and related mood conditions.",
+"cat":"General",
 "q":"How common are mood disorders?"
 },
 {
 "a":"Bipolar Disorder, Depression, Disruptive Mood Dysregulation Disorder, Premenstrual Dysphoric Disorder (PMDD), Schizoaffective Disorder, and Substance-Induced Mood Disorder are some of the most recorded mood disorders in malayalees around the globe.",
+"cat":"General",
 "q":"What are the different types of mood disorders?"
 },
 {
 "a":"Some of the common symptoms include changes in mood, energy, sleep and appetite. You might feel sad, guilty or lose interest in things, while some people experience high energy, restlessness and rapid speech.",
+"cat":"General",
 "q":"What are the symptoms of a mood disorder?"
 },
 {
 "a":"A mental health professional diagnoses it by carefully observing and understanding your symptoms, medical history, and sometimes using psychological assessments. Seeking professional support is important for a right diagnosis and treatment plan.",
+"cat":"General",
 "q":"How is a mood disorder diagnosed?"
 },
 {
 "a":"Mood disorder treatment may include medication, talk therapy and approaches such as Cognitive Behavioral Therapy (CBT), Dialectical Behavior Therapy (DBT), family therapy, light therapy, ECT and TMS.",
+"cat":"General",
 "q":"What are the treatment options for mood disorders?"
 },
 {
 "a":"There is no sure way to prevent mood disorders, but early support and awareness with the right treatment helps you manage symptoms to live a more balanced life.",
+"cat":"General",
 "q":"Can mood disorders be prevented?"
 }
 ],
@@ -5365,8 +5436,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Mood disorders are real mental health conditions that can affect silently your emotional state, including mood, energy levels, thoughts, and your daily functioning. Though mood changes are very common, when these shifts stay for weeks or longer, they can make everyday work, studies and relationships feel hard to manage. Common mood disorders such as depression and bipolar disorder can cause periods of low mood and extreme mood changes.",
-"In Kerala, you may have heard people calling it “mood swings” “tension” or “overthinking” but they are real and recognised medical conditions, not personal weaknesses. Clinically, mood disorders are classified under ICD-10 codes (F30–F39), including depressive disorders and bipolar disorders. Globally, millions of people are currently living with mood disorders, making them a major mental health concern. The most important thing to remember is that mood disorders are treatable with the right support, therapy and care."
+"Mood disorders are real mental health conditions that can affect silently your emotional state, including mood, energy levels, thoughts, and your daily functioning. Common mood disorders such as depression and bipolar disorder can cause periods of low mood and extreme mood changes.",
+"Clinically, mood disorders are classified under ICD-10 codes (F30–F39), including depressive disorders and bipolar disorders. Globally, millions of people are currently living with mood disorders, making them a major mental health concern. The most important thing to remember is that mood disorders are treatable with the right support, therapy and care."
 ]
 },
 "plans":{
@@ -5480,7 +5551,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -5488,7 +5559,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -5496,7 +5567,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -5504,7 +5575,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -5518,7 +5589,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -5672,7 +5743,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "title":"How Does Therapy Help with Mood Disorder",
-"subtitle":"We provide you with the right support, so you can understand your mood patterns and manage emotional ups and downs, creating space for clarity and stability in your life"
+"subtitle":"With the right support you can understand your mood patterns and manage the ups and downs, making space for stability."
 }
 },
 "schema_enabled":false
@@ -5714,22 +5785,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Major treatment options for schizophrenia often include the use of antipsychotic medication, psychotherapy, and psychosocial treatments. This combination is meant to help relieve the individual from the effects.",
+"cat":"General",
 "q":"What are the main treatments for schizophrenia?"
 },
 {
 "a":"The use of psychotherapy has proven beneficial to people diagnosed with schizophrenia. Psychotherapy can include cognitive behavioral therapy and supportive therapy. The approach helps one understand more about their condition and cope with symptoms and related daily challenges.",
+"cat":"General",
 "q":"What is psychotherapy's role in schizophrenia treatment?"
 },
 {
 "a":"The term psychosocial approach encompasses therapies that try to address the environmental and social factors affecting psychological well-being. Such interventions include occupational therapy, community therapy, skill training, and supported accommodation.",
+"cat":"General",
 "q":"What are psychosocial interventions, and how do they help in schizophrenia treatment?"
 },
 {
 "a":"Despite the importance of using both medication and therapy in the treatment of schizophrenia, there are certain other measures that a person can use as part of their management techniques. This includes exercise, stress management techniques, and appropriate nutrition. Nonetheless, one has to seek professional advice prior to employing such an alternative treatment plan.",
+"cat":"Therapy",
 "q":"Are there alternative treatments or lifestyle changes that can help manage schizophrenia?"
 },
 {
 "a":"There is no specific length of time regarding the treatment of schizophrenia since this depends on different elements, including the severity of the symptoms and the response of the patient to the treatment. In fact, the treatment of this mental disorder takes quite a while.",
+"cat":"General",
 "q":"How long does schizophrenia treatment typically last?"
 }
 ],
@@ -5777,7 +5853,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Schizophrenia is a serious mental health condition that affects your thoughts, feelings, and perception of reality. It can impact your emotions, behaviour, and daily functioning. It is different from temporary confusion or stress. When symptoms continue, an individual may face hallucinations, delusions, and other challenges, which would make everyday routine very complicated. In Kerala, people may misunderstand it as “mental weakness” or “loss of control,” but it is a recognised medical condition, not a personal fault. Clinically, schizophrenia is classified under ICD-10 code F20. Globally, millions of people live with schizophrenia, making it an important mental health condition. With the right treatment, therapy, and support, symptoms can be managed, and quality of life can improve."
+"Schizophrenia is a serious mental health condition that affects your thoughts, feelings, and perception of reality. It can impact your emotions, behaviour, and daily functioning. When symptoms continue, an individual may face hallucinations, delusions, and other challenges, which would make everyday routine very complicated. In Kerala, people may misunderstand it as “mental weakness” or “loss of control,” but it is a recognised medical condition, not a personal fault. Clinically, schizophrenia is classified under ICD-10 code F20. With the right treatment, therapy, and support, symptoms can be managed, and quality of life can improve."
 ]
 },
 "plans":{
@@ -5874,7 +5950,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -5882,7 +5958,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -5890,7 +5966,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -5898,7 +5974,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -5912,7 +5988,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -6108,26 +6184,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Some children may experience difficulty with communication, making eye contact, repetition in their actions, over-sensitivity to sound and touch, and difficulties in social interactions. Every kid is unique, and early intervention can assist them in coping with their environment.",
+"cat":"General",
 "q":"How do I know if my child may be on the autism spectrum?"
 },
 {
 "a":"Yes. Most adults recognise that they have been suffering from autism only years later, when they have gone through a life full of struggles. The right assessment and treatment can help them learn more about themselves and improve their daily lives and relationships.",
+"cat":"General",
 "q":"Can adults also be diagnosed with Autism Spectrum Disorder?"
 },
 {
 "a":"Think of therapy as a toolbox for building essential life skills. Here's what therapists typically focus on: Social Communication: Therapists become coaches, helping individuals with ASD initiate conversations, \"read\" body language, and understand social cues. Managing Repetitive Behaviors: Therapists work with clients to find healthy coping mechanisms to replace repetitive behaviors that might be disruptive. Sensory Sensitivities: Imagine loud noises feeling like nails on a chalkboard. Therapists can help clients identify their sensory triggers and develop strategies to manage them. Emotional Regulation: Sometimes, big emotions can be overwhelming. Therapists teach tools to recognize and manage emotions effectively.",
+"cat":"General",
 "q":"What are therapists working on in ASD treatment?"
 },
 {
 "a":"There are various evidence-based therapies, like ABA, Social Skills Training, and CBT. Therapists can recommend the most suitable approach based on your child's needs.",
+"cat":"General",
 "q":"What therapies are available to help my child with ASD?"
 },
 {
 "a":"Family involvement is crucial. Therapists can equip you with strategies to improve communication, establish routines, and manage challenging behaviors at home.",
+"cat":"General",
 "q":"How can I help my child with ASD at home?"
 },
 {
 "a":"Family is a crucial part of the support system. Therapists might: Teach parents and caregivers strategies to support their loved one at home. Help families communicate more effectively. Develop routines that create a more predictable and comfortable environment. Ensure everyone feels supported throughout the therapy journey.",
+"cat":"General",
 "q":"How does therapy involve families?"
 }
 ],
@@ -6175,7 +6257,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Autism Spectrum Disorder (ASD) refers to a disorder in which there are disruptions in a person's ability to communicate, behave and interact socially. The name ASD itself explains the situation that people with the condition display differences that vary from one person to another. People with autism have differences in social communication, sensory processing and behavioural patterns. In Kerala, it is sometimes misunderstood as “late talking” or “being different ”, but it is a recognised developmental condition, not a weakness or lack of ability. Clinically, ASD is classified under the ICD-10 code F84. Globally, millions of people are on the autism spectrum, and early support can make a significant difference. With the right guidance, therapy, and understanding, individuals with ASD can lead fulfilling and independent lives."
+"Autism Spectrum Disorder (ASD) refers to a disorder in which there are disruptions in a person's ability to communicate, behave and interact socially. The name ASD itself explains the situation that people with the condition display differences that vary from one person to another. In Kerala, it is sometimes misunderstood as “late talking” or “being different ”, but it is a recognised developmental condition, not a weakness or lack of ability. Clinically, ASD is classified under the ICD-10 code F84. Globally, millions of people are on the autism spectrum, and early support can make a significant difference. With the right guidance, therapy, and understanding, individuals with ASD can lead fulfilling and independent lives."
 ]
 },
 "plans":{
@@ -6272,7 +6354,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -6280,7 +6362,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -6288,7 +6370,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -6296,7 +6378,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -6310,7 +6392,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -6502,22 +6584,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"It is important because it influences your feeling of achievement and your self-respect. Unproductive behaviour causes more stress and may affect one's mental state by making one depressed and anxious. Productivity helps maintain positive emotions and psychological well-being.",
+"cat":"General",
 "q":"Why is productivity important in mental health?"
 },
 {
 "a":"The first is time management, the second is energy management, and the third is task management. By using these three pillars effectively, you will be able to maximise your productivity.",
+"cat":"General",
 "q":"What are the 3 pillars of productivity?"
 },
 {
 "a":"There are numerous elements that make someone productive. Motivation, attention, organisational skills, and effective goal setting help to increase one's productivity. Work-life balance and reduced stress also improve productivity.",
+"cat":"General",
 "q":"What makes people productive?"
 },
 {
 "a":"At Koott, therapy can assist in improving productivity by working on the root cause that may affect your ability to concentrate and focus, and work towards the targets efficiently. Therapists can help you learn to recognise negative thought patterns and develop coping mechanisms for emotional and stressful situations. This approach will further allow therapists to provide a safe place to address potential issues in productivity and develop efficient strategies for dealing with time management and organisation issues.",
+"cat":"General",
 "q":"How can therapy help improve productivity?"
 },
 {
 "a":"There could be different reasons for being unproductive; some of which include having bad time management habits, being demotivated and tired, struggling with the workload, perfectionism, getting distracted easily or being affected by underlying mental problems like anxiety and depression. Recognising the underlying cause of productivity issues helps you overcome them on time.",
+"cat":"General",
 "q":"Why do I struggle to be productive?"
 }
 ],
@@ -6565,7 +6652,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Productivity is the ability to use your time, energy, and focus effectively to complete tasks and achieve your goals. It is not just about working hard all the time, but involves working for a clear purpose in an organised manner. If balanced well, productivity can help you to be consistent, decrease stress, and make you feel that you are progressing towards your goals. Low productivity is not just about laziness. It can be influenced by stress, burnout, low motivation, poor time management or emotional challenges. In Kerala, people may describe it as “lack of focus,” “low energy”, or “not feeling like doing anything,” but these can be signs of deeper mental or behavioural patterns. Productivity is closely linked with mental well-being, routines and habits. With the right guidance and support, you can improve focus, build better habits and create a more structured and balanced lifestyle."
+"Productivity is the ability to use your time, energy, and focus effectively to complete tasks and achieve your goals. It is not just about working hard all the time, but involves working for a clear purpose in an organised manner. If balanced well, productivity can help you to be consistent, decrease stress, and make you feel that you are progressing towards your goals. Low productivity is not just about laziness. It can be influenced by stress, burnout, low motivation, poor time management or emotional challenges. Productivity is closely linked with mental well-being, routines and habits. With the right guidance and support, you can improve focus, build better habits and create a more structured and balanced lifestyle."
 ]
 },
 "plans":{
@@ -6662,7 +6749,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -6670,7 +6757,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -6678,7 +6765,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -6686,7 +6773,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -6700,7 +6787,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -6896,34 +6983,42 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"The exact causes are complex and can involve a combination of genetic, environmental, psychological, and societal factors.",
+"cat":"General",
 "q":"What causes eating disorders?"
 },
 {
 "a":"Signs may include strict eating rules, unhealthy relationship with food, excessive worry about weight, low self-esteem, hiding food, and distorted self-perception.",
+"cat":"General",
 "q":"How do I know if I have an eating disorder?"
 },
 {
 "a":"Yes, eating disorders can affect individuals of any gender, though they are often associated with women.",
+"cat":"General",
 "q":"Can men have eating disorders too?"
 },
 {
 "a":"Absolutely. Consulting with a healthcare professional, therapist, or counsellor experienced in eating disorders is crucial for proper diagnosis and guidance.",
+"cat":"General",
 "q":"Should I seek professional help for my eating disorder?"
 },
 {
 "a":"Treatments may include therapy, medication, nutritional counselling, and medical care. The specific approach depends on the type and severity of the disorder.",
+"cat":"General",
 "q":"What treatments are available for eating disorders?"
 },
 {
 "a":"Offer non-judgmental support, encourage seeking professional help, and educate yourself about eating disorders to better understand their experiences.",
+"cat":"General",
 "q":"How can I support a friend or family member with an eating disorder?"
 },
 {
 "a":"Yes, recovery is possible with proper treatment, support, and commitment to making positive changes. It may take time, but many individuals can achieve a healthier relationship with food.",
+"cat":"General",
 "q":"Is recovery possible for individuals with eating disorders?"
 },
 {
 "a":"Yes, online therapy can be effective, providing accessibility and convenience for individuals seeking help. However, severe cases may require in-person interventions.",
+"cat":"General",
 "q":"Can online therapy be effective for eating disorders?"
 }
 ],
@@ -6971,7 +7066,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Eating disorders are more than just dieting and worrying about weight. They are real mental health conditions that impact your relationship with food, eating habits, and body image. It is very important to understand that eating disorders can affect anyone at any age and may cause serious health problems. It can begin to affect your physical health, emotions, and daily life if left untreated. Common types of issues include anorexia nervosa, bulimia nervosa, and binge-eating disorder. Each one comes with its own challenges and involves a different kind of struggle with food and body image. According to global health estimates, millions of people are currently living with these conditions. The hopeful part is that recovery is possible with the right support. Professional eating disorder treatment and online eating disorder treatment can help you build a healthier relationship with food and improve your overall quality of life."
+"Eating disorders are more than just dieting and worrying about weight. They are real mental health conditions that impact your relationship with food, eating habits, and body image. Common types of issues include anorexia nervosa, bulimia nervosa, and binge-eating disorder. Each one comes with its own challenges and involves a different kind of struggle with food and body image. According to global health estimates, millions of people are currently living with these conditions. Professional eating disorder treatment and online eating disorder treatment can help you build a healthier relationship with food and improve your overall quality of life."
 ]
 },
 "plans":{
@@ -7085,7 +7180,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -7093,7 +7188,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -7101,7 +7196,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -7109,7 +7204,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -7123,7 +7218,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -7277,7 +7372,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "title":"How Does Online Therapy Help with Eating Disorder",
-"subtitle":"Therapy can help you understand your struggle with food and emotions with the right support. It can create a space for healing that helps you build a balanced relationship with food as well as yourself."
+"subtitle":"Therapy helps you understand your struggle with food and emotions, and builds a balanced relationship with food and yourself."
 }
 },
 "schema_enabled":false
@@ -7319,14 +7414,17 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Corporate counseling focuses on addressing workplace-related issues such as stress management, conflict resolution, leadership development, and team dynamics. Career coaching, on the other hand, specifically assists individuals in achieving their professional goals, including career exploration, job search strategies, and career advancement.",
+"cat":"General",
 "q":"What is corporate counseling, and how does it differ from career coaching?"
 },
 {
 "a":"Career coaching sessions often focus on helping individuals clarify their career goals, identify their strengths and values, develop effective job search strategies, enhance interview skills, and navigate career transitions. Coaches work collaboratively with clients to create actionable plans for achieving their career objectives.",
+"cat":"General",
 "q":"What are the typical areas addressed in career coaching sessions?"
 },
 {
 "a":"Career coaching assists individuals in exploring career options, identifying their passions and interests, overcoming obstacles or roadblocks in their career path, and developing the skills and strategies necessary for career advancement. Coaches provide personalized guidance and support tailored to the individual's specific needs and goals.",
+"cat":"General",
 "q":"How does career coaching help individuals in their professional development?"
 }
 ],
@@ -7472,7 +7570,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -7480,7 +7578,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -7488,7 +7586,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -7496,7 +7594,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -7510,7 +7608,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -7706,26 +7804,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Some of the warning signs may be the feeling of hopelessness or worthlessness, expressing thoughts of own death or killing themself, withdrawing from social interactions, extreme mood swings, and planning suicide.",
+"cat":"General",
 "q":"What are the warning signs of suicidal tendencies?"
 },
 {
 "a":"Yes, therapy methods such as cognitive-behavioural therapy (CBT) and dialectical behaviour therapy (DBT) are proven to be effective in addressing suicidal thoughts. Therapy helps people to understand and manage their emotions, develop coping mechanisms and create safety plans to prevent future suicidal behaviours effectively.",
+"cat":"General",
 "q":"What should I do if I notice someone showing signs of suicidal tendencies?"
 },
 {
 "a":"To provide someone struggling with suicidal tendencies with a safer environment, remove any objects that could harm them, such as firearms or medicine and ensure that they have a connection with friends, family, and professionals. Open discussion and a safety plan in case of crises will be very useful.",
+"cat":"General",
 "q":"Can therapy help with suicidal tendencies?"
 },
 {
 "a":"People with suicidal tendencies may be provided with medications like antidepressants or mood stabilisers to help manage their mental struggles. Medications are only to be considered when combined with the therapy and recommended by a healthcare professional.",
+"cat":"Therapy",
 "q":"Can medication help with suicidal tendencies?"
 },
 {
 "a":"To provide someone struggling with suicidal tendencies with a safer environment, remove any objects that could harm them, such as firearms or medicine and ensure that they have a connection with friends, family, and professionals. Open discussion and a safety plan in case of crises will be very useful.",
+"cat":"General",
 "q":"How can I create a safe environment for someone with suicidal tendencies?"
 },
 {
 "a":"If you know someone with suicidal tendencies who refuses to seek help, it is crucial to offer your continuous support and encourage them to seek professional guidance. You can help them by providing information about available resources, such as hotlines or support groups and emphasising that seeking professional help is a sign of strength. If the situation becomes intense and urgent, consider involving emergency services or contacting a mental health crisis team for assistance.",
+"cat":"General",
 "q":"What should I do if someone with suicidal tendencies refuses help?"
 }
 ],
@@ -7773,7 +7877,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Suicidal tendencies refer to thoughts, feelings or behaviours where an individual considers ending their own life due to overwhelming situations. Such suicidal tendencies usually grow from an intense experience of emotional pain or hopelessness rather than a genuine desire to die.",
+"Suicidal tendencies refer to thoughts, feelings or behaviours where an individual considers ending their own life due to overwhelming situations.",
 "People experiencing suicidal tendencies may feel trapped, lonely, or find it difficult to cope with stress, depression and trauma on their own. It is extremely important to understand that these thoughts are a sign of severe emotional distress and not an act of attention seeking or personal weakness. With timely support, counselling, and compassionate care, a person can find safety, hope, and ways to cope with their silent struggles."
 ]
 },
@@ -7871,7 +7975,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -7879,7 +7983,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -7887,7 +7991,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -7895,7 +7999,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -7909,7 +8013,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -8105,22 +8209,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Treatment for crisis intervention may include short-term counselling, use of medications to reduce the symptoms, referral for specialised mental health services and joint safety planning.",
+"cat":"General",
 "q":"What types of treatment are available in crisis intervention?"
 },
 {
 "a":"The common methods used in crisis intervention therapy include cognitive behavioural therapy, solution-focused therapy, supportive therapy, trauma-informed therapy and crisis stabilisation therapy methods.",
+"cat":"Therapy",
 "q":"What are the different approaches used in crisis intervention therapy?"
 },
 {
 "a":"While conventional therapy usually requires a deep analysis of underlying causes, crisis intervention therapy deals with coping with an urgent crisis and restoring stability in the period immediately following the crisis.",
+"cat":"General",
 "q":"How does crisis intervention therapy differ from traditional therapy?"
 },
 {
 "a":"The therapist supports you during a crisis intervention therapy session by evaluating your safety status, helping you cope with unpleasant thoughts and working together to develop practical strategies to address the situation and finding more resources if necessary.",
+"cat":"General",
 "q":"What happens during a crisis intervention therapy session?"
 },
 {
 "a":"Yes, it is quite feasible to hold crisis intervention therapy sessions via telecommunication or online platforms. It allows you to access professional mental health support wherever you are, even in emergencies.",
+"cat":"General",
 "q":"Can crisis intervention therapy be conducted remotely or online?"
 }
 ],
@@ -8168,7 +8277,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Crisis intervention is a specialised form of immediate support that helps individuals struggling with sudden emotional, psychological or life-threatening situations. It is more than just talking through a problem for a few minutes. When a crisis occurs, feelings of fear, anxiety or exhaustion can make it difficult to think clearly or take any action. In Kerala, people may refer to it as “sudden tension,” “panic” or “mental overload,” but it is a clinically recognised mental health condition and not a personal weakness. Crisis intervention is designed to stabilise emotions, provide safety and provide practical support. Millions of people around the world experience mental health crises each year. The good news is that with experienced professionals and immediate care, crisis situations can be managed safely, and consistent support can help you prevent any future possibility."
+"Crisis intervention is a specialised form of immediate support that helps individuals struggling with sudden emotional, psychological or life-threatening situations. It is more than just talking through a problem for a few minutes. When a crisis occurs, feelings of fear, anxiety or exhaustion can make it difficult to think clearly or take any action. Crisis intervention is designed to stabilise emotions, provide safety and provide practical support. Millions of people around the world experience mental health crises each year. The good news is that with experienced professionals and immediate care, crisis situations can be managed safely, and consistent support can help you prevent any future possibility."
 ]
 },
 "plans":{
@@ -8265,7 +8374,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -8273,7 +8382,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -8281,7 +8390,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -8289,7 +8398,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -8303,7 +8412,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -8495,22 +8604,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"The therapists may use different methods of existential therapy that revolve around examining issues like freedom, choice, isolation, and meaninglessness.",
+"cat":"Therapy",
 "q":"What therapeutic approaches are used in treating existential crises?"
 },
 {
 "a":"Even though there may be some overlap between the two, the difference is that an existential crisis deals more with issues of meaning of life and purpose, while depression is characterised by sadness and loss of interest in one's usual activities.",
+"cat":"General",
 "q":"How can I differentiate between an existential crisis and depression?"
 },
 {
 "a":"Yes, anxiety is a common element of the existential crisis because it makes a person feel like there are uncertainties and no answers about the purpose and meaning of their life.",
+"cat":"General",
 "q":"Is it common to experience anxiety during an existential crisis?"
 },
 {
 "a":"Yes, therapists could include techniques that allow a person to express themselves through journaling or even visualisations to explore their existential issues.",
+"cat":"Therapy",
 "q":"Are there specific exercises or techniques used in existential therapy?"
 },
 {
 "a":"Yes, treatment can definitely be helpful for people of all ages, including adolescents and young adults struggling with identity and purpose.",
+"cat":"General",
 "q":"Can existential crisis treatment be effective for adolescents or young adults?"
 }
 ],
@@ -8655,7 +8769,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -8663,7 +8777,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -8671,7 +8785,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -8679,7 +8793,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -8693,7 +8807,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -8893,22 +9007,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"The term for an illness that lasts for a longer period of time is described as a chronic illness or condition. Illness and its treatment may leave you with emotional struggles that you may not understand or be able to handle by yourself.",
+"cat":"General",
 "q":"What is the term for a long-term illness?"
 },
 {
 "a":"Some of the therapy approaches suggested to help you cope with the illnesses, and their after effects are cognitive-behavioural therapy (CBT), mindfulness-based stress reduction therapy (MBSR), acceptance and commitment therapy (ACT) and supportive therapy.",
+"cat":"General",
 "q":"What types of therapy are recommended for chronic illness management?"
 },
 {
 "a":"Some of the examples of chronic illnesses that could benefit from therapy may include diabetes, arthritis, chronic pain, autoimmune disorders and cancers. It leaves you with emotional struggles even when the physical health improves with the treatment.",
+"cat":"General",
 "q":"What are some examples of chronic illnesses that can benefit from therapy?"
 },
 {
 "a":"Therapy helps you to manage chronic illnesses and emotional well-being by providing you with ways through which you can deal with emotional difficulties caused by the long-term disease.",
+"cat":"General",
 "q":"How does therapy contribute to managing chronic illness and mental health?"
 },
 {
 "a":"Therapy is a useful approach to coping with the emotions that come with chronic illness by providing a space where you can express your feelings freely, learn effective coping strategies and develop emotional resilience.",
+"cat":"General",
 "q":"How can therapy help individuals cope with the emotional impact of chronic illness?"
 }
 ],
@@ -8956,7 +9075,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"A chronic illness refers to a long-term health condition that may affect your body, mind and daily life for a longer period of time. It is more than just an illness, as it often requires consistent care, management and adjustments in your lifestyle. Health conditions like diabetes, heart disease, autoimmune disorders, or chronic pain can affect the way you feel physically and emotionally. Living with a chronic illness and its treatment also affects your thoughts, energy levels, relationships and routine. In Kerala, people may refer to it as “long-term health issues” or “continuous health problems,” but it is a genuine health condition that needs both physical and emotional support. With the right care and gentle guidance, you learn to manage your condition and improve your emotional well-being over time."
+"A chronic illness refers to a long-term health condition that may affect your body, mind and daily life for a longer period of time. Health conditions like diabetes, heart disease, autoimmune disorders, or chronic pain can affect the way you feel physically and emotionally. Living with a chronic illness and its treatment also affects your thoughts, energy levels, relationships and routine. In Kerala, people may refer to it as “long-term health issues” or “continuous health problems,” but it is a genuine health condition that needs both physical and emotional support. With the right care and gentle guidance, you learn to manage your condition and improve your emotional well-being over time."
 ]
 },
 "plans":{
@@ -9053,7 +9172,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -9061,7 +9180,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -9069,7 +9188,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -9077,7 +9196,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -9091,7 +9210,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -9287,26 +9406,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Behavioral health services include therapy, counseling, medication management, crisis intervention, and support groups. These services aim to address a wide range of mental health concerns and promote recovery and well-being.",
+"cat":"General",
 "q":"What Services are Offered in Behavioral Health?"
 },
 {
 "a":"During a behavioral health assessment, a trained professional will evaluate your mental health, emotional well-being, and any behavioral concerns. This may involve discussing your symptoms, medical history, and current stressors to develop an appropriate treatment plan.",
+"cat":"General",
 "q":"What Can I Expect During a Behavioral Health Assessment?"
 },
 {
 "a":"Behavioral health services can benefit individuals by providing support, guidance, and resources to manage mental health concerns effectively. These services can help improve coping skills, enhance self-awareness, and promote overall well-being.",
+"cat":"General",
 "q":"How Can Behavioral Health Services Benefit Me?"
 },
 {
 "a":"You should consider seeking behavioral health services if you are experiencing symptoms of mental health concerns, such as persistent sadness, anxiety, irritability, changes in sleep or appetite, difficulty concentrating, or thoughts of self-harm. Additionally, if you are struggling to cope with stressors or life challenges, seeking support from a behavioral health professional can be beneficial.",
+"cat":"General",
 "q":"When Should I Seek Behavioral Health Services?"
 },
 {
 "a":"The duration of behavioral health treatment varies depending on the individual's needs, the severity of their symptoms, and the treatment approach. Some people may benefit from short-term therapy lasting a few weeks or months, while others may require ongoing support for an extended period.",
+"cat":"General",
 "q":"How Long Does Behavioral Health Treatment Typically Last?"
 },
 {
 "a":"Yes, behavioral health services can help with stress management by teaching coping skills, relaxation techniques, and mindfulness practices. Therapists can work with individuals to identify stressors, develop healthy coping strategies, and improve resilience in the face of challenges.",
+"cat":"General",
 "q":"Can Behavioral Health Services Help with Stress Management?"
 }
 ],
@@ -9354,8 +9479,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Behavioural health is a broad area of mental well-being that focuses on how your thoughts, emotions, and behaviours influence your daily life. It goes beyond just mental illness and includes how you handle stress, build habits, make decisions, and maintain relationships over time. Once certain behaviours become hard to cope with or develop into unhealthy patterns, they have an effect on the psychological and physical well-being of an individual.",
-"It involves issues such as anxiety, depression, stress, addictions, insomnia, and even lifestyle changes. This particular field may be referred to as “overthinking,” “tension,” or “behavioural changes” by people in Kerala; however, they fall within the category of recognised mental health issues rather than a personal failure or inability. Behavioural issues can only be managed through therapeutic interventions. Nevertheless, with proper advice and treatment from professionals, it is possible to lead a healthier life."
+"Behavioural health is a broad area of mental well-being that focuses on how your thoughts, emotions, and behaviours influence your daily life. Once certain behaviours become hard to cope with or develop into unhealthy patterns, they have an effect on the psychological and physical well-being of an individual.",
+"Behavioural issues can only be managed through therapeutic interventions. Nevertheless, with proper advice and treatment from professionals, it is possible to lead a healthier life."
 ]
 },
 "plans":{
@@ -9452,7 +9577,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -9460,7 +9585,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -9468,7 +9593,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -9476,7 +9601,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -9490,7 +9615,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -9686,30 +9811,37 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Emotional self-regulation is the regulation of emotions to ensure that you manage your feelings in a positive manner. It is important because it helps you cope with different situations, maintain healthy relationships and make effective decisions.",
+"cat":"General",
 "q":"What is emotional self-regulation, and why is it important?"
 },
 {
 "a":"The signs that you are struggling with emotional self-regulation include mood swings, impulsive actions, inability to cope with stress, and intense emotional reactions to different situations.",
+"cat":"General",
 "q":"How can I recognize if I have difficulties with emotional self-regulation?"
 },
 {
 "a":"The signs of emotional self-regulation include staying calm even in stressful environments, expressing your feelings adequately, making effective decisions, and adapting to different circumstances over a period of time.",
+"cat":"General",
 "q":"What are some common signs of effective emotional self-regulation?"
 },
 {
 "a":"Emotional self-regulation positively influences relationships by fostering effective communication and conflict resolution skills. In the workplace, it ensures effective stress management and productivity.",
+"cat":"General",
 "q":"How does emotional self-regulation affect my relationships and work?"
 },
 {
 "a":"There are many helpful activities, such as practising mindfulness meditation, progressive muscle relaxation, keeping journals, and engaging in physical activity, that can assist in improving your emotional self-regulation ability.",
+"cat":"Therapy",
 "q":"What daily exercises can improve emotional self-regulation?"
 },
 {
 "a":"Yes, it’s true that some people are naturally inclined to exhibit emotional self-regulation, but this is also a skill that one can acquire with the support of experts, persistence and dedication.",
+"cat":"General",
 "q":"Can emotional self-regulation be learned, or is it primarily an innate trait?"
 },
 {
 "a":"The main aim of practising mindfulness is to develop self-awareness about the thoughts, emotions, and body sensations, which makes it easier for you to react accordingly. It is essential for emotional self-regulation.",
+"cat":"General",
 "q":"What role does mindfulness play in emotional self-regulation?"
 }
 ],
@@ -9757,7 +9889,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Emotional self-regulation refers to the capacity to control and manage your own emotions in a healthy and balanced way. Unlike mere emotional regulation, emotional self-regulation refers to the process of understanding, processing, and learning to cope with emotions in different situations. Lack of self-regulation makes you overwhelmed by emotions or unable to respond calmly in difficult situations. In daily life, this can affect your relationships, decision-making, and overall well-being. In Kerala, emotional self-regulation has been defined as the act of \"managing emotions\" or \"controlling reactions,\" but self-regulation can be achieved through proper guidance. With the help of therapy and practical techniques, emotional self-regulation can be improved over time. Learning to manage emotions effectively helps you stay calm, think clearly, and respond to situations in a more balanced and confident way."
+"Emotional self-regulation refers to the capacity to control and manage your own emotions in a healthy and balanced way. Lack of self-regulation makes you overwhelmed by emotions or unable to respond calmly in difficult situations. In Kerala, emotional self-regulation has been defined as the act of \"managing emotions\" or \"controlling reactions,\" but self-regulation can be achieved through proper guidance. With the help of therapy and practical techniques, emotional self-regulation can be improved over time. Learning to manage emotions effectively helps you stay calm, think clearly, and respond to situations in a more balanced and confident way."
 ]
 },
 "plans":{
@@ -9854,7 +9986,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -9862,7 +9994,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -9870,7 +10002,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -9878,7 +10010,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -9892,7 +10024,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -10092,22 +10224,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Phobias are usually diagnosed through a clinical assessment by a mental health professional. Statistical manual to diagnose a specific phobia or other related types of anxiety disorders can be found in the DSM-5.",
+"cat":"General",
 "q":"How are phobias diagnosed?"
 },
 {
 "a":"Yes, phobias can be effectively treated through different approaches, including cognitive-behavioural therapy (CBT), exposure therapy, relaxation techniques, and medication in some cases if needed.",
+"cat":"General",
 "q":"Can phobias be treated?"
 },
 {
 "a":"Exposure therapy is a type of cognitive-behavioural therapy (CBT) that involves gradually introducing a person to the feared stimulus within a safe and supervised setting.",
+"cat":"General",
 "q":"What is exposure therapy for phobias?"
 },
 {
 "a":"In some cases, medication like SSRIs and benzodiazepines might be administered to alleviate the symptoms of anxiety caused by phobias. In most instances, medication works best in tandem with therapy.",
+"cat":"Therapy",
 "q":"Is medication used to treat phobias?"
 },
 {
 "a":"While it is possible for phobias to self-correct in some instances, most of them remain untreated and have adverse effects on people’s lives. Professional assistance can help with the proper management and correction of phobias.",
+"cat":"General",
 "q":"Can phobias go away on their own?"
 }
 ],
@@ -10155,7 +10292,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Phobias are one of the common types of anxiety disorders, which comprise intense, irrational fears of specific places, objects, events, or activities. They can affect your thoughts, feelings, and regular functioning. It is more than just being scared occasionally. If a phobia becomes severe, even imagining or recalling such objects or situations can cause distress and avoidance to the extent that the person cannot cope with day-to-day activities. In Kerala, people describe it as “strong fear,” “tension,” or “avoid cheyyunnathu,” but it is a recognised medical condition, not an individual weakness. Clinically, phobias are classified under ICD-10 codes F40. It includes different types such as specific phobias, social phobia, and agoraphobia. Globally, many people experience phobias, making them a common mental health concern. The good news is that phobias are treatable with the right support, therapy, and gradual exposure techniques."
+"Phobias are one of the common types of anxiety disorders, which comprise intense, irrational fears of specific places, objects, events, or activities. They can affect your thoughts, feelings, and regular functioning. In Kerala, people describe it as “strong fear,” “tension,” or “avoid cheyyunnathu,” but it is a recognised medical condition, not an individual weakness. Clinically, phobias are classified under ICD-10 codes F40. It includes different types such as specific phobias, social phobia, and agoraphobia. Globally, many people experience phobias, making them a common mental health concern. The good news is that phobias are treatable with the right support, therapy, and gradual exposure techniques."
 ]
 },
 "plans":{
@@ -10252,7 +10389,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -10260,7 +10397,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -10268,7 +10405,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -10276,7 +10413,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -10290,7 +10427,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -10486,26 +10623,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Therapists can provide personalized guidance and support tailored to your specific communication needs. They offer a safe and non-judgmental space to explore underlying issues contributing to communication difficulties and teach practical strategies to enhance your skills.",
+"cat":"General",
 "q":"How can a therapist assist me in improving my communication skills?"
 },
 {
 "a":"Therapists utilize various evidence-based techniques such as cognitive-behavioral therapy (CBT), dialectical behavior therapy (DBT), and interpersonal therapy (IPT). They may focus on improving assertiveness, active listening, conflict resolution, and emotional regulation skills to enhance overall communication effectiveness.",
+"cat":"Therapy",
 "q":"What specific techniques or approaches do therapists use to address communication challenges?"
 },
 {
 "a":"Practice is key to improving communication skills. Engage in active listening, ask clarifying questions, express yourself clearly and assertively, and seek feedback from others to continuously refine your communication abilities.",
+"cat":"General",
 "q":"How can I improve my communication skills in everyday interactions?"
 },
 {
 "a":"Therapy provides professional guidance, support, and accountability that may be lacking in self-help approaches. Therapists offer personalized interventions tailored to your unique needs, address underlying psychological factors contributing to communication challenges, and provide ongoing feedback and encouragement throughout the process.",
+"cat":"General",
 "q":"Why choose therapy for communication difficulties over self-help?"
 },
 {
 "a":"The duration of therapy varies depending on individual factors such as the severity of communication difficulties, personal goals, and level of commitment to the therapeutic process. While some individuals may experience noticeable improvements within a few sessions, others may require longer-term therapy to achieve desired outcomes.",
+"cat":"General",
 "q":"How long does it typically take to see improvement in communication skills through therapy?"
 },
 {
 "a":"Effective communication is crucial for building strong relationships, resolving conflicts, and achieving success in various aspects of life. It enhances understanding, fosters collaboration, and promotes empathy and connection with others.",
+"cat":"General",
 "q":"Why is improving communication important in personal and professional settings?"
 }
 ],
@@ -10554,7 +10697,7 @@ export const CONDITION_PAGES = [
 ],
 "paragraphs":[
 "Communication skills are the ability to express your thoughts, ideas, and feelings clearly while also understanding others effectively. It includes how you speak, listen, respond, and use tone, body language, and timing in different situations. Good communication is not just about talking—it also involves active listening, empathy, clarity, and emotional awareness.",
-"Strong communication skills are essential in relationships, work, and everyday life. They help reduce misunderstandings, handle conflicts better, and build trust and connection with others. With the right guidance and practice, these skills can be improved over time, helping you feel more confident and express yourself more effectively."
+"They help reduce misunderstandings, handle conflicts better, and build trust and connection with others. With the right guidance and practice, these skills can be improved over time, helping you feel more confident and express yourself more effectively."
 ]
 },
 "plans":{
@@ -10651,7 +10794,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -10659,7 +10802,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -10667,7 +10810,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -10675,7 +10818,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -10689,7 +10832,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -10885,22 +11028,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Premarital counselling is a type of therapy which aims to prepare couples for marriage and overcome possible obstacles that they will face after the marriage. Through guidance of a professional therapist, you get an opportunity to talk about important things, develop your communication skills and create a stable base for a healthy relationship after marriage.",
+"cat":"General",
 "q":"What is premarital counseling, and why do we need it?"
 },
 {
 "a":"Initiating premarital counselling process might come from one of you or even from both partners at the same time. It is important to discuss your expectations to start counselling in a positive way by focusing on your relationship development.",
+"cat":"General",
 "q":"Who usually suggests premarital counselling, and how do we start?"
 },
 {
 "a":"No, you don't have to wait until you encounter some difficulties to begin premarital counselling. If you are a happy couple and want to improve communication or just strengthen your relationship, counselling will definitely bring you more benefits.",
+"cat":"General",
 "q":"Is premarital counseling only for couples experiencing problems in their relationship?"
 },
 {
 "a":"To get the best out of premarital counselling, you should be open-minded, honest, and willing to work through the process. Take an active role in the sessions, use what you have learned in them to communicate effectively with your significant other, and apply the knowledge you gain during the process. Remember that premarital counselling is an investment in your future, and yand opportunity to grow.",
+"cat":"General",
 "q":"How does premarital counselling prepare us for marriage?"
 },
 {
 "a":"When dealing with resistance, communication is the key to success. You need to sit down with your partner and have an honest conversation with them about the topic. Listen to them when they speak and try to see their point of view. Remind your partner about the positive aspects of premarital counselling.",
+"cat":"General",
 "q":"What if one partner is hesitant or resistant to participating in premarital counseling?"
 }
 ],
@@ -10948,8 +11096,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Premarital counselling is a form of therapy that helps couples prepare for marriage by building a strong foundation of understanding, communication, and shared expectations. In simple terms, premarital counselling involves having couples talk about important matters in a structured way before getting married.",
-"With a guided process, partners can discuss matters such as communication style, finances, household responsibilities, beliefs, values, and more. It helps partners to discover any potential misunderstandings and learn how to handle them constructively. In Kerala, most individuals get into marriages without discussing matters openly, and hence premarital counselling can assist couples in clarifying these issues.",
+"Premarital counselling is a form of therapy that helps couples prepare for marriage by building a strong foundation of understanding, communication, and shared expectations.",
+"With a guided process, partners can discuss matters such as communication style, finances, household responsibilities, beliefs, values, and more.",
 "With the support of a professional therapist, couples can enhance their relationship and enter marriage with better emotional stability and mutual understanding."
 ]
 },
@@ -11034,7 +11182,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -11042,7 +11190,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -11050,7 +11198,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -11058,7 +11206,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -11072,7 +11220,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -11268,34 +11416,42 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"No, online marital counseling in Kerala is helpful at any stage, from communication problems in a relationship to severe crises, which helps prevent the situation from worsening.",
+"cat":"General",
 "q":"Is marital counseling only for couples on the brink of divorce?"
 },
 {
 "a":"Yes, our licensed therapists in Kerala provide counseling in Malayalam and understand family dynamics, in-law pressures, and cultural values which helps provide personalized services.",
+"cat":"General",
 "q":"Will sessions be in Malayalam, and do therapists understand our culture?"
 },
 {
 "a":"Every relationship is unique and has its own healing time. Through marital counseling, couples can rebuild their bond. It takes a few sessions or more depending on the situation.",
+"cat":"Appointments",
 "q":"How many sessions do we need for real change?"
 },
 {
 "a":"Often, online marital counseling can be even more effective, because it provides comfort, flexibility, and confidentiality. With the option of online marital counseling in Kerala, couples don't have to compromise on the effectiveness of the therapy.",
+"cat":"General",
 "q":"Is online marital counseling as effective as in-person?"
 },
 {
 "a":"We provide counseling to individuals too. You can start with individual sessions through our online counseling, then invite your spouse once you feel comfortable. Your emotional well-being is our top priority.",
+"cat":"General",
 "q":"What if only one partner wants counseling?"
 },
 {
 "a":"We provide 100% confidentiality and your counseling sessions, chats, and data will always be safe with us. You access our counseling without any fear with our Malayalam couples therapy for Malayalees in Kerala and NRIs worldwide.",
+"cat":"Privacy",
 "q":"How confidential is marital counseling at Koott?"
 },
 {
 "a":"Yes, with our flexible scheduling, you can get in touch with online marital counseling in Kerala anywhere in the world—making it easy for NRIs to stay connected to support and guidance that is culturally relevant.",
+"cat":"General",
 "q":"Can NRIs in Dubai or US access Kerala therapists easily?"
 },
 {
 "a":"Our experts are available to guide you through trust issues in a relationship; Malayalam counseling services help in healing relationship wounds due to infidelity and rebuild emotional connection.",
+"cat":"General",
 "q":"What if we're dealing with infidelity or trust issues?"
 }
 ],
@@ -11343,8 +11499,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Every marriage goes through phases where things don’t feel quite right. Sometimes, it’s the small issues that quietly build up over time. At other times, it may be more serious challenges like family pressure, work-related stress, or a growing sense of emotional distance between partners. With time, even the strongest relationships can begin to feel strained. Marital counselling is a safe space where couples can take a step back and truly listen to each other again. With the guidance of a professional therapist, and through online counselling in Malayalam, couples can openly discuss their concerns, work through challenges, and learn healthier ways to communicate and understand each other.",
-"For many Malayalee couples, relationships can be further complicated by family expectations and cultural pressures. Marital counselling offers support that takes these realities into account, helping couples navigate their concerns with sensitivity and understanding. This can be especially helpful for those living outside Kerala who want culturally familiar support."
+"Every marriage goes through phases where things don’t feel quite right. At other times, it may be more serious challenges like family pressure, work-related stress, or a growing sense of emotional distance between partners. With time, even the strongest relationships can begin to feel strained. Marital counselling is a safe space where couples can take a step back and truly listen to each other again.",
+"For many Malayalee couples, relationships can be further complicated by family expectations and cultural pressures. This can be especially helpful for those living outside Kerala who want culturally familiar support."
 ]
 },
 "plans":{
@@ -11436,7 +11592,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -11444,7 +11600,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -11452,7 +11608,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -11460,7 +11616,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -11474,7 +11630,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -11624,7 +11780,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "title":"How Therapy Helps with Marital Issues",
-"subtitle":"Therapy is not merely talking; it is a journey back to each other, where compassionate words lead your hearts towards understanding, healing, and a better tomorrow together."
+"subtitle":"Therapy is not merely talking; it is a journey back to each other, towards understanding and a better tomorrow."
 }
 },
 "schema_enabled":false
@@ -11666,30 +11822,37 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"If your partner is reluctant or does not want to take part in couples therapy, you can always consider individual sessions through Koott that might come in handy. Therapy will help you to cope with relationship problems and build better coping mechanisms despite the lack of commitment from your partner’s side. Individual therapy can assist you in making the right decision regarding your relationship.",
+"cat":"General",
 "q":"What if my partner refuses to attend couples counseling?"
 },
 {
 "a":"Every relationship is unique, couples therapy can provide a supportive environment for partners to address underlying issues, improve communication, and rebuild trust. With dedication and effort from both partners, many relationships can be strengthened and repaired through therapy.",
+"cat":"General",
 "q":"Can couples therapy fix a broken relationship?"
 },
 {
 "a":"Couples therapy can help people who are having issues with behaviour in relationship. It is possible to create an environment where these toxic behaviours can be addressed, and couples can learn new, healthy behaviours to replace those toxic ones. Nevertheless, therapy will be effective only if both people want to change and work towards it.",
+"cat":"General",
 "q":"Can couples counseling save a toxic relationship?"
 },
 {
 "a":"The duration of couples therapy provided by Koott varies among couples because everyone has their own goals and requirements. Therefore, we work individually with couples and tailor our therapy according to what you need.",
+"cat":"General",
 "q":"How long does couples counseling typically last?"
 },
 {
 "a":"Infidelity creates a significant breach of trust in a relationship that couples counselling can help heal. Partners who have experienced the pain of betrayal can benefit from therapeutic guidance on having difficult conversations, discovering underlying reasons for infidelity, setting new boundaries, and regaining emotional connection.",
+"cat":"General",
 "q":"How can couples counseling through Koott help rebuild trust after infidelity?"
 },
 {
 "a":"Going through the breakup or separation of a romantic partnership is never easy. Couples can seek help from counsellors to facilitate dialogue between them, manage challenging emotions, devise a plan for co-parenting or separation, and process their grief. Therapy can help people come to terms with what happened in their relationship and move on with their lives.",
+"cat":"General",
 "q":"How can couples counseling assist in navigating a breakup?"
 },
 {
 "a":"Yes, couples counseling can be beneficial even if one partner is uncertain about the relationship. Through Koott, therapists create a safe and non-judgmental space for partners to explore their feelings, express concerns, and gain clarity about their desires and needs in the relationship. Therapy can help facilitate open communication and decision-making, leading to greater understanding and resolution.",
+"cat":"General",
 "q":"Is couples counseling still beneficial if one partner is unsure about the relationship?"
 }
 ],
@@ -11737,8 +11900,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Couple Therapy is a form of therapy that enables two individuals to gain better insights about each other, communicate better, and address relationship problems in a healthy way. It not only helps people during crises but can also be useful for building stronger relationships and increasing emotional bonding.",
-"With professional guidance, you can freely express emotions, views, problems, and patterns related to your relationship. People in Kerala tend to consider relationship problems as ‘adjustment issues’, but, nevertheless, they need to be addressed.",
+"Couple Therapy is a form of therapy that enables two individuals to gain better insights about each other, communicate better, and address relationship problems in a healthy way.",
+"People in Kerala tend to consider relationship problems as ‘adjustment issues’, but, nevertheless, they need to be addressed.",
 "With the help of a trained couple therapist, couples can learn to manage disagreements, rebuild trust, overcome relationship problems, and create a more balanced and fulfilling relationship over time through online couple therapy."
 ]
 },
@@ -11831,7 +11994,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -11839,7 +12002,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -11847,7 +12010,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -11855,7 +12018,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -11869,7 +12032,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -12069,26 +12232,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Divorce counselling can help couples in various ways, such as improving communication, resolving conflicts amicably, co-parenting effectively, managing emotions, and making informed decisions about divorce-related matters like child custody and asset division.",
+"cat":"General",
 "q":"How can divorce counselling help me and my spouse?"
 },
 {
 "a":"During a divorce counselling session, you can expect to engage in open and honest discussions with a trained therapist or mediator. Topics may include identifying the root causes of marital issues, exploring emotions surrounding the divorce, developing coping strategies, and creating a plan for moving forward.",
+"cat":"General",
 "q":"What can I expect during a divorce counselling session?"
 },
 {
 "a":"The duration of divorce counselling can vary depending on the complexity of the issues involved, the willingness of both parties to participate, and the progress made during sessions. Some couples may require only a few sessions to address specific concerns, while others may benefit from ongoing counselling throughout the divorce process.",
+"cat":"General",
 "q":"How long does divorce counselling typically last?"
 },
 {
 "a":"While divorce counselling can sometimes help couples reconcile and save their marriage, its primary focus is to support couples in navigating the divorce process with respect, dignity, and minimal conflict. The goal is to facilitate healthy communication, emotional healing, and constructive decision-making, whether the outcome is divorce or reconciliation.",
+"cat":"General",
 "q":"Will divorce counselling save my marriage, or help me through it?"
 },
 {
 "a":"While it's ideal for both spouses to participate in divorce counselling, it's not always possible if one party is unwilling to attend. In such cases, you can still benefit from individual counselling to address your own needs, emotions, and concerns related to the divorce. Additionally, a skilled therapist or mediator can offer guidance on how to navigate the process effectively despite your spouse's resistance.",
+"cat":"General",
 "q":"What if my spouse is unwilling to attend divorce counselling?"
 },
 {
 "a":"Yes, divorce counselling can be beneficial for children as well. Many therapists offer family counselling or child-focused sessions to help children understand and cope with their parents' divorce. These sessions may address children's emotions, concerns, and questions about the divorce, as well as provide them with coping strategies and support.",
+"cat":"General",
 "q":"Can divorce counselling help children cope with divorce?"
 }
 ],
@@ -12136,7 +12305,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Divorce counselling is a form of therapy that helps individuals or couples navigate the emotional, mental, and practical challenges of separation or divorce. It provides a safe space to process feelings, gain clarity, and make informed decisions about the future regarding the issues related to your separation from your partner. It can help you deal with emotions, thoughts, and even practical issues surrounding divorce.",
+"Divorce counselling is a form of therapy that helps individuals or couples navigate the emotional, mental, and practical challenges of separation or divorce.",
 "During counselling, you can talk about any issues you have in mind and learn how to deal with them, conflicts, and other matters associated with separation. In Kerala, divorce may not be an easy issue for many people; therefore, with the help of a counsellor, you can make this experience easier.",
 "A professional counsellor can assist you in coping with the issues related to your divorce, which will help you become mentally fit in the future."
 ]
@@ -12222,7 +12391,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -12230,7 +12399,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -12238,7 +12407,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -12246,7 +12415,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -12260,7 +12429,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -12460,26 +12629,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Family counselling is a type of therapy aimed at helping families deal with conflicts, communicate well, and improve relationships. In therapy sessions, the counsellor helps the family members talk about their problems and come up with ways to solve them.",
+"cat":"General",
 "q":"What is family counseling, and how does it work?"
 },
 {
 "a":"Some instances in which families can seek family counselling include when the family is experiencing communication problems, arguments between family members, parenting challenges, or life transitions.",
+"cat":"General",
 "q":"When should families consider seeking counseling?"
 },
 {
 "a":"Family therapy sessions allow families to discuss their problems in an environment free from judgment and help solve issues affecting them.",
+"cat":"General",
 "q":"What can families expect during a counseling session?"
 },
 {
 "a":"There are many benefits to family counselling, which include relationship improvement, better communication skills, improved conflict resolution skills, higher levels of resiliency, and stronger family ties. It may also offer assistance during a time of family crisis or transition.",
+"cat":"General",
 "q":"What are the advantages of family counseling?"
 },
 {
 "a":"Yes, family counselling can be beneficial for addressing specific issues such as addiction, domestic violence, and other complex family dynamics. Therapists trained in these areas can provide support, education, and resources to help families navigate these challenges safely.",
+"cat":"General",
 "q":"Can family counseling help with specific issues like addiction or domestic violence?"
 },
 {
 "a":"Family counselling can certainly be useful when helping a family deal with divorce or separation because they help the family improve communication, cooperate in co-parenting, and manage their emotions. They can help address any problems regarding child custody or visitation as well.",
+"cat":"General",
 "q":"How can family counseling support families dealing with divorce or separation?"
 }
 ],
@@ -12527,7 +12702,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Family counselling is a form of therapy that helps family members understand each other better, improve communication, and resolve conflicts in a healthy and supportive way. It focuses on strengthening relationships and creating a more balanced and peaceful home environment over time. Through guided sessions, families can openly discuss concerns, patterns, and ongoing challenges in a safe and neutral space. It helps identify underlying issues, improve understanding, and develop healthier ways of interacting with each other. In Kerala, family issues are often handled within the home, but professional support can bring clarity and practical solutions. By consulting a qualified family counsellor, members can handle any disagreements that may arise within the family and also offer necessary support to one another."
+"Family counselling is a form of therapy that helps family members understand each other better, improve communication, and resolve conflicts in a healthy and supportive way. Through guided sessions, families can openly discuss concerns, patterns, and ongoing challenges in a safe and neutral space. It helps identify underlying issues, improve understanding, and develop healthier ways of interacting with each other. In Kerala, family issues are often handled within the home, but professional support can bring clarity and practical solutions. By consulting a qualified family counsellor, members can handle any disagreements that may arise within the family and also offer necessary support to one another."
 ]
 },
 "plans":{
@@ -12611,7 +12786,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -12619,7 +12794,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -12627,7 +12802,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -12635,7 +12810,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -12649,7 +12824,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -12849,23 +13024,28 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Therapy provides an opportunity to identify and overcome the problems of communication in the relationship that exists. It enables people to work on their communication skills in order to improve their relationships and develop closer connections with each other. Therapy teaches people how to manage conflicts in a productive way and share their emotions with their partner.",
+"cat":"General",
 "q":"How can therapy help improve communication in relationships?"
 },
 {
 "a":"There are different approaches used by therapists according to the specific requirements of the particular couple, such as role-play activities, reflective listening, and communication training. As a result of practising the mentioned techniques during therapy sessions, partners learn to communicate with one another and handle conflict situations more effectively. Moreover, there may be certain homework tasks related to improving communication.",
+"cat":"Therapy",
 "q":"What techniques do therapists use to enhance communication between partners?"
 },
 {
 "a":"Communication problems are analysed based on the interaction that takes place during therapy sessions. Therapists also use questionnaires and tests to determine the type of problems are related to the communication between the partners. Once the analysis is performed, therapists develop an approach to help people deal with the identified issues. These could be interruptions, being defensive or avoiding discussion of certain subjects.",
+"cat":"General",
 "q":"How do therapists assess and address communication issues in relationships?"
 },
 {
 "a":"Yes, therapy can make great contributions toward helping couples develop their trust and intimacy through improved communication. In therapy sessions, counsellors offer a platform where couples can discuss the problems in their relationship and learn to communicate effectively with their partners. It will support them in building up their trust again and regaining lost intimacy.",
+"cat":"General",
 "q":"Can therapy help couples rebuild trust and intimacy through better communication?"
 },
 {
 "a":"Couples therapy is more specifically directed at improving communication and addressing issues related to conflict in an intimate relationship. The therapist treats the couple as a whole, and the treatment plan concentrates on problems with their communication, dynamics, and goals in the relationship. Individual therapy could identify issues of communication style and triggers for a person which influence interaction in general, including romantic ones. Individual therapy can be helpful along with couples therapy, but it is not focused on improving the relationship directly.",
-"q":"How does couples therapy differ from individual therapy in addressing communication issues?"
+"cat":"General",
+"q":"How does couples therapy differ from individual therapy here?"
 }
 ],
 "hero":{
@@ -12912,8 +13092,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"In a relationship, communication entails the means by which couples express themselves in the context of their experiences and interactions. Communication goes beyond merely speaking; it encompasses the listening skills and understanding that come with it.",
-"Effective communication within a couple is vital in helping the individuals connect at an emotional level and create intimacy through resolving differences amicably. Good communication helps couples develop a sense of trust in each other and strengthens their bonds through mutual understanding and respect. Without healthy communication, a couple may experience emotional strain and detachment."
+"In a relationship, communication entails the means by which couples express themselves in the context of their experiences and interactions.",
+"Effective communication helps a couple connect emotionally and resolve differences amicably. It builds trust and strengthens the bond through mutual understanding and respect. Without it, a couple may experience emotional strain and detachment."
 ]
 },
 "plans":{
@@ -13010,7 +13190,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -13018,7 +13198,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -13026,7 +13206,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -13034,7 +13214,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -13048,7 +13228,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -13244,26 +13424,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Common treatment methods for postpartum depression include therapy, such as cognitive-behavioural therapy, antidepressant medication and, and support groups. Lifestyle changes (such as exercise, nutrition, and sleep hygiene) and self-care practices also play a vital role.",
+"cat":"General",
 "q":"What are the common treatment options for postpartum depression?"
 },
 {
 "a":"Therapy, specifically cognitive-behavioural therapy (CBT), can be an effective method of treatment for postpartum depression through identifying and addressing your negative thoughts and defence mechanisms.",
+"cat":"General",
 "q":"How effective is therapy in treating postpartum depression?"
 },
 {
 "a":"Medications such as antidepressants, SSRIs, and selective norepinephrine reuptake inhibitors (SNRIs) may help patients to cope with the moderate or severe forms of postpartum depression. It is important to discuss any possible side effects of these drugs with healthcare professionals, particularly if you plan to breastfeed your child.",
+"cat":"Therapy",
 "q":"Are medications safe and effective for treating postpartum depression?"
 },
 {
 "a":"There are many factors affecting the course of postpartum depression treatment, including its intensity, effectiveness, and personal specifics. In some cases, treatment may take several months or even longer, and continuous support from a specialist is essential for successful outcomes.",
+"cat":"General",
 "q":"How long does postpartum depression treatment typically last?"
 },
 {
 "a":"Family and friends can support in numerous ways, including active listening and education. You can help the person with postpartum depression by sharing your knowledge about the illness and providing assistance in various situations, such as childcare and everyday tasks.",
+"cat":"General",
 "q":"How can family and friends support someone undergoing postpartum depression treatment?"
 },
 {
 "a":"If you or somebody you know is suffering from the symptoms of postpartum depression, then it is important that you seek medical attention right away. Discuss your options with a medical professional to determine what is the best course of action for you. Remember, you are not alone, and help is available.",
+"cat":"General",
 "q":"What should I do if I or someone I know is experiencing postpartum depression symptoms?"
 }
 ],
@@ -13408,7 +13594,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -13416,7 +13602,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -13424,7 +13610,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -13432,7 +13618,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -13446,7 +13632,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -13642,18 +13828,22 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Despite both parental counselling and family therapy focusing on improving relationships in the family, parental counselling is more focused on improving the ability of parents to act as parents. While parental counselling might focus on specific issues in parenting, family therapy involves several sessions that involve many family members.",
+"cat":"General",
 "q":"How does parental counseling differ from family therapy?"
 },
 {
 "a":"Parental counselling allows you to express all your concerns and issues regarding parenthood and also help to develop an adequate strategy to address your problems in the current moment. You can get information on the methods that could be applied to your situation and also be able to set yourself certain goals.",
+"cat":"General",
 "q":"What can I expect during a parental counseling session?"
 },
 {
 "a":"Parental counselling is a valuable tool for any parent who wants to raise their child effectively, regardless of their age and the level of their previous experience in parenthood. It is possible for parents to receive assistance in solving their issues with toddlers, teenagers or even adults and preparing for parenthood in general.",
+"cat":"General",
 "q":"Is parental counseling only for parents of young children?"
 },
 {
 "a":"Parental counselling sessions can also prove helpful for parents who wants to learn to co-parent their children after separation and divorce. Counsellors will provide you with structured guidance to communicate effectively with your ex-partner in terms of raising the child.",
+"cat":"General",
 "q":"How can parental counseling help with co-parenting after divorce or separation?"
 }
 ],
@@ -13785,7 +13975,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -13793,7 +13983,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -13801,7 +13991,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -13809,7 +13999,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -13823,7 +14013,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -14023,26 +14213,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Individuals and couples may face many different kinds of emotional problems when facing infertility. These include, but are not limited to, feelings of loss, worry, sadness, guilt, embarrassment, and relationship distress.",
+"cat":"General",
 "q":"What are the common emotional challenges addressed in infertility counseling?"
 },
 {
 "a":"Counsellors work with individuals and couples who have difficulty making decisions concerning their fertility problems. The decisions that need to be made could relate to the types of treatment that can be used or any other issues connected to the treatments.",
+"cat":"General",
 "q":"How does infertility counseling support decision-making during fertility treatment?"
 },
 {
 "a":"Yes, infertility counselling could be of great assistance to people dealing with the emotional effects caused by either a miscarriage or unsuccessful fertility treatment. In addition to offering validation, counselling helps to deal with grief and gives suggestions on how to cope.",
+"cat":"Therapy",
 "q":"Can infertility counseling help with coping after pregnancy loss or failed fertility treatment?"
 },
 {
 "a":"Yes, infertility counselling is aware of the effect that having troubles conceiving can have on couples and helps to work through difficulties such as infertility and its impact on relationships through effective communication and other methods.",
+"cat":"General",
 "q":"Does infertility counseling address the impact of infertility on relationships?"
 },
 {
 "a":"Infertility counselling can be helpful not only for couples but for single men or women as well. In any situation you may find yourself in, infertility counselling provides appropriate assistance.",
+"cat":"General",
 "q":"Is infertility counseling only for couples, or can individuals seek support as well?"
 },
 {
 "a":"During infertility counselling sessions, it is common practice to discuss the personal experience of fertility treatment and conception, along with the emotional aspect of these experiences.",
+"cat":"General",
 "q":"What can I expect during infertility counseling sessions?"
 }
 ],
@@ -14090,7 +14286,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Infertility counselling refers to a type of therapy that seeks to assist couples or individuals struggling with emotional issues associated with trying to conceive. Such counselling helps clients to cope with the stress, anxiety, and feelings of sadness and helplessness as they struggle to become parents. By engaging in counselling, you get the opportunity to delve into your worries, find out why you have specific emotions, and explore how fertility problems impact different aspects of your well-being. Counselling also helps you manage pressures from society, friends, family, and repetitive fertility tests. Many couples in Kerala go through infertility silently, but this doesn't mean that they shouldn't get professional advice. With expert counsel, you will develop emotional strength, improve communication, and devise coping mechanisms to tackle your situation. With time, infertility counselling will guide you to make tough decisions and remain emotionally stable, no matter the circumstances."
+"Infertility counselling refers to a type of therapy that seeks to assist couples or individuals struggling with emotional issues associated with trying to conceive. Such counselling helps clients to cope with the stress, anxiety, and feelings of sadness and helplessness as they struggle to become parents. Many couples in Kerala go through infertility silently, but this doesn't mean that they shouldn't get professional advice. With expert counsel, you will develop emotional strength, improve communication, and devise coping mechanisms to tackle your situation. With time, infertility counselling will guide you to make tough decisions and remain emotionally stable, no matter the circumstances."
 ]
 },
 "plans":{
@@ -14174,7 +14370,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -14182,7 +14378,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -14190,7 +14386,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -14198,7 +14394,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -14212,7 +14408,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -14412,34 +14608,42 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Yes. You can feel love and attraction to someone, and still have sexual concerns. It's often due to stress, anxiety, or past experiences that can affect intimacy.",
+"cat":"General",
 "q":"Can sexual concerns happen even if I love my partner?"
 },
 {
 "a":"Yes. No matter how long you have been struggling with sexual health concerns, you can improve with the right therapy, patience, and support.",
+"cat":"General",
 "q":"Can this improve with therapy even if I have had it for years?"
 },
 {
 "a":"That is very normal. An experienced therapist creates a safe, judgment-free space where you can talk without shame and embarassment.",
+"cat":"Payments",
 "q":"What if I feel embarrassed talking about this?"
 },
 {
 "a":"Yes. Emotional stress, burnout, and anxiety can highly affect your desire, comfort, and emotional connection.",
+"cat":"General",
 "q":"Can emotional stress affect sexual health?"
 },
 {
 "a":"Yes. Online counseling assures privacy and comfort, to make it easier opening up about intimate concerns.",
+"cat":"General",
 "q":"Is online counseling suitable for this kind of concern?"
 },
 {
 "a":"Not always. But when there are physical symptoms like pain or physical discomfort, our experienced therapist may suggest a medical check with counseling sessions.",
+"cat":"General",
 "q":"Do I need a medical test before therapy?"
 },
 {
 "a":"Unresolved sexual concerns do affect your relationship satisfaction, communication, and emotional closeness.",
+"cat":"General",
 "q":"Can this affect marriage or relationship satisfaction?"
 },
 {
 "a":"No. Therapy looks at the bigger picture, including your emotions, stress, relationship dynamics, and general well-being.",
+"cat":"General",
 "q":"Will therapy focus only on sex?"
 }
 ],
@@ -14488,7 +14692,7 @@ export const CONDITION_PAGES = [
 ],
 "paragraphs":[
 "Sometimes, it’s not easy to put into words but you just feel that something is different when it comes to intimacy. Maybe your desire feels lower, or you may not feel as comfortable or connected as you used to. And that can quietly stay in your mind, your manassu, without you really knowing why.",
-"Female sexual concerns are very personal experiences that may affect your sexual desire, comfort during intimacy, and emotional connection. Women may experience low libido in women, pain during sex, vaginal dryness, difficulty with arousal, or trouble reaching orgasm. Along with the physical aspects, it may bring feelings such as confusion, worry, guilt, or emotional burden. These concerns are very common in Kerala. They are linked to stress, anxiety, relationship issues, hormonal changes, childbirth, menopause, or other health conditions. But the silence around it often makes it harder. When something so personal isn't talked about, it can feel lonely."
+"Along with the physical aspects, it may bring feelings such as confusion, worry, guilt, or emotional burden. These concerns are very common in Kerala. They are linked to stress, anxiety, relationship issues, hormonal changes, childbirth, menopause, or other health conditions. When something so personal isn't talked about, it can feel lonely."
 ]
 },
 "plans":{
@@ -14580,7 +14784,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -14588,7 +14792,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -14596,7 +14800,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -14604,7 +14808,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -14618,7 +14822,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -14794,26 +14998,32 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"It can be hard to tell on your own, because men’s sexual health concerns are often caused by stress, anxiety, health issues, or relationship challenges. A therapist can help you figure out what’s contributing.",
+"cat":"General",
 "q":"How do I know if my concern is physical or emotional?"
 },
 {
 "a":"Yes, stress and anxiety can have a huge impact on sexual performance, desire, and confidence. When your mind is overwhelmed, your body often reacts too.",
+"cat":"General",
 "q":"Can stress affect sexual performance?"
 },
 {
 "a":"It’s totally normal. Men mostly feel this way when they talk about their sexual concerns, which is why having a safe, private space is really important.",
+"cat":"Payments",
 "q":"What if I feel awkward talking about this?"
 },
 {
 "a":"Yes, relationship issues such as emotional distance or lack of communication affects intimacy. Most of the time, men’s sexual concerns are both emotional and physical.",
+"cat":"General",
 "q":"Can relationship issues affect sexual concerns?"
 },
 {
 "a":"No, it’s never too late. Even long-term sexual health concerns can improve with the right support.",
+"cat":"General",
 "q":"Is it too late to get help if I’ve had this for a long time?"
 },
 {
 "a":"Therapy can help you feel less pressured, see things with clarity, and help to build confidence and a sense of control.",
+"cat":"Payments",
 "q":"Will talking to a therapist actually help me feel better?"
 }
 ],
@@ -14861,8 +15071,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Men’s sexual concerns are more common than most people admit, yet many men face these problems silently. Struggles like low sexual desire, erectile difficulties, performance anxiety, premature ejaculation, or reduced satisfaction can affect men at different points of life. These sexual health issues in men are usually caused by stress, health conditions, relationship challenges, or emotional pressure that builds quietly over the period of time.",
-"For many Malayalee men, the challenge is more than the concern itself, the hesitation to discuss it. Cultural expectations, fear of judgment, and the burden to handle it all by themselves, can make it harder to seek support. Men’s sexual concerns are valid, treatable, there should be no shame associated with them. With the right help of men’s sexual health therapy, it becomes easier for you to understand the problem and get more confidence, comfort, and soukhyam in your personal life."
+"Men’s sexual concerns are more common than most people admit, yet many men face these problems silently. Struggles like low sexual desire, erectile difficulties, performance anxiety, premature ejaculation, or reduced satisfaction can affect men at different points of life.",
+"For many Malayalee men, the challenge is more than the concern itself, the hesitation to discuss it. Men’s sexual concerns are valid, treatable, there should be no shame associated with them. With the right help of men’s sexual health therapy, it becomes easier for you to understand the problem and get more confidence, comfort, and soukhyam in your personal life."
 ]
 },
 "plans":{
@@ -14954,7 +15164,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -14962,7 +15172,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -14970,7 +15180,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -14978,7 +15188,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -14992,7 +15202,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -15160,30 +15370,37 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"It’s a safe and supportive space to communicate about emotional, physical, or relationship concerns related to intimacy and connection.",
+"cat":"General",
 "q":"What is intimacy counselling?"
 },
 {
 "a":"Anyone who feels distant, anxious, confused, or stuck around intimacy in their relationship can help from professional support.",
+"cat":"General",
 "q":"Who can benefit from it?"
 },
 {
 "a":"Yes, sessions are confidential and tailored to make you feel safe and comfortable talking about anything openly.",
+"cat":"Privacy",
 "q":"Is it private?"
 },
 {
 "a":"Not at all. People can also seek support for personal intimacy concerns, trust issues, or emotional connection.",
+"cat":"General",
 "q":"Do I need to be in a relationship to seek help?"
 },
 {
 "a":"Absolutely. Many find online intimacy support easier to access, more convenient, and less stressful to begin with.",
+"cat":"General",
 "q":"Can online therapy really help?"
 },
 {
 "a":"It’s completely normal to feel awkward. Therapists for intimacy are trained to support conversations gently, without judgment.",
+"cat":"Payments",
 "q":"What if I feel awkward talking about it?"
 },
 {
 "a":"Simply choose a therapist, book a session, and begin when you feel ready—your journey toward comfort and connection can start anytime.",
+"cat":"General",
 "q":"How do I start?"
 }
 ],
@@ -15231,9 +15448,9 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Intimacy is more than just being physically close; it’s being emotionally safe, understood, and deeply connected to someone you love. It’s when you become comfortable speaking openly, sharing your thoughts and feelings, and being yourself with no fear of being judged.",
+"Intimacy is more than just being physically close; it’s being emotionally safe, understood, and deeply connected to someone you love.",
 "But sometimes, intimacy challenges can make this feeling tough. You might feel emotional distance, difficulty opening up, trust issues, or low confidence. Stress, past events, or relationship pressures can gradually make connection and closeness feel more difficult than they should.",
-"At Koott, we know how personal this can be. We provide a safe, private, and supportive space where you can talk freely and receive professional guidance with professional care and understanding. Whether you are trying to rebuild a connection, improve emotional intimacy, or feel more comfortable in your relationship, support is available when you are ready."
+"Whether you are trying to rebuild a connection, improve emotional intimacy, or feel more comfortable in your relationship, support is available when you are ready."
 ]
 },
 "plans":{
@@ -15325,7 +15542,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -15333,7 +15550,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -15341,7 +15558,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -15349,7 +15566,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -15363,7 +15580,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -15539,30 +15756,37 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"It’s a safe, supportive space for pre-marriage and newly married couples to talk about communication, expectations, emotional changes, and early marriage challenges with help and care.",
+"cat":"General",
 "q":"What is pre and newly married counseling?"
 },
 {
 "a":"Those who are newly married, preparing for marriage, or facing early marriage adjustment challenges, getting relationship support can provide a sense of stability and reassurance.",
+"cat":"General",
 "q":"Who should consider this counseling?"
 },
 {
 "a":"It provides you a space to communicate clearly, reduce misunderstandings, manage family pressure, and make their emotional connection stronger from the beginning",
+"cat":"General",
 "q":"How can counseling help in early marriage?"
 },
 {
 "a":"Yes, Online counseling gives you a confidential and secure environment, allowing you to share your thoughts freely, without any hesitation or fear of being judged.",
+"cat":"Privacy",
 "q":"Is online counseling private and safe?"
 },
 {
 "a":"Absolutely. Many couples take relationship counseling not due to any problems, but to develop a healthy, stable foundation early on.",
+"cat":"General",
 "q":"Can counseling help even if we are not in a major conflict?"
 },
 {
 "a":"Individual counseling support can still make things better, even if only one person starts it. It gives better results when both partners are equally involved.",
+"cat":"General",
 "q":"Do both partners need to attend?"
 },
 {
 "a":"Yes, online counseling for Malayalees is easily accessible from anywhere in the world, whether you’re in Kerala, across India, or living in another country.",
+"cat":"General",
 "q":"Can Malayalees living outside Kerala use this service?"
 }
 ],
@@ -15610,7 +15834,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"New couples enter marriage with love, hope, and excitement, but sometimes, the day-to-day reality makes you feel very different. Even the most loving couples face challenges in their early days of marriage. The hardest part is not the big conflicts, but the quiet feeling that “we don’t really understand each other yet.” One partner might want closeness while the other requires space. One may seek clear conversation while the other struggles to express. These small relationship gaps may create stress, emotional distance, and confusion. Pre-marriage and newly married couples start their journey with excitement and hope, but pressure from families, role expectations, and adjusting to a shared routine bring unexpected misunderstandings. That is where pre-marriage counseling or newly married adjustment support helps couples navigate new phases with understanding, connection, and care by learning each other’s habits, communication styles, and emotional needs."
+"New couples enter marriage with love, hope, and excitement, but sometimes, the day-to-day reality makes you feel very different. The hardest part is not the big conflicts, but the quiet feeling that “we don’t really understand each other yet.” These small relationship gaps may create stress, emotional distance, and confusion. That is where pre-marriage counseling or newly married adjustment support helps couples navigate new phases with understanding, connection, and care by learning each other’s habits, communication styles, and emotional needs."
 ]
 },
 "plans":{
@@ -15702,7 +15926,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -15710,7 +15934,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -15718,7 +15942,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -15726,7 +15950,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -15740,7 +15964,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -15870,7 +16094,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "title":"How Therapy Helps",
-"subtitle":"When things feel confusing or distant between you and your partner, therapy provides a space to talk freely and feel heard. From there, you begin to reconnect and find your way to each other."
+"subtitle":"When things feel distant between you, therapy gives you a space to talk freely and feel heard, and to find your way back."
 }
 },
 "schema_enabled":false
@@ -15912,30 +16136,37 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"If sexual trauma is affecting your thoughts, emotions, sleep, or relationships, then it might be a sign to consider sexual trauma therapy to get gentle healing support and guidance.",
+"cat":"General",
 "q":"How do I know if I need sexual trauma therapy?"
 },
 {
 "a":"During the initial therapy session, the focus is to make you feel safe, comfortable, and truly heard. So you can share at your own pace without any pressure to talk about everything right away.",
+"cat":"General",
 "q":"What happens in the first therapy session?"
 },
 {
 "a":"Healing from sexual trauma is a different journey for everyone. With continuous therapy support, you may notice improvements over time as they work at their own pace.",
+"cat":"General",
 "q":"How long does healing from sexual trauma take?"
 },
 {
 "a":"Online counseling sessions are completely confidential and designed to provide you a safe, private space to open up.",
+"cat":"Privacy",
 "q":"Is everything I share in therapy confidential?"
 },
 {
 "a":"Yes, we understand that finding the right therapist is essential for healing. You can choose a different licensed therapist from our team as per your need.",
+"cat":"Payments",
 "q":"Can I switch my therapist if I don’t feel comfortable?"
 },
 {
 "a":"Therapy is all about moving at your own comfort. Take your time and share what you are comfortable with.",
+"cat":"General",
 "q":"Do I have to talk about everything right away?"
 },
 {
 "a":"Trauma therapy does help you manage triggers, reduce flashbacks, and feel more grounded and in control in your daily life.",
+"cat":"General",
 "q":"Can therapy help with triggers and flashbacks?"
 }
 ],
@@ -15983,8 +16214,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Sexual trauma is the deep emotional and psychological effect which can remain after an unwanted, forced, or unsafe or unconsented sexual experience. It can affect how you feel about your body, your ability to trust, your sense of intimacy, and your intimacy, and your sense of safety in the world.",
-"Healing from sexual trauma is a process that takes time. It involves rebuilding self-trust, restoring emotional balance, and gradually reconnecting with feelings of safety. Every healing is a personal journey. With compassionate therapy and a safe, private, non-judgmental space, it is possible to work through what you have been through. Gradually, this support can help you overcome fear, shame, and emotional suffering.",
+"Sexual trauma is the deep emotional and psychological effect which can remain after an unwanted, forced, or unsafe or unconsented sexual experience.",
+"Healing from sexual trauma is a process that takes time. It involves rebuilding self-trust, restoring emotional balance, and gradually reconnecting with feelings of safety.",
 "As your healing progresses, people begin to feel more grounded, more in control, and a greater connection to a sense of inner peace and soukhyam—a profounding feeling of well-being and wholeness."
 ]
 },
@@ -16077,7 +16308,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -16085,7 +16316,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -16093,7 +16324,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -16101,7 +16332,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -16115,7 +16346,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -16295,34 +16526,42 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Yes, many people go through this at different points in life. Stress, past experiences, or relationship issues can make emotional connection feel difficult.",
+"cat":"General",
 "q":"Is it normal to struggle with emotional connection?"
 },
 {
 "a":"It can come from past relationships, attachment patterns, fear of vulnerability, unresolved emotions, or ongoing life stress.",
+"cat":"General",
 "q":"What causes emotional disconnection?"
 },
 {
 "a":"Absolutely. With the right support and awareness, you can rebuild emotional closeness and improve emotional connection in relationships.",
+"cat":"General",
 "q":"Can emotional connection be rebuilt?"
 },
 {
 "a":"You may find it hard to open up, avoid deep conversations, or feel distant even in close relationships.",
+"cat":"General",
 "q":"How do I know if I’m emotionally unavailable?"
 },
 {
 "a":"No. Emotional connection struggles can affect friendships, family bonds, and even your relationship with yourself.",
+"cat":"General",
 "q":"Does this affect only romantic relationships?"
 },
 {
 "a":"Yes. Therapy for emotional connection helps you understand patterns, improve communication, and build safer relationships.",
+"cat":"General",
 "q":"Can therapy really help with this?"
 },
 {
 "a":"It varies for each person, but with consistent support, many people notice gradual improvement in emotional connection over time.",
+"cat":"General",
 "q":"How long does it take to improve emotional connection?"
 },
 {
 "a":"Feeling emotionally numb is common and often protective. With support, you can slowly reconnect with your emotions and rebuild emotional connection.",
+"cat":"Payments",
 "q":"What if I feel nothing at all?"
 }
 ],
@@ -16370,8 +16609,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"An emotional connection is the strong and hidden thread that makes you and your partner feel truly heard, valued, and accepted. It turns a relationship into a secure, deep, and meaningful and more than just a routine or functional partnership.",
-"When an emotional connection in a relationship begins to vanish, you may feel distant, unheard and lonely, even when you are living under the same roof. Everyday communication may start to feel challenging, little misunderstandings may get bigger, and the relationship may feel heavier instead of comforting.",
+"An emotional connection is the strong and hidden thread that makes you and your partner feel truly heard, valued, and accepted.",
+"When an emotional connection in a relationship begins to vanish, you may feel distant, unheard and lonely, even when you are living under the same roof.",
 "The good news is, that emotional connection can be rebuilt. You can reconnect, regain trust, and bring back love and peace with gentle care, open communication, empathy and professional couples counseling."
 ]
 },
@@ -16476,7 +16715,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -16484,7 +16723,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -16492,7 +16731,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -16500,7 +16739,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -16514,7 +16753,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -16668,7 +16907,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "title":"How Therapy Helps with Emotional Connection Struggles",
-"subtitle":"Struggling with emotional connection in relationships can feel lonely and therapy creates a supportive environment to understand what’s holding back connection and gently revive closeness."
+"subtitle":"Therapy creates a supportive space to understand what is holding connection back, and to gently revive closeness."
 }
 },
 "schema_enabled":false
@@ -16710,34 +16949,42 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Yes. You can feel love and attraction to someone, and still have sexual concerns. It's often due to stress, anxiety, or past experiences that can affect intimacy.",
+"cat":"General",
 "q":"Can sexual concerns happen even if I love my partner?"
 },
 {
 "a":"Yes. No matter how long you have been struggling with sexual health concerns, you can improve with the right therapy, patience, and support.",
+"cat":"General",
 "q":"Can this improve with therapy even if I have had it for years?"
 },
 {
 "a":"That is very normal. An experienced therapist creates a safe, judgment-free space where you can talk without shame and embarassment.",
+"cat":"Payments",
 "q":"What if I feel embarrassed talking about this?"
 },
 {
 "a":"Yes. Emotional stress, burnout, and anxiety can highly affect your desire, comfort, and emotional connection.",
+"cat":"General",
 "q":"Can emotional stress affect sexual health?"
 },
 {
 "a":"Yes. Online counseling assures privacy and comfort, to make it easier opening up about intimate concerns.",
+"cat":"General",
 "q":"Is online counseling suitable for this kind of concern?"
 },
 {
 "a":"Not always. But when there are physical symptoms like pain or physical discomfort, our experienced therapist may suggest a medical check with counseling sessions.",
+"cat":"General",
 "q":"Do I need a medical test before therapy?"
 },
 {
 "a":"Unresolved sexual concerns do affect your relationship satisfaction, communication, and emotional closeness.",
+"cat":"General",
 "q":"Can this affect marriage or relationship satisfaction?"
 },
 {
 "a":"No. Therapy looks at the bigger picture, including your emotions, stress, relationship dynamics, and general well-being.",
+"cat":"General",
 "q":"Will therapy focus only on sex?"
 }
 ],
@@ -16871,7 +17118,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -16879,7 +17126,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -16887,7 +17134,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -16895,7 +17142,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -16909,7 +17156,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -17081,22 +17328,27 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"LGBTQ+ counseling provides support and therapy tailored to the unique needs and challenges faced by individuals who identify as lesbian, gay, bisexual, transgender, queer, or other gender and sexual minorities.",
+"cat":"General",
 "q":"What is LGBTQ+ counseling?"
 },
 {
 "a":"LGBTQ+ counseling can help you navigate issues related to identity, coming out, discrimination, relationship problems, mental health concerns, and more. Therapists offer a safe and affirming space to explore your feelings and experiences.",
+"cat":"General",
 "q":"How can LGBTQ+ counseling help me?"
 },
 {
 "a":"In LGBTQ+ counseling, you can discuss a wide range of topics, including but not limited to: coming out, gender identity, sexual orientation, family dynamics, relationships, self-acceptance, mental health, and coping strategies for dealing with discrimination or stigma.",
+"cat":"General",
 "q":"What topics can I discuss in LGBTQ+ counseling?"
 },
 {
 "a":"You may consider LGBTQ+ counseling if you're struggling with issues related to your gender identity or sexual orientation, experiencing stress or anxiety due to discrimination, facing challenges in relationships, or seeking support and guidance on your journey of self-discovery and self-acceptance.",
+"cat":"General",
 "q":"How do I know if LGBTQ+ counseling is right for me?"
 },
 {
 "a":"Yes, LGBTQ+ counseling is confidential. Koott Therapists are bound by ethical and legal standards to maintain the privacy and confidentiality of their clients, regardless of their sexual orientation or gender identity.",
+"cat":"Privacy",
 "q":"Is LGBTQ+ counseling confidential?"
 }
 ],
@@ -17144,8 +17396,8 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"LGBTQIA+ is an inclusive term used to describe a wide range of sexual orientations and gender identities. It stands for Lesbian, Gay, Bisexual, Transgender, Queer or Questioning, Intersex, and Asexual, while the “+” includes other identities that may not be specifically listed.",
-"This term represents how people experience attraction, express their gender, and understand their identity. Sexual orientation refers to who a person is emotionally or physically attracted to, while gender identity refers to how a person sees and defines themselves.",
+"LGBTQIA+ is an inclusive term used to describe a wide range of sexual orientations and gender identities.",
+"Sexual orientation refers to who a person is emotionally or physically attracted to, while gender identity refers to how a person sees and defines themselves.",
 "Understanding LGBTQIA+ is about respect, acceptance, and creating a safe space where individuals can express themselves without fear of judgment. With the right support and awareness, people can feel more confident, understood, and comfortable in their own identity and life."
 ]
 },
@@ -17243,7 +17495,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -17251,7 +17503,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -17259,7 +17511,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -17267,7 +17519,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -17281,7 +17533,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{
@@ -17477,38 +17729,47 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Sex therapy is a form of counseling aimed at addressing sexual issues and improving intimacy between partners. It involves discussions about sexual concerns, exploring emotions, and learning techniques to enhance sexual experiences.",
+"cat":"General",
 "q":"What is sex therapy and how does it work?"
 },
 {
 "a":"The duration of sex therapy varies depending on the complexity of the issues and the progress made during sessions. Some clients may see improvements in a few sessions while others may require more extensive therapy over several months.",
+"cat":"General",
 "q":"How long does sex therapy typically last?"
 },
 {
 "a":"Sex therapy is not just for couples experiencing difficulties. It can also benefit individuals dealing with sexual issues on their own, such as performance anxiety, body image concerns, or difficulty achieving orgasm.",
+"cat":"General",
 "q":"Is sex therapy only for couples experiencing problems?"
 },
 {
 "a":"Sex therapy sessions are conducted in a confidential and non-judgmental environment. You can expect open discussions about your sexual concerns, exploration of underlying factors contributing to those issues, and the development of strategies to address them.",
+"cat":"General",
 "q":"What can I expect during a sex therapy session?"
 },
 {
 "a":"Yes, sex therapy can provide support and guidance for individuals struggling with issues related to sexual orientation, gender identity, and sexual expression. Therapists can help clients explore and affirm their identities while addressing any concerns or challenges they may face.",
+"cat":"General",
 "q":"Can sex therapy help with issues related to sexual orientation or gender identity?"
 },
 {
 "a":"Absolutely. Sex therapy can be instrumental in helping survivors of sexual trauma or abuse reclaim their sexuality and rebuild trust in intimate relationships. Therapists work sensitively with survivors to address trauma-related symptoms, restore boundaries, and foster healing.",
+"cat":"General",
 "q":"Is sex therapy suitable for survivors of sexual trauma or abuse?"
 },
 {
 "a":"Sex therapy can complement medical treatments for fertility and reproductive issues by addressing psychological factors that may impact sexual functioning and conception. Therapists can help couples navigate the emotional challenges of infertility, manage stress, and maintain intimacy during fertility treatments.",
+"cat":"General",
 "q":"Can sex therapy assist with fertility or reproductive issues?"
 },
 {
 "a":"Sex therapy is appropriate for individuals of all ages, from adolescents to older adults. Therapists adapt their approaches to suit the developmental stage, life experiences, and needs of their clients, ensuring that therapy is both age-appropriate and effective.",
+"cat":"General",
 "q":"Are there age limitations for sex therapy?"
 },
 {
 "a":"Yes, sex therapy can help individuals struggling with compulsive sexual behaviors, hypersexuality, or sexual addiction. Therapists assist clients in understanding the underlying causes of their behaviors, developing healthier coping strategies, and fostering more fulfilling relationships.",
+"cat":"General",
 "q":"Can sex therapy address compulsive sexual behaviors or addictions?"
 }
 ],
@@ -17557,7 +17818,7 @@ export const CONDITION_PAGES = [
 ],
 "paragraphs":[
 "Sexual intimacy issues refer to difficulties in emotional or physical closeness between partners in a relationship. It can include challenges with comfort, desire, communication, or feeling connected during intimate moments.",
-"These issues may arise due to stress, past experiences, relationship conflicts, performance anxiety, or emotional distance. Over time, they can affect confidence, trust, and overall relationship satisfaction. It is important to understand that these concerns are common and can be improved with the right guidance. With professional support, couples can rebuild comfort, improve communication, and develop a healthier, more secure and fulfilling intimate connection."
+"These issues may arise due to stress, past experiences, relationship conflicts, performance anxiety, or emotional distance. With professional support, couples can rebuild comfort, improve communication, and develop a healthier, more secure and fulfilling intimate connection."
 ]
 },
 "plans":{
@@ -17654,7 +17915,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -17662,7 +17923,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -17670,7 +17931,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -17678,7 +17939,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -17692,7 +17953,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{

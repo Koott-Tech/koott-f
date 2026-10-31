@@ -284,7 +284,14 @@ export default function ConditionPageTemplate({ data }) {
      Tabs only mean something once the questions carry a category, so they
      are built from whatever categories this page's FAQs actually have; a
      page with none keeps the search, which narrows the list for real. */
-  const faqCats = [...new Set(d.faqs.map((f) => f.cat).filter(Boolean))];
+  /* In the design's order, not the order the questions happen to sit in.
+     One pill is not a filter, so a page whose questions all fall in the
+     same category keeps the search box instead. */
+  const FAQ_TABS = ['General', 'Appointments', 'Therapy', 'Payments', 'Privacy'];
+  const faqCatsPresent = new Set(d.faqs.map((f) => f.cat).filter(Boolean));
+  const faqCats = faqCatsPresent.size > 1
+    ? FAQ_TABS.filter((c) => faqCatsPresent.has(c))
+    : [];
   const faqTabOn = faqTab || faqCats[0];
   const faqs = d.faqs.filter((f) => {
     if (faqCats.length) return f.cat === faqTabOn;
