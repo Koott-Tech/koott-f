@@ -29,7 +29,7 @@ export const conditionPageTemplateSample = {
   },
 
   stats: [
-    { value: '9 out of 10', label: 'Placeholder stat description explaining what this number represents for clients.' },
+    { value: '9/10', label: 'Placeholder stat description explaining what this number represents for clients.' },
     { value: '92%', label: 'Placeholder stat description explaining what this number represents for clients.' },
     { value: '2x better', label: 'Placeholder stat description explaining what this number represents for clients.' },
     { value: '33,400+', label: 'Placeholder stat description explaining what this number represents for clients.' },

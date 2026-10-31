@@ -147,19 +147,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -555,19 +555,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -1007,19 +1007,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -1401,19 +1401,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -1795,19 +1795,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -2185,19 +2185,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -2583,19 +2583,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -2981,19 +2981,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -3376,19 +3376,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -3787,19 +3787,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -4185,19 +4185,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -4591,19 +4591,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -4989,19 +4989,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -5392,19 +5392,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -5803,19 +5803,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -6201,19 +6201,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -6591,19 +6591,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -6997,19 +6997,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -7401,19 +7401,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -7800,19 +7800,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -8194,19 +8194,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -8584,19 +8584,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -8982,19 +8982,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -9381,19 +9381,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -9783,19 +9783,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -10181,19 +10181,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -10580,19 +10580,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -10971,19 +10971,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -11365,19 +11365,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -11760,19 +11760,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -12159,19 +12159,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -12548,19 +12548,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -12939,19 +12939,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -13337,19 +13337,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -13722,19 +13722,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -14111,19 +14111,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -14509,19 +14509,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -14883,19 +14883,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -15254,19 +15254,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -15631,19 +15631,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -16006,19 +16006,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -16393,19 +16393,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -16808,19 +16808,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -17172,19 +17172,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],
@@ -17583,19 +17583,19 @@ export const CONDITION_PAGES = [
 },
 "stats":[
 {
-"label":"clients say their therapist helped them feel understood and comfortable from the very first session.",
-"value":"9 out of 10"
+"label":"Clients feel understood from first session.",
+"value":"9/10"
 },
 {
-"label":"clients said they started feeling a little lighter, sleeping better, & handling emotions better within 3-4 sessions.",
+"label":"Better sleep, mood after few sessions.",
 "value":"92%"
 },
 {
-"label":"progress when clients feel guided, understood, and supported by qualified therapists.",
+"label":"Clients advance with experts.",
 "value":"2x better"
 },
 {
-"label":"session hours completed with experienced psychologists trusted by clients and rated 4.9 reviews.",
+"label":"Trusted psychologists rated 4.9 stars.",
 "value":"33,400+"
 }
 ],

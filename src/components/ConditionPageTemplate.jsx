@@ -307,7 +307,6 @@ export default function ConditionPageTemplate({ data }) {
             decorative — buttons with no handler — so they are gone rather than
             restyled. Filtering lives on /book-malayali-psychologists, which the
             button below leads to. */}
-        {d.therapists.eyebrow && <p className="kct-kicker">{d.therapists.eyebrow}</p>}
         <h2 className="kct-h2 kct-center">{d.therapists.title}</h2>
 
         <div className="kct-therapists">
@@ -1137,6 +1136,24 @@ const CSS = `
   --ktc-surface:#fff;
   border-width:1px;border-radius:16px;padding:20px;
 }
+/* The card the design draws is this card, sized differently: 377.33x360
+   with 20 of padding, and inside it a 234-tall block over a 66-tall foot
+   20 below it. Measured off the .fig —
+     head   48   (a 48 avatar, not 64)
+     panel  60   (12 + two lines of bio + 12)
+     tags   24
+     stats  54   (three 97.11x54 tiles on #F9F9F9, radius 12)
+     foot   66   (#F0F5ED on a #DDEED8 hairline, a 120x40 #1B6930 button)
+   with 16 between each and 20 before the foot. Scoped to .kct so the
+   booking page keeps the card it has. */
+.kct .ktc{min-height:360px;}
+.kct .ktc-avatar{width:48px;height:48px;}
+.kct .ktc-head{margin-bottom:16px;}
+.kct .ktc-panel{min-height:60px;}
+.kct .ktc-voice{display:none;}
+.kct .ktc-tags-wrap{height:24px;overflow:hidden;}
+.kct .ktc-stats,.kct .ktc-stats:not(#_){margin-bottom:20px;}
+.kct .ktc-foot a,.kct .ktc-foot button{background:var(--p-dark);}
 .kct .ktc-name{font-size:16px!important;font-weight:500!important;line-height:24px!important;}
 .kct .ktc-role{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
 .kct .ktc-panel{border-radius:12px;padding:12px;margin-bottom:16px;}
