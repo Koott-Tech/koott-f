@@ -1213,20 +1213,20 @@ const CSS = `
 
    The cards are a lift off the band rather than a different colour, which is
    what keeps them legible on it. */
-.kct-on-dark{padding:40px 0;}
-.kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:center;}
+.kct-on-dark{padding:80px 0;}
+.kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:stretch;}
 .kct-why-media{
-  position:relative;height:400px;border-radius:12px;overflow:hidden;
+  position:relative;height:auto;min-height:427.72px;border-radius:12px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 100%);
 }
 .kct-why-body{min-width:0;}
 .kct-on-dark .kct-h2,.kct-on-dark .kct-h2:not(#_){color:#fff!important;}
-.kct-on-dark .kct-sub{color:#fff!important;font-size:16px!important;line-height:24px!important;margin-top:11px;}
+.kct-on-dark .kct-sub{color:#fff!important;font-size:16px!important;line-height:24px!important;margin-top:8px;}
 .kct-why-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(2,minmax(120px,auto));grid-auto-flow:column;
-  column-gap:16px;row-gap:12px;margin-top:20px;
+  grid-template-rows:repeat(2,minmax(141.52px,auto));grid-auto-flow:column;
+  column-gap:16px;row-gap:16px;margin-top:24px;
 }
 .kct-why .kct-fig-play{
   position:absolute;width:72px;height:72px;border-radius:50%;
@@ -1236,7 +1236,7 @@ const CSS = `
 }
 .kct-on-dark .kct-card--solid{
   background:linear-gradient(180deg,#094334 0%,#0E765C 100%);
-  border:0;border-radius:10px;padding:14px 16px;min-height:120px;
+  border:0;border-radius:10px;padding:16px;min-height:141.52px;
 }
 .kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
   font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
@@ -1624,7 +1624,7 @@ const CSS = `
 /* Tablet: the hero's 374 media and 1140 column no longer fit side by side. */
 @media (max-width:1024px){
   .kct-hero-grid,.kct-why{grid-template-columns:1fr;gap:32px;}
-  .kct-why-media{height:auto;aspect-ratio:358/230;}
+  .kct-why-media{height:auto;min-height:0;aspect-ratio:358/230;}
   /* Square at 374 is right beside the text; stacked it would be half the
      fold. It becomes a band at the ratio the phone frame uses (358/230). */
   .kct-hero-media{width:100%;max-width:none;height:auto;aspect-ratio:358/230;}
