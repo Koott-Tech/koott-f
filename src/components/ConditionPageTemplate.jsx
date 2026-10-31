@@ -1297,7 +1297,7 @@ const CSS = `
    column, so the block runs 980 and the cards narrow with it. */
 .kct-why{
   display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:stretch;
-  max-width:980px;margin-left:auto;margin-right:auto;
+  max-width:1060px;margin-left:auto;margin-right:auto;
 }
 .kct-why-media{
   position:relative;height:auto;min-height:0;border-radius:10px;overflow:hidden;

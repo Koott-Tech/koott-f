@@ -449,19 +449,19 @@ export const CONDITION_PAGES = [
 "why":{
 "items":[
 {
-"body":"Our therapist offers support and understanding of your emotional challenges for depression counseling in Kerala.",
+"body":"Our therapists understand the emotional challenges that come with depression.",
 "title":"Experienced Therapist"
 },
 {
-"body":"Choose from our RCI licensed psychologists in Kerala who provide empathetic, personalised support tailored to your needs.",
+"body":"Choose from our RCI licensed psychologists in Kerala, with support tailored to you.",
 "title":"Choose your Therapist"
 },
 {
-"body":"We use proven evidence-based strategies to help you through depression treatment in Kerala that truly works for you.",
+"body":"We use proven, evidence-based strategies that genuinely work for depression.",
 "title":"Evidence-Based Care"
 },
 {
-"body":"We focus on you as a person, and our ongoing online therapy in Kerala ensures consistent care and long-term emotional well-being.",
+"body":"We focus on you as a person, with ongoing care for long-term well-being.",
 "title":"Human First Approach"
 }
 ],
