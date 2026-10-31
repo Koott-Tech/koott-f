@@ -1335,8 +1335,10 @@ const CSS = `
 .kct-price{
   display:inline-flex;align-items:center;justify-content:center;
   margin-top:auto;padding-top:0;
-  background:#fff;border:1px solid var(--s-green-2);border-radius:8px;
-  height:40px;padding:8px 18px;width:100%;
+  /* 217x40 at radius 38 in the .fig — a pill, not a rounded plate. The
+     PDF read flat, which is what sent this to 8 the first time. */
+  background:#fff;border:1px solid var(--s-green-2);border-radius:999px;
+  height:40px;padding:8px 12px;width:100%;
   font-family:var(--body)!important;font-size:16px!important;font-weight:500!important;
   line-height:24px!important;letter-spacing:0!important;color:var(--p-dark)!important;
 }
