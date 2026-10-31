@@ -1314,7 +1314,7 @@ const CSS = `
   filter:drop-shadow(0 6px 10px rgba(2,85,69,.3));
 }
 .kct-on-dark .kct-card--solid{
-  background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+  background:linear-gradient(180deg,#0A4636 -9.1%,#18AC85 157%);
   border:0;border-radius:10px;padding:14px 16px;min-height:124px;
   position:relative;isolation:isolate;
 }
@@ -1569,7 +1569,7 @@ const CSS = `
 .kct-types-body .kct-sub{margin:8px 0 0;}
 .kct-types-body .kct-seek{max-width:none;margin:24px 0 0;gap:16px;}
 .kct-types-body .kct-seek-row,.kct-types-body .kct-seek-row.is-open{
-  background:linear-gradient(180deg,#E2E8E7 0%,#FFFFFF 100%);
+  background:linear-gradient(180deg,#E2E8E7 -74.3%,#FFFFFF 100%);
   border:1px solid #FFFFFF;border-radius:8px;padding:15px 16px;
   box-shadow:0 2px 4px rgba(0,0,0,.04);
 }
@@ -1627,7 +1627,7 @@ const CSS = `
 .kct-review{
   flex:none;width:452px;min-height:415px;margin:0;padding:20px;
   display:flex;flex-direction:column;
-  background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+  background:linear-gradient(180deg,#0A4636 -9.1%,#18AC85 157%);
   border:0;border-radius:16px;
 }
 .kct-review-quote{
@@ -1963,7 +1963,7 @@ const CSS = `
   grid-template-columns:124px minmax(0,1fr);
   grid-template-areas:"photo who" "photo rate" "quote quote";
   align-content:start;column-gap:26px;row-gap:16px;
-  background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+  background:linear-gradient(180deg,#0A4636 -9.1%,#18AC85 157%);
 }
 .kct-review--big .kct-review-avatar{
   grid-area:photo;width:124px;height:124px;border-radius:12px;align-self:start;
