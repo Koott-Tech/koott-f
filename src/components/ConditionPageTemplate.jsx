@@ -1985,7 +1985,8 @@ const CSS = `
   font-family:var(--body)!important;font-size:16px;line-height:24px;
   transition:background-color .15s ease,color .15s ease,border-color .15s ease;
 }
-.kct-faq-tab.is-on{background:var(--p-light);border-color:var(--p-light);color:var(--p-dark);}
+/* the active pill keeps a #BFE3CB hairline; it is not borderless */
+.kct-faq-tab.is-on{background:var(--p-light);border-color:var(--s-green-1);color:var(--p-dark);}
 
 .kct-blog{border:1px solid #F4F4F4;border-radius:16px;padding:16px;}
 .kct-blog-img{height:210px;border-radius:0;}
