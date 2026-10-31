@@ -245,6 +245,7 @@ export default function ConditionPageTemplate({ data }) {
     return () => { off = true; };
   }, []);
   const [query, setQuery] = useState('');
+  const [faqTab, setFaqTab] = useState('');
   const [liveTherapists, setLiveTherapists] = useState([]);
   const d = data;
 
@@ -279,9 +280,16 @@ export default function ConditionPageTemplate({ data }) {
     [cmsTherapists, liveTherapists]
   );
 
-  const faqs = d.faqs.filter(
-    (f) => !query || (f.q + f.a).toLowerCase().includes(query.toLowerCase())
-  );
+  /* The design filters the FAQ with a tab group rather than a search box.
+     Tabs only mean something once the questions carry a category, so they
+     are built from whatever categories this page's FAQs actually have; a
+     page with none keeps the search, which narrows the list for real. */
+  const faqCats = [...new Set(d.faqs.map((f) => f.cat).filter(Boolean))];
+  const faqTabOn = faqTab || faqCats[0];
+  const faqs = d.faqs.filter((f) => {
+    if (faqCats.length) return f.cat === faqTabOn;
+    return !query || (f.q + f.a).toLowerCase().includes(query.toLowerCase());
+  });
 
   return (
     <main className="kct">
@@ -700,14 +708,27 @@ export default function ConditionPageTemplate({ data }) {
             show the same list. The search stays instead; it narrows the list
             for real. Add a category per FAQ and the tabs can replace it. */}
         <div className="kct-faq-head">
-          <input
-            type="text"
-            className="kct-faq-search"
-            placeholder="Looking for something?"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search frequently asked questions"
-          />
+          {faqCats.length ? (
+            <div className="kct-faq-tabs" role="tablist">
+              {faqCats.map((c) => (
+                <button key={c} type="button" role="tab"
+                  aria-selected={faqTabOn === c}
+                  className={`kct-faq-tab ${faqTabOn === c ? 'is-on' : ''}`}
+                  onClick={() => setFaqTab(c)}>
+                  {c}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <input
+              type="text"
+              className="kct-faq-search"
+              placeholder="Looking for something?"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search frequently asked questions"
+            />
+          )}
         </div>
         <div className="kct-faq">
           {faqs.map((f, i) => {
@@ -1919,6 +1940,37 @@ const CSS = `
 @media (max-width:640px){
   .kct-rev-col--a,.kct-rev-col--b{width:calc(100vw - 48px);}
   .kct-review--big{width:calc(100vw - 48px);min-height:0;}
+}
+
+
+/* ── FAQ, blogs and plans: the parts I had not opened up ─────────────────
+   FAQ section is #F9F9F9, not white, and its 552x56 tab group is a real
+   filter — General, Appointments, Therapy, Payments, Privacy — with the
+   active pill in #EFFFEA. Blog cards are radius 16 on an #F4F4F4 hairline
+   with 16 of padding and a 210-tall picture, under a 122x32 #F9FFF8 chip
+   that carries a 10% shadow. Plan cards pad 24, not 25.               */
+.kct-faq-sec{background:#F9F9F9;}
+.kct-faq-tabs{
+  display:flex;align-items:center;gap:16px;padding:4px;border-radius:8px;
+}
+.kct-faq-tab{
+  height:48px;padding:0 12px;border-radius:8px;cursor:pointer;
+  background:#fff;border:1px solid var(--s-1);color:var(--t-primary);
+  font-family:var(--body)!important;font-size:16px;line-height:24px;
+  transition:background-color .15s ease,color .15s ease,border-color .15s ease;
+}
+.kct-faq-tab.is-on{background:var(--p-light);border-color:var(--p-light);color:var(--p-dark);}
+
+.kct-blog{border:1px solid #F4F4F4;border-radius:16px;padding:16px;}
+.kct-blog-img{height:210px;border-radius:0;}
+.kct-blog-more{height:24px;margin-top:16px;}
+.kct-blogs-sec .kct-kicker{
+  min-width:122px;padding:0 12px;background:#F9FFF8;color:var(--t-body)!important;
+  box-shadow:0 1px 4px rgba(36,36,36,.10);
+}
+.kct-card--plan{padding:24px;}
+@media (max-width:640px){
+  .kct-faq-tabs{flex-wrap:wrap;gap:8px;justify-content:center;}
 }
 
 `;

@@ -451,30 +451,37 @@ export const CONDITION_PAGES = [
 "faqs":[
 {
 "a":"Depression is a prevalent mental health condition in Keralites. As per the recent study, about 35 per cent of the population were affected by depression and the 20-35 age group, were mainly found suffering from depression.",
+"cat":"General",
 "q":"How common is depression in Kerala?"
 },
 {
 "a":"Yes, depression is treatable. Treatment options may include psychotherapy, medication, lifestyle changes, and support from healthcare professionals.",
+"cat":"General",
 "q":"Can depression be treated?"
 },
 {
 "a":"If you consistently experience symptoms such as sadness, lack of interest, changes in sleep or appetite, and difficulty functioning, it's important to consult with a healthcare professional for an accurate diagnosis.",
+"cat":"General",
 "q":"How do I know if I have depression?"
 },
 {
 "a":"Yes, depression can impact physical health, leading to issues such as sleep disturbances, changes in appetite, fatigue, and a weakened immune system.",
+"cat":"General",
 "q":"Can depression affect physical health?"
 },
 {
 "a":"Yes, adopting a healthy lifestyle can complement traditional treatments. Regular exercise, balanced nutrition, sufficient sleep, and social support can positively impact mood.",
+"cat":"General",
 "q":"Can lifestyle changes help manage depression?"
 },
 {
 "a":"Not necessarily. The treatment approach varies. Some individuals may benefit from medication, while others may find relief through psychotherapy, lifestyle changes, or a combination of interventions.",
+"cat":"Therapy",
 "q":"Is medication always necessary for treating depression?"
 },
 {
 "a":"Yes, online therapy can be an effective option, providing accessibility and convenience for individuals seeking mental health support. However, the severity of depression may influence the choice of intervention.",
+"cat":"Appointments",
 "q":"Can online therapy be effective for treating depression?"
 }
 ],
