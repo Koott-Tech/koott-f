@@ -1627,7 +1627,9 @@ const CSS = `
 
 /* The illustration at the foot of each step card. Sizes are the design's:
    ~58 faces, a 70-tall media row, 8 radius on the tiles. */
-.kct-step-media{margin-top:auto;padding-top:36px;display:flex;align-items:center;gap:8px;}
+/* Frame 57 is 58 tall in every card, 36 under the copy — the call and
+   pair strips were running 106 and 98 and taking their cards to 230. */
+.kct-step-media{margin-top:auto;padding-top:36px;height:94px;display:flex;align-items:center;gap:8px;overflow:hidden;}
 .kct-step-faces img{
   width:58px;height:58px;border-radius:999px;object-fit:cover;flex:none;
   background:#EFF4F0;

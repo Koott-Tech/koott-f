@@ -348,19 +348,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Choose from our pool of licensed therapists based on your needs and goals related to anxiety counselling.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session for anxiety easily at a time that fits your routine and feels comfortable for you in a few easy steps.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session through Google Meet for anxiety counselling from anywhere, ensuring confidentiality.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Our ongoing guidance and follow-ups ensure consistency in managing anxiety and make steady progress.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -793,19 +793,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select any of our licensed psychologists online in Kerala for depression to support your mental health.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"​Schedule your session for depression counselling securely and connect at the time that works best for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a secure video or audio session for depression via Google Meet from a comfortable space anywhere in the world.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Our ongoing follow-ups help track progress to heal from depression and maintain emotional well-being effectively.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -1204,19 +1204,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select a licensed psychologist online in Kerala who specialises in trauma counselling and provides compassionate, professional care.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule an online session for trauma counselling securely at your convenient time that fits your daily routine.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session for trauma counselling via Google Meet from anywhere, in a comfortable space to share.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Continuous counselling and follow-ups ensure that you track your progress and achieve gradual improvement.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -1598,19 +1598,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our wide pool of licensed psychologists online in Kerala who understand the underlying cause of panic attacks and provide expert guidance.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session online securely at a time that fits well in your routine and daily responsibilities.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a secure video or audio session via Google Meet from anywhere, ensuring your privacy, comfort, and convenience.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing follow-ups and guidance that help you track progress and maintain your emotional stability over time.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -1992,19 +1992,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our experienced and licensed therapists based on your needs and preferences.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Pick a convenient time and schedule your session easily through our platform.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join your private video or audio session in a secure and comfortable environment.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Receive continued guidance, tools, and follow-ups to support your recovery journey.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -2382,19 +2382,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed psychologists online in Kerala who understand grief and provide compassionate, professional support.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Book appointments with your selected therapists on our platform at a time that is convenient for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session via Google Meet from anywhere, ensuring privacy, and a safe space to share.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Consistent support and follow-ups will enable tracking of progress and moving ahead at your own pace.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -2784,19 +2784,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select a licensed therapist based on your special needs for addiction and recovery goals.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session at a time that is convenient for your comfort level in a few easy steps.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a secure video or audio session online through Google Meet from anywhere, ensuring privacy and ease.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Receive guidance consistently to manage triggers, build habits, and stay on your recovery path for the longer period.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -3178,19 +3178,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed psychologists online in Kerala who understand your sleep problems and everyday difficulties.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session securely at a time that suits your schedule best in just a few clicks.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a safe video or audio session online via Google Meet from anywhere, ensuring privacy and comfort.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Consistent guidance and regular follow-ups ensure your improvement and maintenance of good sleeping habits.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -3590,19 +3590,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed psychologists who understand your OCD and related struggles.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session with us easily at a time that is convenient for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join your video or audio session online via Google Meet from a place where you feel comfortable.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Get our ongoing guidance and regular follow-ups to ensure you stay consistent and improve.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -3988,19 +3988,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our professional therapists based on your needs, goals, and personal preferences related to ADHD.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session easily at a time that fits your routine and feels comfortable for you in a few easy steps.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session through Google Meet from anywhere, ensuring comfort and complete confidentiality.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Our ongoing guidance and follow-ups help you stay focused, build habits, and ensure steady progress.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -4394,19 +4394,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Our counsellors specialise in abuse cases and can provide proper advice based on their expertise in such matters.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"We offer personalised sessions that focus on your emotions and progress towards recovery.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Attend your online video/audio session through Google Meet from anywhere you feel comfortable.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Continuous support and follow-ups assist you in monitoring your progress and staying emotionally healthy.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -4788,19 +4788,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our certified psychologists online in Kerala who understand your personality patterns and emotional struggles.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Book the appointment easily according to your schedule, commitments and responsibilities.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a safe video or audio session through Google Meet from anywhere, with comfort, privacy, and convenience.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing assistance helps in tracking improvement and keeping emotional stability over time.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -5186,19 +5186,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed psychologists online in Kerala who are trained to help you with PTSD.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session securely at a time that is suitable for your routine and comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a safe video or audio session through Google Meet, ensuring your privacy and ease of access.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing assistance in therapy can provide you with long-term stability and ensure your progress.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -5606,19 +5606,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our pool of licensed psychologists who understand your mood-related concerns and emotional needs.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Easily schedule your session online at a time that fits your schedule, comfort and daily routine.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Through Google Meet, join a safe and private video or audio session for mood disorders from a place where you feel relaxed.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Wiht our ongoing guidance, follow-ups, and consistent care you can rebuil and maintain your emotional balance.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -6000,19 +6000,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select among our licensed psychologists who are based in Kerala and who understand schizophrenia.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Arrange your appointment at your convenience without worries about security and confidentiality.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Take part in the online therapy from any location that suits you, and make sure your privacy is intact.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Get continued guidance and support for monitoring your progress and maintaining your stability.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -6398,19 +6398,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed professionals based on your needs and goals related to the Autism spectrum.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session for Autism spectrum easily at a time that fits your routine and feels comfortable.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session via Google Meet from anywhere, ensuring comfort and confidentiality.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"With our consistent support and regular follow-ups, you can gain a long-term emotional balance.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -6788,19 +6788,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed psychologists online in Kerala who help you improve focus and productivity.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session easily at a time that fits your routine and feels comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session via Google Meet from anywhere, ensuring comfort, privacy, and a focused space to talk.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing guidance and follow-ups help you stay consistent, track progress, and build better productivity habits.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -7211,19 +7211,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Pick from our wide pool of licensed psychologists who understand your needs.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your counselling session for eating disorders easily at a time that works best for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a safe and secure video or audio session via Google Meet from anywhere you feel comfortable.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Get ongoing mental health guidance and follow-ups to support your progress and recovery.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -7598,19 +7598,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our experienced professionals based on your career needs, goals, and preferences.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session easily at a time that fits your routine and feels comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session from anywhere, ensuring comfort, focus, and full confidentiality.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing guidance and follow-ups help you stay focused, make progress, and achieve your career goals.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -7997,19 +7997,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed psychologists who are trained to understand your suicidal thoughts and support you with care.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session for suicidal tendencies securely at a time that feels comfortable and safe for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session online through Google Meet from anywhere, ensuring safety and privacy.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing guidance and follow-ups help you stay supported, feel safer and move forward step by step towards healing.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -8391,19 +8391,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Choose a licensed psychologist online in Kerala who can help you overcome your difficulties during a crisis.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"You can book your online session for crisis intervention with us safely according to your convenience.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Attend your audio/video session online securely via Google Meet from the comfort of your own space.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Our consistent follow-ups and support for crisis intervention ensure that you keep moving ahead positively.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -8785,19 +8785,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Choose from qualified psychologists available online in Kerala, who specialise in issues related to existential crisis.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Arrange your therapy session at a convenient time according to your schedule.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Attend your online session through Google Meet from your home, ensuring safety and confidentiality.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Receive continuous support through follow-up sessions to ensure consistent growth and guidance.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -9179,19 +9179,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select any of our qualified and licensed therapists who specialise in your chronic illness support.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session for online counselling for chronic illness securely at a time that fits your routine.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session through Google Meet from anywhere, ensuring privacy and a comfortable space.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Our continuous care and support help you track progress, feel supported, and continue building healthy coping strategies.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -9578,19 +9578,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed psychologists who are specialised in behavioural health and provide practical guidance for a healthy life.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session for behavioural health securely at a time that fits your routine and feels comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session through Google Meet from anywhere, ensuring comfort and safety.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Regular guidance will enable you to maintain consistency in your practice and see the results through.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -9984,19 +9984,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select your therapist based on your requirements to build strong emotional regulation for a longer period.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Book your session for emotional self-regulation conveniently at your preferred date and time in just a few clicks.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Attend your video or audio session online from your comfortable space with complete privacy and confidentiality.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Consistent support through sessions ensures the development of your emotional control and progress.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -10378,19 +10378,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Choose from our list of qualified therapists available online in Kerala, with expertise in treating phobias and anxiety disorders.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session for phobias securely at a time that fits your convenience and feels comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a safe video or audio session online via Google Meet from anywhere, ensuring privacy, comfort and easy access.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Regular counselling support is essential to assess your progress and boost your confidence level in the long term.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -10777,19 +10777,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed therapists in Kerala who help you improve communication and build confidence.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session easily at a time that fits your routine and feels comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session from anywhere, ensuring comfort, privacy, and a focused space.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing guidance and follow-ups help you practice, improve, and build strong communication skills over time.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -11164,19 +11164,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select a licensed therapist based on your needs, comfort, and the support you are looking for in your relationship.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session for premarital counselling at a time that works for both partners and fits your routine comfortably.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session via Google Meet together, ensuring a safe, supportive, and confidential environment.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Regular sessions help you to build understanding, improve communication, and prepare for your marriage with confidence.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -11562,19 +11562,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"You can choose from our licensed Malayalam-speaking therapists specializing in marital counseling in Kerala that suit your requirements.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Book your online marital counseling sessions that suit Kerala locals and NRIs worldwide.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join online video sessions via Google Meet for couples therapy in Malayalam & English.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Get continuous relationship counseling support, follow-ups, and resources to ensure enduring soukhyam between sessions.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -11961,19 +11961,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select a therapist who has expertise in conducting couple therapy depending on your needs and comfort.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Fix an appointment according to a convenient time that suits both you and your partner’s schedule.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Attend the online session together via Google Meet and create a conducive environment for therapy.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Join a private video or audio session together, ensuring a safe, supportive, and confidential environment.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -12352,19 +12352,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select a qualified therapist who meets your requirements and who you feel comfortable talking to and can offer support to you.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session for divorce counselling at a time that fits your routine and feels comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session through Google Meet from anywhere, ensuring safety, comfort, and full confidentiality.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Regular sessions help you process emotions, gain clarity, and move forward with confidence over time.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -12741,19 +12741,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Pick an experienced counsellor according to your requirements and preferences.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Choose a convenient time for all family members and fix your session accordingly.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session through Google Meet together, ensuring a supportive and confidential environment.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"With constant support, you can enhance your communication skills and foster better relations with each other.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -13136,19 +13136,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from the available licensed relationship therapists who specialise in solving communication problems.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session to improve communication at a suitable time for yourself and your partner.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session through Google Meet from anywhere, ensuring comfort, privacy, and a safe space to talk.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Get continuous guidance from us to develop good communication skills and have a strong relationship.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -13534,19 +13534,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed psychologists, who are specialists when it comes to postpartum issues and concerns of mothers.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session easily at a time that works best for you and your routine.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join the video/audio session online via Google Meet at your scheduled time from your own house.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Get ongoing guidance and follow-ups to help you progress to ensure long-lasting stability.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -13915,19 +13915,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select a licensed therapist based on your child's and parenting needs, comfort, and the support you are looking for.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session for parental counselling at a time that fits your routine and feels comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session through Google Meet from anywhere, ensuring a supportive and confidential space.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Regular sessions help you improve parenting strategies, build confidence, and create a positive home environment over time.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -14304,19 +14304,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select a licensed therapist based on your needs, comfort, and the support you are looking for to manage the infertility issue.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session for infertility counselling at a time that fits your routine and feels comfortable for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session via Google Meet from anywhere, ensuring a safe, supportive, and confidential space.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Regular sessions help you manage emotions, stay balanced, and move forward with clarity over time.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -14690,19 +14690,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Find a therapist who meets your needs, comfort, and gives the kind of support you deserve to recieve.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"We are available for you, choose a time that works for you and book a session online.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join your online session via google meet from the comfort of your home, without travel, added stress.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Receive ongoing support with follow-ups and gentle support, so you can keep moving ahead with confidence.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -15060,19 +15060,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Find a therapist who fits your needs,speaks your language, and makes you feel at ease",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your online session for a time that works best for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"You can join online sessions via google meet, from anywhere and talk freely in a safe, private space.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"With our continued support and regular follow-up care, you work through your sexual health concerns at your own pace.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -15435,19 +15435,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Search and select a therapist for intimacy support who you feel is right for your needs and comfort.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule an online session for intimacy counseling at a time that fits your routine and lifestyle.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"You can join your online session via google meet from a private, comfortable space which makes therapy safe and easy.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Keep getting steady guidance and care, so you can make genuine progress and feel less alone and supported.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -15812,19 +15812,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select a therapist who understands your needs, someone you feel comfortable with, and someone you can trust.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"You can quickly schedule an online counseling session using Google Meet, at a time that suits your schedule.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"In a private, secure, and confidential environment you can join from the comfort of your home and speak freely.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Continued support is available.As you progress at your own pace, stay connected with our ongoing counseling support.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -16191,19 +16191,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Choose from our team licensed therapists, someone who feels the right fit for your needs and comfort.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Select a time that is convenient for you and book your online counseling session in just a few clicks.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join your online therapy session through Google Meet from home. Talk openly in a safe and confidential space where you feel comfortable.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"With our regular therapy sessions and continuous support, you keep moving forward in your healing journey with one step at a time.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -16606,19 +16606,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Find a therapist who understands emotional connection struggles, relationship patterns, and your cultural background—so you feel genuinely heard and supported.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Pick a time that fits your routine and easily schedule your session without stress or complexity.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join from the comfort of your space and speak openly in a confidential, judgment-free setting where emotional connection can safely grow.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Receive continuous guidance to build emotional awareness, strengthen trust, improve communication, and nurture healthier relationships over time.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -16981,19 +16981,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Browse and select a therapist who fits your needs and comfort level.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Pick a convenient time slot and schedule your session",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join your session from anywhere through a secure and confidential platform.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Receive continuous guidance, follow-ups, and support as you progress.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -17369,19 +17369,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed therapists in Kerala who are experienced in LGBTQIA+ concerns and provide inclusive support.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session easily at a time that feels comfortable and works best for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session from anywhere, ensuring a safe, confidential, and supportive space.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing guidance and follow-ups help you feel supported, build confidence, and move forward at your pace.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
@@ -17780,19 +17780,19 @@ export const CONDITION_PAGES = [
 "howItWorks":{
 "steps":[
 {
-"body":"Select from our licensed therapists in Kerala who specialize in relationship and intimacy concerns.",
-"title":"Choose a Therapist"
+"body":"Browse and select your ideal psychologist easily and quickly.",
+"title":"Choose your therapist"
 },
 {
-"body":"Schedule your session easily at a time that feels comfortable and convenient for you.",
-"title":"Book a Session"
+"body":"Choose your slot and day in a few easy steps.",
+"title":"Book a session"
 },
 {
-"body":"Join a private video or audio session from anywhere, ensuring comfort, safety, and full confidentiality.",
-"title":"Attend Online Session"
+"body":"Join a private Google Meet session from anywhere.",
+"title":"Start getting better"
 },
 {
-"body":"Ongoing guidance and follow-ups help you build comfort, improve connection, and make steady progress.",
+"body":"Ongoing guidance and follow-ups keep your progress steady.",
 "title":"Continuous Support"
 }
 ],
