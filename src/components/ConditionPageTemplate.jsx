@@ -79,7 +79,9 @@ const ReviewRating = ({ source }) => (
 const ReviewCard = ({ r, big = false }) => (
   <figure className={`kct-review ${big ? 'kct-review--big' : ''}`}>
     <span className="kct-review-avatar">
-      {r.avatar && <img src={r.avatar} alt="" loading="lazy" />}
+      {r.avatar
+        ? <img src={r.avatar} alt="" loading="lazy" />
+        : <span aria-hidden>{(r.name || '').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('')}</span>}
     </span>
     <figcaption className="kct-review-who">
       <span className="kct-review-name">{r.name}</span>
@@ -2025,5 +2027,16 @@ const CSS = `
 @media (max-width:640px){
   .kct-faq-tabs{flex-wrap:wrap;gap:8px;justify-content:center;}
 }
+
+
+/* The design fills the review avatars with stock faces. Rather than leave
+   an empty plate where a face should be, the circle carries the person's
+   initials until a review brings a real, permissioned photo of its own. */
+.kct-review-avatar{align-items:center;justify-content:center;}
+.kct-review-avatar > span{
+  font-family:var(--body)!important;font-size:14px;font-weight:500;
+  line-height:1;color:rgba(255,255,255,.72);letter-spacing:.02em;
+}
+.kct-review--big .kct-review-avatar > span{font-size:36px;}
 
 `;
