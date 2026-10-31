@@ -76,7 +76,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What should I do if I or someone I know is experiencing a severe anxiety attack?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_b646fe011a2e48acb419a1e7dfa51bd0~mv2.webp",
 "title":"Best online counselling for Anxiety Treatment in Malayalam",
@@ -489,7 +504,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can online therapy be effective for treating depression?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_2e5a6f5c7a12459c95a835521dc7094a~mv2.png",
 "title":"Best online counselling for Depression Treatment in Malayalam",
@@ -948,7 +978,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Where can I access trauma counseling online in India?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_70c078cabd234e1694965440a4148a15~mv2.webp",
 "title":"Best online counselling for Trauma Treatment in Malayalam",
@@ -1347,7 +1397,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can personality disorder treatment include cuddle therapy with puppies?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_080d4857aa3343da80f40f62f7c6a2ad~mv2.webp",
 "title":"Best online counselling for Panic Attacks Treatment in Malayalam",
@@ -1746,7 +1811,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"When should I seek help for burnout?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_2806701b779040a187b56aa539ea9bc4~mv2.webp",
 "title":"Best online counselling for Burnout Recovery Treatment in Malayalam",
@@ -2141,7 +2226,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What happens if grief is not treated?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_08b66d278154408aae868335693f821e~mv2.webp",
 "title":"Best online counselling for Loss & Grief in Malayalam",
@@ -2545,7 +2645,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How can I manage cravings and withdrawal symptoms during treatment?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_2da9849541fe4672bf9e78d3f85c90c2~mv2.webp",
 "title":"Best online counselling for Addictions Treatment in Malayalam",
@@ -2948,7 +3063,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What should I expect during Sleep Disorder treatment?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_a2a45c0f7e1c4d5183ee016c008f1d0d~mv2.webp",
 "title":"Best online counselling for Sleep Disorder Treatment in Malayalam",
@@ -3347,7 +3477,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How can I support someone with OCD?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_3aec3cca35024bc39ba3ad270c5f64e8~mv2.webp",
 "title":"Best online counselling for OCD Treatment in Malayalam",
@@ -3764,7 +3914,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What if I suspect I have ADHD myself?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_4cc4d2293bd246308fb6c3a5bad37204~mv2.webp",
 "title":"Best online counselling for ADHD Treatment in Malayalam",
@@ -4167,7 +4337,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can perpetrators also seek help through abuse counseling, or is it only for survivors?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_087e900a3adc450c8ef5fdb032d52e30~mv2.webp",
 "title":"Best online counselling for Abuse in Malayalam",
@@ -4578,7 +4768,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can personality disorders be cured with treatment?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_f7610fe7f92a4636bbe4f3d7713a55ca~mv2.webp",
 "title":"Best online counselling for Personality Disorder Management in Malayalam",
@@ -4982,7 +5187,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Is online therapy helpful for PTSD?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_bc87c97c5fa94e11b8f6626def5155e9~mv2.webp",
 "title":"Best online counselling for PTSD Treatment in Malayalam",
@@ -5391,7 +5611,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can mood disorders be prevented?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_b14fa203f87a42a29421f48732065cf6~mv2.webp",
 "title":"Best online counselling for Mood Disorder Treatment in Malayalam",
@@ -5808,7 +6048,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How long does schizophrenia treatment typically last?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_96b46c3f539a4d94a7341a5ae6c5e346~mv2.webp",
 "title":"Online Counselling for Schizophrenia Treatment in Malayalam",
@@ -6212,7 +6467,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How does therapy involve families?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_ef9331d8692842b4844b51c060eca8cd~mv2.webp",
 "title":"Best online counselling for Autism Spectrum Treatment in Malayalam",
@@ -6607,7 +6882,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Why do I struggle to be productive?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_434d3ad448a54e5fbb486bb87e38e236~mv2.webp",
 "title":"Best online counselling for Boosting Productivity in Malayalam",
@@ -7021,7 +7316,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can online therapy be effective for eating disorders?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_d195dac51c794458803e022b2e1f43e0~mv2.webp",
 "title":"Best online counselling for Eating Disorder Treatment in Malayalam",
@@ -7427,7 +7742,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How does career coaching help individuals in their professional development?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_2e5a6f5c7a12459c95a835521dc7094a~mv2.png",
 "title":"Best online counselling for Career Coaching in Malayalam",
@@ -7832,7 +8167,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What should I do if someone with suicidal tendencies refuses help?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_0f19011b17ab4674abfe9c8cafdf7f4b~mv2.webp",
 "title":"Best online counselling for Suicidal Tendencies Treatment in Malayalam",
@@ -8232,7 +8582,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can crisis intervention therapy be conducted remotely or online?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_42cc74cebd2c41ad894b27a797d52f5d~mv2.webp",
 "title":"Best online counselling for Crisis Intervention in Malayalam",
@@ -8627,7 +8992,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can existential crisis treatment be effective for adolescents or young adults?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_672f346346894a6ba7a3de06e97a1ae9~mv2.webp",
 "title":"Best online counselling for Existential Crisis Treatment in Malayalam",
@@ -9030,7 +9410,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How can therapy help individuals cope with the emotional impact of chronic illness?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_8734b108e27d4d399551248472f53b4f~mv2.webp",
 "title":"Best online counselling for Chronic Illness Treatment in Malayalam",
@@ -9434,7 +9834,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can Behavioral Health Services Help with Stress Management?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_6755321ead624cdf80975371b3f31b4c~mv2.webp",
 "title":"Best online counselling for Behavioral Health Treatment in Malayalam",
@@ -9844,7 +10264,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What role does mindfulness play in emotional self-regulation?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_834f9997ecb34bdbb676a811cd477927~mv2.webp",
 "title":"Best online counselling for Emotional Self-regulation in Malayalam",
@@ -10247,7 +10682,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can phobias go away on their own?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_dc5ab1e871434caeb62b6038db506129~mv2.webp",
 "title":"Best online counselling for Phobia Treatment in Malayalam",
@@ -10651,7 +11101,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Why is improving communication important in personal and professional settings?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_2e5a6f5c7a12459c95a835521dc7094a~mv2.png",
 "title":"Best online counselling in Malayalam for Improving Communication Skills",
@@ -11051,7 +11516,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What if one partner is hesitant or resistant to participating in premarital counseling?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_bf180970c2c54dd6b759d6b2595c1592~mv2.webp",
 "title":"Best Malayali Psychologist for Pre-Marital Counselling Online",
@@ -11454,7 +11939,17 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What if we're dealing with infidelity or trust issues?"
 }
-],
+,
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_055654b904ca4b7d92f4188e12a65bc3~mv2.webp",
 "title":"Best Malayali Psychologist for Online Marital Counselling in Malayalam",
@@ -11855,7 +12350,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Is couples counseling still beneficial if one partner is unsure about the relationship?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_777ca0e69a074e55b716cab74feee08c~mv2.webp",
 "title":"When Relationships Feel Difficult, Online Couples Therapy Can Help",
@@ -12260,7 +12775,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can divorce counselling help children cope with divorce?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_e8056a273de041b8afdf39a74715f897~mv2.webp",
 "title":"Best Malayali Psychologist for Divorce Counselling Online",
@@ -12657,7 +13192,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How can family counseling support families dealing with divorce or separation?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_cb1dcfdc0d294e81a7bbb33ec51a339e~mv2.webp",
 "title":"Best Malayali Psychologist for Family Counselling Online",
@@ -13047,7 +13602,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How does couples therapy differ from individual therapy here?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_70c078cabd234e1694965440a4148a15~mv2.webp",
 "title":"Best online counselling for Improving Communication in Relationships in Malayalam",
@@ -13452,7 +14022,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What should I do if I or someone I know is experiencing postpartum depression symptoms?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_458fd524d1ac4c7c9519bfb6a5af1c2e~mv2.webp",
 "title":"Best online counselling for Postpartum Depression Treatment in Malayalam",
@@ -13846,7 +14431,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How can parental counseling help with co-parenting after divorce or separation?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_bf2f98af53c04640aafefd5be97e6256~mv2.webp",
 "title":"Best Malayali Psychologist for Parental Counselling Online",
@@ -14241,7 +14846,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"What can I expect during infertility counseling sessions?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_7ba639a4b7e04201a4dfd3fdf21aea85~mv2.webp",
 "title":"Best Malayali Psychologist for Infertility Counselling in Malayalam",
@@ -14646,7 +15266,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Will therapy focus only on sex?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_34ce385f92ed48479e21fd5c4c216b8f~mv2.webp",
 "title":"Best Online Counseling for Female Sexual Concerns in Malayalam",
@@ -15026,7 +15661,22 @@ export const CONDITION_PAGES = [
 "cat":"Payments",
 "q":"Will talking to a therapist actually help me feel better?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_00fc96a99c304480890cde419d112fad~mv2.webp",
 "title":"Best Online Counseling for Men’s Sexual Concerns in Malayalam",
@@ -15403,7 +16053,17 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"How do I start?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_f27f43847cab4e39973f81adbf35f4ba~mv2.webp",
 "title":"Best Online Intimacy Counselling in Malayalam",
@@ -15789,7 +16449,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can Malayalees living outside Kerala use this service?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_bff7314c23f8410da6c6cafaf8925d01~mv2.webp",
 "title":"Best Online Pre-Marriage & Newlywed Counseling in Malayalam",
@@ -16169,7 +16844,17 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can therapy help with triggers and flashbacks?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_d1ab38e97c65431c9dc08e03cce704aa~mv2.webp",
 "title":"Best Online Sexual Trauma & Healing Counseling in Malayalam",
@@ -16564,7 +17249,22 @@ export const CONDITION_PAGES = [
 "cat":"Payments",
 "q":"What if I feel nothing at all?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_d195dac51c794458803e022b2e1f43e0~mv2.webp",
 "title":"Best Online Counselling for Emotional connection in Malayalam",
@@ -16987,7 +17687,22 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Will therapy focus only on sex?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_cb1d499b25a14570847538dbd043acc7~mv2.webp",
 "title":"Best Online Counseling for Vaginismus Treatment in Malayalam",
@@ -17351,7 +18066,22 @@ export const CONDITION_PAGES = [
 "cat":"Privacy",
 "q":"Is LGBTQ+ counseling confidential?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_c70c50329bdd413f92ca09c3001b0be8~mv2.webp",
 "title":"Best online counselling for LGBTQIA+ in Malayalam",
@@ -17772,7 +18502,27 @@ export const CONDITION_PAGES = [
 "cat":"General",
 "q":"Can sex therapy address compulsive sexual behaviors or addictions?"
 }
-],
+,
+{
+"a":"Pick a therapist, choose a slot that suits you, and you will get a confirmation with the link to join. Sessions run 50 minutes, or 1 hour 20 minutes for couples. If your plans change, you can request a reschedule from your bookings.",
+"cat":"Appointments",
+"q":"How do I book a session, and can I change the time later?"
+},
+{
+"a":"That depends on what you are working through. Your therapist may draw on CBT, ACT, DBT, mindfulness or person-centred work, often more than one. They will explain the approach in the first session and adjust it as you go.",
+"cat":"Therapy",
+"q":"What approach will my therapist use?"
+},
+{
+"a":"What you pay depends on the kind of support you choose — counselling, psychiatry, a package of sessions or a support group. The starting price for each is listed in the plans above, and the fee is confirmed before you book.",
+"cat":"Payments",
+"q":"How much does a session cost?"
+},
+{
+"a":"Yes. What you share stays between you and your therapist, and your records are not passed on without your consent. The only exceptions are the ones the law requires, such as a serious risk to your safety or someone else's.",
+"cat":"Privacy",
+"q":"Is what I share in a session kept confidential?"
+}],
 "hero":{
 "image":"https://static.wixstatic.com/media/624142_2e5a6f5c7a12459c95a835521dc7094a~mv2.png",
 "title":"Best online counselling for Sexual Intimacy Issues in Malayalam",
