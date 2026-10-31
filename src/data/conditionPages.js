@@ -522,9 +522,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "paragraphs":[
-"Depression is one of the most common mental health conditions that quietly affects mood, thoughts, energy, sleep, appetite, and daily functioning. It is more than just feeling sad for a few days. When depression lasts for weeks or months, even simple daily tasks like working, studying, or socializing can feel overwhelming. In Kerala, people often describe it as “thinking too much,” “tension,” or “prarthanayil kuravu,” but it is not a personal weakness. It is a recognized medical condition experienced by millions of people in Kerala and around the world. Clinically, depression is classified under the ICD-10 codes F32 (Depressive Episode) and F33 (Recurrent Depressive Disorder). Globally, around 280 million people live with depression, making it one of the leading causes of disability. With the right depression treatment, including professional therapy and support, recovery is possible, and many people go on to lead healthy, fulfilling lives.",
-"ഡിപ്രഷൻ ഒരാളുടെ മനസ്സിനെയും ദിനചര്യയെയും ബാധിക്കുന്ന ഒരു മാനസിക അവസ്ഥയാണ്. പല മലയാളികളും ഇത് നേരിട്ട് “ഡിപ്രഷൻ” എന്ന് പറയാതെ “മനസ്സ് ഭാരം തോന്നുന്നു,” “ഒന്നിനും മനസില്ല,” “വളരെ അധികം ആലോചിക്കുന്നു,” അല്ലെങ്കിൽ “ജീവിതം മുന്നോട്ടുപോകുന്നില്ലെന്നു തോന്നുന്നു” എന്നിങ്ങനെ പറയാറുണ്ട്. ഉറക്കത്തിലെ മാറ്റം, വിശപ്പില്ലായ്മ, ആളുകളോട് സംസാരിക്കാൻ താല്പര്യം കുറയുക, ചെറിയ കാര്യങ്ങൾ പോലും വളരെ ബുദ്ധിമുട്ടായി തോന്നുക തുടങ്ങിയ ലക്ഷണങ്ങൾ ഉണ്ടാകാം.",
-"ലോകമെമ്പാടും ഏകദേശം 3.5 കോടി മലയാളികൾ ജീവിക്കുന്നു. ഗൾഫ് രാജ്യങ്ങളിലോ വിദേശത്തോ താമസിക്കുന്നവർക്കിടയിൽ ഒറ്റപ്പെടൽ, ജോലി സമ്മർദ്ദം, കുടുംബത്തിൽ നിന്ന് ദൂരം തുടങ്ങിയ കാരണങ്ങൾ മനസ്സിനെ ബാധിക്കാറുണ്ട്. ഇന്നത്തെ കാലത്ത് മലയാളികളിൽ മാനസികാരോഗ്യത്തെക്കുറിച്ചുള്ള അവബോധം ക്രമേണ വർധിക്കുകയാണ്, അതിനാൽ കൂടുതൽ ആളുകൾ സഹായം തേടാനും സംസാരിക്കാനും തുടങ്ങിക്കഴിഞ്ഞു."
+"Depression is one of the most common mental health conditions, quietly affecting mood, thoughts, energy, sleep, appetite and daily functioning. It is more than feeling sad for a few days: when it lasts weeks or months, even working, studying or socialising can feel overwhelming. In Kerala people often describe it as “thinking too much” or “tension,” but it is not a personal weakness. It is a recognised medical condition, classified under ICD-10 as F32 and F33, and around 280 million people live with it worldwide. With the right treatment and support, recovery is possible, and many people go on to lead healthy, fulfilling lives."
 ]
 },
 "plans":{
@@ -863,7 +861,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "title":"How Does Therapy Help with Depression",
-"subtitle":"We know when you are feeling low, it may seem like nothing will change. But with the right depression treatment, support, and gentle guidance, healing is possible, one step at a time."
+"subtitle":"When you are feeling low it can seem nothing will change. With the right treatment and gentle guidance, healing is possible, one step at a time."
 }
 },
 "schema_enabled":false
