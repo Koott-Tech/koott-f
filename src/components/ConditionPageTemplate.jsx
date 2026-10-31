@@ -328,7 +328,6 @@ export default function ConditionPageTemplate({ data }) {
           the card is the number, the title and the body. */}
       <Section>
         <h2 className="kct-h2 kct-center">{d.howItWorks.title}</h2>
-        {d.howItWorks.subtitle && <p className="kct-sub kct-center">{d.howItWorks.subtitle}</p>}
         <div className="kct-steps">
           {d.howItWorks.steps.map((s, i) => (
             <div key={i} className="kct-step">
@@ -599,6 +598,9 @@ export default function ConditionPageTemplate({ data }) {
         <p className="kct-sub kct-center">{d.therapyHelps.subtitle}</p>
         {/* The same accordion as "when to seek help", filled grey and set
             smaller — the design uses the shape twice at two weights. */}
+        <div className="kct-helps-media" aria-hidden>
+          <span /><span />
+        </div>
         <ul className="kct-seek kct-seek--soft">
           {d.therapyHelps.items.map((it, i) => {
             const open = openHelp === i;
@@ -1174,17 +1176,17 @@ const CSS = `
    The number is beside the copy, not inside the title, so the body lines up
    under the title rather than under the number. */
 .kct-steps{
-  display:grid;grid-template-columns:repeat(2,minmax(0,374px));gap:24px;margin-top:32px;
+  display:grid;grid-template-columns:repeat(2,373px);gap:24px;margin-top:40px;
   justify-content:center;
 }
 /* The card is a column: the number beside the copy, then the picture under
    both. The picture starts where the number starts — x=600 against a card at
    574 with 24 padding — not where the title does. */
 .kct-step{
-  display:flex;flex-direction:column;
+  display:flex;flex-direction:column;min-height:216px;
   background:#fff;border:1px solid var(--s-1);border-radius:16px;padding:24px;
 }
-.kct-step-head{display:flex;align-items:flex-start;gap:11px;}
+.kct-step-head{display:flex;align-items:flex-start;gap:12px;}
 .kct-step-copy{min-width:0;}
 .kct-step-t,.kct-step-t:not(#_){
   margin:0;
@@ -1193,7 +1195,7 @@ const CSS = `
 }
 .kct-num{
   flex:none;display:inline-flex;align-items:center;justify-content:center;
-  width:34px;height:34px;border-radius:8px;
+  width:32px;height:32px;border-radius:8px;
   border:1px solid var(--s-green-1);background:#fff;
   font-family:var(--body)!important;font-size:12px!important;font-weight:500!important;
   line-height:18px!important;color:var(--t-primary)!important;
@@ -1413,8 +1415,41 @@ const CSS = `
 
 /* The soft variant of the accordion: filled rather than outlined, and set at
    body size. Used by "how therapy helps". */
-.kct-seek--soft .kct-seek-row{background:var(--bg-soft);border-color:transparent;}
-.kct-seek--soft .kct-seek-row.is-open{background:var(--bg-soft);border-color:var(--s-1);}
+/* "How does therapy help": a 752 column, two stadium photos 364x134 over a
+   stack of 58-tall rows on #F9F9F9 with an #F4F4F4 hairline, 16 apart. */
+/* ── measured off the Figma tree ─────────────────────────────────────────
+   Blogs  head 92 (a 122x32 chip, 12, the heading), 40, cards 358.7x346.
+   FAQ    heading 48, 16, a 552x56 tab row, 40, then 860x60 rows 16 apart
+          with 17 of padding.
+   Stats  heading 48, then 80 before the 415-tall review row.
+   Therapists  the heading, 24, then a 1180 strip 360 tall and a 201x40
+          button 24 under it.                                            */
+.kct-blogs-sec .kct-kicker{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:122px;height:32px;padding:0 16px;border-radius:999px;
+  background:var(--p-light);color:var(--p-dark)!important;
+  font-size:14px!important;line-height:22px!important;margin:0 0 12px;
+}
+.kct-blogs-sec{text-align:center;}
+.kct-blogs-sec .kct-blogs{text-align:left;margin-top:40px;}
+.kct-blog{min-height:346px;}
+.kct-faq-row{padding:17px;min-height:60px;}
+.kct-faq-head{margin-top:16px;min-height:56px;}
+.kct-reviews-sec .kct-kicker{display:none;}
+.kct-reviews{margin-top:80px;min-height:415px;}
+.kct-therapists{margin-top:24px;}
+.kct-more{margin:24px 0 0;}
+.kct-helps-media{
+  display:grid;grid-template-columns:repeat(2,364px);gap:24px;
+  justify-content:center;margin-top:40px;
+}
+.kct-helps-media span{
+  height:134px;border-radius:67px;
+  background:linear-gradient(135deg,#E8EFE5 0%,#CFE3D4 100%);
+}
+.kct-seek--soft{max-width:752px;gap:16px;margin-top:24px;}
+.kct-seek--soft .kct-seek-row{background:#F9F9F9;border-color:#F4F4F4;padding:15px 16px;}
+.kct-seek--soft .kct-seek-row.is-open{background:#F9F9F9;border-color:#F4F4F4;}
 .kct-seek--soft .kct-seek-t{font-size:18px!important;line-height:26px!important;font-weight:500!important;}
 .kct-band-p--lead{font-size:16px!important;line-height:24px!important;color:var(--t-primary)!important;}
 /* The strip's one line is Poppins 20/30, and its button is 161x48 rather
@@ -1429,7 +1464,7 @@ const CSS = `
 /* Types we treat ----------------------------------------------------------
    A tall picture beside the list, rather than the three-across grid this was.
    The accordion is the soft one again, run full width of its column. */
-.kct-types{display:grid;grid-template-columns:360px minmax(0,1fr);gap:40px;align-items:start;}
+.kct-types{display:grid;grid-template-columns:372px minmax(0,1fr);gap:32px;align-items:start;}
 .kct-types-art{
   border-radius:12px;min-height:420px;align-self:stretch;
   background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
@@ -1453,7 +1488,7 @@ const CSS = `
   font-family:var(--body)!important;font-size:14px!important;color:var(--t-primary)!important;
 }
 .kct-faq-search:focus{outline:none;border-color:var(--p-main);box-shadow:0 0 0 3px rgba(24,158,79,.15);}
-.kct-faq{max-width:640px;margin:20px auto 0;display:flex;flex-direction:column;gap:12px;}
+.kct-faq{max-width:860px;margin:40px auto 0;display:flex;flex-direction:column;gap:16px;}
 .kct-faq-row{background:#fff;border:1px solid var(--s-1);border-radius:10px;padding:14px 18px;}
 .kct-faq-row button{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
@@ -1571,7 +1606,7 @@ const CSS = `
 
 /* The illustration at the foot of each step card. Sizes are the design's:
    ~58 faces, a 70-tall media row, 8 radius on the tiles. */
-.kct-step-media{margin-top:auto;padding-top:28px;display:flex;align-items:center;gap:8px;}
+.kct-step-media{margin-top:auto;padding-top:36px;display:flex;align-items:center;gap:8px;}
 .kct-step-faces img{
   width:58px;height:58px;border-radius:999px;object-fit:cover;flex:none;
   background:#EFF4F0;
@@ -1630,6 +1665,8 @@ const CSS = `
 
 /* Tablet: the hero's 374 media and 1140 column no longer fit side by side. */
 @media (max-width:1024px){
+  /* The design's fixed tracks (373 steps, 364 photos) stop fitting here. */
+  .kct-steps,.kct-helps-media{grid-template-columns:repeat(2,minmax(0,1fr));}
   .kct-hero-grid,.kct-why{grid-template-columns:1fr;gap:32px;}
   .kct-why-media{height:auto;min-height:0;aspect-ratio:358/230;}
   /* Square at 374 is right beside the text; stacked it would be half the
@@ -1660,6 +1697,7 @@ const CSS = `
   .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
   .kct-stat-l{font-size:12px!important;line-height:18px!important;}
   .kct-grid-3,.kct-grid-3--wide,.kct-grid-4,.kct-grid-4--plans,.kct-therapists,.kct-why-grid,.kct-pillars{grid-template-columns:1fr;}
+  .kct-helps-media{grid-template-columns:1fr;}
   .kct-why-grid{grid-template-rows:auto;grid-auto-flow:row;}
   .kct-on-dark .kct-card--solid{min-height:0;}
   .kct-steps{grid-template-columns:minmax(0,1fr);}
