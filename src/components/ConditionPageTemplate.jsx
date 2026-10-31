@@ -1316,7 +1316,22 @@ const CSS = `
 .kct-on-dark .kct-card--solid{
   background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
   border:0;border-radius:10px;padding:14px 16px;min-height:124px;
+  position:relative;isolation:isolate;
 }
+/* Figma puts a monotone noise over the gradient on these cards and on the
+   big review card: grain 1.5, density 100, black and white at 25%, the
+   layer itself at 25%. feTurbulence at 1/1.5 is the same grain; it sits
+   under the copy, as the Rectangle it is attached to does in the file. */
+.kct-on-dark .kct-card--solid::before,
+.kct-review--big::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  z-index:0;pointer-events:none;opacity:.25;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  background-size:160px 160px;
+}
+.kct-on-dark .kct-card--solid > *,
+.kct-review--big > *{position:relative;z-index:1;}
+.kct-review--big{isolation:isolate;}
 .kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;letter-spacing:0!important;color:#fff!important;margin:0;
