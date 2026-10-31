@@ -660,7 +660,7 @@ export const CONDITION_PAGES = [
 {
 "age":"37 years",
 "name":"Divya Menon",
-"quote":"Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were struggling with. But we finally open up, at our own pace, in online counselling by Koott.",
+"quote":"Being in a new country was not easy, and we struggled to say what we felt. We finally opened up, at our own pace, with Koott.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -668,7 +668,7 @@ export const CONDITION_PAGES = [
 {
 "age":"36 years",
 "name":"Jithin Mohan",
-"quote":"Things had been really stressful lately… we were constantly misunderstanding each other. I was holding back what I actually felt. Counselling helped us learn to express things better.",
+"quote":"We had been misunderstanding each other and I was holding back what I felt. Counselling helped us express it better.",
 "avatar":null,
 "source":"whatsapp",
 "sourceLogo":null
@@ -676,7 +676,7 @@ export const CONDITION_PAGES = [
 {
 "age":"26 years",
 "name":"Fathima Noora",
-"quote":"There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made, we understand each other much better and resolve issues.",
+"quote":"There were unresolved issues and we struggled to understand what we felt. Counselling was the best decision we made.",
 "avatar":null,
 "source":"google",
 "sourceLogo":null
@@ -684,7 +684,7 @@ export const CONDITION_PAGES = [
 {
 "age":"32 years",
 "name":"Praveen",
-"quote":"There were constant misunderstandings and it gets even messier when family interferes to fix it. Counselling by a professional therapist helped us resolve issues and hear each other out.",
+"quote":"Misunderstandings got messier when family stepped in. A professional therapist helped us hear each other out.",
 "avatar":null,
 "source":"zoho",
 "sourceLogo":null
@@ -698,7 +698,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"4.9 in Google reviews, Touched more than a million human lives.",
+"title":"We have touched more than a million human lives.",
 "eyebrow":"Reviews"
 },
 "bookBand":{

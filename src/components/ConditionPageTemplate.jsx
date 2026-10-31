@@ -53,6 +53,40 @@ const Icon = ({ name, size = 15, fill = '#189E4F', className = '' }) => {
 /** Fallback marks for review sources when no logo URL is supplied. */
 const SOURCE_MARK = { google: 'G', whatsapp: '✆', zoho: 'Z' };
 
+/** The four-colour Google mark, 38x38 in the reviews heading. */
+const GoogleMark = () => (
+  <svg viewBox="0 0 48 48" width="38" height="38" aria-hidden focusable="false">
+    <path fill="#FBBB00" d="M10.6 28.7 9 34.9l-6.1.1A24 24 0 0 1 2.7 13l5.4 1 2.4 5.4a14.3 14.3 0 0 0 .1 9.3z" />
+    <path fill="#518EF8" d="M47.6 19.5a24 24 0 0 1-8.5 23.2l-6.8-.3-1-6a14.3 14.3 0 0 0 6.2-7.3H24.5v-9.6h23.1z" />
+    <path fill="#28B446" d="M39.1 42.7A24 24 0 0 1 9 34.9l7.6-6.2a14.3 14.3 0 0 0 20.6 7.3z" />
+    <path fill="#F14336" d="M39.4 5.6 31.8 11.8a14.3 14.3 0 0 0-21.1 7.6l-7.6-6.3A24 24 0 0 1 39.4 5.6z" />
+  </svg>
+);
+
+/** The rating line a review card ends on: the source badge, 4.9/5, stars. */
+const ReviewRating = ({ source }) => (
+  <span className="kct-rev-rate">
+    <span className="kct-rev-src">{SOURCE_MARK[source] || '★'}</span>
+    <span className="kct-rev-score">4.9/5</span>
+    <span className="kct-rev-stars">★★★★★</span>
+  </span>
+);
+
+/** A review as the design draws it: 192 tall in a column, or 415 on its own. */
+const ReviewCard = ({ r, big = false }) => (
+  <figure className={`kct-review ${big ? 'kct-review--big' : ''}`}>
+    <span className="kct-review-avatar">
+      {r.avatar && <img src={r.avatar} alt="" loading="lazy" />}
+    </span>
+    <figcaption className="kct-review-who">
+      <span className="kct-review-name">{r.name}</span>
+      {r.age && <span className="kct-review-age">{r.age}</span>}
+    </figcaption>
+    <blockquote className="kct-review-quote">{r.quote}</blockquote>
+    <ReviewRating source={r.source} />
+  </figure>
+);
+
 /** Session-mode glyphs shown as circular badges on a therapist card. */
 const ModeIcon = ({ name }) =>
   name === 'audio' ? (
@@ -378,30 +412,26 @@ export default function ConditionPageTemplate({ data }) {
 
       {/* ── Reviews ────────────────────────────────────────────────────── */}
       <Section className="kct-reviews-sec">
-        {d.reviews.eyebrow && <p className="kct-kicker">{d.reviews.eyebrow}</p>}
-        <h2 className="kct-h2 kct-center kct-reviews-h">{d.reviews.title}</h2>
+        <div className="kct-reviews-head">
+          <h2 className="kct-h2 kct-reviews-h">{d.reviews.title}</h2>
+          <div className="kct-reviews-rating">
+            <GoogleMark />
+            <span className="kct-reviews-score">
+              <b>4.9</b>
+              <em>★★★★★</em>
+            </span>
+          </div>
+        </div>
+        {/* Two stacked 192s, a 415 on its own, two more stacked — the mix the
+            design runs, and exactly the five reviews the CMS carries. */}
         <div className="kct-reviews">
-          {d.reviews.items.map((r, i) => (
-            <figure key={i} className="kct-review">
-              {r.source && (
-                <span className={`kct-review-src is-${r.source}`} title={r.source}>
-                  {r.sourceLogo
-                    ? <img src={r.sourceLogo} alt="" loading="lazy" />
-                    : SOURCE_MARK[r.source] || '★'}
-                </span>
-              )}
-              <blockquote className="kct-review-quote">{r.quote}</blockquote>
-              <figcaption className="kct-review-person">
-                <span className="kct-review-avatar">
-                  {r.avatar && <img src={r.avatar} alt="" loading="lazy" />}
-                </span>
-                <span className="kct-review-who">
-                  <span className="kct-review-name">{r.name}</span>
-                  {r.age && <span className="kct-review-age">{r.age}</span>}
-                </span>
-              </figcaption>
-            </figure>
-          ))}
+          <div className="kct-rev-col kct-rev-col--a">
+            {d.reviews.items.slice(0, 2).map((r, i) => <ReviewCard key={i} r={r} />)}
+          </div>
+          {d.reviews.items[2] && <ReviewCard r={d.reviews.items[2]} big />}
+          <div className="kct-rev-col kct-rev-col--b">
+            {d.reviews.items.slice(3, 5).map((r, i) => <ReviewCard key={i} r={r} />)}
+          </div>
         </div>
       </Section>
 
@@ -1799,6 +1829,96 @@ const CSS = `
 .kct-seekhelp .kct-seek-head{min-height:40px;}
 .kct-seekhelp .kct-seek-t,.kct-seekhelp .kct-seek-t:not(#_){
   font-size:18px!important;line-height:26px!important;font-weight:600!important;
+}
+
+
+/* ── reviews, measured off the .fig ───────────────────────────────────────
+   Heading row 1132x48 left-aligned, the title in Poppins SemiBold 32 and a
+   145.84x40.5 Google block on the right. Then a 2349 marquee of 24-apart
+   columns: two 192-tall cards stacked 27 apart, a 415 on its own, two more.
+     small  473 or 438 x 192, #0A4636, 20 padding, 8 spacing
+            40 round avatar, name Inter Medium 16/24, place 12/18
+            quote Inter Regular 14/22 (three lines, 66)
+            footer 26: a 26x26 #063327 "G", 4.9/5 at 12/18, stars 16/24 #F5A623
+     big    452x415, radius 16, the #0A4636 -> #18AC85 gradient
+            124 photo at radius 12, quote Inter Medium 23/32           */
+.kct-reviews-head{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  max-width:1132px;margin:0 auto;
+}
+.kct-reviews-h,.kct-reviews-h:not(#_){color:#fff!important;margin:0;text-align:left;}
+.kct-reviews-rating{display:flex;align-items:center;gap:12px;flex:none;}
+.kct-reviews-score{display:flex;flex-direction:column;line-height:1;}
+.kct-reviews-score b{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:500!important;
+  line-height:18px!important;color:#fff!important;
+}
+.kct-reviews-score em{font-style:normal;font-size:16px;line-height:22px;color:#F5A623;}
+
+.kct-reviews{
+  display:flex;align-items:flex-start;gap:24px;overflow-x:auto;
+  overscroll-behavior-x:contain;margin:80px calc(50% - 50vw) 0 0;padding:0 24px 0 0;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.kct-reviews::-webkit-scrollbar{display:none;}
+.kct-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;}
+.kct-rev-col--a{width:473px;}
+.kct-rev-col--b{width:438px;}
+
+.kct-review{
+  /* the Wix rule above pins height:380px, which beats any min-height */
+  flex:none;width:100%;height:auto;min-height:192px;margin:0;padding:20px;
+  display:grid;grid-template-columns:40px minmax(0,1fr);
+  grid-template-areas:"avatar who" "quote quote" "rate rate";
+  align-items:center;align-content:start;column-gap:12px;row-gap:8px;
+  background:#0A4636;border:0;border-radius:12px;
+}
+.kct-review-avatar{
+  grid-area:avatar;flex:none;width:40px;height:40px;border-radius:50%;
+  overflow:hidden;background:rgba(255,255,255,.14);display:inline-flex;
+}
+.kct-review-who{grid-area:who;display:flex;flex-direction:column;min-width:0;}
+.kct-review-name,.kct-review-name:not(#_){
+  font-family:var(--body)!important;font-size:16px!important;font-weight:500!important;
+  line-height:24px!important;color:#fff!important;
+}
+.kct-review-age{
+  font-family:var(--body)!important;font-size:12px!important;font-weight:400!important;
+  line-height:18px!important;color:#fff!important;
+}
+.kct-review-quote{
+  grid-area:quote;margin:0;padding:0;background:none;border-radius:0;display:block;text-align:left;
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:#fff!important;
+}
+.kct-rev-rate{grid-area:rate;display:flex;align-items:center;gap:8px;}
+.kct-rev-src{
+  flex:none;width:26px;height:26px;background:#063327;color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--body)!important;font-size:12px;line-height:18px;
+}
+.kct-rev-score{font-family:var(--body)!important;font-size:12px;line-height:18px;color:#fff;}
+.kct-rev-stars{font-size:16px;line-height:24px;color:#F5A623;}
+
+.kct-review--big{
+  width:452px;min-height:415px;border-radius:16px;
+  grid-template-columns:124px minmax(0,1fr);
+  grid-template-areas:"photo photo" "who who" "quote quote" "rate rate";
+  align-content:start;row-gap:16px;
+  background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+}
+.kct-review--big .kct-review-avatar{
+  grid-area:photo;width:124px;height:124px;border-radius:12px;
+}
+.kct-review--big .kct-review-quote{
+  font-size:23px!important;font-weight:500!important;line-height:32px!important;
+}
+@media (max-width:1024px){
+  .kct-reviews-head{flex-direction:column;align-items:flex-start;}
+}
+@media (max-width:640px){
+  .kct-rev-col--a,.kct-rev-col--b{width:calc(100vw - 48px);}
+  .kct-review--big{width:calc(100vw - 48px);min-height:0;}
 }
 
 `;
