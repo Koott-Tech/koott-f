@@ -432,8 +432,8 @@ export default function ConditionPageTemplate({ data }) {
           <div className="kct-reviews-rating">
             <GoogleMark />
             <span className="kct-reviews-score">
-              <b>4.9</b>
-              <em>★★★★★</em>
+              <small>Google Rating</small>
+              <span><b>4.9</b> <em>★★★★★</em></span>
             </span>
           </div>
         </div>
@@ -1867,12 +1867,16 @@ const CSS = `
 }
 .kct-reviews-h,.kct-reviews-h:not(#_){color:#fff!important;margin:0;text-align:left;}
 .kct-reviews-rating{display:flex;align-items:center;gap:12px;flex:none;}
-.kct-reviews-score{display:flex;flex-direction:column;line-height:1;}
-.kct-reviews-score b{
-  font-family:var(--body)!important;font-size:14px!important;font-weight:500!important;
+.kct-reviews-score{display:flex;flex-direction:column;gap:3px;}
+.kct-reviews-score small{
+  font-family:var(--body)!important;font-size:12px!important;font-weight:400!important;
   line-height:18px!important;color:#fff!important;
 }
-.kct-reviews-score em{font-style:normal;font-size:16px;line-height:22px;color:#F5A623;}
+.kct-reviews-score b{
+  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;color:#fff!important;
+}
+.kct-reviews-score em{font-style:normal;font-size:14px;line-height:22px;color:#F5A623;}
 
 .kct-reviews{
   display:flex;align-items:flex-start;gap:24px;overflow-x:auto;
@@ -1912,7 +1916,7 @@ const CSS = `
 }
 .kct-rev-rate{grid-area:rate;display:flex;align-items:center;gap:8px;}
 .kct-rev-src{
-  flex:none;width:26px;height:26px;background:#063327;color:#fff;
+  flex:none;width:26px;height:26px;border-radius:50%;background:#063327;color:#fff;
   display:inline-flex;align-items:center;justify-content:center;
   font-family:var(--body)!important;font-size:12px;line-height:18px;
 }
@@ -1922,13 +1926,15 @@ const CSS = `
 .kct-review--big{
   width:452px;min-height:415px;border-radius:16px;
   grid-template-columns:124px minmax(0,1fr);
-  grid-template-areas:"photo photo" "who who" "quote quote" "rate rate";
-  align-content:start;row-gap:16px;
+  grid-template-areas:"photo who" "photo rate" "quote quote";
+  align-content:start;column-gap:26px;row-gap:16px;
   background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
 }
 .kct-review--big .kct-review-avatar{
-  grid-area:photo;width:124px;height:124px;border-radius:12px;
+  grid-area:photo;width:124px;height:124px;border-radius:12px;align-self:start;
 }
+.kct-review--big .kct-review-who{align-self:end;}
+.kct-review--big .kct-rev-rate{align-self:start;}
 .kct-review--big .kct-review-quote{
   font-size:23px!important;font-weight:500!important;line-height:32px!important;
 }
