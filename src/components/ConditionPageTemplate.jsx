@@ -410,15 +410,15 @@ export default function ConditionPageTemplate({ data }) {
       {/* ── CTA band ───────────────────────────────────────────────────
           Full-bleed on the live page (1265px at 1280 viewport, radius 0), so it
           deliberately sits outside <Section>'s 980px .kct-in wrapper. */}
-      <section className="kct-ctaband">
-        <div className="kct-ctaband-in">
-          <p className="kct-cta-text">{d.ctaBand.text}</p>
-          <a href={d.ctaBand.cta.href} className="kct-btn-cta">
-            <span>{d.ctaBand.cta.label}</span>
-            <span className="kct-btn-cta-arrow" aria-hidden>→</span>
-          </a>
+      <Section className="kct-ctasec">
+        <div className="kct-bookband">
+          <span className="kct-bookband-art" aria-hidden />
+          <div className="kct-bookband-copy">
+            <p className="kct-band-p kct-band-p--lead">{d.ctaBand.text}</p>
+          </div>
+          <BookButton href={d.ctaBand.cta.href}>{d.ctaBand.cta.label}</BookButton>
         </div>
-      </section>
+      </Section>
 
       {/* ── About the condition ──────────────────────────────────────────
           One band in the design: the explanation in a card beside a photo,
@@ -508,7 +508,7 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Mid CTA band ───────────────────────────────────────────────── */}
-      <Section>
+      <Section className="kct-ctasec">
         <div className="kct-bookband">
           <span className="kct-bookband-art" aria-hidden />
           <div className="kct-bookband-copy">
@@ -550,7 +550,7 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Book band ──────────────────────────────────────────────────── */}
-      <Section>
+      <Section className="kct-ctasec">
         {/* A soft green strip: a picture, the line, and the button on the end. */}
         <div className="kct-bookband">
           <span className="kct-bookband-art" aria-hidden />
@@ -620,7 +620,7 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Final CTA ──────────────────────────────────────────────────── */}
-      <Section>
+      <Section className="kct-ctasec">
         <div className="kct-bookband">
           <span className="kct-bookband-art" aria-hidden />
           <div className="kct-bookband-copy">
@@ -772,7 +772,7 @@ const CSS = `
 /* The design lays the page out on a 1140 column inside a 1920 frame. Below
    1180 it shrinks with the viewport, and at tablet and phone the gutter
    narrows to the 16px the mobile frame uses (358 inside 390). */
-.kct-sec{padding:64px 0;}
+.kct-sec{padding:80px 0;}
 /* 1140 of content, not 1140 including the gutter. Every section in the design
    runs 390 to 1530 on a 1920 frame — the plans row is four 267 cards 24 apart,
    the blogs three 358.7 cards 32 apart, both exactly 1140 — and the column was
@@ -805,9 +805,9 @@ const CSS = `
 }
 .kct-sub{
   font-family:var(--body)!important;font-size:16px!important;font-weight:400!important;
-  line-height:1.6em!important;letter-spacing:0!important;color:var(--ink)!important;margin:12px 0 0;
+  line-height:24px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:8px 0 0;
 }
-.kct-sub.kct-center{max-width:44em;margin-left:auto;margin-right:auto;}
+.kct-sub.kct-center{max-width:630px;margin-left:auto;margin-right:auto;}
 .kct-kicker{
   font-family:var(--body)!important;font-size:13px!important;font-weight:400!important;
   line-height:1.4em!important;letter-spacing:0!important;color:var(--ink)!important;
@@ -815,7 +815,7 @@ const CSS = `
 }
 
 /* hero ------------------------------------------------------------------ */
-.kct-hero{padding-top:56px;padding-bottom:80px;}
+.kct-hero{padding-top:0;padding-bottom:80px;}
 .kct-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 374px;gap:56px;align-items:center;}
 /* The text column stacks 8 / 12 / 11.3 in the design; the heading and lede
    carry no margin of their own so the gaps come only from here. */
@@ -1213,7 +1213,6 @@ const CSS = `
 
    The cards are a lift off the band rather than a different colour, which is
    what keeps them legible on it. */
-.kct-on-dark{padding:80px 0;}
 .kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:stretch;}
 .kct-why-media{
   position:relative;height:auto;min-height:427.72px;border-radius:12px;overflow:hidden;
@@ -1250,10 +1249,11 @@ const CSS = `
 /* Plans -------------------------------------------------------------------
    Four across, white on a hairline, with the price as a pill at the foot. The
    cards stretch so the pills line up however long the copy runs. */
-.kct-grid-4--plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin-top:32px;align-items:stretch;}
+.kct-grid-4--plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin-top:40px;align-items:stretch;}
 .kct-card--plan{
   display:flex;flex-direction:column;
-  background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:20px;
+  min-height:298px;
+  background:#FAFCF9;border:1px solid var(--s-green-2);border-radius:12px;padding:25px;
 }
 .kct-card--plan .kct-card-t,.kct-card--plan .kct-card-t:not(#_){
   font-family:var(--sans)!important;font-size:20px!important;font-weight:600!important;
@@ -1266,10 +1266,10 @@ const CSS = `
 .kct-price{
   display:inline-flex;align-items:center;justify-content:center;
   margin-top:auto;padding-top:0;
-  background:#fff;border:1px solid var(--s-green-1);border-radius:999px;
-  height:40px;padding:8px 18px;
-  font-family:var(--body)!important;font-size:14px!important;font-weight:500!important;
-  line-height:22px!important;letter-spacing:0!important;color:var(--p-dark)!important;
+  background:#fff;border:1px solid var(--s-green-2);border-radius:8px;
+  height:40px;padding:8px 18px;width:100%;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:500!important;
+  line-height:24px!important;letter-spacing:0!important;color:var(--p-dark)!important;
 }
 .kct-card--plan .kct-price{margin-top:auto;}
 
@@ -1387,22 +1387,22 @@ const CSS = `
 /* Book band ---------------------------------------------------------------
    Picture, line, button — on one soft green strip. */
 .kct-bookband{
-  display:flex;align-items:center;gap:24px;
-  background:linear-gradient(180deg,#F4FBF0 0%,#EAF7E4 100%);
-  border:1px solid var(--s-green-2);border-radius:16px;padding:16px;
+  display:flex;align-items:center;gap:24px;min-height:182px;
+  background:linear-gradient(135deg,#FFFFFF 0%,#E8F1E1 100%);
+  border:1px solid var(--s-green-2);border-radius:16px;padding:40px;
 }
 .kct-bookband-art{
-  flex:none;width:104px;height:72px;border-radius:10px;
+  flex:none;width:168px;height:100px;border-radius:8px;
   background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
 }
 .kct-bookband-copy{flex:1;min-width:0;}
 .kct-bookband .kct-band-h,.kct-bookband .kct-band-h:not(#_){
-  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
-  line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
+  font-family:var(--sans)!important;font-size:20px!important;font-weight:600!important;
+  line-height:30px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
 }
 .kct-bookband .kct-band-p{
-  font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:2px 0 0;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:400!important;
+  line-height:24px!important;letter-spacing:0!important;color:var(--t-body)!important;margin:2px 0 0;
 }
 @media (max-width:640px){
   .kct-bookband{flex-direction:column;align-items:stretch;text-align:center;}
@@ -1417,6 +1417,13 @@ const CSS = `
 .kct-seek--soft .kct-seek-row.is-open{background:var(--bg-soft);border-color:var(--s-1);}
 .kct-seek--soft .kct-seek-t{font-size:18px!important;line-height:26px!important;font-weight:500!important;}
 .kct-band-p--lead{font-size:16px!important;line-height:24px!important;color:var(--t-primary)!important;}
+/* The strip's one line is Poppins 20/30, and its button is 161x48 rather
+   than the 122x40 the hero uses. */
+.kct-bookband .kct-band-p--lead,.kct-bookband .kct-band-p--lead:not(#_){
+  font-family:var(--sans)!important;font-size:20px!important;font-weight:600!important;
+  line-height:30px!important;color:var(--t-primary)!important;
+}
+.kct-bookband .kct-btn-solid{flex:none;height:48px;min-width:161px;}
 
 
 /* Types we treat ----------------------------------------------------------
