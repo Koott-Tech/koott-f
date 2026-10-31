@@ -73,10 +73,13 @@ const ReviewRating = ({ source }) => (
 );
 
 /** A review as the design draws it: 192 tall in a column, or 415 on its own. */
-const ReviewCard = ({ r, big = false }) => (
+const REVIEW_FACES = ['/design/review-1.webp', '/design/review-2.webp',
+  '/design/review-4.webp', '/design/review-3.webp', '/design/review-1.webp'];
+
+const ReviewCard = ({ r, i = 0, big = false }) => (
   <figure className={`kct-review ${big ? 'kct-review--big' : ''}`}>
     <span className="kct-review-avatar">
-      {r.avatar && <img src={r.avatar} alt="" loading="lazy" />}
+      <img src={r.avatar || REVIEW_FACES[i % REVIEW_FACES.length]} alt="" loading="lazy" />
     </span>
     <figcaption className="kct-review-who">
       <span className="kct-review-name">{r.name}</span>
@@ -350,7 +353,7 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Therapists ─────────────────────────────────────────────────── */}
-      <Section bg="linear-gradient(180deg,#E5F0DD 0%,#FFFFFF 100%)">
+      <Section bg="linear-gradient(180deg,#E8F2E1 0%,rgba(190,219,172,0) 100%)">
         {/* The design is the heading, the cards, then one button. There is no
             filter row on it, and the dropdowns that used to sit here were
             decorative — buttons with no handler — so they are gone rather than
@@ -443,11 +446,11 @@ export default function ConditionPageTemplate({ data }) {
           {[0, 1].map((pass) => (
             <div className="kct-rev-set" key={pass} aria-hidden={pass === 1 || undefined}>
               <div className="kct-rev-col kct-rev-col--a">
-                {d.reviews.items.slice(0, 2).map((r, i) => <ReviewCard key={i} r={r} />)}
+                {d.reviews.items.slice(0, 2).map((r, i) => <ReviewCard key={i} r={r} i={i} />)}
               </div>
-              {d.reviews.items[2] && <ReviewCard r={d.reviews.items[2]} big />}
+              {d.reviews.items[2] && <ReviewCard r={d.reviews.items[2]} i={2} big />}
               <div className="kct-rev-col kct-rev-col--b">
-                {d.reviews.items.slice(3, 5).map((r, i) => <ReviewCard key={i} r={r} />)}
+                {d.reviews.items.slice(3, 5).map((r, i) => <ReviewCard key={i} r={r} i={i + 3} />)}
               </div>
             </div>
           ))}
@@ -1274,7 +1277,7 @@ const CSS = `
 .kct-step-b{
   margin:4px 0 0;
   font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
-  line-height:22px!important;letter-spacing:0!important;color:var(--t-body)!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--t-soft)!important;
 }
 
 
@@ -1463,7 +1466,7 @@ const CSS = `
    Picture, line, button — on one soft green strip. */
 .kct-bookband{
   display:flex;align-items:center;gap:24px;min-height:182px;
-  background:linear-gradient(135deg,#FFFFFF 0%,#E8F1E1 100%);
+  background:linear-gradient(180deg,#FFFFFF 0%,#E7F1DF 100%);
   border:1px solid var(--s-green-2);border-radius:16px;padding:40px;
 }
 .kct-bookband-art{
@@ -1912,6 +1915,7 @@ const CSS = `
   grid-area:avatar;flex:none;width:40px;height:40px;border-radius:50%;
   overflow:hidden;background:rgba(255,255,255,.14);display:inline-flex;
 }
+.kct-review-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
 .kct-review-who{grid-area:who;display:flex;flex-direction:column;min-width:0;}
 .kct-review-name,.kct-review-name:not(#_){
   font-family:var(--body)!important;font-size:16px!important;font-weight:500!important;
