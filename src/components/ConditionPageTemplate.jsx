@@ -509,7 +509,7 @@ export default function ConditionPageTemplate({ data }) {
       {/* ── Mid CTA band ───────────────────────────────────────────────── */}
       <Section className="kct-ctasec">
         <div className="kct-bookband">
-          <span className="kct-bookband-art" aria-hidden />
+          <span className="kct-bookband-art kct-bookband-art--b" aria-hidden />
           <div className="kct-bookband-copy">
             <p className="kct-band-p kct-band-p--lead">{d.midCta.text}</p>
           </div>
@@ -552,7 +552,7 @@ export default function ConditionPageTemplate({ data }) {
       <Section className="kct-ctasec">
         {/* A soft green strip: a picture, the line, and the button on the end. */}
         <div className="kct-bookband">
-          <span className="kct-bookband-art" aria-hidden />
+          <span className="kct-bookband-art kct-bookband-art--c" aria-hidden />
           <div className="kct-bookband-copy">
             <h4 className="kct-band-h">{d.bookBand.title}</h4>
             <p className="kct-band-p">{d.bookBand.text}</p>
@@ -828,10 +828,11 @@ const CSS = `
   line-height:18px!important;letter-spacing:0!important;color:var(--t-soft)!important;
   margin:4px 0 0;
 }
+.kct-tick{color:#3D985C;}
 .kct-tick{color:var(--p-main);}
 .kct-hero-media{
   position:relative;width:374px;height:374px;border-radius:10px;overflow:hidden;
-  background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+  background:#EFF4F0 url('/design/hero.webp') center/cover no-repeat;
   display:flex;align-items:center;justify-content:center;
 }
 .kct-play{
@@ -1190,7 +1191,7 @@ const CSS = `
 .kct-step-copy{min-width:0;}
 .kct-step-t,.kct-step-t:not(#_){
   margin:0;
-  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  font-family:var(--body)!important;font-size:18px!important;font-weight:500!important;
   line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;
 }
 .kct-num{
@@ -1217,9 +1218,9 @@ const CSS = `
    what keeps them legible on it. */
 .kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:stretch;}
 .kct-why-media{
-  position:relative;height:auto;min-height:427.72px;border-radius:12px;overflow:hidden;
+  position:relative;height:auto;min-height:427.72px;border-radius:10px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(180deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 100%);
+  background:#0A4636 url('/design/why-video.webp') center/cover no-repeat;
 }
 .kct-why-body{min-width:0;}
 .kct-on-dark .kct-h2,.kct-on-dark .kct-h2:not(#_){color:#fff!important;}
@@ -1236,11 +1237,11 @@ const CSS = `
   filter:drop-shadow(0 6px 10px rgba(2,85,69,.3));
 }
 .kct-on-dark .kct-card--solid{
-  background:linear-gradient(180deg,#094334 0%,#0E765C 100%);
+  background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
   border:0;border-radius:10px;padding:16px;min-height:141.52px;
 }
 .kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
-  font-family:var(--sans)!important;font-size:18px!important;font-weight:600!important;
+  font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;letter-spacing:0!important;color:#fff!important;margin:0;
 }
 .kct-on-dark .kct-card-b{
@@ -1284,7 +1285,7 @@ const CSS = `
 .kct-about-card{background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:24px;}
 .kct-about-media{
   border-radius:12px;min-height:300px;align-self:stretch;
-  background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+  background:#EFF4F0 url('/design/about.webp') center/cover no-repeat;
 }
 .kct-about .kct-prose p{
   font-family:var(--body)!important;font-size:14px!important;font-weight:400!important;
@@ -1375,7 +1376,7 @@ const CSS = `
   background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--t-muted);
 }
 .kct-seek-t{
-  font-family:var(--sans)!important;font-size:24px!important;font-weight:600!important;
+  font-family:var(--body)!important;font-size:24px!important;font-weight:600!important;
   line-height:32px!important;letter-spacing:0!important;color:var(--t-primary)!important;
 }
 .kct-seek-head svg{flex:none;transition:transform .15s ease;}
@@ -1395,8 +1396,10 @@ const CSS = `
 }
 .kct-bookband-art{
   flex:none;width:168px;height:100px;border-radius:8px;
-  background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+  background:#EFF4F0 url('/design/cta-1.webp') center/cover no-repeat;
 }
+.kct-bookband-art--b{background-image:url('/design/cta-2.webp');}
+.kct-bookband-art--c{background-image:url('/design/cta-3.webp');}
 .kct-bookband-copy{flex:1;min-width:0;}
 .kct-bookband .kct-band-h,.kct-bookband .kct-band-h:not(#_){
   font-family:var(--sans)!important;font-size:20px!important;font-weight:600!important;
@@ -1444,18 +1447,19 @@ const CSS = `
   justify-content:center;margin-top:40px;
 }
 .kct-helps-media span{
-  height:134px;border-radius:67px;
-  background:linear-gradient(135deg,#E8EFE5 0%,#CFE3D4 100%);
+  height:134px;border-radius:67px;background:#EFF4F0 center/cover no-repeat;
 }
+.kct-helps-media span:first-child{background-image:url('/design/hero.webp');}
+.kct-helps-media span:last-child{background-image:url('/design/helps-2.webp');}
 .kct-seek--soft{max-width:752px;gap:16px;margin-top:24px;}
 .kct-seek--soft .kct-seek-row{background:#F9F9F9;border-color:#F4F4F4;padding:15px 16px;}
 .kct-seek--soft .kct-seek-row.is-open{background:#F9F9F9;border-color:#F4F4F4;}
-.kct-seek--soft .kct-seek-t{font-size:18px!important;line-height:26px!important;font-weight:500!important;}
+.kct-seek--soft .kct-seek-t{font-size:18px!important;line-height:26px!important;font-weight:600!important;}
 .kct-band-p--lead{font-size:16px!important;line-height:24px!important;color:var(--t-primary)!important;}
 /* The strip's one line is Poppins 20/30, and its button is 161x48 rather
    than the 122x40 the hero uses. */
 .kct-bookband .kct-band-p--lead,.kct-bookband .kct-band-p--lead:not(#_){
-  font-family:var(--sans)!important;font-size:20px!important;font-weight:600!important;
+  font-family:var(--sans)!important;font-size:20px!important;font-weight:500!important;
   line-height:30px!important;color:var(--t-primary)!important;
 }
 .kct-bookband .kct-btn-solid{flex:none;height:48px;min-width:161px;}
@@ -1467,7 +1471,7 @@ const CSS = `
 .kct-types{display:grid;grid-template-columns:372px minmax(0,1fr);gap:32px;align-items:start;}
 .kct-types-art{
   border-radius:12px;min-height:420px;align-self:stretch;
-  background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
+  background:#EFF4F0 url('/design/types.webp') center/cover no-repeat;
 }
 .kct-types-body .kct-sub{margin:8px 0 0;}
 .kct-seek--flush{max-width:none;margin-left:0;margin-right:0;}
