@@ -543,17 +543,6 @@ export default function ConditionPageTemplate({ data }) {
         </div>
       </Section>
 
-      {/* ── Mid CTA band ───────────────────────────────────────────────── */}
-      <Section className="kct-ctasec">
-        <div className="kct-bookband">
-          <span className="kct-bookband-art kct-bookband-art--b" aria-hidden />
-          <div className="kct-bookband-copy">
-            <p className="kct-band-p kct-band-p--lead">{d.midCta.text}</p>
-          </div>
-          <BookButton href={d.midCta.cta.href}>{d.midCta.cta.label}</BookButton>
-        </div>
-      </Section>
-
       {/* ── When to seek help ──────────────────────────────────────────── */}
       <Section className="kct-seek-sec">
         <div className="kct-seekhelp">
@@ -591,7 +580,7 @@ export default function ConditionPageTemplate({ data }) {
       <Section className="kct-ctasec">
         {/* A soft green strip: a picture, the line, and the button on the end. */}
         <div className="kct-bookband">
-          <span className="kct-bookband-art kct-bookband-art--c" aria-hidden />
+          <span className="kct-bookband-art kct-bookband-art--b" aria-hidden />
           <div className="kct-bookband-copy">
             <h4 className="kct-band-h">{d.bookBand.title}</h4>
             <p className="kct-band-p">{d.bookBand.text}</p>
@@ -663,7 +652,7 @@ export default function ConditionPageTemplate({ data }) {
       {/* ── Final CTA ──────────────────────────────────────────────────── */}
       <Section className="kct-ctasec">
         <div className="kct-bookband">
-          <span className="kct-bookband-art" aria-hidden />
+          <span className="kct-bookband-art kct-bookband-art--c" aria-hidden />
           <div className="kct-bookband-copy">
             <p className="kct-band-p kct-band-p--lead">{d.finalCta.text}</p>
           </div>
