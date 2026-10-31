@@ -1291,9 +1291,11 @@ const CSS = `
 
    The cards are a lift off the band rather than a different colour, which is
    what keeps them legible on it. */
+/* asked to sit under the design's 587.72: 56 of padding, not 80 */
+.kct-on-dark{padding:56px 0;}
 .kct-why{display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:stretch;}
 .kct-why-media{
-  position:relative;height:auto;min-height:427.72px;border-radius:10px;overflow:hidden;
+  position:relative;height:auto;min-height:0;border-radius:10px;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
   background:#0A4636 url('/design/why-video.webp') center/cover no-repeat;
 }
@@ -1302,8 +1304,8 @@ const CSS = `
 .kct-on-dark .kct-sub{color:#fff!important;font-size:16px!important;line-height:24px!important;margin-top:8px;}
 .kct-why-grid{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(2,minmax(141.52px,auto));grid-auto-flow:column;
-  column-gap:16px;row-gap:16px;margin-top:24px;
+  grid-template-rows:repeat(2,minmax(124px,auto));grid-auto-flow:column;
+  column-gap:16px;row-gap:12px;margin-top:20px;
 }
 .kct-why .kct-fig-play{
   position:absolute;width:72px;height:72px;border-radius:50%;
@@ -1313,7 +1315,7 @@ const CSS = `
 }
 .kct-on-dark .kct-card--solid{
   background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
-  border:0;border-radius:10px;padding:16px;min-height:141.52px;
+  border:0;border-radius:10px;padding:14px 16px;min-height:124px;
 }
 .kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
