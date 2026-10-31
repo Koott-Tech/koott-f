@@ -1331,7 +1331,8 @@ const CSS = `
    big review card: grain 1.5, density 100, black and white at 25%, the
    layer itself at 25%. feTurbulence at 1/1.5 is the same grain; it sits
    under the copy, as the Rectangle it is attached to does in the file. */
-.kct-on-dark .kct-card--solid::before{
+.kct-on-dark .kct-card--solid::before,
+.kct-reviews-sec .kct-review::before{
   content:"";position:absolute;inset:0;border-radius:inherit;
   z-index:0;pointer-events:none;
   /* 3px cells in a 300 tile, drawn at 150 so each grain lands on 1.5px,
@@ -1340,6 +1341,11 @@ const CSS = `
   background:url('/design/noise.png') 0 0/150px 150px repeat;
 }
 .kct-on-dark .kct-card--solid > *{position:relative;z-index:1;}
+/* every card in the carousel carries its own grain, clipped to its own
+   box by border-radius:inherit, so it reads as texture on each card
+   rather than one field running behind the whole strip. */
+.kct-reviews-sec .kct-review{position:relative;isolation:isolate;}
+.kct-reviews-sec .kct-review > *{position:relative;z-index:1;}
 .kct-on-dark .kct-card-t,.kct-on-dark .kct-card-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;letter-spacing:0!important;color:#fff!important;margin:0;
