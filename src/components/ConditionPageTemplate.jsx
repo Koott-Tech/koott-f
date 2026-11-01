@@ -115,18 +115,19 @@ const ModeIcon = ({ name }) =>
  * avatars — and every one of the 45 pages carries the same four steps in the
  * same order, so they are keyed by position rather than authored per page.
  *
- * They are built from the therapists the page already loaded and from markup,
- * not from stock art: a slot that needed an asset nobody has would be an empty
- * frame on every page.
+ * The photographs are the design's own, pulled out of the .fig: the five
+ * portraits, the couple and the second avatar came from its images/ folder by
+ * content hash; the video-call therapist and the first avatar are not in that
+ * export, so those two are rendered off the 1920 PDF instead. The date strip
+ * and the call chrome stay as markup, as the design draws them.
  */
-function StepMedia({ step, therapists }) {
-  const faces = therapists.filter((t) => t.photo).slice(0, 5);
-
+function StepMedia({ step }) {
   if (step === 0) {
-    if (faces.length < 2) return null;
     return (
       <div className="kct-step-media kct-step-faces" aria-hidden>
-        {faces.map((t, i) => <img key={i} src={t.photo} alt="" loading="lazy" />)}
+        {[1, 2, 3, 4, 5].map((i) => (
+          <img key={i} src={`/design/steps/face-${i}.webp`} alt="" loading="lazy" />
+        ))}
       </div>
     );
   }
@@ -157,24 +158,24 @@ function StepMedia({ step, therapists }) {
   }
 
   if (step === 2) {
-    const who = faces[0];
     return (
       <div className="kct-step-media kct-step-call" aria-hidden>
-        <span className="kct-step-tile" />
+        <span className="kct-step-tile">
+          <img src="/design/steps/call-1.webp" alt="" loading="lazy" />
+        </span>
         <span className="kct-step-tile kct-step-tile--call">
-          {who && <img src={who.photo} alt="" loading="lazy" />}
+          <img src="/design/steps/call-2.webp" alt="" loading="lazy" />
           <span className="kct-step-dots"><i /><i /><i /></span>
         </span>
       </div>
     );
   }
 
-  if (faces.length < 2) return null;
   return (
     <div className="kct-step-media kct-step-pair" aria-hidden>
       <img className="kct-step-mark" src="/logo.png" alt="" loading="lazy" />
-      <img src={faces[0].photo} alt="" loading="lazy" />
-      <img src={faces[1].photo} alt="" loading="lazy" />
+      <img src="/design/steps/pair-1.webp" alt="" loading="lazy" />
+      <img src="/design/steps/pair-2.webp" alt="" loading="lazy" />
     </div>
   );
 }
@@ -391,7 +392,7 @@ export default function ConditionPageTemplate({ data }) {
                   <p className="kct-step-b">{s.body}</p>
                 </div>
               </div>
-              <StepMedia step={i} therapists={therapists} />
+              <StepMedia step={i} />
             </div>
           ))}
         </div>
@@ -1762,7 +1763,9 @@ const CSS = `
 }
 .kct-step-slot small{font-size:12px;line-height:18px;color:var(--t-primary);}
 .kct-step-slot b{font-size:16px;line-height:24px;font-weight:500;color:var(--p-dark);}
-.kct-step-call{gap:8px;}
+/* The design's two photos are 73 tall against the circles' 58, and they start
+   that much higher up the card — the 94 the media box runs stays the same. */
+.kct-step-call{gap:8px;padding-top:24px;}
 .kct-step-tile{
   position:relative;flex:1;height:70px;border-radius:8px;overflow:hidden;
   background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
