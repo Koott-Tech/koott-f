@@ -1865,7 +1865,11 @@ const CSS = `
   border-radius:12px;padding:24px;
 }
 .kct-about-card .kct-prose p{font-size:18px!important;line-height:26px!important;color:var(--t-body)!important;}
-.kct-about-media{min-height:366px;border-radius:0;}
+/* 16, not the card's 12 and not the 0 this carried: the file clips the
+   photo to a rounded frame. Measured off the 1920 render, where a true
+   12 corner reads 10.4, a 16 reads 14.4 and a 32 reads 29.5 -- this one
+   reads 14.2. */
+.kct-about-media{min-height:366px;border-radius:16px;}
 .kct-pillars{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:32px;}
 .kct-pillar{
   min-height:134.52px;background:#fff;border:1px solid var(--s-green-2);
