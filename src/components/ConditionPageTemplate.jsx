@@ -1552,7 +1552,7 @@ const CSS = `
 .kct-blog{min-height:346px;}
 .kct-faq-row{padding:17px;min-height:60px;}
 .kct-reviews-sec .kct-kicker{display:none;}
-.kct-reviews{margin-top:48px;min-height:415px;}
+.kct-reviews{margin-top:32px;min-height:415px;}
 .kct-therapists{margin-top:24px;}
 .kct-more{margin:24px 0 0;}
 .kct-helps-media{
@@ -1635,11 +1635,13 @@ const CSS = `
    A Primary Darkest band with the quotes in a column layout, as the design
    draws it: cards of different heights packed into four columns rather than a
    row of equal boxes. The cards are a lift off the band, like the Why ones. */
-/* asked to come in under the design's 703: the band's own padding drops
-   from the page's 80 to 56 and the carousel sits 48 under the heading
-   rather than 80, which takes the section to 623. The cards are
-   untouched -- the 415 column is what the file draws. */
-.kct-reviews-sec{background:var(--p-darkest);padding:56px 0;}
+/* asked twice to come in under the design's 703. All of it comes out of
+   the band's own chrome -- 40 of padding against the page's 80, and the
+   carousel 32 under the heading rather than 80 -- which takes the section
+   to 575. The 415 card column is left alone: a small card is 20 of
+   padding, a 40 avatar row, three 22 quote lines and a 26 footer, so it
+   cannot lose height without losing a line of the quote. */
+.kct-reviews-sec{background:var(--p-darkest);padding:40px 0;}
 .kct-reviews-sec .kct-kicker{color:rgba(255,255,255,.72)!important;}
 .kct-reviews-h,.kct-reviews-h:not(#_){color:#fff!important;margin:0 0 28px;}
 .kct-reviews{
@@ -1941,7 +1943,7 @@ const CSS = `
      slides exactly one set's width, so the loop is seamless and there is
      no scroll container to clip a card or show a bar. */
   position:relative;display:block;overflow:hidden;padding:0;
-  margin:48px calc(50% - 50vw) 0 calc(50% - 50vw);
+  margin:32px calc(50% - 50vw) 0 calc(50% - 50vw);
 }
 /* The file ends the strip with blurred plates — 189x604 of #063327 at
    88% under an 87 blur, one left and two stacked right. Taken out on
