@@ -1946,9 +1946,27 @@ const CSS = `
   .kct-h2,.kct-h2:not(#_){font-size:24px!important;line-height:32px!important;}
   /* The video sits above the words on the phone, as the frame shows. */
   .kct-hero-grid > div:first-child{order:2;}
-  .kct-hero-media{order:1;max-width:none;aspect-ratio:358/230;}
-  .kct-hero-cta{gap:12px;}
-  .kct-hero-cta > *{flex:1 1 auto;}
+  /* 358x167 in the 390 frame, measured off the mobile file -- a letterbox,
+     not the 358x230 this carried. */
+  .kct-hero-media{order:1;max-width:none;aspect-ratio:358/167;}
+  .kct-hero-grid{gap:24px;}
+  /* The file draws the two buttons at 168 and 170 on a 16 gutter: near
+     enough an even split of the 358 column, so they share it. */
+  .kct-hero-cta{gap:16px;width:100%;}
+  .kct-hero-cta > *{flex:1 1 0;min-width:0;}
+  /* The mobile file opens on the video and goes straight to the heading --
+     the "Trusted by millions" line is desktop only. */
+  .kct-hero .kct-eyebrow{display:none;}
+  /* The mobile file sets the lede at 14/22, not the desktop 16/24: three
+     lines in the 358 column rather than four. */
+  .kct-lede,.kct-lede:not(#_){font-size:14px!important;line-height:22px!important;}
+  /* Glyph-to-glyph against the file: heading to lede 114, lede to the
+     verified line 81, verified to the buttons 59. The line boxes alone give
+     108/76/54, so each gap takes the difference as margin. */
+  .kct-hero .kct-h1,.kct-hero .kct-h1:not(#_){margin-bottom:6px;}
+  .kct-hero .kct-verified{margin-top:9px;}
+  .kct-hero .kct-hero-cta{margin-top:16px;}
+  .kct-stat{min-height:104px;padding:16px;}
   .kct-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:24px;}
   .kct-stat-v,.kct-stat-v:not(#_){line-height:32px!important;}
   .kct-stat-l{font-size:12px!important;line-height:18px!important;}
