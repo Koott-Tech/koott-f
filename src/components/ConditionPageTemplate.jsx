@@ -1858,7 +1858,11 @@ const CSS = `
   border-radius:12px;padding:24px;
 }
 
-.kct-symptoms-sec{padding:0 0 80px;}
+/* The 80 the About band carries at its foot is inside the grey, so it
+   is not the gap: the file leaves another 80 of page white between the
+   band and this card (Frame 76 ends at 843.04, Frame 146 starts at 923).
+   Without it the card's top edge lands exactly on the colour change. */
+.kct-symptoms-sec{padding:80px 0;}
 .kct-symptoms{
   max-width:1140px;margin:0 auto;padding:64px 16px;
   background:#fff;border:0;border-radius:32px;
