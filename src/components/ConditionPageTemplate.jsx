@@ -51,22 +51,23 @@ const Icon = ({ name, size = 15, fill = '#189E4F', className = '' }) => {
 };
 
 /** Fallback marks for review sources when no logo URL is supplied. */
-const SOURCE_MARK = { google: 'G', whatsapp: '✆', zoho: 'Z' };
+
 
 /** The four-colour Google mark, 38x38 in the reviews heading. */
-const GoogleMark = () => (
-  <svg viewBox="0 0 48 48" width="38" height="38" aria-hidden focusable="false">
-    <path fill="#FBBB00" d="M10.6 28.7 9 34.9l-6.1.1A24 24 0 0 1 2.7 13l5.4 1 2.4 5.4a14.3 14.3 0 0 0 .1 9.3z" />
-    <path fill="#518EF8" d="M47.6 19.5a24 24 0 0 1-8.5 23.2l-6.8-.3-1-6a14.3 14.3 0 0 0 6.2-7.3H24.5v-9.6h23.1z" />
-    <path fill="#28B446" d="M39.1 42.7A24 24 0 0 1 9 34.9l7.6-6.2a14.3 14.3 0 0 0 20.6 7.3z" />
-    <path fill="#F14336" d="M39.4 5.6 31.8 11.8a14.3 14.3 0 0 0-21.1 7.6l-7.6-6.3A24 24 0 0 1 39.4 5.6z" />
+const GoogleMark = ({ size = 38 }) => (
+  <svg viewBox="0 0 48 48" width={size} height={size} aria-hidden focusable="false">
+    <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z" />
+    <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z" />
+    <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z" />
+    <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z" />
   </svg>
 );
 
-/** The rating line a review card ends on: the source badge, 4.9/5, stars. */
-const ReviewRating = ({ source }) => (
+/* The design badges every card with Google's G -- this is the Google review
+   band -- rather than the review's own source, so that is what is drawn. */
+const ReviewRating = () => (
   <span className="kct-rev-rate">
-    <span className="kct-rev-src">{SOURCE_MARK[source] || '★'}</span>
+    <span className="kct-rev-src">G</span>
     <span className="kct-rev-score">4.9/5</span>
     <span className="kct-rev-stars">★★★★★</span>
   </span>
@@ -88,7 +89,7 @@ const ReviewCard = ({ r, big = false }) => (
       {r.age && <span className="kct-review-age">{r.age}</span>}
     </figcaption>
     <blockquote className="kct-review-quote">{r.quote}</blockquote>
-    <ReviewRating source={r.source} />
+    <ReviewRating />
   </figure>
 );
 
@@ -1551,7 +1552,7 @@ const CSS = `
 .kct-blog{min-height:346px;}
 .kct-faq-row{padding:17px;min-height:60px;}
 .kct-reviews-sec .kct-kicker{display:none;}
-.kct-reviews{margin-top:80px;min-height:415px;}
+.kct-reviews{margin-top:48px;min-height:415px;}
 .kct-therapists{margin-top:24px;}
 .kct-more{margin:24px 0 0;}
 .kct-helps-media{
@@ -1634,7 +1635,11 @@ const CSS = `
    A Primary Darkest band with the quotes in a column layout, as the design
    draws it: cards of different heights packed into four columns rather than a
    row of equal boxes. The cards are a lift off the band, like the Why ones. */
-.kct-reviews-sec{background:var(--p-darkest);}
+/* asked to come in under the design's 703: the band's own padding drops
+   from the page's 80 to 56 and the carousel sits 48 under the heading
+   rather than 80, which takes the section to 623. The cards are
+   untouched -- the 415 column is what the file draws. */
+.kct-reviews-sec{background:var(--p-darkest);padding:56px 0;}
 .kct-reviews-sec .kct-kicker{color:rgba(255,255,255,.72)!important;}
 .kct-reviews-h,.kct-reviews-h:not(#_){color:#fff!important;margin:0 0 28px;}
 .kct-reviews{
@@ -1936,7 +1941,7 @@ const CSS = `
      slides exactly one set's width, so the loop is seamless and there is
      no scroll container to clip a card or show a bar. */
   position:relative;display:block;overflow:hidden;padding:0;
-  margin:80px calc(50% - 50vw) 0 calc(50% - 50vw);
+  margin:48px calc(50% - 50vw) 0 calc(50% - 50vw);
 }
 /* The file ends the strip with blurred plates — 189x604 of #063327 at
    88% under an 87 blur, one left and two stacked right. Taken out on
