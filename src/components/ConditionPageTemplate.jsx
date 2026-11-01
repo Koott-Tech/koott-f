@@ -6,6 +6,7 @@ import { toCard } from './BookMalayaliPsychologists';
 import { ResumeBooking } from './ResumeBookingCard';
 import { publicApi } from '@/lib/backendApi';
 import { blogApi } from '@/lib/blogApi';
+import { screenerFor, scoreScreener, FREQUENCY, CRISIS_LINES } from '@/data/screeners';
 
 /**
  * ConditionPageTemplate — layout for condition / counselling landing pages.
@@ -232,10 +233,23 @@ export default function ConditionPageTemplate({ data }) {
   // The symptom checklist: which signs are ticked, and which one is open.
   const [checked, setChecked] = useState([]);
   const [openSign, setOpenSign] = useState(0);
+  /* Where a condition has a validated instrument, the symptom list becomes
+     that questionnaire instead of a tick-list. Answers are component state
+     and nothing else: they are never stored, and never leave the page. */
+  const [answers, setAnswers] = useState([]);
   const [openSeek, setOpenSeek] = useState(0);
   const [openHelp, setOpenHelp] = useState(0);
   const [openType, setOpenType] = useState(0);
   const [posts, setPosts] = useState([]);
+
+  /* Null on the pages with no validated instrument -- most of them -- and
+     those keep the plain checklist, which counts what someone recognises
+     and is never shown as a score. */
+  const screener = useMemo(() => screenerFor(data.slug), [data.slug]);
+  const result = useMemo(
+    () => (screener ? scoreScreener(screener, answers) : null),
+    [screener, answers],
+  );
 
   /**
    * The blogs strip near the foot of the page. The condition pages carry no
@@ -511,55 +525,159 @@ export default function ConditionPageTemplate({ data }) {
           <h2 className="kct-h2 kct-center">{d.symptoms.title}</h2>
           <p className="kct-sub kct-center">{d.symptoms.subtitle}</p>
 
-          <ul className="kct-signs">
-            {d.symptoms.items.map((it, i) => {
-              const on = checked.includes(i);
-              const open = openSign === i;
-              return (
-                <li key={i} className={`kct-sign ${open ? 'is-open' : ''}`}>
-                  <div className="kct-sign-row">
-                    <label className="kct-sign-tick">
-                      <input
-                        type="checkbox"
-                        checked={on}
-                        onChange={() => setChecked((p) => (on ? p.filter((x) => x !== i) : [...p, i]))}
-                      />
-                      <span aria-hidden />
-                      <span className="kct-sign-t">{it.title}</span>
-                    </label>
-                    <button
-                      type="button"
-                      className="kct-sign-more"
-                      aria-expanded={open}
-                      aria-label={open ? `Hide what ${it.title} means` : `What ${it.title} means`}
-                      onClick={() => setOpenSign(open ? -1 : i)}
-                    >
-                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
-                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M6 9l6 6 6-6" />
-                      </svg>
-                    </button>
-                  </div>
-                  {open && <p className="kct-sign-b">{it.body}</p>}
-                </li>
-              );
-            })}
-          </ul>
+          {screener ? (
+            <>
+              <p className="kct-scr-lead">{screener.leadIn}</p>
+              <ol className="kct-scr">
+                {screener.items.map((text, i) => (
+                  <li
+                    key={i}
+                    className={`kct-scr-row ${Number.isInteger(answers[i]) ? 'is-answered' : ''}`}
+                  >
+                    <p className="kct-scr-q">
+                      <span className="kct-scr-n" aria-hidden>{i + 1}</span>
+                      {text}
+                    </p>
+                    <div className="kct-scr-opts" role="radiogroup" aria-label={text}>
+                      {FREQUENCY.map((o) => (
+                        <label
+                          key={o.value}
+                          className={`kct-scr-opt ${answers[i] === o.value ? 'is-on' : ''}`}
+                        >
+                          <input
+                            type="radio"
+                            name={`${screener.id}-${i}`}
+                            checked={answers[i] === o.value}
+                            onChange={() =>
+                              setAnswers((prev) => {
+                                const next = [...prev];
+                                next[i] = o.value;
+                                return next;
+                              })
+                            }
+                          />
+                          <span>{o.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ol>
 
-          <div className="kct-signs-out">
-            <span className="kct-signs-ico" aria-hidden>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
-                stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16.5v.01" />
-              </svg>
-            </span>
-            <p>
-              {checked.length === 0
-                ? 'Tick the signs you notice to see what they might mean.'
-                : `You ticked ${checked.length} of ${d.symptoms.items.length}. Talking it through with a therapist is a good next step.`}
-            </p>
-            <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
-          </div>
+              <div className={`kct-scr-out is-${result.tone}`} aria-live="polite">
+                {result.answered === 0 ? (
+                  <p className="kct-scr-msg">
+                    Answer all {screener.items.length} to see where you sit on the {screener.name}.
+                    Nothing you choose is saved or sent anywhere.
+                  </p>
+                ) : !result.complete ? (
+                  <>
+                    <p className="kct-scr-msg">
+                      {result.answered} of {screener.items.length} answered.
+                    </p>
+                    <div className="kct-scr-bar" aria-hidden>
+                      <i style={{ width: `${(result.answered / screener.items.length) * 100}%` }} />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="kct-scr-score">
+                      <b>{result.total}</b> <span>/ {screener.max}</span>
+                      <em>{result.band.label}</em>
+                    </p>
+                    <p className="kct-scr-msg">
+                      {result.refer
+                        ? `A ${screener.name} score of ${screener.referAt} or more is the point at which the people who built it suggest talking to someone who can look properly.`
+                        : 'That sits in the lower range. If it still does not feel right to you, that is reason enough to talk to someone.'}
+                    </p>
+                  </>
+                )}
+
+                {result.atRisk && (
+                  <div className="kct-scr-crisis" role="alert">
+                    <p>
+                      You said you have had thoughts of being better off dead or of hurting
+                      yourself. Please talk to someone now — these lines are free, open all hours,
+                      and you do not need an appointment.
+                    </p>
+                    <ul>
+                      {CRISIS_LINES.map((c) => (
+                        <li key={c.number}>
+                          <a href={`tel:${c.number.replace(/[^0-9+]/g, '')}`}>
+                            {c.name} {c.number}
+                          </a>
+                          <span>{c.note}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {result.offerBooking && (
+                  <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
+                )}
+
+                <p className="kct-scr-note">
+                  The {screener.name} is a screening and severity questionnaire, not a diagnosis.
+                  Only a qualified professional can tell you what is going on. {screener.credit}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <ul className="kct-signs">
+                {d.symptoms.items.map((it, i) => {
+                  const on = checked.includes(i);
+                  const open = openSign === i;
+                  return (
+                    <li key={i} className={`kct-sign ${open ? 'is-open' : ''}`}>
+                      <div className="kct-sign-row">
+                        <label className="kct-sign-tick">
+                          <input
+                            type="checkbox"
+                            checked={on}
+                            onChange={() =>
+                              setChecked((prev) => (on ? prev.filter((x) => x !== i) : [...prev, i]))
+                            }
+                          />
+                          <span aria-hidden />
+                          <span className="kct-sign-t">{it.title}</span>
+                        </label>
+                        <button
+                          type="button"
+                          className="kct-sign-more"
+                          aria-expanded={open}
+                          aria-label={open ? `Hide what ${it.title} means` : `What ${it.title} means`}
+                          onClick={() => setOpenSign(open ? -1 : i)}
+                        >
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M6 9l6 6 6-6" />
+                          </svg>
+                        </button>
+                      </div>
+                      {open && <p className="kct-sign-b">{it.body}</p>}
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <div className="kct-signs-out">
+                <span className="kct-signs-ico" aria-hidden>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+                    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                    <circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16.5v.01" />
+                  </svg>
+                </span>
+                <p>
+                  {checked.length === 0
+                    ? 'Tick the signs you notice to see what they might mean.'
+                    : `You ticked ${checked.length} of ${d.symptoms.items.length}. Talking it through with a therapist is a good next step.`}
+                </p>
+                <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
+              </div>
+            </>
+          )}
         </div>
       </Section>
 
@@ -1896,6 +2014,107 @@ const CSS = `
 .kct-sign-t,.kct-sign-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;color:var(--t-primary)!important;
+}
+
+
+/* Screener ----------------------------------------------------------------
+   On the pages that carry a validated instrument the symptom list becomes the
+   questionnaire itself: every item takes one of four frequency answers, and
+   the card below totals them against the published cut points. It keeps the
+   design's symptoms card -- the 663 column, the rows at radius 8 -- so the
+   section reads the same; only the row's right-hand side changes from a tick
+   to a four-way choice. */
+.kct-scr-lead{
+  max-width:663px;margin:0 auto 20px;text-align:center;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:500!important;
+  line-height:24px!important;color:var(--t-primary)!important;
+}
+.kct-scr{list-style:none;max-width:663px;margin:0 auto;padding:0;display:flex;flex-direction:column;gap:12px;}
+.kct-scr-row{
+  background:#fff;border:1px solid var(--s-green-2);border-radius:8px;padding:14px 16px;
+  transition:border-color .15s ease;
+}
+.kct-scr-row.is-answered{border-color:var(--s-green-1);}
+.kct-scr-q{
+  display:flex;gap:10px;margin:0 0 12px;
+  font-family:var(--body)!important;font-size:16px!important;font-weight:500!important;
+  line-height:24px!important;color:var(--t-primary)!important;
+}
+.kct-scr-n{
+  flex:none;width:22px;height:22px;margin-top:1px;border-radius:999px;
+  background:var(--p-light);color:var(--p-dark);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;line-height:18px;font-weight:600;
+}
+.kct-scr-opts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.kct-scr-opt{
+  position:relative;display:flex;align-items:center;justify-content:center;text-align:center;
+  min-height:44px;padding:6px 8px;border:1px solid var(--s-1);border-radius:8px;
+  cursor:pointer;background:#fff;transition:border-color .12s ease,background .12s ease;
+}
+.kct-scr-opt input{position:absolute;opacity:0;width:0;height:0;}
+.kct-scr-opt span{
+  font-family:var(--body)!important;font-size:13px!important;line-height:18px!important;
+  color:var(--t-secondary)!important;
+}
+.kct-scr-opt:hover{border-color:var(--s-green-1);}
+.kct-scr-opt.is-on{background:var(--p-light);border-color:var(--p-main);}
+.kct-scr-opt.is-on span{color:var(--p-dark)!important;font-weight:600!important;}
+.kct-scr-opt input:focus-visible + span{outline:2px solid var(--p-main);outline-offset:4px;border-radius:2px;}
+
+/* The result. Its tone is the whole point of the thing: green while the total
+   sits under the instrument's own referral cut point, amber at it, red above
+   it -- or straight to red, whatever the total, if the risk item is positive. */
+.kct-scr-out{
+  max-width:663px;margin:24px auto 0;padding:20px;border-radius:12px;
+  border:1px solid var(--s-green-2);background:#FAFCF9;
+  display:flex;flex-direction:column;align-items:flex-start;gap:12px;
+}
+.kct-scr-out.is-ok{border-color:#BFE3CB;background:#F3FBF4;}
+.kct-scr-out.is-warn{border-color:#F0C98A;background:#FDF7EC;}
+.kct-scr-out.is-high{border-color:#E9A79B;background:#FDF1EE;}
+.kct-scr-msg,.kct-scr-note{
+  margin:0;font-family:var(--body)!important;font-size:14px!important;
+  line-height:22px!important;color:var(--t-body)!important;text-align:left;
+}
+.kct-scr-note{font-size:12px!important;line-height:18px!important;color:var(--t-soft)!important;}
+.kct-scr-score{display:flex;align-items:baseline;gap:8px;margin:0;}
+.kct-scr-score b{
+  font-family:var(--body)!important;font-size:32px!important;font-weight:600!important;
+  line-height:40px!important;color:var(--t-primary)!important;
+}
+.kct-scr-score span{font-size:14px!important;line-height:22px!important;color:var(--t-muted)!important;}
+.kct-scr-score em{
+  font-style:normal;margin-left:4px;padding:4px 10px;border-radius:999px;
+  font-size:12px!important;line-height:18px!important;font-weight:600!important;
+}
+.is-ok .kct-scr-score em{background:#DDF1E1;color:#1B6930;}
+.is-warn .kct-scr-score em{background:#F8E4C4;color:#8A5A12;}
+.is-high .kct-scr-score em{background:#F7D9D2;color:#9A3B28;}
+.kct-scr-bar{width:100%;height:6px;border-radius:999px;background:#E8EFE5;overflow:hidden;}
+.kct-scr-bar i{display:block;height:100%;background:var(--p-main);transition:width .2s ease;}
+
+/* Shown whenever the risk item is answered at all, whatever the total says. */
+.kct-scr-crisis{
+  width:100%;padding:14px 16px;border-radius:10px;
+  background:#fff;border:1px solid #E9A79B;
+}
+.kct-scr-crisis p{
+  margin:0 0 10px;font-family:var(--body)!important;font-size:14px!important;
+  line-height:22px!important;color:var(--t-primary)!important;font-weight:500!important;
+}
+.kct-scr-crisis ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 20px;}
+.kct-scr-crisis li{display:flex;flex-direction:column;gap:2px;}
+.kct-scr-crisis a{
+  font-family:var(--body)!important;font-size:16px!important;font-weight:600!important;
+  line-height:24px!important;color:#9A3B28!important;text-decoration:none;
+}
+.kct-scr-crisis a:hover{text-decoration:underline;}
+.kct-scr-crisis span{font-size:12px!important;line-height:18px!important;color:var(--t-soft)!important;}
+
+@media (max-width:640px){
+  .kct-scr-opts{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .kct-scr-out{padding:16px;}
 }
 
 .kct-seek-sec{padding:0 0 80px;}
