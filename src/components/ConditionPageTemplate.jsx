@@ -777,6 +777,10 @@ const CSS = `
    Titles are Poppins, body is Inter, which is what globals.css already
    enforces; the sizes are this page's own and are set below. */
 .kct{
+  /* layout — the design's column is 1140; asked to pull the page in from
+     the sides, so every width below is written against this one number. */
+  --col:1080px;
+  --gut:24px;
   /* brand */
   --p-main:#189E4F;
   --p-light:#EFFFEA;
@@ -838,7 +842,7 @@ const CSS = `
    runs 390 to 1530 on a 1920 frame — the plans row is four 267 cards 24 apart,
    the blogs three 358.7 cards 32 apart, both exactly 1140 — and the column was
    24 short on each side of that. */
-.kct-in{max-width:1188px;margin:0 auto;padding:0 24px;}
+.kct-in{max-width:calc(var(--col) + var(--gut)*2);margin:0 auto;padding:0 var(--gut);}
 .kct-center{text-align:center!important;}
 
 /* Type, from the Figma text styles. H2/Web is 32 and H2/Mob is 24/32, so the
@@ -977,7 +981,7 @@ const CSS = `
 }
 /* .kct-in holds the page at 1140 less its 24 gutters, so the strip has to step
    outside it to reach 1180. Only once the viewport can take it. */
-@media (min-width:1228px){
+@media (min-width:1168px){
   .kct-therapists{margin-left:-20px;margin-right:-20px;}
 }
 .kct-more{display:flex;justify-content:center;margin:24px 0 0;}
@@ -1301,7 +1305,7 @@ const CSS = `
    column, so the block runs 980 and the cards narrow with it. */
 .kct-why{
   display:grid;grid-template-columns:316px minmax(0,1fr);gap:40px;align-items:stretch;
-  max-width:1060px;margin-left:auto;margin-right:auto;
+  max-width:calc(var(--col) - 80px);margin-left:auto;margin-right:auto;
 }
 .kct-why-media{
   position:relative;height:auto;min-height:0;border-radius:10px;overflow:hidden;
@@ -1676,7 +1680,7 @@ const CSS = `
    soft band the design uses elsewhere on the page. */
 .kct-ctaband{background:var(--p-light);padding:28px 0;}
 .kct-ctaband-in{
-  max-width:1140px;margin:0 auto;padding:0 24px;
+  max-width:var(--col);margin:0 auto;padding:0 var(--gut);
   display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;
 }
 .kct-cta-text{
@@ -1845,14 +1849,14 @@ const CSS = `
      Seek help 1920x918     a 1140 box at radius 24 with 40 of padding, an
                812 heading block, then 660 rows 66 tall (122 open).
    The 80 gaps land as padding on the lower section of each pair.          */
-.kct-about-top{grid-template-columns:704px 396px;gap:40px;align-items:stretch;}
+.kct-about-top{grid-template-columns:704fr 396fr;gap:40px;align-items:stretch;}
 .kct-about-card{
   min-height:366px;background:#fff;border:1px solid var(--s-green-2);
   border-radius:12px;padding:24px;
 }
 .kct-about-card .kct-prose p{font-size:18px!important;line-height:26px!important;color:var(--t-body)!important;}
 .kct-about-media{min-height:366px;border-radius:0;}
-.kct-pillars{grid-template-columns:repeat(2,562px);gap:16px;margin-top:32px;justify-content:space-between;}
+.kct-pillars{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:32px;}
 .kct-pillar{
   min-height:134.52px;background:#fff;border:1px solid var(--s-green-2);
   border-radius:12px;padding:24px;
@@ -1864,7 +1868,7 @@ const CSS = `
    Without it the card's top edge lands exactly on the colour change. */
 .kct-symptoms-sec{padding:80px 0;}
 .kct-symptoms{
-  max-width:1140px;margin:0 auto;padding:64px 16px;
+  max-width:var(--col);margin:0 auto;padding:64px 16px;
   background:#fff;border:0;border-radius:32px;
   box-shadow:inset 0 0 31px #F6D9C4;
 }
@@ -1881,7 +1885,7 @@ const CSS = `
 }
 
 .kct-seek-sec{padding:0 0 80px;}
-.kct-seekhelp{max-width:1140px;margin:0 auto;padding:40px;border-radius:24px;}
+.kct-seekhelp{max-width:var(--col);margin:0 auto;padding:40px;border-radius:24px;}
 .kct-seekhelp .kct-sub{max-width:812px;}
 .kct-seekhelp .kct-seek{max-width:660px;margin:40px auto 0;gap:16px;}
 .kct-seekhelp .kct-seek-row{
@@ -1907,7 +1911,7 @@ const CSS = `
             124 photo at radius 12, quote Inter Medium 23/32           */
 .kct-reviews-head{
   display:flex;align-items:center;justify-content:space-between;gap:24px;
-  max-width:1132px;margin:0 auto;
+  max-width:calc(var(--col) - 8px);margin:0 auto;
 }
 .kct-reviews-h,.kct-reviews-h:not(#_){color:#fff!important;margin:0;text-align:left;}
 .kct-reviews-rating{display:flex;align-items:center;gap:12px;flex:none;}
