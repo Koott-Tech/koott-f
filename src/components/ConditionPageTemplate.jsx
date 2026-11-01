@@ -240,6 +240,13 @@ export default function ConditionPageTemplate({ data }) {
   const [openSeek, setOpenSeek] = useState(0);
   const [openHelp, setOpenHelp] = useState(0);
   const [openType, setOpenType] = useState(0);
+  /* The plans are four plain cards on the desktop frame and an accordion on
+     the 390 one -- first open, the rest collapsed to their title. The markup
+     carries the control at both sizes; only the phone sheet reveals it. */
+  const [openPlan, setOpenPlan] = useState(0);
+  /* Same again for the About pillars, which the 390 frame also draws as an
+     accordion: Mind open at 134.7, the other three collapsed to 60. */
+  const [openPillar, setOpenPillar] = useState(0);
   const [posts, setPosts] = useState([]);
 
   /* Null on the pages with no validated instrument -- most of them -- and
@@ -436,13 +443,28 @@ export default function ConditionPageTemplate({ data }) {
         <h2 className="kct-h2 kct-center">{d.plans.title}</h2>
         <p className="kct-sub kct-center">{d.plans.subtitle}</p>
         <div className="kct-grid-4 kct-grid-4--plans">
-          {d.plans.items.map((p, i) => (
-            <div key={i} className="kct-card kct-card--plan">
-              <h3 className="kct-card-t">{p.name}</h3>
-              <p className="kct-card-b">{p.body}</p>
-              <span className="kct-price">Starting from ₹{p.from}</span>
-            </div>
-          ))}
+          {d.plans.items.map((p, i) => {
+            const open = openPlan === i;
+            return (
+              <div key={i} className={`kct-card kct-card--plan ${open ? 'is-open' : ''}`}>
+                <button
+                  type="button"
+                  className="kct-plan-head"
+                  aria-expanded={open}
+                  onClick={() => setOpenPlan(open ? -1 : i)}
+                >
+                  <h3 className="kct-card-t">{p.name}</h3>
+                  <svg className="kct-plan-x" viewBox="0 0 24 24" width="16" height="16" fill="none"
+                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                    aria-hidden focusable="false">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                <p className="kct-card-b">{p.body}</p>
+                <span className="kct-price">Starting from ₹{p.from}</span>
+              </div>
+            );
+          })}
         </div>
       </Section>
 
@@ -508,8 +530,20 @@ export default function ConditionPageTemplate({ data }) {
 
         <div className="kct-pillars">
           {d.about.pillars.map((p, i) => (
-            <div key={i} className="kct-pillar">
-              <h3 className="kct-pillar-t">{p.title}</h3>
+            <div key={i} className={`kct-pillar ${openPillar === i ? 'is-open' : ''}`}>
+              <button
+                type="button"
+                className="kct-pillar-head"
+                aria-expanded={openPillar === i}
+                onClick={() => setOpenPillar(openPillar === i ? -1 : i)}
+              >
+                <h3 className="kct-pillar-t">{p.title}</h3>
+                <svg className="kct-pillar-x" viewBox="0 0 24 24" width="16" height="16" fill="none"
+                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  aria-hidden focusable="false">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
               <p className="kct-pillar-b">{p.body}</p>
             </div>
           ))}
@@ -1483,6 +1517,14 @@ const CSS = `
    Four across, white on a hairline, with the price as a pill at the foot. The
    cards stretch so the pills line up however long the copy runs. */
 .kct-grid-4--plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin-top:40px;align-items:stretch;}
+/* The accordion control is inert above the phone breakpoint: the head is a
+   plain block so the title sits exactly where it did, and the chevron is
+   not drawn at all. The phone sheet at the foot turns both on. */
+.kct-plan-head,.kct-plan-head:not(#_){
+  display:block;width:100%;margin:0;padding:0;border:0;background:none;
+  text-align:left;font:inherit;color:inherit;cursor:default!important;
+}
+.kct-plan-x{display:none;flex:none;color:var(--t-muted);}
 .kct-card--plan{
   display:flex;flex-direction:column;
   min-height:298px;
@@ -1525,6 +1567,12 @@ const CSS = `
 }
 .kct-pillars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:24px;}
 .kct-pillar{background:#fff;border:1px solid var(--s-1);border-radius:12px;padding:20px;}
+/* Inert above the phone breakpoint, exactly as the plan head is. */
+.kct-pillar-head,.kct-pillar-head:not(#_){
+  display:block;width:100%;margin:0;padding:0;border:0;background:none;
+  text-align:left;font:inherit;color:inherit;cursor:default!important;
+}
+.kct-pillar-x{display:none;flex:none;color:var(--t-muted);}
 .kct-pillar-t,.kct-pillar-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;letter-spacing:0!important;color:var(--t-primary)!important;margin:0;
@@ -1983,6 +2031,7 @@ const CSS = `
   .kct-band-art{display:none;}
   .kct-faq-head{flex-direction:column;align-items:flex-start;gap:8px;}
   .kct-faq-search{width:100%;}
+
 }
 /* ── the article block, measured off the .fig ─────────────────────────────
    Three frames in a 3047 stack with 80 between them:
@@ -2303,4 +2352,106 @@ const CSS = `
 }
 .kct-review--big .kct-review-avatar > span{font-size:36px;}
 
+
+
+/* ── the 390 mobile frame, last so it wins ────────────────────────────
+   Measured off "Individual mobile.pdf". This block sits at the foot of the
+   sheet deliberately: the article and reviews rules above it are written
+   without a media query, so at equal specificity they would otherwise win
+   on source order. Nothing here applies above 640. */
+@media (max-width:640px){
+  /* ---- measured off "Individual mobile.pdf", a 390 frame -----------------
+     Everything in the file sits on a 358 column at a 16 gutter, every band
+     opens and closes on 48, and the stacked rows run 16 apart. */
+  .kct-sec{padding:48px 0;}
+
+  /* How it works: four 358x200 cards, 16 apart (2037..2885 is 4x200+3x16). */
+  .kct-steps{gap:16px;margin-top:24px;}
+  .kct-step{min-height:200px;}
+  .kct-step-media{padding-top:20px;height:80px;}
+
+  /* Why: the video, then the heading, then cards 318 wide that run off the
+     right edge -- the file draws them at x16, 350, 684, 924, so they scroll
+     sideways rather than stacking. */
+  .kct-why-media{aspect-ratio:358/210;height:auto;min-height:0;}
+  .kct-why-grid{
+    display:flex;gap:16px;margin-top:24px;
+    overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    margin-left:-16px;margin-right:-16px;padding:0 16px;
+  }
+  .kct-why-grid::-webkit-scrollbar{display:none;}
+  .kct-on-dark .kct-card--solid{flex:0 0 318px;min-height:142px;scroll-snap-align:start;}
+
+  /* Plans: the first card open at 358x208 with its price pill, the other
+     three collapsed to 60, 16 apart. */
+  .kct-grid-4--plans{gap:16px;margin-top:24px;}
+  .kct-card--plan{padding:24px;min-height:0;}
+  .kct-plan-head,.kct-plan-head:not(#_){
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    cursor:pointer!important;min-height:24px;
+  }
+  .kct-plan-x{display:block;transition:transform .15s ease;}
+  .kct-card--plan.is-open .kct-plan-x{transform:rotate(180deg);}
+  .kct-card--plan:not(.is-open){padding:16px 24px;min-height:60px;}
+  .kct-card--plan:not(.is-open) .kct-card-t,
+  .kct-card--plan:not(.is-open) .kct-card-t:not(#_){margin:0;}
+  .kct-card--plan:not(.is-open) .kct-card-b,
+  .kct-card--plan:not(.is-open) .kct-price{display:none;}
+
+  /* Reviews: the file draws a single row of 326x330 cards, not the desktop
+     mix of stacked 192s beside a 415. The columns collapse so every card
+     becomes its own item in the track. */
+  .kct-rev-col{display:contents;}
+  .kct-review,.kct-review--big{width:326px;min-height:330px;}
+  .kct-rev-set{gap:16px;margin-right:16px;}
+  .kct-reviews{margin-top:24px;}
+
+  /* About: the photo first at 358x178, then the card, then the four
+     pillars -- all 16 apart. The photo was stretching to the card's height
+     because it is a stretched grid item with no ratio of its own. */
+  .kct-about-top{grid-template-columns:1fr;gap:16px;}
+  .kct-about-media{
+    order:-1;aspect-ratio:358/178;min-height:0;height:auto;align-self:start;
+    border-radius:16px;
+  }
+  .kct-about-card{padding:24px;min-height:0;}
+  .kct-pillars{grid-template-columns:1fr;gap:16px;margin-top:16px;}
+  .kct-pillar{min-height:0;padding:16px;}
+  .kct-pillar-head,.kct-pillar-head:not(#_){
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    cursor:pointer!important;min-height:24px;
+  }
+  .kct-pillar-x{display:block;transition:transform .15s ease;}
+  .kct-pillar.is-open .kct-pillar-x{transform:rotate(180deg);}
+  .kct-pillar:not(.is-open){min-height:60px;padding:16px;display:flex;align-items:center;}
+  .kct-pillar:not(.is-open) .kct-pillar-t,
+  .kct-pillar:not(.is-open) .kct-pillar-t:not(#_){margin:0;}
+  .kct-pillar:not(.is-open) .kct-pillar-head{width:100%;}
+  .kct-pillar:not(.is-open) .kct-pillar-b{display:none;}
+
+  /* Symptoms: no inset card on the phone. The file puts the rows straight
+     on the white band at the 358 column -- no 32 radius, no 64 of padding
+     and no inner glow. */
+  .kct-symptoms{
+    max-width:none;padding:0;border-radius:0;box-shadow:none;background:none;
+  }
+  .kct-signs{max-width:none;gap:12px;margin-top:40px;}
+  .kct-signs-out{margin-top:24px;}
+
+  /* Seek help, types and therapy-helps are the same stacked rows: 358 wide,
+     16 apart, 58 closed. */
+  .kct-seekhelp{max-width:none;padding:0;border-radius:0;}
+  .kct-seekhelp .kct-seek{max-width:none;margin-top:24px;gap:16px;}
+  .kct-seek{max-width:none;gap:16px;}
+  .kct-seek-row{min-height:58px;}
+  .kct-seekhelp .kct-seek-row{min-height:58px;}
+  .kct-types-body .kct-seek{margin-top:24px;}
+
+  /* The screener rows take the same 358 column as everything else. */
+  .kct-scr,.kct-scr-out,.kct-scr-lead{max-width:none;}
+
+  /* FAQ: the 860 column collapses to the page's own. */
+  .kct-faq{max-width:none;margin-top:24px;gap:12px;}
+}
 `;
