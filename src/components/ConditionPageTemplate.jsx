@@ -1685,13 +1685,19 @@ const CSS = `
 
 /* Book band ---------------------------------------------------------------
    Picture, line, button — on one soft green strip. */
+/* The file draws this strip 1140 wide with 41 of padding, a 168 picture, 24
+   gutters and a 161 button, which leaves its copy 662 -- exactly two lines at
+   20/30. The page column is 1080 now, so those same numbers leave only 621 and
+   the copy breaks to three. The 41 comes back out of the padding, the picture
+   and the gutters rather than out of the button or the type, which the file
+   fixes. */
 .kct-bookband{
-  display:flex;align-items:center;gap:24px;min-height:182px;
+  display:flex;align-items:center;gap:18px;min-height:182px;
   background:linear-gradient(180deg,#FFFFFF 0%,#E7F1DF 100%);
-  border:1px solid var(--s-green-2);border-radius:16px;padding:40px;
+  border:1px solid var(--s-green-2);border-radius:16px;padding:30px;
 }
 .kct-bookband-art{
-  flex:none;width:168px;height:100px;border-radius:8px;
+  flex:none;width:152px;height:112px;border-radius:8px;
   background:#EFF4F0 url('/design/cta-1.webp') center/cover no-repeat;
 }
 .kct-bookband-art--b{background-image:url('/design/cta-2.webp');}
