@@ -17,6 +17,7 @@ export default async function sitemap() {
     // aliases (/about, /career, /contact-us) are not submitted twice.
     "/about-us",
     "/book-malayali-psychologists",
+    "/counselling",
     "/get-in-touch",
     "/jobs",
     "/online-child-psychologist",

@@ -127,7 +127,14 @@ const nextConfig = {
       // the same layout koott.in uses, so it is no longer redirected away.
 
       // Wix event pages.
+      // These three carry a month in their new slugs, so the general rule misses them.
+      { source: '/event-details/pre-marital-workshop', destination: '/events/pre-marital-workshop-march', permanent: true },
+      { source: '/event-details/marital-conflict-workshop', destination: '/events/marital-conflict-workshop-april', permanent: true },
+      { source: '/event-details/positive-parenting-workshop', destination: '/events/positive-parenting-workshop-march', permanent: true },
       { source: '/event-details/:slug', destination: '/events/:slug', permanent: true },
+
+      // Wix pricing plans; sessions are priced and booked per therapist here.
+      { source: '/pricing-plans/:path*', destination: '/book-malayali-psychologists', permanent: true },
 
       // The old MyKoott child-therapy template resolves the same CMS rows as the
       // new top-level condition pages, so it renders the right content in the

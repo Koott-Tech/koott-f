@@ -49,7 +49,7 @@ export const DEFAULT_FOOTER = {
         { label: 'Adult ADHD', href: '/adhd-treatment' },
         { label: 'Depression', href: '/depression-treatment' },
         { label: 'Panic Attacks', href: '/panic-attack-treatment' },
-        { label: "Women's Health", href: '/postpartum-depression-treatment' },
+        { label: "Women's Health", href: '/womens-mental-health' },
         { label: 'Bipolar Disorder', href: '/mood-disorder-treatment' },
         { label: 'Social Anxiety', href: '/phobias-counselling' },
         { label: 'Personality Disorders', href: '/personality-disorder-management' },
@@ -104,7 +104,7 @@ export const DEFAULT_FOOTER = {
     { icon: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/koott.in/' },
     { icon: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/koott.in/' },
     { icon: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@koott' },
-    { icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/company/koott/' },
+    { icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/company/koott-in/' },
   ],
 
   copyright: '© Koott 2026',
