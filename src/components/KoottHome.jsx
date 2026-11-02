@@ -1425,7 +1425,7 @@ const CSS = `
   height:48px;padding:0 11px;
   font-family:var(--text)!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:var(--ink);
 }
-.kh2-pop-mode{height:74px;padding:0 11px;color:var(--body);}
+.kh2-pop-mode{height:74px;padding:0 11px;color:var(--soft);}
 .kh2-pop-lang.is-on,.kh2-pop-mode.is-on{background:var(--green-light);border-color:var(--line-green);}
 .kh2-pop-lang.is-on{color:var(--green-dark);}
 .kh2-pop-mode.is-on{color:var(--green-dark);}
