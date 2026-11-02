@@ -1,4 +1,4 @@
-/** VAGINISUMS — SEXUAL & INTIMACY. Served at /vaginismus. */
+/** VAGINISMUS — SEXUAL & INTIMACY. Served at /vaginismus. */
 export default {
   "slug": "vaginismus",
   "hero_title": "Best Online Counseling for Vaginismus Treatment in Malayalam",

@@ -1,5 +1,7 @@
 /**
- * The header's condition menu, in koott.in's order and with its labels.
+ * The header's condition menu, in koott.in's order and with its labels, less the
+ * four spelling mistakes the live site has (MANAGMENT, COUNCELLING, &HEALING,
+ * VAGINISUMS).
  *
  * Kept apart from the pages because the header loads on every page of the site
  * and must not pull in the copy of all 45. To add a condition: put its file in
@@ -21,7 +23,7 @@ export const CONDITION_MENU = [
       { slug: "ocd-treatment", label: "OCD" },
       { slug: "adhd-treatment", label: "ADHD" },
       { slug: "abuse-counselling", label: "ABUSE" },
-      { slug: "personality-disorder-management", label: "PERSONALITY DISORDER MANAGMENT" },
+      { slug: "personality-disorder-management", label: "PERSONALITY DISORDER MANAGEMENT" },
     ],
     groups: [
       {
@@ -79,10 +81,10 @@ export const CONDITION_MENU = [
       { slug: "female-sexual-concerns", label: "FEMALE SEXUAL CONCERNS" },
       { slug: "male-sexual-concerns", label: "MALE SEXUAL CONCERNS" },
       { slug: "intimacy-counselling", label: "INTIMACY COUNSELLING" },
-      { slug: "newlywed-counseling", label: "NEWLYWED COUNCELLING" },
-      { slug: "sexual-trauma", label: "SEXUAL TRAUMA &HEALING" },
+      { slug: "newlywed-counseling", label: "NEWLYWED COUNSELLING" },
+      { slug: "sexual-trauma", label: "SEXUAL TRAUMA & HEALING" },
       { slug: "emotional-connection", label: "EMOTIONAL CONNECTION" },
-      { slug: "vaginismus", label: "VAGINISUMS" },
+      { slug: "vaginismus", label: "VAGINISMUS" },
       { slug: "lgbtq-counselling", label: "LGBTQ+ COUNSELLING" },
       { slug: "sexual-intimacy-issues", label: "SEXUAL INTIMACY ISSUES" },
     ],

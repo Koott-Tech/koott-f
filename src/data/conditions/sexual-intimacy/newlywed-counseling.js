@@ -1,4 +1,4 @@
-/** NEWLYWED COUNCELLING — SEXUAL & INTIMACY. Served at /newlywed-counseling. */
+/** NEWLYWED COUNSELLING — SEXUAL & INTIMACY. Served at /newlywed-counseling. */
 export default {
   "slug": "newlywed-counseling",
   "hero_title": "Best Online Pre-Marriage & Newlywed Counseling in Malayalam",

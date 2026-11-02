@@ -1,4 +1,4 @@
-/** PERSONALITY DISORDER MANAGMENT — INDIVIDUAL. Served at /personality-disorder-management. */
+/** PERSONALITY DISORDER MANAGEMENT — INDIVIDUAL. Served at /personality-disorder-management. */
 export default {
   "slug": "personality-disorder-management",
   "hero_title": "Best online counselling for Personality Disorder Management in Malayalam",

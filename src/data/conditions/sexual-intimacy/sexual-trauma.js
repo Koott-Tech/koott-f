@@ -1,4 +1,4 @@
-/** SEXUAL TRAUMA &HEALING — SEXUAL & INTIMACY. Served at /sexual-trauma. */
+/** SEXUAL TRAUMA & HEALING — SEXUAL & INTIMACY. Served at /sexual-trauma. */
 export default {
   "slug": "sexual-trauma",
   "hero_title": "Best Online Sexual Trauma & Healing Counseling in Malayalam",
