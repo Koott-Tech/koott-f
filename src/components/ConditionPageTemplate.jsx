@@ -165,10 +165,10 @@ function StepMedia({ step }) {
     return (
       <div className="kct-step-media kct-step-call" aria-hidden>
         <span className="kct-step-tile">
-          <img src="/design/steps/call-1.webp" alt="" loading="lazy" />
+          <img src="/design/home/call-1.webp" alt="" loading="lazy" />
         </span>
         <span className="kct-step-tile kct-step-tile--call">
-          <img src="/design/steps/call-2.webp" alt="" loading="lazy" />
+          <img src="/design/home/call-2.webp" alt="" loading="lazy" />
           <span className="kct-step-dots"><i /><i /><i /></span>
         </span>
       </div>
@@ -1948,10 +1948,20 @@ ${designCardCss('.kct')}
    that much higher up the card — the 94 the media box runs stays the same. */
 .kct-step-call{gap:8px;padding-top:24px;}
 .kct-step-tile{
-  position:relative;flex:1;height:70px;border-radius:8px;overflow:hidden;
+  position:relative;flex:196 1 0;min-width:0;height:70px;border-radius:8px;overflow:hidden;
   background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);
 }
-.kct-step-tile img{width:100%;height:100%;object-fit:cover;display:block;}
+.kct-step-tile--call{flex:121 1 0;}
+/* The laptop frame draws both photos larger than their tiles, placed to keep the
+   heads in view; these are its numbers. The phone frame fits them to the width. */
+.kct-step-tile img{position:absolute;left:-9.6%;top:-11.6%;width:114.4%;height:180.1%;max-width:none;object-fit:cover;display:block;}
+.kct-step-tile--call img{left:-17.4%;top:-90%;width:126%;height:330.4%;}
+@media (max-width:640px){
+  .kct-step-tile{height:60px;}
+  .kct-step-tile img,.kct-step-tile--call img{left:0;top:0;width:100%;height:100%;}
+  .kct-step-tile img{object-position:50% 16.5%;}
+  .kct-step-tile--call img{object-position:50% 37.9%;}
+}
 .kct-step-dots{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;}
 .kct-step-dots i{width:14px;height:14px;border-radius:999px;background:rgba(255,255,255,.9);display:block;}
 .kct-step-pair{position:relative;justify-content:center;gap:28px;min-height:76px;}
