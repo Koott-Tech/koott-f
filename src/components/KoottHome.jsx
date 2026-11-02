@@ -2038,8 +2038,9 @@ const CSS = `
   .kh2-play{width:64px;height:48px;margin:-24px 0 0 -32px;border-radius:12px;font-size:20px;}
 
   /* reviews: a band 48 in from the white, swiped one card at a time. */
-  .kh2-rev-sec{background:#fff;padding:48px 0;}
-  .kh2-rev-sec > *{background:var(--deep);}
+  /* One dark band with white margins. Painting each child dark on a white
+     section left a hairline wherever two of them met on a fractional pixel. */
+  .kh2-rev-sec{margin:48px 0;padding:0;}
   .kh2-rev-head{padding-top:32px;}
   .kh2-reviews::before,.kh2-reviews::after{display:none;}
   .kh2-rating{display:none;}
@@ -2097,7 +2098,8 @@ const CSS = `
   .kh2-reveal--phone > .kh2-reveal-in{display:block;visibility:hidden;opacity:0;}
   .kh2-reveal--phone.is-open > .kh2-reveal-in{visibility:visible;opacity:1;}
   .kh2-exp-ctas{justify-content:flex-start;flex-wrap:wrap;gap:12px;margin-top:24px;}
-  .kh2-exp-ctas .kh2-textlink{width:132px;}
+  .kh2-exp-ctas .kh2-textlink{width:132px;padding:0;white-space:nowrap;}
+  .kh2-exp-ctas .kh2-textlink svg{display:none;}
 
   /* services: the tab rail gets arrows and fades, the stories swipe. */
   .kh2-rail{position:relative;margin-top:20px;justify-content:flex-start;}
