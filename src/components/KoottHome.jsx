@@ -1288,7 +1288,7 @@ const CSS = `
 .kh2-fsearch input::-webkit-search-cancel-button{cursor:pointer;}
 .kh2-flang{
   position:relative;flex:none;width:157px;height:40px;display:flex;align-items:center;justify-content:space-between;
-  background:#F9F9F9;border:1px solid var(--line);border-radius:4px;padding:0 8px 0 12px;color:var(--hint);cursor:pointer;
+  background:#F9F9F9;border:1px solid var(--line);border-radius:4px;padding:0 8px 0 11px;color:var(--hint);cursor:pointer;
 }
 .kh2-flang-v{
   display:inline-flex;align-items:baseline;gap:4px;
@@ -1322,8 +1322,9 @@ const CSS = `
    block, and a 24 play button; the condition pages' frame does not. */
 .kh2 .ktc{padding:19px;}
 .kh2 .ktc-panel,.kh2 .ktc-tags-wrap{margin-bottom:16px;}
-.kh2 .ktc-chip{height:24px;border-radius:999px;font-weight:500!important;}
+.kh2 .ktc-chip{height:24px;padding-top:2px;border-radius:999px;font-weight:500!important;}
 .kh2 .ktc-wave-btn{width:24px;height:24px;margin:0 -.7px;border-width:1.25px;}
+.kh2 .ktc-who{align-self:center;}
 
 /* ════ how it works ════ */
 .kh2-how{background:var(--grey-bg);padding-bottom:80.41px;}
@@ -1362,8 +1363,8 @@ const CSS = `
    box sits 15.7 on. */
 .kh2-step-dates{gap:15.7px;margin-left:-23px;}
 .kh2-step-days{
-  flex:0 0 229px;min-width:0;height:70px;display:flex;align-items:center;justify-content:flex-end;gap:16px;
-  overflow:hidden;background:#F9F9F9;border-radius:0 8px 8px 0;padding:0 12px 0 0;
+  flex:0 0 229px;min-width:0;height:70px;display:flex;align-items:flex-start;justify-content:flex-end;gap:16px;
+  overflow:hidden;background:#F9F9F9;border-radius:0 8px 8px 0;padding:12px 12px 0 0;
   -webkit-mask-image:linear-gradient(90deg,transparent 47px,#000 115px,#000 129px,transparent 197px);
   mask-image:linear-gradient(90deg,transparent 47px,#000 115px,#000 129px,transparent 197px);
 }
@@ -1396,6 +1397,8 @@ const CSS = `
 .kh2-step-dots i:nth-child(2){background:#EF4444;}
 
 /* ════ what koott offers ════ */
+/* The frame centres this heading in 1132 of the 1180 column, 24 left of the page's centre. */
+@media (min-width:1241px){ .kh2-offers-sec .kh2-h2,.kh2-offers-sub{max-width:1132px;} }
 .kh2-offers{display:grid;grid-template-columns:664fr 484fr;gap:32px;margin-top:40px;}
 .kh2-offer-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;}
 .kh2-offer-tile{
@@ -1503,7 +1506,7 @@ const CSS = `
 .kh2-reviews::after{right:-53px;background:rgba(6,51,39,.986);}
 .kh2-rev-track{display:flex;width:max-content;animation:kh2-roll 72s linear infinite;}
 .kh2-reviews:hover .kh2-rev-track{animation-play-state:paused;}
-.kh2-rev-set{display:flex;align-items:flex-start;gap:24px;flex:none;margin-right:24px;}
+.kh2-rev-set{display:flex;align-items:center;gap:24px;flex:none;margin-right:24px;}
 @keyframes kh2-roll{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
 .kh2-rev-spare{display:none;}
 @media (min-width:1921px){ .kh2-rev-spare{display:contents;} .kh2-rev-track{animation-duration:216s;} }
@@ -1710,6 +1713,8 @@ const CSS = `
 .kh2-final-tag svg{color:var(--body);}
 .kh2-final-h{margin-top:16px!important;}
 .kh2-final-b{width:220px;margin-top:16px;}
+/* 3.86 right of centre in the frame, whose button row is wider than its column. */
+@media (min-width:1241px){ .kh2-final-b{transform:translateX(3.86px);} }
 
 /* ════ between the two frames ════
    Neither design has a tablet layout. Below the 1180 column the laptop layout
@@ -1819,7 +1824,7 @@ const CSS = `
      against its right one */
   .kh2-step-dates{margin:0 -16px;gap:16px;}
   .kh2-step-days{
-    flex-basis:238px;
+    flex-basis:238px;align-items:center;padding-top:0;
     -webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
     mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
   }
@@ -1882,7 +1887,7 @@ const CSS = `
     padding:0 16px;scroll-padding:0 16px;
   }
   .kh2-rev-track{animation:none;width:auto;}
-  .kh2-rev-set{gap:12px;margin-right:0;}
+  .kh2-rev-set{align-items:flex-start;gap:12px;margin-right:0;}
   .kh2-rev-set + .kh2-rev-set,.kh2-rev-spare,.kh2-review--repeat{display:none!important;}
   .kh2-rev-col{display:contents;}
   .kh2-review,.kh2-review--big{
