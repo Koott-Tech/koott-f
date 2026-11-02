@@ -1283,11 +1283,20 @@ const CSS = `
   transition:background-color .18s ease,border-color .18s ease,color .18s ease;
 }
 .kh2-quick img{width:32px;height:32px;flex:none;}
+/* The frame's four chips, whatever Inter build sets their labels. */
+@media (min-width:1241px){
+  .kh2-quick{justify-content:center;}
+  .kh2-quick:nth-child(1){width:247px;}
+  .kh2-quick:nth-child(2){width:153px;}
+  .kh2-quick:nth-child(3){width:119px;}
+  .kh2-quick:nth-child(4){width:168px;}
+}
 .kh2-quick:hover{border-color:var(--line-green);}
 .kh2-quick.is-on{background:var(--green-light);border-color:var(--line-green);color:var(--green-dark)!important;}
 .kh2-empty{margin-top:24px!important;text-align:center;font-family:var(--text)!important;font-size:14px!important;color:var(--soft)!important;}
 .kh2-tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:16px;}
 .kh2-ther-more{margin-top:24px;}
+.kh2-ther-more-b{width:201px;}
 /* Home's frame draws the card's chips 24 tall in Medium, with 16 between every
    block, and a 24 play button; the condition pages' frame does not. */
 .kh2 .ktc{padding:19px;}
@@ -1584,7 +1593,9 @@ const CSS = `
 .kh2-rail-arrow{display:none;}
 .kh2-tabs{display:flex;gap:16px;padding:4px;border-radius:8px;}
 .kh2-tab{
-  flex:none;height:48px;padding:0 11px;border-radius:8px;cursor:pointer;white-space:nowrap;
+  /* The frame's tab rows are 955 and 552 wide; this makes up the slightly
+     narrower Inter build the page loads. */
+  flex:none;height:48px;padding:0 11.28px;border-radius:8px;cursor:pointer;white-space:nowrap;
   background:#fff;border:1px solid var(--line);
   font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;color:var(--ink)!important;
   transition:background-color .15s ease,border-color .15s ease,color .15s ease;
@@ -1623,11 +1634,13 @@ const CSS = `
 .kh2-slide-l li{
   list-style:disc;font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;color:#fff!important;
 }
-.kh2-slide-cta{margin-top:24px;}
+/* 252 in the frame, its label starting at the left padding. */
+.kh2-slide-cta{margin-top:24px;min-width:252px;justify-content:flex-start;}
 .kh2-svc-dots{margin-top:20px;height:8px;}
 
 /* ════ faq ════ */
 .kh2-faq-sec .kh2-in{--w:860px;}
+.kh2-faq-sec .kh2-tabs{background:#fff;}
 .kh2-faq{display:flex;flex-direction:column;gap:16px;margin-top:40px;}
 .kh2-faq-row{
   border:1px solid #F4F4F4;border-radius:16px;background:#F9F9F9;
@@ -1922,7 +1935,7 @@ const CSS = `
   .kh2-slide-lead{margin-top:20px!important;font-size:14px!important;line-height:22px!important;}
   .kh2-slide-l{margin-top:20px!important;gap:10px;}
   .kh2-slide-l li{font-size:14px!important;line-height:22px!important;}
-  .kh2-slide-cta{width:100%;height:48px;margin-top:auto;}
+  .kh2-slide-cta{width:100%;min-width:0;height:48px;margin-top:auto;justify-content:center;}
   .kh2-svc-dots{display:none;}
 
   /* faq */
