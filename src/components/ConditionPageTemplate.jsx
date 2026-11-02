@@ -262,6 +262,16 @@ export default function ConditionPageTemplate({ data }) {
     return out;
   }, [data.reviews]);
 
+  /* The signs checklist colours itself only once something is ticked:
+     one or two is a normal amount to recognise, more than that warns. */
+  const signsTone =
+    checked.length === 0 ? 'idle' : checked.length <= 2 ? 'ok' : 'warn';
+  const SIGNS_TONE = {
+    idle: { borderColor: 'var(--s-green-2)', background: '#FAFCF9' },
+    ok:   { borderColor: '#BFE3CB',          background: '#F3FBF4' },
+    warn: { borderColor: '#F0C98A',          background: '#FDF7EC' },
+  };
+
   const screener = useMemo(() => screenerFor(data.slug), [data.slug]);
   const result = useMemo(
     () => (screener ? scoreScreener(screener, answers) : null),
@@ -575,159 +585,68 @@ export default function ConditionPageTemplate({ data }) {
           <h2 className="kct-h2 kct-center">{d.symptoms.title}</h2>
           <p className="kct-sub kct-center">{d.symptoms.subtitle}</p>
 
-          {screener ? (
-            <>
-              <p className="kct-scr-lead">{screener.leadIn}</p>
-              <ol className="kct-scr">
-                {screener.items.map((text, i) => (
-                  <li
-                    key={i}
-                    className={`kct-scr-row ${Number.isInteger(answers[i]) ? 'is-answered' : ''}`}
-                  >
-                    <p className="kct-scr-q">
-                      <span className="kct-scr-n" aria-hidden>{i + 1}</span>
-                      {text}
-                    </p>
-                    <div className="kct-scr-opts" role="radiogroup" aria-label={text}>
-                      {FREQUENCY.map((o) => (
-                        <label
-                          key={o.value}
-                          className={`kct-scr-opt ${answers[i] === o.value ? 'is-on' : ''}`}
-                        >
-                          <input
-                            type="radio"
-                            name={`${screener.id}-${i}`}
-                            checked={answers[i] === o.value}
-                            onChange={() =>
-                              setAnswers((prev) => {
-                                const next = [...prev];
-                                next[i] = o.value;
-                                return next;
-                              })
-                            }
-                          />
-                          <span>{o.label}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-
-              <div className={`kct-scr-out is-${result.tone}`} aria-live="polite">
-                {result.answered === 0 ? (
-                  <p className="kct-scr-msg">
-                    Answer all {screener.items.length} to see where you sit on the {screener.name}.
-                    Nothing you choose is saved or sent anywhere.
-                  </p>
-                ) : !result.complete ? (
-                  <>
-                    <p className="kct-scr-msg">
-                      {result.answered} of {screener.items.length} answered.
-                    </p>
-                    <div className="kct-scr-bar" aria-hidden>
-                      <i style={{ width: `${(result.answered / screener.items.length) * 100}%` }} />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="kct-scr-score">
-                      <b>{result.total}</b> <span>/ {screener.max}</span>
-                      <em>{result.band.label}</em>
-                    </p>
-                    <p className="kct-scr-msg">
-                      {result.refer
-                        ? `A ${screener.name} score of ${screener.referAt} or more is the point at which the people who built it suggest talking to someone who can look properly.`
-                        : 'That sits in the lower range. If it still does not feel right to you, that is reason enough to talk to someone.'}
-                    </p>
-                  </>
-                )}
-
-                {result.atRisk && (
-                  <div className="kct-scr-crisis" role="alert">
-                    <p>
-                      You said you have had thoughts of being better off dead or of hurting
-                      yourself. Please talk to someone now — these lines are free, open all hours,
-                      and you do not need an appointment.
-                    </p>
-                    <ul>
-                      {CRISIS_LINES.map((c) => (
-                        <li key={c.number}>
-                          <a href={`tel:${c.number.replace(/[^0-9+]/g, '')}`}>
-                            {c.name} {c.number}
-                          </a>
-                          <span>{c.note}</span>
-                        </li>
-                      ))}
-                    </ul>
+          <ul className="kct-signs">
+            {d.symptoms.items.map((it, i) => {
+              const on = checked.includes(i);
+              const open = openSign === i;
+              return (
+                <li key={i} className={`kct-sign ${open ? 'is-open' : ''}`}>
+                  <div className="kct-sign-row">
+                    <label className="kct-sign-tick">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        onChange={() =>
+                          setChecked((prev) => (on ? prev.filter((x) => x !== i) : [...prev, i]))
+                        }
+                      />
+                      <span aria-hidden />
+                      <span className="kct-sign-t">{it.title}</span>
+                    </label>
+                    <button
+                      type="button"
+                      className="kct-sign-more"
+                      aria-expanded={open}
+                      aria-label={open ? `Hide what ${it.title} means` : `What ${it.title} means`}
+                      onClick={() => setOpenSign(open ? -1 : i)}
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
+                    </button>
                   </div>
-                )}
+                  {open && <p className="kct-sign-b">{it.body}</p>}
+                </li>
+              );
+            })}
+          </ul>
 
-                {result.offerBooking && (
-                  <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
-                )}
-
-                <p className="kct-scr-note">
-                  The {screener.name} is a screening and severity questionnaire, not a diagnosis.
-                  Only a qualified professional can tell you what is going on. {screener.credit}
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <ul className="kct-signs">
-                {d.symptoms.items.map((it, i) => {
-                  const on = checked.includes(i);
-                  const open = openSign === i;
-                  return (
-                    <li key={i} className={`kct-sign ${open ? 'is-open' : ''}`}>
-                      <div className="kct-sign-row">
-                        <label className="kct-sign-tick">
-                          <input
-                            type="checkbox"
-                            checked={on}
-                            onChange={() =>
-                              setChecked((prev) => (on ? prev.filter((x) => x !== i) : [...prev, i]))
-                            }
-                          />
-                          <span aria-hidden />
-                          <span className="kct-sign-t">{it.title}</span>
-                        </label>
-                        <button
-                          type="button"
-                          className="kct-sign-more"
-                          aria-expanded={open}
-                          aria-label={open ? `Hide what ${it.title} means` : `What ${it.title} means`}
-                          onClick={() => setOpenSign(open ? -1 : i)}
-                        >
-                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
-                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M6 9l6 6 6-6" />
-                          </svg>
-                        </button>
-                      </div>
-                      {open && <p className="kct-sign-b">{it.body}</p>}
-                    </li>
-                  );
-                })}
-              </ul>
-
-              <div className="kct-signs-out">
-                <span className="kct-signs-ico" aria-hidden>
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
-                    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16.5v.01" />
-                  </svg>
-                </span>
-                <p>
-                  {checked.length === 0
-                    ? 'Tick the signs you notice to see what they might mean.'
-                    : `You ticked ${checked.length} of ${d.symptoms.items.length}. Talking it through with a therapist is a good next step.`}
-                </p>
-                <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
-              </div>
-            </>
-          )}
+          {/* Nothing is coloured until something is ticked. One or two is a
+              normal amount to recognise, so it stays green; past that the
+              panel warns; ticking most of them offers the booking. */}
+          <div
+            className={`kct-signs-out is-${signsTone}`}
+            style={SIGNS_TONE[signsTone]}
+            aria-live="polite"
+          >
+            <span className="kct-signs-ico" aria-hidden>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+                stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16.5v.01" />
+              </svg>
+            </span>
+            <p>
+              {checked.length === 0
+                ? 'Tick the signs you notice to see what they might mean.'
+                : checked.length <= 2
+                  ? `You ticked ${checked.length} of ${d.symptoms.items.length}. Recognising a sign or two is common and not a diagnosis.`
+                  : `You ticked ${checked.length} of ${d.symptoms.items.length}. That is a lot to be carrying — talking it through with a therapist is a good next step.`}
+            </p>
+            {checked.length > 2 && (
+              <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
+            )}
+          </div>
         </div>
       </Section>
 
@@ -1611,7 +1530,7 @@ const CSS = `
 .kct-symptoms .kct-sub{margin-bottom:24px;}
 .kct-signs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
 .kct-sign{background:#fff;border:1px solid var(--s-1);border-radius:10px;padding:12px 14px;}
-.kct-sign.is-open{border-color:var(--s-green-1);}
+/* removed: the file does not recolour an open row. */
 .kct-sign-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .kct-sign-tick{display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;}
 .kct-sign-tick input{position:absolute;opacity:0;width:0;height:0;}
@@ -2099,7 +2018,24 @@ const CSS = `
   min-height:52px;background:#fff;border:1px solid var(--s-green-2);
   border-radius:8px;padding:12px;
 }
+/* The row keeps #E8EFE5 whether it is open or shut -- the file draws both
+   states with the same 1px edge, and only the radius and height change. */
 .kct-sign.is-open{border-radius:12px;min-height:82px;}
+/* The box: 18x18 at radius 2.5, #189E4F filled with a white tick when on,
+   white with a #7C7C7C edge when off. */
+.kct-signs .kct-sign-tick > span[aria-hidden]{
+  width:18px;height:18px;border-radius:2.5px;border:1px solid var(--t-soft);
+}
+.kct-signs .kct-sign-tick input:checked + span[aria-hidden]{
+  background:var(--p-main);border-color:var(--p-main);
+}
+/* The outcome panel is the only thing that takes a colour, and only once
+   the count says so. */
+/* The panel's colour is set inline from the tick count, not from a class:
+   this sheet declares .kct-signs-out twice, hundreds of lines apart, and a
+   modifier class on it would not survive that. Inline wins outright, and
+   nothing here carries !important so it can. */
+.kct-signs-out{transition:border-color .15s ease,background .15s ease;}
 .kct-sign-t,.kct-sign-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;color:var(--t-primary)!important;
