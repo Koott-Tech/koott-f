@@ -287,7 +287,7 @@ export default function ConditionPageTemplate({ data }) {
 
   const reviewCards = () => Array.from(
     reviewsRef.current?.querySelectorAll('.kct-rev-set:first-child .kct-review:not(.kct-review--repeat)') || [],
-  );
+  ).filter((c) => !c.closest('.kct-rev-spare'));
   const onReviewsScroll = () => {
     const left = reviewsRef.current.getBoundingClientRect().left + 16;
     const gaps = reviewCards().map((c) => Math.abs(c.getBoundingClientRect().left - left));
@@ -587,16 +587,23 @@ export default function ConditionPageTemplate({ data }) {
           <div className="kct-rev-track">
             {[0, 1].map((pass) => (
               <div className="kct-rev-set" key={pass} aria-hidden={pass === 1 || undefined}>
-                {reviewGroups.map((group, g) => (
-                  <Fragment key={g}>
-                    <ReviewCard r={group[0]} big />
-                    {group.length > 1 && (
-                      <div className="kct-rev-col">
-                        {group.slice(1).map((r, i) => <ReviewCard key={i} r={r} />)}
-                      </div>
-                    )}
-                  </Fragment>
-                ))}
+                {/* One run reaches 1946 wide, so past 1920 the sheet shows the two
+                    spare runs too; otherwise the strip runs out before it loops. */}
+                {[0, 1, 2].map((run) => {
+                  const cards = reviewGroups.map((group, g) => (
+                    <Fragment key={g}>
+                      <ReviewCard r={group[0]} big />
+                      {group.length > 1 && (
+                        <div className="kct-rev-col">
+                          {group.slice(1).map((r, i) => <ReviewCard key={i} r={r} />)}
+                        </div>
+                      )}
+                    </Fragment>
+                  ));
+                  return run === 0
+                    ? <Fragment key={run}>{cards}</Fragment>
+                    : <div className="kct-rev-spare" key={run} aria-hidden>{cards}</div>;
+                })}
               </div>
             ))}
           </div>
@@ -2370,7 +2377,7 @@ const CSS = `
   /* a carousel, not a scroller: the set is rendered twice and the track
      slides exactly one set's width, so the loop is seamless and there is
      no scroll container to clip a card or show a bar. */
-  position:relative;display:block;overflow:hidden;padding:0;
+  position:relative;display:block;overflow:hidden;padding:0;columns:auto;
   margin:32px calc(50% - 50vw) 0 calc(50% - 50vw);
 }
 /* The file ends the strip with blurred plates — 189x604 of #063327 at
@@ -2381,6 +2388,13 @@ const CSS = `
 .kct-rev-track:hover{animation-play-state:paused;}
 .kct-rev-set{display:flex;align-items:flex-start;gap:24px;flex:none;margin-right:24px;}
 @keyframes kct-rev-roll{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
+/* Wider than the 1920 frame, each set holds three runs, which covers past 5K. The
+   loop is three times as long, so the time is too and the cards keep their speed. */
+.kct-rev-spare{display:none;}
+@media (min-width:1921px){
+  .kct-rev-spare{display:contents;}
+  .kct-rev-track{animation-duration:216s;}
+}
 @media (prefers-reduced-motion:reduce){ .kct-rev-track{animation:none;} }
 .kct-reviews::-webkit-scrollbar{display:none;}
 /* Every stacked pair is the same column now that the run repeats; the file
