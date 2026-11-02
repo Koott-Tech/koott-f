@@ -1216,6 +1216,17 @@ const CSS = `
 /* The clip band, 227 tall, at y=566 of the 793 section: 56 under the buttons,
    because its 72 is measured from a 362 box that the content overflows. */
 .kh2-foliage{position:relative;margin-top:56px;height:227px;pointer-events:none;}
+/* Header and hero come to 877 in the frame, taller than a laptop's window. Where
+   the screen is shorter the empty space gives way first, then the band, so the
+   whole hero stays in view; from 877 up this works out to the frame's own numbers. */
+@media (min-width:641px){
+  .kh2-hero{padding-top:clamp(24px,calc((100vh - 690px) * .7),131px);padding-top:clamp(24px,calc((100svh - 690px) * .7),131px);}
+  .kh2-foliage{
+    margin-top:clamp(0px,calc((100vh - 690px) * .3),56px);margin-top:clamp(0px,calc((100svh - 690px) * .3),56px);
+    height:clamp(150px,calc(100vh - 487px),227px);height:clamp(150px,calc(100svh - 487px),227px);
+  }
+  .kh2-foliage .kh2-badge-wrap{top:calc(100% - 146px);}
+}
 .kh2-clips{
   /* The image is 105.73% of the band with its top cut off. Its pale ground is a
      shade off the hero's, and darken leaves the hero's colour showing instead. */
