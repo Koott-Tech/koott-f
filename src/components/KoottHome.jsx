@@ -1319,6 +1319,14 @@ const CSS = `
   }
   .kh2-foliage .kh2-badge-wrap{top:calc(100% - 146px);}
 }
+/* Past the frame's 1920 the band keeps the image's proportions instead of
+   stretching it sideways, unless that would push the hero off a short screen. */
+@media (min-width:1921px){
+  .kh2-foliage{
+    height:max(150px,min(11.82vw,calc(100vh - 487px)));
+    height:max(150px,min(11.82vw,calc(100svh - 487px)));
+  }
+}
 .kh2-clips{
   /* The image is 105.73% of the band with its top cut off. Its pale ground is a
      shade off the hero's, and darken leaves the hero's colour showing instead. */
@@ -1651,6 +1659,10 @@ const CSS = `
 }
 .kh2-reviews::before{left:-40px;background:rgba(6,51,39,.88);}
 .kh2-reviews::after{right:-53px;background:rgba(6,51,39,.986);}
+/* Narrower where a card is a large share of the width, so its text stays readable. */
+@media (max-width:1240px){
+  .kh2-reviews::before,.kh2-reviews::after{width:80px;filter:blur(24px);}
+}
 .kh2-rev-track{display:flex;width:max-content;animation:kh2-roll 72s linear infinite;}
 .kh2-reviews:hover .kh2-rev-track{animation-play-state:paused;}
 .kh2-rev-set{display:flex;align-items:center;gap:24px;flex:none;margin-right:24px;}
@@ -1881,7 +1893,8 @@ const CSS = `
   .kh2-care-media{min-height:480px;}
   .kh2-rev-head{flex-direction:column;align-items:flex-start;}
   .kh2-slide{grid-template-columns:1fr 1fr;}
-  .kh2-posts{grid-template-columns:repeat(2,minmax(0,1fr));}
+  /* three across, with a tighter gap, so no card is left alone on a row */
+  .kh2-posts{gap:16px;}
 }
 @media (max-width:860px) and (min-width:641px){
   .kh2-quicks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:560px;margin:0 auto;}
