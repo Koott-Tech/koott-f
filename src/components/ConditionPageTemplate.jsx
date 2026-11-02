@@ -2210,8 +2210,15 @@ const CSS = `
 }
 .kct-seekhelp .kct-seek-row.is-open{border-radius:12px;min-height:122px;}
 .kct-seekhelp .kct-seek-head{min-height:40px;}
+/* 24, not 18: the file sets these rows larger than the signs checklist above
+   them -- seven titles at 24 against the symptom rows' 14 -- and the body with
+   them at 16. The comment on this block has said 24 since it was measured; the
+   rule did not follow it. */
 .kct-seekhelp .kct-seek-t,.kct-seekhelp .kct-seek-t:not(#_){
-  font-size:18px!important;line-height:26px!important;font-weight:600!important;
+  font-size:24px!important;line-height:32px!important;font-weight:600!important;
+}
+.kct-seekhelp .kct-seek-b,.kct-seekhelp .kct-seek-b:not(#_){
+  font-size:16px!important;line-height:24px!important;
 }
 
 
@@ -2466,6 +2473,30 @@ const CSS = `
 
   /* The screener rows take the same 358 column as everything else. */
   .kct-scr,.kct-scr-out,.kct-scr-lead{max-width:none;}
+
+  /* The seek-help rows are 24 on the desktop frame and 18 on this one. */
+  .kct-seekhelp .kct-seek-t,.kct-seekhelp .kct-seek-t:not(#_){
+    font-size:18px!important;line-height:26px!important;
+  }
+  .kct-seekhelp .kct-seek-b,.kct-seekhelp .kct-seek-b:not(#_){
+    font-size:14px!important;line-height:22px!important;
+  }
+
+  /* CTA strips: the mobile file drops the lead line from the desktop 20/30
+     to 14/22, the middle strip's heading from 20 to 18, and every strip's
+     button label from 16 to 14. */
+  .kct-bookband .kct-band-p--lead,.kct-bookband .kct-band-p--lead:not(#_){
+    font-size:14px!important;line-height:22px!important;
+  }
+  .kct-bookband .kct-band-h,.kct-bookband .kct-band-h:not(#_){
+    font-size:18px!important;line-height:26px!important;
+  }
+  .kct-bookband .kct-band-p,.kct-bookband .kct-band-p:not(#_){
+    font-size:14px!important;line-height:22px!important;
+  }
+  .kct-bookband .kct-btn-solid,.kct-bookband .kct-btn-solid:not(#_){
+    font-size:14px!important;
+  }
 
   /* FAQ: the 860 column collapses to the page's own. */
   .kct-faq{max-width:none;margin-top:24px;gap:12px;}
