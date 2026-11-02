@@ -582,3 +582,101 @@ export const THERAPIST_CARD_CSS = `
   .ktc-book{padding:10px 13px;}
 }
 `;
+
+/**
+ * The card as the Figma frames draw it ("Individual page_Final", "Home_Final"
+ * and their phone frames), applied under the scope class so a page opts in and the
+ * booking listing keeps the card it has. Pass the page's root class, e.g.
+ * designCardCss('.kct').
+ */
+export const designCardCss = (scope) => `
+/* Most of it re-points the card's own variables; the rest are the handful of
+   shapes the design changes. */
+${scope} .ktc{
+  --ktc-primary:#189E4F;
+  --ktc-primary-soft:#EFFFEA;
+  --ktc-ink:#0F0F0F;
+  --ktc-ink-soft:#5C5C5C;          /* Typography/Tertiary */
+  --ktc-line:#E3E2E2;
+  --ktc-bg:#F9F9F9;
+  --ktc-surface:#fff;
+  border-width:1px;border-radius:16px;padding:20px;
+}
+/* The card the design draws is this card, sized differently: 377.33x360
+   with 20 of padding, and inside it a 234-tall block over a 66-tall foot
+   20 below it. Measured off the .fig —
+     head   48   (a 48 avatar, not 64)
+     panel  60   (12 + two lines of bio + 12)
+     tags   24
+     stats  54   (three 97.11x54 tiles on #F9F9F9, radius 12)
+     foot   66   (#F0F5ED on a #DDEED8 hairline, a 120x40 #1B6930 button)
+   with 16 between each and 20 before the foot. Scoped to ${scope} so the
+   booking page keeps the card it has. */
+${scope} .ktc{min-height:360px;}
+${scope} .ktc-head{align-items:flex-start;gap:12px;margin:0 0 16px;}
+/* The photo in a #E3E2E2 ring, with the link's arrow on a pale badge at its foot. */
+${scope} .ktc-ava{position:relative;flex:none;display:block;width:48px;height:48px;text-decoration:none;}
+${scope} .ktc-avatar{
+  display:block;width:48px;height:48px;border:0;background:#EFFFEA;
+  box-shadow:0 0 0 1px #E3E2E2;
+}
+${scope} .ktc-go{
+  position:absolute;left:25.3px;top:29px;display:flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;background:#EFFFEA;color:#1B6930;box-shadow:0 0 0 .6px #fff;
+}
+${scope} .ktc-who{flex:1;}
+${scope} .ktc-name{font-size:16px!important;font-weight:500!important;line-height:24px!important;}
+${scope} .ktc-role{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
+/* Eight 1px bars around the 25 button, lit from the inside out as it plays. */
+${scope} .ktc-wave{flex:none;display:flex;align-items:center;gap:5.7px;height:29px;}
+${scope} .ktc-wave i{flex:none;display:block;width:1px;background:#E3E2E2;transform-origin:center;}
+${scope} .ktc-wave i.is-near{background:#BFE3CB;}
+${scope} .ktc-wave.is-playing i{animation:ktc-bar-move .7s ease-in-out infinite alternate;}
+${scope} .ktc-wave-btn{
+  flex:none;display:flex;align-items:center;justify-content:center;width:25.2px;height:25.2px;
+  margin:0 -1.3px;padding:0;border:1.3px solid #1B6930;border-radius:50%;
+  background:#fff;color:#1B6930;cursor:pointer;
+}
+${scope} .ktc-panel{min-height:60px;margin:0 0 15px;padding:12px;border-radius:12px;}
+${scope} .ktc-bio{font-size:12px!important;line-height:18px!important;margin:0;max-height:36px;}
+${scope} .ktc-tags-wrap{flex:none;margin:0 0 15px;}
+${scope} .ktc-tags{padding-bottom:0;}
+${scope} .ktc-chip{
+  display:inline-flex;align-items:center;height:26px;padding:0 10px;border-color:#E3E2E2;border-radius:13px;
+  font-size:12px!important;font-weight:400!important;line-height:18px!important;color:#373737!important;
+}
+${scope} .ktc-stats,${scope} .ktc-stats:not(#_){grid-template-columns:repeat(3,minmax(0,1fr));gap:23px;margin:0 0 20px;}
+${scope} .ktc-stat{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:54px;padding:4px 6px;border-radius:12px;
+}
+${scope} .ktc-stat-v{font-size:12px!important;font-weight:500!important;line-height:18px!important;}
+${scope} .ktc-stat-l{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
+${scope} .ktc-lang-phone{display:none;}
+/* The foot is a tinted panel in the design, not a hairline above the row. */
+${scope} .ktc-foot{
+  min-height:66px;margin-top:auto;padding:0 12px;
+  background:#F0F5ED;border:1px solid #DDEED8;border-radius:12px;
+}
+${scope} .ktc-avail-l{font-size:12px!important;line-height:18px!important;color:#373737!important;}
+${scope} .ktc-avail{font-size:12px!important;font-weight:500!important;line-height:18px!important;margin:2px 0 0;}
+${scope} .ktc-book{
+  justify-content:center;width:120px;height:40px;padding:0;border-radius:8px;background:#189E4F;
+  font-size:16px!important;font-weight:500!important;line-height:24px!important;
+}
+${scope} .ktc-book:hover{background:#1B6930;}
+
+/* The 390 phone frames. */
+@media (max-width:640px){
+  ${scope} .ktc{min-height:348px;padding:16px;--ktc-ink-soft:#7C7C7C;}
+  ${scope} .ktc-wave{margin-top:5px;}
+  ${scope} .ktc-wave-btn{width:31.2px;height:31.2px;margin:0 -4.3px;}
+  ${scope} .ktc-chip{height:30px;border-color:#E8EFE5;border-radius:15px;}
+  ${scope} .ktc-stats,${scope} .ktc-stats:not(#_){gap:8px;margin-bottom:16px;}
+  ${scope} .ktc-stat{min-height:56px;border-radius:10px;}
+  ${scope} .ktc-lang-lap{display:none;}
+  ${scope} .ktc-lang-phone{display:block;}
+  ${scope} .ktc-foot{min-height:60px;padding:0 10px;border:0;}
+  ${scope} .ktc-book{width:112px;text-transform:capitalize;}
+}
+`;

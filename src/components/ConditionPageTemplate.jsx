@@ -1,7 +1,7 @@
 'use client';
 
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import TherapistCard, { THERAPIST_CARD_CSS } from './TherapistCard';
+import TherapistCard, { THERAPIST_CARD_CSS, designCardCss } from './TherapistCard';
 import { toCard } from './BookMalayaliPsychologists';
 import { ResumeBooking } from './ResumeBookingCard';
 import { publicApi } from '@/lib/backendApi';
@@ -1400,85 +1400,7 @@ const CSS = `
 /* closing --------------------------------------------------------------- */
 
 
-/* Therapist card, from the Figma -------------------------------------------
-   The card is shared with the home page, the booking listing and the resume
-   card, so the design is applied here rather than in TherapistCard itself —
-   those three keep the card they have until their own designs land. Most of it
-   is re-pointing the card's own variables; the rest are the handful of shapes
-   the design changes. */
-.kct .ktc{
-  --ktc-primary:var(--p-main);
-  --ktc-primary-soft:var(--p-light);
-  --ktc-ink:var(--t-primary);
-  --ktc-ink-soft:#5C5C5C;          /* Typography/Tertiary */
-  --ktc-line:var(--s-1);
-  --ktc-bg:var(--bg-soft);
-  --ktc-surface:#fff;
-  border-width:1px;border-radius:16px;padding:20px;
-}
-/* The card the design draws is this card, sized differently: 377.33x360
-   with 20 of padding, and inside it a 234-tall block over a 66-tall foot
-   20 below it. Measured off the .fig —
-     head   48   (a 48 avatar, not 64)
-     panel  60   (12 + two lines of bio + 12)
-     tags   24
-     stats  54   (three 97.11x54 tiles on #F9F9F9, radius 12)
-     foot   66   (#F0F5ED on a #DDEED8 hairline, a 120x40 #1B6930 button)
-   with 16 between each and 20 before the foot. Scoped to .kct so the
-   booking page keeps the card it has. */
-.kct .ktc{min-height:360px;}
-.kct .ktc-head{align-items:flex-start;gap:12px;margin:0 0 16px;}
-/* The photo in a #E3E2E2 ring, with the link's arrow on a pale badge at its foot. */
-.kct .ktc-ava{position:relative;flex:none;display:block;width:48px;height:48px;text-decoration:none;}
-.kct .ktc-avatar{
-  display:block;width:48px;height:48px;border:0;background:var(--p-light);
-  box-shadow:0 0 0 1px #E3E2E2;
-}
-.kct .ktc-go{
-  position:absolute;left:25.3px;top:29px;display:flex;align-items:center;justify-content:center;
-  width:20px;height:20px;border-radius:50%;background:#EFFFEA;color:#1B6930;box-shadow:0 0 0 .6px #fff;
-}
-.kct .ktc-who{flex:1;}
-.kct .ktc-name{font-size:16px!important;font-weight:500!important;line-height:24px!important;}
-.kct .ktc-role{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
-/* Eight 1px bars around the 25 button, lit from the inside out as it plays. */
-.kct .ktc-wave{flex:none;display:flex;align-items:center;gap:5.7px;height:29px;}
-.kct .ktc-wave i{flex:none;display:block;width:1px;background:#E3E2E2;transform-origin:center;}
-.kct .ktc-wave i.is-near{background:#BFE3CB;}
-.kct .ktc-wave.is-playing i{animation:ktc-bar-move .7s ease-in-out infinite alternate;}
-.kct .ktc-wave-btn{
-  flex:none;display:flex;align-items:center;justify-content:center;width:25.2px;height:25.2px;
-  margin:0 -1.3px;padding:0;border:1.3px solid #1B6930;border-radius:50%;
-  background:#fff;color:#1B6930;cursor:pointer;
-}
-.kct .ktc-panel{min-height:60px;margin:0 0 15px;padding:12px;border-radius:12px;}
-.kct .ktc-bio{font-size:12px!important;line-height:18px!important;margin:0;max-height:36px;}
-.kct .ktc-tags-wrap{flex:none;margin:0 0 15px;}
-.kct .ktc-tags{padding-bottom:0;}
-.kct .ktc-chip{
-  display:inline-flex;align-items:center;height:26px;padding:0 10px;border-color:#E3E2E2;border-radius:13px;
-  font-size:12px!important;font-weight:400!important;line-height:18px!important;color:var(--t-body)!important;
-}
-.kct .ktc-stats,.kct .ktc-stats:not(#_){grid-template-columns:repeat(3,minmax(0,1fr));gap:23px;margin:0 0 20px;}
-.kct .ktc-stat{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:54px;padding:4px 6px;border-radius:12px;
-}
-.kct .ktc-stat-v{font-size:12px!important;font-weight:500!important;line-height:18px!important;}
-.kct .ktc-stat-l{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
-.kct .ktc-lang-phone{display:none;}
-/* The foot is a tinted panel in the design, not a hairline above the row. */
-.kct .ktc-foot{
-  min-height:66px;margin-top:auto;padding:0 12px;
-  background:#F0F5ED;border:1px solid #DDEED8;border-radius:12px;
-}
-.kct .ktc-avail-l{font-size:12px!important;line-height:18px!important;color:var(--t-body)!important;}
-.kct .ktc-avail{font-size:12px!important;font-weight:500!important;line-height:18px!important;margin:2px 0 0;}
-.kct .ktc-book{
-  justify-content:center;width:120px;height:40px;padding:0;border-radius:8px;background:#189E4F;
-  font-size:16px!important;font-weight:500!important;line-height:24px!important;
-}
-.kct .ktc-book:hover{background:var(--p-dark);}
+${designCardCss('.kct')}
 
 
 /* How it works ------------------------------------------------------------
@@ -2577,16 +2499,6 @@ const CSS = `
      with 8 between them, and a borderless 60 foot with a 112 button. */
   .kct-stat:hover,.kct-blog:hover{transform:none;}
   .kct-therapists > .ktc ~ .ktc ~ .ktc{display:none;}
-  .kct .ktc{min-height:348px;padding:16px;--ktc-ink-soft:#7C7C7C;}
-  .kct .ktc-wave{margin-top:5px;}
-  .kct .ktc-wave-btn{width:31.2px;height:31.2px;margin:0 -4.3px;}
-  .kct .ktc-chip{height:30px;border-color:#E8EFE5;border-radius:15px;}
-  .kct .ktc-stats,.kct .ktc-stats:not(#_){gap:8px;margin-bottom:16px;}
-  .kct .ktc-stat{min-height:56px;border-radius:10px;}
-  .kct .ktc-lang-lap{display:none;}
-  .kct .ktc-lang-phone{display:block;}
-  .kct .ktc-foot{min-height:60px;padding:0 10px;border:0;}
-  .kct .ktc-book{width:112px;text-transform:capitalize;}
   .kct-more a.kct-btn-ghost{
     width:207px;height:32px;padding:0;background:#189E4F;border:0;border-radius:6px;color:#fff!important;
   }
