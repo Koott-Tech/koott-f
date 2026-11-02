@@ -2517,7 +2517,7 @@ const CSS = `
 }
 
 .kct-blog{border:1px solid #F4F4F4;border-radius:16px;padding:16px;}
-.kct-blog-img{height:210px;border-radius:0;}
+.kct-blog-img{height:210px;border-radius:12px;}
 .kct-blog-more{height:24px;margin-top:16px;}
 .kct-blogs-sec .kct-kicker{
   min-width:122px;padding:0 12px;background:#F9FFF8;color:var(--t-body)!important;
