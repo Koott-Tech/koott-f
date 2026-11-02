@@ -1630,7 +1630,8 @@ const CSS = `
 }
 
 /* ════ reviews ════ */
-.kh2-rev-sec{background:var(--deep);overflow:hidden;}
+/* Spaced as on the condition pages, 575 tall in all, not the frame's 703. */
+.kh2-rev-sec{background:var(--deep);overflow:hidden;padding:40px 0;}
 .kh2-rev-head{--w:1132px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
 /* 13 right of the 1132 column, where the frame puts this one row. */
 @media (min-width:1241px){ .kh2-rev-head{transform:translateX(13px);} }
@@ -1640,7 +1641,7 @@ const CSS = `
 .kh2-rating-t small{font-family:var(--text);font-size:12px;line-height:18px;color:#fff;}
 .kh2-rating-t b{font-family:var(--text);font-size:14px;font-weight:400;line-height:22px;color:#fff;}
 .kh2 .kh2-rating-t em{font-style:normal;font-size:14px;line-height:21px;letter-spacing:.14px!important;color:#F5A623;}
-.kh2-reviews{position:relative;overflow:hidden;margin-top:80px;}
+.kh2-reviews{position:relative;overflow:hidden;margin-top:32px;}
 .kh2-reviews::-webkit-scrollbar{display:none;}
 /* The dark blurs over both ends: 189 wide, 40 off the left and 53 off the right,
    the right one drawn twice in the frame. */
