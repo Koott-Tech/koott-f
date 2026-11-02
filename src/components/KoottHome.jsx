@@ -357,9 +357,9 @@ function StepArt({ step }) {
   }
   return (
     <div className="kh2-step-art kh2-step-call" aria-hidden>
-      <span className="kh2-step-tile kh2-step-tile--a"><img src="/design/steps/call-1.webp" alt="" loading="lazy" /></span>
+      <span className="kh2-step-tile kh2-step-tile--a"><img src={`${ART}/call-1.webp`} alt="" loading="lazy" /></span>
       <span className="kh2-step-tile kh2-step-tile--b">
-        <img src="/design/steps/call-2.webp" alt="" loading="lazy" />
+        <img src={`${ART}/call-2.webp`} alt="" loading="lazy" />
         <span className="kh2-step-dots"><i /><i /><i /></span>
       </span>
     </div>
@@ -1545,6 +1545,9 @@ const CSS = `
 .kh2-step-tile--a{flex:0 0 196px;}
 .kh2-step-tile--b{flex:1 1 0;}
 .kh2-step-tile img{width:100%;height:100%;object-fit:cover;display:block;}
+/* The frame's crops: both photos keep the heads in view. */
+.kh2-step-tile--a img{object-position:50% 16.5%;}
+.kh2-step-tile--b img{object-position:50% 38.2%;}
 .kh2-step-dots{position:absolute;right:4px;top:13px;display:flex;flex-direction:column;gap:2.5px;}
 .kh2-step-dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.9);display:block;}
 .kh2-step-dots i:nth-child(2){background:#EF4444;}
@@ -1614,7 +1617,9 @@ const CSS = `
   background:linear-gradient(180deg,#E8F2E1 0%,rgba(190,219,172,0) 100%);
 }
 /* The Malayalam letter cut off at the card's top right. */
-.kh2-care-mark{position:absolute;inset:0;width:100%;height:auto;pointer-events:none;}
+/* The file's canvas runs 30 above and 36 right of the 714 card, so only the
+   card's own edge cuts the mark. */
+.kh2-care-mark{position:absolute;left:0;top:0;width:105.04%;max-width:none;height:auto;margin-top:-4.2%;pointer-events:none;}
 .kh2-care-card > *:not(.kh2-care-mark){position:relative;}
 .kh2-care-ps{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
 .kh2-care-p{font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;color:var(--body)!important;}
@@ -1909,6 +1914,9 @@ const CSS = `
 /* ════ the 390 phone frame ("Home mobile Updated") ════
    Last in the sheet so it wins on equal specificity. 16px gutters, headings
    24/32, body 14/22. */
+@media (max-width:340px){
+  .kh2-exp-ctas .kh2-btn2,.kh2-exp-ctas .kh2-textlink{font-size:14px!important;}
+}
 @media (max-width:640px){
   .kh2-lap{display:none!important;}
   .kh2-ph{display:revert!important;}
@@ -2039,7 +2047,8 @@ const CSS = `
   /* care: the card, then the photo under it. */
   .kh2-care{grid-template-columns:1fr;gap:16px;}
   .kh2-care-card{padding:20px;}
-  .kh2-care-mark{inset:auto;left:85px;top:7px;width:283px;}
+  /* From the right, so it stays in the corner on any phone. */
+  .kh2-care-mark{left:auto;right:-24px;top:-5px;width:297.3px;margin-top:0;}
   .kh2-care-ps{gap:20px;margin-top:12px;}
   .kh2-care-p{font-size:14px!important;line-height:22px!important;}
   .kh2-stats{gap:24px 16px;margin-top:20px;}
@@ -2062,13 +2071,14 @@ const CSS = `
     padding:24px 16px 0;scroll-padding:0 16px;
   }
   .kh2-rev-track{animation:none;width:auto;}
-  .kh2-rev-set{align-items:flex-start;gap:12px;margin-right:0;}
+  /* Every card as tall as the tallest, with its rating on the same line. */
+  .kh2-rev-set{align-items:stretch;gap:12px;margin-right:0;}
   .kh2-rev-set + .kh2-rev-set,.kh2-rev-spare,.kh2-review--repeat{display:none!important;}
   .kh2-rev-col{display:contents;}
   .kh2-review,.kh2-review--big{
     width:min(326px,calc(100vw - 64px));min-height:330px;padding:20px;border-radius:16px;scroll-snap-align:start;
-    grid-template-columns:56px minmax(0,1fr);grid-template-areas:"av who" "q q" "rate rate";
-    column-gap:12px;row-gap:20px;align-content:start;
+    grid-template-columns:56px minmax(0,1fr);grid-template-rows:auto auto 1fr;grid-template-areas:"av who" "q q" "rate rate";
+    column-gap:12px;row-gap:20px;align-content:stretch;
     background:linear-gradient(180deg,#0A4636 9.13%,#18AC85 156.96%);
   }
   .kh2-review::before{
@@ -2080,7 +2090,7 @@ const CSS = `
   .kh2-review-who{gap:3px;}
   .kh2-review-q,.kh2-review--big .kh2-review-q{font-size:18px!important;font-weight:500!important;line-height:26px!important;}
   .kh2-review-rate,.kh2-review--big .kh2-review-rate{
-    position:static;display:flex;justify-self:start;align-self:start;height:30px;margin-top:-2px;gap:4px;padding:0 10px;border-radius:8px;background:var(--deep);
+    position:static;display:flex;justify-self:start;align-self:end;height:30px;margin-top:0;gap:4px;padding:0 10px;border-radius:8px;background:var(--deep);
   }
   .kh2-review-g,.kh2-review--big .kh2-review-g{width:auto;height:auto;margin-top:0;background:none;}
   .kh2-review--big .kh2-review-s{height:auto;}
@@ -2110,8 +2120,10 @@ const CSS = `
   .kh2-reveal--phone{display:grid;}
   .kh2-reveal--phone > .kh2-reveal-in{display:block;visibility:hidden;opacity:0;}
   .kh2-reveal--phone.is-open > .kh2-reveal-in{visibility:visible;opacity:1;}
-  .kh2-exp-ctas{justify-content:flex-start;flex-wrap:wrap;gap:12px;margin-top:24px;}
-  .kh2-exp-ctas .kh2-textlink{width:132px;padding:0;white-space:nowrap;}
+  /* One row on every phone: the button gives up its side padding first. */
+  .kh2-exp-ctas{justify-content:flex-start;flex-wrap:nowrap;gap:12px;margin-top:24px;}
+  .kh2-exp-ctas .kh2-textlink{flex:0 1 132px;width:auto;min-width:0;padding:0;white-space:nowrap;}
+  .kh2-exp-ctas .kh2-btn2.kh2-btn2--m{flex:1 0 auto;padding:0 8px;}
   .kh2-exp-ctas .kh2-textlink svg{display:none;}
 
   /* services: the tab rail gets arrows and fades, the stories swipe. */
