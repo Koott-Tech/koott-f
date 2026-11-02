@@ -7,8 +7,9 @@
  * app/ (about-us, blog, admin, …) still wins; this only picks up what is left,
  * and calls notFound() when the slug is not one of ours.
  *
- * These are static. The copy lives in data/conditionPages.js — the same pages,
- * exported from counselling_services rather than retyped — so the page no
+ * These are static. The copy lives in data/conditions/, a file a page in the
+ * folder of its header category — the same pages, exported from
+ * counselling_services rather than retyped — so the page no
  * longer waits on the API, and a change to it is a commit rather than a form.
  * Blog posts and careers stay in the CMS: those are written continuously by
  * people who should not need a deploy.
@@ -17,7 +18,7 @@
 import { notFound } from 'next/navigation';
 import ConditionPageTemplate from '@/components/ConditionPageTemplate';
 import StaticPageTemplate from '@/components/StaticPageTemplate';
-import { findConditionPage, CONDITION_SLUGS } from '@/data/conditionPages';
+import { findConditionPage, CONDITION_SLUGS } from '@/data/conditions';
 import { findStaticPage, KOOTT_STATIC_PAGES } from '@/data/koottStaticPages';
 
 // Built at build time now that the content ships with the app. dynamicParams

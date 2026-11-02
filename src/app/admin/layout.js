@@ -116,7 +116,7 @@ export default function AdminLayout({ children }) {
       hasSubmenu: true,
       // What is still written here. The condition pages, the home page, about
       // and the FAQ left the CMS: their copy is in the repository now
-      // (data/conditionPages.js and the rest of data/), so editing them is a
+      // (data/conditions/ and the rest of data/), so editing them is a
       // commit. Their routes still exist and still read the database, so an
       // old link opens an editor whose changes no longer reach the site —
       // which is why they are not in this menu.

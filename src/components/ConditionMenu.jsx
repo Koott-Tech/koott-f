@@ -5,84 +5,20 @@
  *
  * Three top-level groups — INDIVIDUAL, RELATIONSHIP, SEXUAL & INTIMACY — and,
  * under INDIVIDUAL only, a nested third level (OTHER DISORDERS, OTHER CRISIS,
- * OTHER BEHAVIOUR). Everything is driven by the CMS: each published row in
- * counselling_services carries its category, nested group, nav label and order,
- * so adding a condition page in the admin puts it in the menu with no code change.
+ * OTHER BEHAVIOUR). The pages are static, so the menu is too: it comes from
+ * data/conditions/menu.js and is whole in the first HTML, backend or no backend.
  *
  * Links point at the top-level slug (/depression-treatment), matching the live
  * site and the app/[conditionSlug] route.
  *
- * Two renderers share one data hook:
+ * Two renderers:
  *   <ConditionMenuPanel />  the desktop hover/click flyout
  *   <ConditionMenuMobile /> the stacked accordion inside the mobile drawer
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { rowsOf, shapeMenu } from '@/lib/conditionMenu';
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
-
-// Last menu seen: in memory for this tab, and in localStorage across visits.
-const MENU_CACHE_KEY = 'koott_condition_menu_v1';
-let memo = null;
-
-function readCachedMenu() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(MENU_CACHE_KEY) || 'null');
-    return Array.isArray(saved?.cats) && saved.cats.length ? saved.cats : null;
-  } catch (_) {
-    return null; // private mode / storage blocked
-  }
-}
-
-function saveCachedMenu(cats) {
-  try {
-    localStorage.setItem(MENU_CACHE_KEY, JSON.stringify({ at: Date.now(), cats }));
-  } catch (_) { /* private mode / storage blocked */ }
-}
-
-/**
- * Fetch once per mount and shape into categories -> direct items + nested groups.
- * `enabled: false` skips the request — for a renderer that is handed the menu the
- * header already loaded (the mobile drawer), so opening it never shows an empty
- * list while a second copy of the same request is in flight.
- */
-export function useConditionMenu({ enabled = true, initial = null } = {}) {
-  // `initial` is the menu the server put in the first HTML (app/layout.js).
-  const [cats, setCats] = useState(() => (initial?.length ? initial : []));
-
-  useEffect(() => {
-    if (!enabled) return undefined;
-    let cancelled = false;
-
-    // Show the last menu straight away (this tab's copy, else the one saved in the
-    // browser) — after a login or redirect the header used to sit empty while the
-    // menu downloaded — then refresh it in the background.
-    const cached = memo || readCachedMenu();
-    if (cached && !initial?.length) setCats(cached);
-
-    (async () => {
-      try {
-        // Menu-only endpoint (a few KB); the full list carried every page's content (~1 MB).
-        let res = await fetch(`${API}/counselling/menu`);
-        if (!res.ok) res = await fetch(`${API}/counselling?limit=200`);
-        if (!res.ok) return;
-        const json = await res.json();
-        const shaped = shapeMenu(rowsOf(json));
-
-        memo = shaped;
-        saveCachedMenu(shaped);
-        if (!cancelled) setCats(shaped);
-      } catch (_) {
-        // Backend not reachable — the menu simply stays empty rather than breaking the header.
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [enabled]);
-
-  return cats;
-}
+import { CONDITION_MENU } from '@/data/conditions/menu';
 
 const Chevron = ({ className = '' }) => (
   <svg className={`w-4 h-4 text-gray-500 ${className}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -201,15 +137,12 @@ export function ConditionCategoryFlyout({ category, onNavigate }) {
 /* ------------------------------- desktop -------------------------------- */
 
 export function ConditionMenuPanel({ onNavigate }) {
-  const cats = useConditionMenu();
   const [openCat, setOpenCat] = useState(null);
   const [openGroup, setOpenGroup] = useState(null);
 
-  if (!cats.length) return null;
-
   return (
     <div className="counselling-dropdown header-dropdown absolute top-full left-1/2 -translate-x-1/2 w-72 bg-white rounded-lg shadow-lg border border-gray-100 py-3 z-50 mt-4">
-      {cats.map((cat) => (
+      {CONDITION_MENU.map((cat) => (
         <div
           key={cat.key}
           className="relative"
@@ -264,22 +197,14 @@ export function ConditionMenuPanel({ onNavigate }) {
 
 /* -------------------------------- mobile -------------------------------- */
 
-/**
- * The accordion inside the mobile drawer. Pass `cats` (the header's already
- * loaded menu) so the drawer is complete the moment it opens; without it the
- * component loads the menu itself.
- */
-export function ConditionMenuMobile({ onNavigate, cats: givenCats }) {
-  const ownCats = useConditionMenu({ enabled: !givenCats });
-  const cats = givenCats || ownCats;
+/** The accordion inside the mobile drawer. */
+export function ConditionMenuMobile({ onNavigate }) {
   const [openCat, setOpenCat] = useState(null);
   const [openGroup, setOpenGroup] = useState(null);
 
-  if (!cats.length) return null;
-
   return (
     <div className="kcm-mobile space-y-1 py-1">
-      {cats.map((cat) => (
+      {CONDITION_MENU.map((cat) => (
         <div key={cat.key}>
           <button
             type="button"

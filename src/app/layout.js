@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 import HeaderWrapper from "@/components/HeaderWrapper";
-import { fetchConditionMenu } from "@/lib/conditionMenu";
 import FooterWrapper from "@/components/FooterWrapper";
 import ConditionalProviders from "@/components/ConditionalProviders";
 import ConditionalPadding from "@/components/ConditionalPadding";
@@ -89,9 +88,6 @@ export const viewport = {
 };
 
 export default async function RootLayout({ children }) {
-  // Header condition menu in the first HTML, so its headings show before any script
-  // runs (cached 5 min; [] if the API is slow or down — the browser then fills it in).
-  const conditionMenu = await fetchConditionMenu();
   return (
     <html lang="en">
       <head>
@@ -348,7 +344,7 @@ export default async function RootLayout({ children }) {
         <ErrorBoundary>
           <PostHogProvider>
             <ConditionalProviders>
-              <HeaderWrapper conditionMenu={conditionMenu} />
+              <HeaderWrapper />
               <ConditionalPadding>
                 {children}
               </ConditionalPadding>

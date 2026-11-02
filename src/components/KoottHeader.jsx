@@ -14,12 +14,11 @@
  *   logo      143x56
  *   column    980px, matching the condition pages
  *
- * The three dropdowns are CMS-driven (see ConditionMenu), so publishing a
- * condition page in the admin puts it in the nav with no code change.
+ * The three dropdowns come from data/conditions/menu.js, in koott.in's order.
  *
  * Responsive:
  *   ≥1024px   full nav (fits from ~930px; 1024 is tablet landscape)
- *   <1024px   burger + drawer; the drawer reuses the menu the header loaded
+ *   <1024px   burger + drawer
  *   ≤520px    smaller logo crop and SIGN IN pill
  * Icon buttons keep their drawn size but get a 44px touch target.
  *
@@ -34,11 +33,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import {
-  useConditionMenu,
   ConditionCategoryFlyout,
   ConditionMenuMobile,
   pointerLeft,
 } from '@/components/ConditionMenu';
+import { CONDITION_MENU as cats } from '@/data/conditions/menu';
 
 const BOOK_HREF = '/book-malayali-psychologists';
 
@@ -57,9 +56,7 @@ const PillCaret = ({ open }) => (
   </svg>
 );
 
-export default function KoottHeader({ conditionMenu } = {}) {
-  // Starts from the server-rendered menu (app/layout.js), refreshed in the browser.
-  const cats = useConditionMenu({ initial: conditionMenu });
+export default function KoottHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
@@ -255,7 +252,7 @@ export default function KoottHeader({ conditionMenu } = {}) {
               onClick={() => setMobileOpen(false)}
             />
             <div className="kh-drawer">
-              <ConditionMenuMobile cats={cats} onNavigate={() => setMobileOpen(false)} />
+              <ConditionMenuMobile onNavigate={() => setMobileOpen(false)} />
               <Link href={BOOK_HREF} className="kh-drawer-link" onClick={() => setMobileOpen(false)}>
                 THERAPISTS
               </Link>

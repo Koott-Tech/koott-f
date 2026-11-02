@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 // in Header.jsx, unused, so the swap is easy to reverse.
 import Header from './KoottHeader';
 
-export default function HeaderWrapper({ conditionMenu }) {
+export default function HeaderWrapper() {
   const pathname = usePathname();
   
   // Hide global site header on admin, superadmin, psychologist, finance dashboards
@@ -22,5 +22,5 @@ export default function HeaderWrapper({ conditionMenu }) {
   // The client area used to hide this on phones because its own sidebar carried
   // the navigation there. That sidebar is gone (the dashboard prototype has
   // none), so the header is the navigation at every width.
-  return <Header conditionMenu={conditionMenu} />;
+  return <Header />;
 }
