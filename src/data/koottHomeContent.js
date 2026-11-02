@@ -58,9 +58,17 @@ export const HERO = {
 export const THERAPISTS_SECTION = {
   title: "Kerala's best Malayali counsellors and therapists are your Koott now.",
   searchPlaceholder: 'Search',
-  // The dropdown inside the search field: the language a session is held in.
-  languageLabel: 'Online',
+  // The filter inside the search field opens a popup with these two choices.
   languages: ['English', 'Malayalam'],
+  filterPopup: {
+    languageTitle: 'Choose your comfortable language',
+    languageOrder: ['Malayalam', 'English'],
+    attendTitle: 'How would you like to attend?',
+    attend: [
+      { key: 'online', label: 'Online', title: 'Online', note: 'Connect with a therapist online', icon: 'monitor' },
+      { key: 'offline', label: 'Offline', title: 'Offline - Kozhikode', note: '2nd floor, 7M-450, 4th Main Rd, Nadakkavu, Kozhikode', icon: 'building' },
+    ],
+  },
   // One-tap filters. `kind` says what a chip matches: 'role' the therapist's
   // title, 'need' what they work with or a title that names it. `match` is
   // one or more words, any of which counts.
