@@ -138,6 +138,7 @@ const CUTS = {
   mob: { mp4: '/hero-calm-mobile.mp4', webm: '/hero-calm-mobile.webm', poster: '/hero-calm-mobile.webp' },
 };
 const HANDOVER = 0.12;
+const SERVICE_AUTO_MS = 5000;
 
 const HeroClip = () => {
   const [cut, setCut] = useState(null);
@@ -487,6 +488,16 @@ export default function KoottHome({ content } = {}) {
     if (n !== serviceTab) track('ui_toggle', { element: 'services_tab', index: n });
     setServiceTab(n);
   };
+  // Moves on by itself every few seconds and wraps at the end. Picking or swiping
+  // restarts the wait, because the timer is rebuilt whenever the tab changes.
+  const [servicePaused, setServicePaused] = useState(false);
+  useEffect(() => {
+    if (servicePaused || window.matchMedia('(prefers-reduced-motion:reduce)').matches) return undefined;
+    const timer = setInterval(() => {
+      if (!document.hidden) setServiceTab((i) => (i + 1) % SERVICES.panels.length);
+    }, SERVICE_AUTO_MS);
+    return () => clearInterval(timer);
+  }, [serviceTab, servicePaused, SERVICES.panels.length]);
   // Keep the chosen tab in view where the row scrolls (the phone); scrolls the
   // row only, never the page.
   useEffect(() => {
@@ -496,8 +507,9 @@ export default function KoottHome({ content } = {}) {
     const by = tab.getBoundingClientRect().left - row.getBoundingClientRect().left - (row.clientWidth - tab.offsetWidth) / 2;
     row.scrollTo({ left: row.scrollLeft + by, behavior: 'smooth' });
   }, [serviceTab]);
-  const onServiceTouchStart = (e) => { serviceSwipe.current = e.touches[0].clientX; };
+  const onServiceTouchStart = (e) => { serviceSwipe.current = e.touches[0].clientX; setServicePaused(true); };
   const onServiceTouchEnd = (e) => {
+    setServicePaused(false);
     if (serviceSwipe.current === null) return;
     const dx = e.changedTouches[0].clientX - serviceSwipe.current;
     serviceSwipe.current = null;
@@ -890,7 +902,15 @@ export default function KoottHome({ content } = {}) {
       </section>
 
       {/* ══ services ══════════════════════════════════════════════════════ */}
-      <section className="kh2-sec kh2-svc-sec">
+      {/* Held while a mouse is over it or the keyboard is in it. Pointer events,
+          because a tap fires mouseenter with no mouseleave and would stick. */}
+      <section
+        className="kh2-sec kh2-svc-sec"
+        onPointerEnter={(e) => { if (e.pointerType === 'mouse') setServicePaused(true); }}
+        onPointerLeave={(e) => { if (e.pointerType === 'mouse') setServicePaused(false); }}
+        onFocus={(e) => { if (e.target.matches(':focus-visible')) setServicePaused(true); }}
+        onBlur={() => setServicePaused(false)}
+      >
         <div className="kh2-in">
           <h2 className="kh2-h2 kh2-center kh2-svc-h">{SERVICES.title}</h2>
           <div className="kh2-rail">
@@ -915,7 +935,8 @@ export default function KoottHome({ content } = {}) {
 
         {/* Every panel sits on one track; the next one peeks in from the right. */}
         <div className="kh2-slides" role="region" aria-label={SERVICES.title}
-          onTouchStart={onServiceTouchStart} onTouchEnd={onServiceTouchEnd}>
+          onTouchStart={onServiceTouchStart} onTouchEnd={onServiceTouchEnd}
+          onTouchCancel={() => setServicePaused(false)}>
           <div className="kh2-track" style={{ '--at': serviceTab }}>
             {SERVICES.panels.map((p, i) => (
               <article key={p.title} className={`kh2-slide${i === serviceTab ? ' is-on' : ''}`}
