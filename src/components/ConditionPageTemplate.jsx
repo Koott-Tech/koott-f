@@ -2498,6 +2498,31 @@ ${designCardCss('.kct')}
      solid "View more". 16 of padding, a 31 play button, taller chips and tiles
      with 8 between them, and a borderless 60 foot with a 112 button. */
   .kct-stat:hover,.kct-blog:hover{transform:none;}
+
+  /* Blogs: a row of 326x351 cards 12 apart that swipes one at a time, the next
+     showing at the edge, with no dots in the file. 14 of padding round a 298x195
+     picture, and a smaller chip above the heading. */
+  .kct-blogs-sec .kct-kicker{
+    min-width:105px;height:26px;margin-bottom:8px;padding:0 10px;border-radius:6px;
+    font-size:12px!important;line-height:18px!important;
+  }
+  .kct-blogs-sec .kct-blogs{
+    --blog-w:min(326px,calc(100vw - 64px));
+    display:flex;gap:12px;margin:28px -16px 0;padding:0 calc(100vw - 16px - var(--blog-w)) 0 16px;
+    overflow-x:auto;overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;scroll-padding-left:16px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .kct-blogs-sec .kct-blogs::-webkit-scrollbar{display:none;}
+  .kct-blog{
+    /* 13 + the 1px hairline: the picture gets its full 298 and sits 14 in */
+    flex:0 0 var(--blog-w);min-height:351px;padding:13px;
+    scroll-snap-align:start;scroll-snap-stop:always;
+  }
+  .kct-blog-img{height:195px;}
+  .kct-blog-t{margin-top:14px;}
+  .kct-blog-more svg{width:24px;height:24px;}
+
   .kct-therapists > .ktc ~ .ktc ~ .ktc{display:none;}
   .kct-more a.kct-btn-ghost{
     width:207px;height:32px;padding:0;background:#189E4F;border:0;border-radius:6px;color:#fff!important;
