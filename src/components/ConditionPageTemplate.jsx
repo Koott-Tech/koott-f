@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import TherapistCard, { THERAPIST_CARD_CSS } from './TherapistCard';
 import { toCard } from './BookMalayaliPsychologists';
 import { ResumeBooking } from './ResumeBookingCard';
@@ -252,6 +252,16 @@ export default function ConditionPageTemplate({ data }) {
   /* Null on the pages with no validated instrument -- most of them -- and
      those keep the plain checklist, which counts what someone recognises
      and is never shown as a score. */
+  /* Reviews run big, two small, big, two small. Chunking the list in
+     threes makes that the repeating unit: the first of each three is the
+     415 card, the other two are the stacked 192s. */
+  const reviewGroups = useMemo(() => {
+    const items = data.reviews?.items || [];
+    const out = [];
+    for (let i = 0; i < items.length; i += 3) out.push(items.slice(i, i + 3));
+    return out;
+  }, [data.reviews]);
+
   const screener = useMemo(() => screenerFor(data.slug), [data.slug]);
   const result = useMemo(
     () => (screener ? scoreScreener(screener, answers) : null),
@@ -480,19 +490,25 @@ export default function ConditionPageTemplate({ data }) {
             </span>
           </div>
         </div>
-        {/* Two stacked 192s, a 415 on its own, two more stacked — the mix the
-            design runs, and exactly the five reviews the CMS carries. */}
+        {/* The run is a 415 on its own, then two 192s stacked, then another
+            415, and so on. The reviews are chunked in threes to make that
+            repeat: the first of each three is the big card, the other two
+            stack beside it. Five reviews give a big-two-big-one run; a sixth
+            would make the pattern land evenly. */}
         <div className="kct-reviews">
           <div className="kct-rev-track">
             {[0, 1].map((pass) => (
               <div className="kct-rev-set" key={pass} aria-hidden={pass === 1 || undefined}>
-                <div className="kct-rev-col kct-rev-col--a">
-                  {d.reviews.items.slice(0, 2).map((r, i) => <ReviewCard key={i} r={r} />)}
-                </div>
-                {d.reviews.items[2] && <ReviewCard r={d.reviews.items[2]} big />}
-                <div className="kct-rev-col kct-rev-col--b">
-                  {d.reviews.items.slice(3, 5).map((r, i) => <ReviewCard key={i} r={r} />)}
-                </div>
+                {reviewGroups.map((group, g) => (
+                  <Fragment key={g}>
+                    <ReviewCard r={group[0]} big />
+                    {group.length > 1 && (
+                      <div className="kct-rev-col">
+                        {group.slice(1).map((r, i) => <ReviewCard key={i} r={r} />)}
+                      </div>
+                    )}
+                  </Fragment>
+                ))}
               </div>
             ))}
           </div>
@@ -2245,9 +2261,9 @@ const CSS = `
 @keyframes kct-rev-roll{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
 @media (prefers-reduced-motion:reduce){ .kct-rev-track{animation:none;} }
 .kct-reviews::-webkit-scrollbar{display:none;}
-.kct-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;}
-.kct-rev-col--a{width:473px;}
-.kct-rev-col--b{width:438px;}
+/* Every stacked pair is the same column now that the run repeats; the file
+   drew its two at 473 and 438, and 473 is the one that sets the rhythm. */
+.kct-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;width:473px;}
 
 .kct-review{
   /* the Wix rule above pins height:380px, which beats any min-height */
@@ -2304,7 +2320,7 @@ const CSS = `
   .kct-reviews-head{flex-direction:column;align-items:flex-start;}
 }
 @media (max-width:640px){
-  .kct-rev-col--a,.kct-rev-col--b{width:calc(100vw - 48px);}
+  .kct-rev-col{width:calc(100vw - 48px);}
   .kct-review--big{width:calc(100vw - 48px);min-height:0;}
   .kct-reviews{margin-left:calc(50% - 50vw + 16px);}
 }
