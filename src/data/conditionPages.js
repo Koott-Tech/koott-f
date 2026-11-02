@@ -31,7 +31,7 @@ export const CONDITION_PAGES = [
 "why":{
 "items":[
 {
-"body":"Our therapists understand your anxiety related conerns and provide practical guidance to help you manage it effectively.",
+"body":"Our therapists understand your anxiety related concerns and provide practical guidance to help you manage it effectively.",
 "title":"Experienced Therapist"
 },
 {
@@ -48,7 +48,7 @@ export const CONDITION_PAGES = [
 }
 ],
 "title":"Why Koott for Anxiety treatment?",
-"subtitle":"Choosing the right support makes a noticeable difference in managing anxiety and improving your daily life. At Koott, we help you feel calm and in balanced"
+"subtitle":"Choosing the right support makes a noticeable difference in managing anxiety and improving your daily life. At Koott, we help you feel calm and balanced."
 },
 "faqs":[
 {
@@ -223,7 +223,7 @@ export const CONDITION_PAGES = [
 "ctaBand":{
 "cta":{
 "href":"/book-malayali-psychologists",
-"label":"Book Now"
+"label":"Book a Session"
 },
 "text":"Take the first step today—connect with a licensed therapist in Kerala to manage anxiety and build a calmer, more balanced life."
 },
@@ -271,7 +271,7 @@ export const CONDITION_PAGES = [
 "sourceLogo":null
 }
 ],
-"title":"We have touched more than a million human lives.",
+"title":"We Helped 🤝 30,000+ Malayalees Around The Globe.",
 "eyebrow":"Reviews"
 },
 "bookBand":{

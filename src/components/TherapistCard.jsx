@@ -98,7 +98,14 @@ export const cardFields = (p) => {
   };
 };
 
-export default function TherapistCard({ t, profileHref, bookHref }) {
+/* The Figma card's waveform: four quiet bars either side of the play button,
+   outside in, the two nearest it in the brand's pale green. */
+const WAVE = [8, 26, 14, 29];
+
+/* `design` draws the card as "Individual page_Final.pdf" and "Individual mobile.pdf"
+   have it. The condition pages use it; the home page and the booking listing keep
+   the older card until their own designs are done. */
+export default function TherapistCard({ t, profileHref, bookHref, design = false }) {
   const href = profileHref ?? t.profileHref ?? '#';
   const book = bookHref ?? t.bookHref ?? href;
   const years = yearsOf(t);
@@ -203,6 +210,106 @@ export default function TherapistCard({ t, profileHref, bookHref }) {
   const elapsed = Math.round((progress / 100) * duration);
   const clock = (s) => `0:${String(s).padStart(2, '0')}`;
   const availability = t.availability || null;
+
+  if (design) {
+    return (
+      <article className="ktc">
+        <div className="ktc-head">
+          <a href={href} className="ktc-ava" data-track="card_avatar" aria-label={`View ${t.name}'s profile`}>
+            <span className="ktc-avatar">
+              {t.photo
+                // eslint-disable-next-line @next/next/no-img-element
+                ? <img src={t.photo} alt={t.name} loading="lazy" />
+                : <span className="ktc-initials" aria-hidden>{initialsOf(t.name)}</span>}
+            </span>
+            <span className="ktc-go" aria-hidden>
+              <svg viewBox="0 0 8 8" width="8" height="8" fill="none" stroke="currentColor" strokeWidth="1.1"
+                strokeLinecap="round" strokeLinejoin="round">
+                <path d="M.6 7.4L7.4.6M1.6.6h5.8v5.8" />
+              </svg>
+            </span>
+          </a>
+          <div className="ktc-who">
+            <p className="ktc-name">{t.name}</p>
+            {t.role && <p className="ktc-role">{t.role}</p>}
+          </div>
+          <div className={`ktc-wave ${playing ? 'is-playing' : ''}`}>
+            {WAVE.map((h, i) => <i key={i} className={i > 1 ? 'is-near' : ''} style={{ height: h }} />)}
+            <button type="button" className="ktc-wave-btn" onClick={playVoice} aria-label={playing ? 'Pause intro' : 'Play intro'}>
+              {playing
+                ? <Pause size={11} />
+                : (
+                  <svg viewBox="0 0 10 11" width="10" height="11" fill="none" stroke="currentColor" strokeWidth="1.2"
+                    strokeLinejoin="round" aria-hidden>
+                    <path d="M1 1l8 4.5L1 10z" />
+                  </svg>
+                )}
+            </button>
+            {[...WAVE].reverse().map((h, i) => <i key={i} className={i < 2 ? 'is-near' : ''} style={{ height: h }} />)}
+            {t.voiceUrl && <audio ref={audioRef} src={t.voiceUrl} onEnded={() => setPlaying(false)} preload="none" />}
+          </div>
+        </div>
+
+        {t.bio && (
+          <div className="ktc-panel">
+            <p ref={bioRef} className="ktc-bio" data-clamped={bioClamped ? 'true' : 'false'}>{t.bio}</p>
+          </div>
+        )}
+
+        {/* The same endless drift as the older card below: two copies of the
+            list, the track sliding exactly half its width. */}
+        {tags.length > 0 && (
+          <div className="ktc-tags-wrap">
+            <div
+              ref={tagsRef}
+              className="ktc-tags"
+              style={{ animationDuration: `${tagsSeconds}s` }}
+              onMouseEnter={() => setTagsPaused(true)}
+              onMouseLeave={() => setTagsPaused(false)}
+              data-paused={tagsPaused ? 'true' : 'false'}
+            >
+              {[0, 1].map((copy) => (
+                <span key={copy} className="ktc-tags-set" aria-hidden={copy === 1}>
+                  {Array.from({ length: tagsReps }, (_, rep) => tags.map((tag) => (
+                    <span key={`${rep}-${tag}`} className="ktc-chip">{tag}</span>
+                  )))}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="ktc-stats">
+          <div className="ktc-stat">
+            <p className="ktc-stat-v">{years > 0 ? `${years} yrs` : '—'}</p>
+            <p className="ktc-stat-l">Experience</p>
+          </div>
+          <div className="ktc-stat">
+            <p className="ktc-stat-v"><span>{lead}</span></p>
+            {/* The laptop file names the second language; the phone file says "Language". */}
+            <p className="ktc-stat-l ktc-lang-lap" title={others.join(', ')}>
+              {shown.join(', ') || 'Language'}{moreLangs > 0 && ` +${moreLangs}`}
+            </p>
+            <p className="ktc-stat-l ktc-lang-phone">Language</p>
+          </div>
+          <div className="ktc-stat">
+            <p className="ktc-stat-v">{price > 0 ? `₹${price.toLocaleString('en-IN')}` : '—'}</p>
+            <p className="ktc-stat-l">Per session</p>
+          </div>
+        </div>
+
+        <div className="ktc-foot">
+          {availability ? (
+            <div>
+              <p className="ktc-avail-l">{t.availabilityLabel || 'Next available'}</p>
+              <p className="ktc-avail">{availability}</p>
+            </div>
+          ) : <span />}
+          <a href={book} className="ktc-book" data-track="card_book_now">Book now</a>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="ktc">
@@ -313,8 +420,9 @@ export const THERAPIST_CARD_CSS = `
   background:var(--ktc-surface);border:1.5px solid var(--ktc-line);border-radius:20px;padding:20px;
   transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
 }
-/* lift on hover only where there is a real mouse — on phones a tap would leave it stuck */
-@media (hover:hover) and (pointer:fine){
+/* lift on hover only where there is a real mouse and room for it — on phones a
+   tap would leave it stuck, and a narrow window should behave like a phone */
+@media (hover:hover) and (pointer:fine) and (min-width:641px){
   .ktc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(30,43,35,.06);}
   .ktc-avatar:hover{transform:scale(1.04);}
 }

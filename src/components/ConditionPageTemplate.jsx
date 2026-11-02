@@ -1,11 +1,13 @@
 'use client';
 
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import TherapistCard, { THERAPIST_CARD_CSS } from './TherapistCard';
 import { toCard } from './BookMalayaliPsychologists';
 import { ResumeBooking } from './ResumeBookingCard';
 import { publicApi } from '@/lib/backendApi';
 import { blogApi } from '@/lib/blogApi';
+import { fetchTherapistOrder } from '@/lib/therapistOrder';
+import { whenLabel } from '@/lib/nextAvailable';
 import { screenerFor, scoreScreener, FREQUENCY, CRISIS_LINES } from '@/data/screeners';
 
 /**
@@ -79,7 +81,7 @@ const ReviewRating = () => (
    five-star testimonial reads as that client, so the circle stays empty
    until a review carries a real, permissioned photo of its own. */
 const ReviewCard = ({ r, big = false }) => (
-  <figure className={`kct-review ${big ? 'kct-review--big' : ''}`}>
+  <figure className={`kct-review ${big ? 'kct-review--big' : ''} ${r.repeat ? 'kct-review--repeat' : ''}`}>
     <span className="kct-review-avatar">
       {r.avatar
         ? <img src={r.avatar} alt="" loading="lazy" />
@@ -191,6 +193,17 @@ const Section = ({ children, bg, className = '', id }) => (
 );
 
 /**
+ * The body of a dropdown. It stays mounted and eases between no height and its
+ * own, so every row on the page opens and closes the same way. `phone` is for
+ * the plans and pillars, which are plain cards until the phone sheet folds them.
+ */
+const Reveal = ({ open, phone = false, children }) => (
+  <div className={`kct-reveal ${phone ? 'kct-reveal--phone' : ''} ${open ? 'is-open' : ''}`}>
+    <div className="kct-reveal-in">{children}</div>
+  </div>
+);
+
+/**
  * Bordered card with an inline leading icon — symptoms / types / seek-help / therapy.
  *
  * Most sections give the card a single `body` paragraph. The "Types of … We
@@ -248,33 +261,57 @@ export default function ConditionPageTemplate({ data }) {
      accordion: Mind open at 134.7, the other three collapsed to 60. */
   const [openPillar, setOpenPillar] = useState(0);
   const [posts, setPosts] = useState([]);
+  /* The phone's review carousel: which card is in place, for the dots. */
+  const [reviewAt, setReviewAt] = useState(0);
+  const reviewsRef = useRef(null);
 
   /* Null on the pages with no validated instrument -- most of them -- and
      those keep the plain checklist, which counts what someone recognises
      and is never shown as a score. */
   /* Reviews run big, two small, big, two small. Chunking the list in
      threes makes that the repeating unit: the first of each three is the
-     415 card, the other two are the stacked 192s. */
+     415 card, the other two are the stacked 192s. A list that does not divide
+     by three leaves a gap under the last small card, so that stack borrows
+     from the start of the list, skipping the first review because the run
+     loops straight back to it. The phone hides these repeats. */
   const reviewGroups = useMemo(() => {
     const items = data.reviews?.items || [];
     const out = [];
     for (let i = 0; i < items.length; i += 3) out.push(items.slice(i, i + 3));
+    const last = out[out.length - 1];
+    if (last && last.length < 3 && items.length > 3) {
+      for (let i = 1; last.length < 3; i += 1) last.push({ ...items[i], repeat: true });
+    }
     return out;
   }, [data.reviews]);
 
-  /* The signs checklist colours itself only once something is ticked:
-     one or two is a normal amount to recognise, more than that warns. */
-  const signsTone =
-    checked.length === 0 ? 'idle' : checked.length <= 2 ? 'ok' : 'warn';
-  /* Nothing is coloured until something is ticked: at rest the panel and its
-     icon are plain grey, and the green or amber fades in from there. The
-     values are custom properties so the icon inside can follow without a
-     second source of truth. */
-  const SIGNS_TONE = {
-    idle: { '--tone-line': '#E3E2E2', '--tone-bg': '#FAFAFA', '--tone-ink': '#7C7C7C', '--tone-soft': '#F4F4F4' },
-    ok:   { '--tone-line': '#BFE3CB', '--tone-bg': '#F3FBF4', '--tone-ink': '#1B6930', '--tone-soft': '#DDF1E1' },
-    warn: { '--tone-line': '#F0C98A', '--tone-bg': '#FDF7EC', '--tone-ink': '#B4700C', '--tone-soft': '#FBEBD2' },
+  const reviewCards = () => Array.from(
+    reviewsRef.current?.querySelectorAll('.kct-rev-set:first-child .kct-review:not(.kct-review--repeat)') || [],
+  );
+  const onReviewsScroll = () => {
+    const left = reviewsRef.current.getBoundingClientRect().left + 16;
+    const gaps = reviewCards().map((c) => Math.abs(c.getBoundingClientRect().left - left));
+    setReviewAt(gaps.indexOf(Math.min(...gaps)));
   };
+  const goToReview = (i) => {
+    const el = reviewsRef.current;
+    const card = reviewCards()[i];
+    if (!el || !card) return;
+    const by = card.getBoundingClientRect().left - el.getBoundingClientRect().left - 16;
+    el.scrollTo({ left: el.scrollLeft + by, behavior: 'smooth' });
+  };
+
+  /* The card and the panel warm together, a step with each tick: plain grey
+     at rest, the design's orange at the third tick, which is the state the
+     file draws, and holding there. The values are custom properties so the
+     icon inside can follow without a second source of truth. */
+  const SIGNS_STEPS = [
+    { '--signs-glow': '#E3E2E2', '--tone-line': '#E3E2E2', '--tone-bg': '#FAFAFA', '--tone-ink': '#7C7C7C', '--tone-soft': '#F4F4F4', '--tone-ico-line': '#E3E2E2', '--tone-glow': 'rgba(239,180,121,0)' },
+    { '--signs-glow': '#E9DFD8', '--tone-line': '#ECE6E0', '--tone-bg': '#FCFCFC', '--tone-ink': '#9B7A55', '--tone-soft': '#F7F2EC', '--tone-ico-line': '#E0BE99', '--tone-glow': 'rgba(239,180,121,.022)' },
+    { '--signs-glow': '#F0DCCE', '--tone-line': '#F5EADE', '--tone-bg': '#FDFDFD', '--tone-ink': '#BA792D', '--tone-soft': '#FBF0E4', '--tone-ico-line': '#DC9B4F', '--tone-glow': 'rgba(239,180,121,.043)' },
+    { '--signs-glow': '#F6D9C4', '--tone-line': '#FEEEDC', '--tone-bg': '#FFFFFF', '--tone-ink': '#D97706', '--tone-soft': '#FEEEDC', '--tone-ico-line': '#D97706', '--tone-glow': 'rgba(239,180,121,.065)' },
+  ];
+  const signsStep = SIGNS_STEPS[Math.min(checked.length, SIGNS_STEPS.length - 1)];
 
   const screener = useMemo(() => screenerFor(data.slug), [data.slug]);
   const result = useMemo(
@@ -298,6 +335,8 @@ export default function ConditionPageTemplate({ data }) {
   }, []);
   const [query, setQuery] = useState('');
   const [faqTab, setFaqTab] = useState('');
+  /* The phone shows a tab's first three questions until "View more". */
+  const [faqAll, setFaqAll] = useState(false);
   const [liveTherapists, setLiveTherapists] = useState([]);
   const d = data;
 
@@ -315,13 +354,18 @@ export default function ConditionPageTemplate({ data }) {
   useEffect(() => {
     if (cmsTherapists.length) return undefined;
     let off = false;
-    publicApi.getPsychologists()
-      .then((res) => {
+    // The order endpoint carries each therapist's next free start, which is the
+    // card's "Next available". No answer leaves that line off; nothing is invented.
+    Promise.all([publicApi.getPsychologists(), fetchTherapistOrder('booking').catch(() => null)])
+      .then(([res, order]) => {
         if (off) return;
         const rows = res?.data?.psychologists || res?.data || [];
         // More than the three cards need: the "choose a therapist" step shows a
         // row of faces, and the design puts five in it.
-        setLiveTherapists(Array.isArray(rows) ? rows.slice(0, 8).map(toCard) : []);
+        setLiveTherapists(Array.isArray(rows) ? rows.slice(0, 8).map(toCard).map((t) => ({
+          ...t,
+          availability: whenLabel(order?.nextAt?.get(String(t.id))),
+        })) : []);
       })
       .catch(() => { if (!off) setLiveTherapists([]); });
     return () => { off = true; };
@@ -349,6 +393,28 @@ export default function ConditionPageTemplate({ data }) {
     if (faqCats.length) return f.cat === faqTabOn;
     return !query || (f.q + f.a).toLowerCase().includes(query.toLowerCase());
   });
+
+  /* The phone frame sets Therapy ahead of General, so the rail's arrows walk
+     that order; the sheet moves the pill to match. */
+  const faqRail = [...faqCats.filter((c) => c === 'Therapy'), ...faqCats.filter((c) => c !== 'Therapy')];
+  const faqRailAt = faqRail.indexOf(faqTabOn);
+  const faqRailRef = useRef(null);
+  const faqRailMoved = useRef(false);
+  const pickFaqTab = (c) => {
+    setFaqTab(c);
+    setOpenFaq(-1);
+    setFaqAll(false);
+  };
+  /* The active pill rests at x111, in the clear between the two fades. Above
+     the phone the row does not overflow, so this does nothing there. */
+  useEffect(() => {
+    const el = faqRailRef.current;
+    const tab = el?.querySelector('.is-on');
+    if (!tab) return;
+    const by = tab.getBoundingClientRect().left - el.getBoundingClientRect().left - 111;
+    el.scrollTo({ left: el.scrollLeft + by, behavior: faqRailMoved.current ? 'smooth' : 'auto' });
+    faqRailMoved.current = true;
+  }, [faqTabOn]);
 
   return (
     <main className="kct">
@@ -413,7 +479,13 @@ export default function ConditionPageTemplate({ data }) {
         <div className="kct-therapists">
           <ResumeBooking />
           {therapists.slice(0, 3).map((t, i) => (
-            <TherapistCard key={t.id || i} t={t} />
+            <TherapistCard
+              key={t.id || i}
+              t={t}
+              design
+              profileHref={t.slug ? `/service-page/${t.slug}` : `/therapist-profile?doctor=${encodeURIComponent(t.id)}`}
+              bookHref={t.slug ? `/book/${t.slug}` : `/therapist-profile?doctor=${encodeURIComponent(t.id)}`}
+            />
           ))}
         </div>
         <p className="kct-more">
@@ -463,9 +535,9 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── Plans ──────────────────────────────────────────────────────── */}
-      <Section>
+      <Section className="kct-plans-sec">
         <h2 className="kct-h2 kct-center">{d.plans.title}</h2>
-        <p className="kct-sub kct-center">{d.plans.subtitle}</p>
+        <p className="kct-sub kct-center kct-plans-sub">{d.plans.subtitle}</p>
         <div className="kct-grid-4 kct-grid-4--plans">
           {d.plans.items.map((p, i) => {
             const open = openPlan === i;
@@ -478,14 +550,16 @@ export default function ConditionPageTemplate({ data }) {
                   onClick={() => setOpenPlan(open ? -1 : i)}
                 >
                   <h3 className="kct-card-t">{p.name}</h3>
-                  <svg className="kct-plan-x" viewBox="0 0 24 24" width="16" height="16" fill="none"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  <svg className="kct-plan-x" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                    stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
                     aria-hidden focusable="false">
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
-                <p className="kct-card-b">{p.body}</p>
-                <span className="kct-price">Starting from ₹{p.from}</span>
+                <Reveal open={open} phone>
+                  <p className="kct-card-b">{p.body}</p>
+                  <span className="kct-price">Starting from ₹{p.from}</span>
+                </Reveal>
               </div>
             );
           })}
@@ -507,9 +581,9 @@ export default function ConditionPageTemplate({ data }) {
         {/* The run is a 415 on its own, then two 192s stacked, then another
             415, and so on. The reviews are chunked in threes to make that
             repeat: the first of each three is the big card, the other two
-            stack beside it. Five reviews give a big-two-big-one run; a sixth
-            would make the pattern land evenly. */}
-        <div className="kct-reviews">
+            stack beside it. On the phone it stops rolling and becomes a swipe
+            carousel of equal cards, with dots to show the place. */}
+        <div className="kct-reviews" ref={reviewsRef} onScroll={onReviewsScroll}>
           <div className="kct-rev-track">
             {[0, 1].map((pass) => (
               <div className="kct-rev-set" key={pass} aria-hidden={pass === 1 || undefined}>
@@ -526,6 +600,18 @@ export default function ConditionPageTemplate({ data }) {
               </div>
             ))}
           </div>
+        </div>
+        <div className="kct-rev-dots">
+          {d.reviews.items.map((r, i) => (
+            <button
+              key={i}
+              type="button"
+              className={i === reviewAt ? 'is-on' : ''}
+              aria-label={`Show review ${i + 1} of ${d.reviews.items.length}`}
+              aria-current={i === reviewAt || undefined}
+              onClick={() => goToReview(i)}
+            />
+          ))}
         </div>
       </Section>
 
@@ -574,7 +660,9 @@ export default function ConditionPageTemplate({ data }) {
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </button>
-              <p className="kct-pillar-b">{p.body}</p>
+              <Reveal open={openPillar === i} phone>
+                <p className="kct-pillar-b">{p.body}</p>
+              </Reveal>
             </div>
           ))}
         </div>
@@ -585,7 +673,7 @@ export default function ConditionPageTemplate({ data }) {
           and opens to read why, and the panel underneath responds to how many
           are ticked. The design shows it mid-use — some ticked, one open. */}
       <Section className="kct-symptoms-sec">
-        <div className="kct-symptoms">
+        <div className="kct-symptoms" style={signsStep}>
           <h2 className="kct-h2 kct-center">{d.symptoms.title}</h2>
           <p className="kct-sub kct-center">{d.symptoms.subtitle}</p>
 
@@ -620,35 +708,34 @@ export default function ConditionPageTemplate({ data }) {
                       </svg>
                     </button>
                   </div>
-                  {open && <p className="kct-sign-b">{it.body}</p>}
+                  <Reveal open={open}><p className="kct-sign-b">{it.body}</p></Reveal>
                 </li>
               );
             })}
           </ul>
 
-          {/* Nothing is coloured until something is ticked. One or two is a
-              normal amount to recognise, so it stays green; past that the
-              panel warns; ticking most of them offers the booking. */}
-          <div
-            className={`kct-signs-out is-${signsTone}`}
-            style={SIGNS_TONE[signsTone]}
-            aria-live="polite"
-          >
-            <span className="kct-signs-ico" aria-hidden>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
-                stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16.5v.01" />
-              </svg>
-            </span>
-            <p>
-              {checked.length === 0
-                ? 'Tick the signs you notice to see what they might mean.'
-                : checked.length <= 2
-                  ? `You ticked ${checked.length} of ${d.symptoms.items.length}. Recognising a sign or two is common and not a diagnosis.`
-                  : `You ticked ${checked.length} of ${d.symptoms.items.length}. That is a lot to be carrying — talking it through with a therapist is a good next step.`}
-            </p>
-            {checked.length > 2 && (
-              <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
+          {/* Nothing until something is ticked, then it warms with the card. One
+              or two is a normal amount to recognise; from three the panel warns
+              and offers the booking. The live region stays mounted so a screen
+              reader announces the panel when it arrives. */}
+          <div aria-live="polite">
+            {checked.length > 0 && (
+              <div className="kct-signs-out">
+                <span className="kct-signs-ico" aria-hidden>
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none"
+                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                    <circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16v.01" />
+                  </svg>
+                </span>
+                <p>
+                  {checked.length <= 2
+                    ? `You ticked ${checked.length} of ${d.symptoms.items.length}. Recognising a sign or two is common and not a diagnosis.`
+                    : 'Seems you have signs of common stress, book a consultation now to feel better!'}
+                </p>
+                {checked.length > 2 && (
+                  <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -679,7 +766,7 @@ export default function ConditionPageTemplate({ data }) {
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
-                {open && <p className="kct-seek-b">{it.body}</p>}
+                <Reveal open={open}><p className="kct-seek-b">{it.body}</p></Reveal>
               </li>
             );
           })}
@@ -722,7 +809,7 @@ export default function ConditionPageTemplate({ data }) {
                         <path d="M6 9l6 6 6-6" />
                       </svg>
                     </button>
-                    {open && <p className="kct-seek-b">{it.body}</p>}
+                    <Reveal open={open}><p className="kct-seek-b">{it.body}</p></Reveal>
                   </li>
                 );
               })}
@@ -732,7 +819,7 @@ export default function ConditionPageTemplate({ data }) {
       </Section>
 
       {/* ── How therapy helps ──────────────────────────────────────────── */}
-      <Section>
+      <Section className="kct-helps-sec">
         <h2 className="kct-h2 kct-center">{d.therapyHelps.title}</h2>
         <p className="kct-sub kct-center">{d.therapyHelps.subtitle}</p>
         {/* The same accordion as "when to seek help", filled grey and set
@@ -753,7 +840,7 @@ export default function ConditionPageTemplate({ data }) {
                     <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
-                {open && <p className="kct-seek-b">{it.body}</p>}
+                <Reveal open={open}><p className="kct-seek-b">{it.body}</p></Reveal>
               </li>
             );
           })}
@@ -801,7 +888,15 @@ export default function ConditionPageTemplate({ data }) {
 
       {/* ── FAQs (Wix "line" theme: search + underlined rows) ──────────── */}
       <Section className="kct-faq-sec">
-        <h2 className="kct-h2 kct-center">{d.faqsTitle || 'Frequently Asked Questions'}</h2>
+        {/* The desktop file spells it out; the phone frame says "FAQ's". */}
+        <h2 className="kct-h2 kct-center">
+          {d.faqsTitle || (
+            <>
+              <span className="kct-faq-title">Frequently Asked Questions</span>
+              <span className="kct-faq-title kct-faq-title--phone">FAQ’s</span>
+            </>
+          )}
+        </h2>
         {/* The design puts category tabs here — General, Appointments, Therapy,
             Payments, Privacy. Nothing in the CMS carries a category: a FAQ is
             a question and an answer, so tabs would be five buttons that all
@@ -809,15 +904,33 @@ export default function ConditionPageTemplate({ data }) {
             for real. Add a category per FAQ and the tabs can replace it. */}
         <div className="kct-faq-head">
           {faqCats.length ? (
-            <div className="kct-faq-tabs" role="tablist">
-              {faqCats.map((c) => (
-                <button key={c} type="button" role="tab"
-                  aria-selected={faqTabOn === c}
-                  className={`kct-faq-tab ${faqTabOn === c ? 'is-on' : ''}`}
-                  onClick={() => setFaqTab(c)}>
-                  {c}
-                </button>
-              ))}
+            <div className="kct-faq-rail">
+              <button type="button" className="kct-faq-arrow kct-faq-arrow--prev"
+                aria-label="Previous category" disabled={faqRailAt <= 0}
+                onClick={() => pickFaqTab(faqRail[faqRailAt - 1])}>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                  strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M15 6l-6 6 6 6" />
+                </svg>
+              </button>
+              <div className="kct-faq-tabs" role="tablist" ref={faqRailRef}>
+                {faqCats.map((c) => (
+                  <button key={c} type="button" role="tab"
+                    aria-selected={faqTabOn === c}
+                    className={`kct-faq-tab ${faqTabOn === c ? 'is-on' : ''} ${c === 'Therapy' ? 'kct-faq-tab--first' : ''}`}
+                    onClick={() => pickFaqTab(c)}>
+                    {c}
+                  </button>
+                ))}
+              </div>
+              <button type="button" className="kct-faq-arrow kct-faq-arrow--next"
+                aria-label="Next category" disabled={faqRailAt >= faqRail.length - 1}
+                onClick={() => pickFaqTab(faqRail[faqRailAt + 1])}>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                  strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M9 6l6 6-6 6" />
+                </svg>
+              </button>
             </div>
           ) : (
             <input
@@ -830,7 +943,7 @@ export default function ConditionPageTemplate({ data }) {
             />
           )}
         </div>
-        <div className="kct-faq">
+        <div className={`kct-faq ${faqAll ? 'is-all' : ''}`}>
           {faqs.map((f, i) => {
             const open = openFaq === i;
             return (
@@ -839,12 +952,15 @@ export default function ConditionPageTemplate({ data }) {
                   <span>{f.q}</span>
                   <span className="kct-faq-sign" aria-hidden>{open ? '−' : '+'}</span>
                 </button>
-                {open && <p>{f.a}</p>}
+                <Reveal open={open}><p>{f.a}</p></Reveal>
               </div>
             );
           })}
           {faqs.length === 0 && <p className="kct-faq-empty">No matching questions.</p>}
         </div>
+        {faqs.length > 3 && !faqAll && (
+          <button type="button" className="kct-faq-more" onClick={() => setFaqAll(true)}>View more</button>
+        )}
       </Section>
 
       {/* The design runs FAQ straight into the footer. What stood here was a
@@ -1304,41 +1420,55 @@ const CSS = `
    with 16 between each and 20 before the foot. Scoped to .kct so the
    booking page keeps the card it has. */
 .kct .ktc{min-height:360px;}
-.kct .ktc-avatar{width:48px;height:48px;}
-.kct .ktc-head{margin-bottom:16px;}
-.kct .ktc-panel{min-height:60px;}
-.kct .ktc-voice{display:none;}
-/* the card's own 11.5 is below anything the design uses */
-.kct .ktc-view{font-size:12px!important;line-height:18px!important;}
-.kct .ktc-tags-wrap{height:24px;overflow:hidden;}
-.kct .ktc-stats,.kct .ktc-stats:not(#_){margin-bottom:20px;}
-.kct .ktc-foot a,.kct .ktc-foot button{background:var(--p-dark);}
+.kct .ktc-head{align-items:flex-start;gap:12px;margin:0 0 16px;}
+/* The photo in a #E3E2E2 ring, with the link's arrow on a pale badge at its foot. */
+.kct .ktc-ava{position:relative;flex:none;display:block;width:48px;height:48px;text-decoration:none;}
+.kct .ktc-avatar{
+  display:block;width:48px;height:48px;border:0;background:var(--p-light);
+  box-shadow:0 0 0 1px #E3E2E2;
+}
+.kct .ktc-go{
+  position:absolute;left:25.3px;top:29px;display:flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;background:#EFFFEA;color:#1B6930;box-shadow:0 0 0 .6px #fff;
+}
+.kct .ktc-who{flex:1;}
 .kct .ktc-name{font-size:16px!important;font-weight:500!important;line-height:24px!important;}
 .kct .ktc-role{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
-.kct .ktc-panel{border-radius:12px;padding:12px;margin-bottom:16px;}
-.kct .ktc-bio{
-  font-size:12px!important;line-height:18px!important;margin:0;
-  max-height:calc(18px * 3);
+/* Eight 1px bars around the 25 button, lit from the inside out as it plays. */
+.kct .ktc-wave{flex:none;display:flex;align-items:center;gap:5.7px;height:29px;}
+.kct .ktc-wave i{flex:none;display:block;width:1px;background:#E3E2E2;transform-origin:center;}
+.kct .ktc-wave i.is-near{background:#BFE3CB;}
+.kct .ktc-wave.is-playing i{animation:ktc-bar-move .7s ease-in-out infinite alternate;}
+.kct .ktc-wave-btn{
+  flex:none;display:flex;align-items:center;justify-content:center;width:25.2px;height:25.2px;
+  margin:0 -1.3px;padding:0;border:1.3px solid #1B6930;border-radius:50%;
+  background:#fff;color:#1B6930;cursor:pointer;
 }
+.kct .ktc-panel{min-height:60px;margin:0 0 15px;padding:12px;border-radius:12px;}
+.kct .ktc-bio{font-size:12px!important;line-height:18px!important;margin:0;max-height:36px;}
+.kct .ktc-tags-wrap{flex:none;margin:0 0 15px;}
+.kct .ktc-tags{padding-bottom:0;}
 .kct .ktc-chip{
-  height:24px;padding:3px 10px;
-  font-size:12px!important;font-weight:500!important;line-height:18px!important;
-  color:var(--t-body)!important;
+  display:inline-flex;align-items:center;height:26px;padding:0 10px;border-color:#E3E2E2;border-radius:13px;
+  font-size:12px!important;font-weight:400!important;line-height:18px!important;color:var(--t-body)!important;
 }
-.kct .ktc-tags{gap:6px;}
-.kct .ktc-stats{gap:23px;margin-bottom:16px;}
-.kct .ktc-stat{border-radius:12px;padding:8px;}
+.kct .ktc-stats,.kct .ktc-stats:not(#_){grid-template-columns:repeat(3,minmax(0,1fr));gap:23px;margin:0 0 20px;}
+.kct .ktc-stat{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:54px;padding:4px 6px;border-radius:12px;
+}
 .kct .ktc-stat-v{font-size:12px!important;font-weight:500!important;line-height:18px!important;}
 .kct .ktc-stat-l{font-size:12px!important;line-height:18px!important;margin:2px 0 0;}
+.kct .ktc-lang-phone{display:none;}
 /* The foot is a tinted panel in the design, not a hairline above the row. */
 .kct .ktc-foot{
+  min-height:66px;margin-top:auto;padding:0 12px;
   background:#F0F5ED;border:1px solid #DDEED8;border-radius:12px;
-  padding:12px;border-top:0;margin-top:auto;
 }
 .kct .ktc-avail-l{font-size:12px!important;line-height:18px!important;color:var(--t-body)!important;}
 .kct .ktc-avail{font-size:12px!important;font-weight:500!important;line-height:18px!important;margin:2px 0 0;}
 .kct .ktc-book{
-  height:40px;padding:8px 22px;border-radius:8px;
+  justify-content:center;width:120px;height:40px;padding:0;border-radius:8px;background:#189E4F;
   font-size:16px!important;font-weight:500!important;line-height:24px!important;
 }
 .kct .ktc-book:hover{background:var(--p-dark);}
@@ -1536,7 +1666,11 @@ const CSS = `
 .kct-sign{background:#fff;border:1px solid var(--s-1);border-radius:10px;padding:12px 14px;}
 /* removed: the file does not recolour an open row. */
 .kct-sign-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.kct-sign-tick{display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;}
+/* A control, not text: without this a click parks a text caret in the box. */
+.kct-sign-tick{
+  display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;
+  user-select:none;-webkit-user-select:none;caret-color:transparent;
+}
 .kct-sign-tick input{position:absolute;opacity:0;width:0;height:0;}
 /* The box is drawn rather than native so the tick can be the brand green. */
 .kct-sign-tick > span[aria-hidden]{
@@ -2014,7 +2148,8 @@ const CSS = `
 .kct-symptoms{
   max-width:var(--col);margin:0 auto;padding:64px 16px;
   background:#fff;border:0;border-radius:32px;
-  box-shadow:inset 0 0 31px #F6D9C4;
+  box-shadow:inset 0 0 31px var(--signs-glow,#E3E2E2);
+  transition:box-shadow .6s ease;
 }
 .kct-symptoms .kct-sub{max-width:677px;}
 .kct-signs{max-width:663px;margin:40px auto 0;gap:16px;}
@@ -2046,25 +2181,34 @@ const CSS = `
 .kct-signs .kct-sign-tick input:checked + span[aria-hidden]::after{
   transform:rotate(45deg) scale(1);opacity:1;
 }
-/* The outcome panel is the only thing that takes a colour, and only once
-   the count says so. */
-/* The tone is set inline from the tick count, as three custom properties:
-   this sheet declares .kct-signs-out twice, hundreds of lines apart, and a
-   modifier class on it would not survive that. The panel and the icon both
-   read the properties, so there is one source of truth, and both ease over
-   400ms so the change reads as a shift rather than a flash. */
+/* The tone is set inline on .kct-symptoms from the tick count, as custom
+   properties: this sheet declares .kct-signs-out twice, hundreds of lines
+   apart, and a modifier class on it would not survive that. The card, the
+   panel and the icon all read the properties, so there is one source of
+   truth, and they ease so the change reads as a shift rather than a flash. */
+/* Frame: 663x196 inside a 1px edge, radius 12, 24 of padding. The icon is 48
+   with its 1px stroke outside, the copy sits 4 under it and the 145x32 button
+   18 under that. The glow is measured off the PDF, which flattens effects. */
 .kct-signs-out{
+  gap:0;padding:24px;
+  max-width:663px;margin:32px auto 0;
   border-color:var(--tone-line,#E3E2E2);
   background:var(--tone-bg,#FAFAFA);
-  transition:border-color .4s ease,background-color .4s ease;
+  box-shadow:inset 0 8px 29px var(--tone-glow,transparent);
+  transition:border-color .6s ease,background-color .6s ease,box-shadow .6s ease;
 }
 .kct-signs-out .kct-signs-ico{
-  border-color:var(--tone-line,#E3E2E2);
+  width:50px;height:50px;
+  border-color:var(--tone-ico-line,#E3E2E2);
   background:var(--tone-soft,#F4F4F4);
   color:var(--tone-ink,#7C7C7C);
-  transition:border-color .4s ease,background-color .4s ease,color .4s ease;
+  transition:border-color .6s ease,background-color .6s ease,color .6s ease;
 }
-.kct-signs-out p{transition:color .4s ease;}
+.kct-signs-out p{margin:4px 0 0;max-width:360px;transition:color .4s ease;}
+.kct-signs-out .kct-btn-solid{
+  height:32px;min-width:145px;margin-top:18px;padding:0 22px;border-radius:6px;
+  font-size:14px!important;line-height:22px;
+}
 .kct-sign-t,.kct-sign-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;color:var(--t-primary)!important;
@@ -2294,6 +2438,7 @@ const CSS = `
 .kct-review--big .kct-review-quote{
   font-size:23px!important;font-weight:500!important;line-height:32px!important;
 }
+.kct-rev-dots{display:none;}
 @media (max-width:1024px){
   .kct-reviews-head{flex-direction:column;align-items:flex-start;}
 }
@@ -2322,6 +2467,40 @@ const CSS = `
 }
 /* the active pill keeps a #BFE3CB hairline; it is not borderless */
 .kct-faq-tab.is-on{background:var(--p-light);border-color:var(--s-green-1);color:var(--p-dark);}
+/* The rail, the arrows and "View more" are the phone's; above it the pills
+   sit in the head as they always did. */
+.kct-faq-rail{display:contents;}
+.kct-faq-arrow,.kct-faq-more,.kct-faq-title--phone{display:none;}
+
+/* Every dropdown on the page. A one-row grid eases between 0fr and 1fr, which is
+   how a box animates to a height nobody knows in advance; the words fade with it
+   and leave the tab order once shut. The rows and chevrons take the same .4s. */
+.kct-reveal{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.4,0,.2,1);}
+.kct-reveal.is-open{grid-template-rows:1fr;}
+.kct-reveal-in{
+  min-height:0;overflow:hidden;visibility:hidden;opacity:0;
+  transition:opacity .25s ease,visibility 0s linear .4s;
+}
+.kct-reveal.is-open > .kct-reveal-in{
+  visibility:visible;opacity:1;
+  transition:opacity .35s ease .05s,visibility 0s;
+}
+/* Plans and pillars are not dropdowns above the phone: the wrappers step aside
+   and their contents sit in the card as they always did. */
+.kct-reveal--phone,.kct-reveal--phone > .kct-reveal-in{display:contents;}
+.kct-reveal--phone > .kct-reveal-in{visibility:visible;opacity:1;}
+.kct .kct-sign,.kct .kct-seek-row,.kct .kct-pillar,.kct .kct-card--plan,.kct .kct-faq-row{
+  transition:min-height .4s cubic-bezier(.4,0,.2,1),padding .4s cubic-bezier(.4,0,.2,1),
+    border-radius .4s ease,border-color .4s ease,background-color .4s ease;
+}
+.kct .kct-sign-more,.kct .kct-seek-head svg,.kct .kct-plan-x,.kct .kct-pillar-x{
+  transition:transform .4s cubic-bezier(.4,0,.2,1),margin .4s cubic-bezier(.4,0,.2,1);
+}
+@media (prefers-reduced-motion:reduce){
+  .kct-reveal,.kct-reveal-in,.kct-reveal.is-open > .kct-reveal-in,
+  .kct .kct-sign,.kct .kct-seek-row,.kct .kct-pillar,.kct .kct-card--plan,.kct .kct-faq-row,
+  .kct .kct-sign-more,.kct .kct-seek-head svg,.kct .kct-plan-x,.kct .kct-pillar-x{transition:none;}
+}
 
 .kct-blog{border:1px solid #F4F4F4;border-radius:16px;padding:16px;}
 .kct-blog-img{height:210px;border-radius:0;}
@@ -2370,36 +2549,132 @@ const CSS = `
   .kct-why-media{aspect-ratio:358/210;height:auto;min-height:0;}
   .kct-why-grid{
     display:flex;gap:16px;margin-top:24px;
-    overflow-x:auto;scroll-snap-type:x mandatory;
+    overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:16px;
     -webkit-overflow-scrolling:touch;scrollbar-width:none;
-    margin-left:-16px;margin-right:-16px;padding:0 16px;
+    /* The snap line is 16 in, or the active card lands on the screen edge.
+       The trailing space lets the last card reach that line too. */
+    margin-left:-16px;margin-right:-16px;padding:0 calc(100vw - 334px) 0 16px;
   }
   .kct-why-grid::-webkit-scrollbar{display:none;}
   .kct-on-dark .kct-card--solid{flex:0 0 318px;min-height:142px;scroll-snap-align:start;}
 
-  /* Plans: the first card open at 358x208 with its price pill, the other
-     three collapsed to 60, 16 apart. */
-  .kct-grid-4--plans{gap:16px;margin-top:24px;}
-  .kct-card--plan{padding:24px;min-height:0;}
+  /* Therapist cards: the 358x348 card of the phone file, two of them, then a
+     solid "View more". 16 of padding, a 31 play button, taller chips and tiles
+     with 8 between them, and a borderless 60 foot with a 112 button. */
+  .kct-stat:hover,.kct-blog:hover{transform:none;}
+  .kct-therapists > .ktc ~ .ktc ~ .ktc{display:none;}
+  .kct .ktc{min-height:348px;padding:16px;--ktc-ink-soft:#7C7C7C;}
+  .kct .ktc-wave{margin-top:5px;}
+  .kct .ktc-wave-btn{width:31.2px;height:31.2px;margin:0 -4.3px;}
+  .kct .ktc-chip{height:30px;border-color:#E8EFE5;border-radius:15px;}
+  .kct .ktc-stats,.kct .ktc-stats:not(#_){gap:8px;margin-bottom:16px;}
+  .kct .ktc-stat{min-height:56px;border-radius:10px;}
+  .kct .ktc-lang-lap{display:none;}
+  .kct .ktc-lang-phone{display:block;}
+  .kct .ktc-foot{min-height:60px;padding:0 10px;border:0;}
+  .kct .ktc-book{width:112px;text-transform:capitalize;}
+  .kct-more a.kct-btn-ghost{
+    width:207px;height:32px;padding:0;background:#189E4F;border:0;border-radius:6px;color:#fff!important;
+  }
+
+  /* Plans: no subtitle in the file. The first card open at 358x208, radius 16
+     on the green edge, with a price pill that hugs its text; the other three
+     collapsed to 60, radius 12 on a grey edge, 16 apart. Titles are 18 on one
+     line, starting 25 in when open and 17 when shut. */
+  .kct-plans-sec{padding:44px 0 96px;}
+  .kct-plans-sec .kct-h2{text-wrap:balance;}
+  .kct-plans-sub{display:none;}
+  .kct-grid-4--plans{gap:16px;margin-top:28px;}
+  .kct-card--plan{padding:20px 24px 24px;min-height:0;border-radius:16px;}
   .kct-plan-head,.kct-plan-head:not(#_){
     display:flex;align-items:center;justify-content:space-between;gap:12px;
-    cursor:pointer!important;min-height:24px;
+    cursor:pointer!important;min-height:26px;
   }
-  .kct-plan-x{display:block;transition:transform .15s ease;}
-  .kct-card--plan.is-open .kct-plan-x{transform:rotate(180deg);}
-  .kct-card--plan:not(.is-open){padding:16px 24px;min-height:60px;}
+  .kct-card--plan .kct-card-t,.kct-card--plan .kct-card-t:not(#_){
+    font-family:var(--body)!important;font-size:18px!important;font-weight:500!important;
+    line-height:26px!important;
+  }
+  .kct-card--plan .kct-card-b{margin:4px 0 0;}
+  .kct-card--plan .kct-price{align-self:flex-start;width:auto;margin-top:26px;padding:0 12px;}
+  /* The 24 icon. The file sits it further out and lower on the open card:
+     7 off the edge rather than 17, and 4 under the title's centre. */
+  .kct-plan-x{display:block;width:24px;height:24px;color:#7C7C7C;transition:transform .15s ease;}
+  .kct-card--plan.is-open .kct-plan-x{margin-right:-17px;transform:translateY(4px) rotate(180deg);}
+  /* Padding rather than a centred min-height, so the title eases into place
+     as the card opens instead of jumping. 16.2 + 26 + 16.2 and the edge is 60. */
+  .kct-card--plan:not(.is-open){
+    padding:16.2px 16px;border-radius:12px;border-color:#F4F4F4;
+  }
   .kct-card--plan:not(.is-open) .kct-card-t,
   .kct-card--plan:not(.is-open) .kct-card-t:not(#_){margin:0;}
-  .kct-card--plan:not(.is-open) .kct-card-b,
-  .kct-card--plan:not(.is-open) .kct-price{display:none;}
+  .kct-card--plan .kct-reveal--phone,.kct-pillar .kct-reveal--phone{display:grid;}
+  .kct-card--plan .kct-reveal--phone > .kct-reveal-in{display:flex;flex-direction:column;align-items:stretch;}
+  .kct-pillar .kct-reveal--phone > .kct-reveal-in{display:block;}
+  .kct-reveal--phone:not(.is-open) > .kct-reveal-in{visibility:hidden;opacity:0;}
+
+  /* How therapy helps: no pictures in the file, the 14/22 subtitle goes
+     straight to the rows. Radius 8 shut and 12 open, titles at medium, and
+     the chevron the 24 icon in #7C7C7C. */
+  .kct-helps-media{display:none;}
+  .kct-helps-sec .kct-sub{margin-top:10px;font-size:14px!important;line-height:22px!important;}
+  .kct-helps-sec .kct-seek--soft{margin-top:26px;}
+  .kct-helps-sec .kct-seek-row{border-radius:8px;}
+  .kct-helps-sec .kct-seek-row.is-open{border-radius:12px;}
+  .kct-helps-sec .kct-seek-t{font-weight:500!important;}
+  .kct-helps-sec .kct-seek-head svg{width:24px;height:24px;color:#7C7C7C;stroke-width:1.6;}
 
   /* Reviews: the file draws a single row of 326x330 cards, not the desktop
-     mix of stacked 192s beside a 415. The columns collapse so every card
-     becomes its own item in the track. */
+     mix of stacked 192s beside a 415, and no rating beside the heading. The
+     columns collapse so every card becomes its own item, and the roll stops:
+     the row swipes one card at a time, with the dots under it. */
+  .kct-reviews-sec{padding:28px 0 40px;}
+  .kct-reviews-h{max-width:275px;}
+  .kct-reviews-rating{display:none;}
+  .kct-reviews{
+    --rev-w:min(326px,calc(100vw - 64px));
+    margin:28px -16px 0;min-height:0;columns:auto;
+    overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;scroll-padding-left:16px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  /* The trailing space lets the last card reach the same snap line. */
+  .kct-rev-track{animation:none;padding:0 calc(100vw - 16px - var(--rev-w)) 0 16px;}
   .kct-rev-col{display:contents;}
-  .kct-review,.kct-review--big{width:326px;min-height:330px;}
-  .kct-rev-set{gap:16px;margin-right:16px;}
-  .kct-reviews{margin-top:24px;}
+  .kct-rev-set{align-items:stretch;gap:16px;margin-right:0;}
+  .kct-rev-set[aria-hidden],.kct-review--repeat{display:none;}
+  .kct-review,.kct-review--big{
+    width:var(--rev-w);min-height:330px;padding:20px 20px 28px;border-radius:16px;
+    scroll-snap-align:start;scroll-snap-stop:always;
+    grid-template-columns:56px minmax(0,1fr);grid-template-rows:auto 1fr auto;
+    grid-template-areas:"avatar who" "quote quote" "rate rate";
+    column-gap:12px;row-gap:0;align-content:stretch;
+    background:linear-gradient(180deg,#0A4636 -9.1%,#18AC85 157%);
+  }
+  .kct-review .kct-review-avatar,.kct-review--big .kct-review-avatar{
+    grid-area:avatar;width:56px;height:56px;border-radius:12px;
+  }
+  .kct-review--big .kct-review-avatar > span{font-size:18px;}
+  .kct-review .kct-review-who,.kct-review--big .kct-review-who{align-self:center;}
+  .kct-review .kct-review-quote,.kct-review--big .kct-review-quote{
+    align-self:start;margin:18px 0 22px;
+    font-size:18px!important;font-weight:400!important;line-height:26px!important;
+  }
+  /* The badge: a 148x30 plate at radius 8, with the G bare inside it. */
+  .kct-review .kct-rev-rate,.kct-review--big .kct-rev-rate{
+    justify-self:start;align-self:end;min-width:148px;height:30px;padding:0 10px;gap:8px;
+    border-radius:8px;background:#063327;
+  }
+  .kct-rev-src{width:auto;height:auto;background:none;}
+  .kct-rev-stars{margin-left:auto;font-size:14px;line-height:18px;color:#F7B84B;}
+  .kct-rev-dots{display:flex;align-items:center;gap:5px;margin-top:24px;}
+  .kct-rev-dots button{
+    position:relative;flex:none;width:6px;height:6px;margin:0;padding:0;border:0;
+    border-radius:3px;background:#D6DCD8;
+    transition:width .2s ease,background-color .2s ease;
+  }
+  /* A 6px dot is too small to tap: the hit area reaches past it. */
+  .kct-rev-dots button::before{content:'';position:absolute;inset:-10px -3px;}
+  .kct-rev-dots button.is-on{width:20px;background:#189E4F;}
 
   /* About: the photo first at 358x178, then the card, then the four
      pillars -- all 16 apart. The photo was stretching to the card's height
@@ -2408,6 +2683,10 @@ const CSS = `
   .kct-about-media{
     order:-1;aspect-ratio:358/178;min-height:0;height:auto;align-self:start;
     border-radius:16px;
+    /* The file's own wider photo, not the near-square desktop crop, hung from
+       its top: 2.3 up of the 64.5 spare. Centred, it cuts the head off. */
+    background-image:url('/design/about-mobile.webp');
+    background-position:center 3.6%;
   }
   .kct-about-card{padding:24px;min-height:0;}
   .kct-pillars{grid-template-columns:1fr;gap:16px;margin-top:16px;}
@@ -2418,11 +2697,10 @@ const CSS = `
   }
   .kct-pillar-x{display:block;transition:transform .15s ease;}
   .kct-pillar.is-open .kct-pillar-x{transform:rotate(180deg);}
-  .kct-pillar:not(.is-open){min-height:60px;padding:16px;display:flex;align-items:center;}
+  .kct-pillar:not(.is-open){min-height:60px;}
   .kct-pillar:not(.is-open) .kct-pillar-t,
   .kct-pillar:not(.is-open) .kct-pillar-t:not(#_){margin:0;}
-  .kct-pillar:not(.is-open) .kct-pillar-head{width:100%;}
-  .kct-pillar:not(.is-open) .kct-pillar-b{display:none;}
+  .kct-pillar-head,.kct-pillar-head:not(#_){width:100%;}
 
   /* Symptoms: no inset card on the phone. The file puts the rows straight
      on the white band at the 358 column -- no 32 radius, no 64 of padding
@@ -2456,20 +2734,86 @@ const CSS = `
   /* CTA strips: the mobile file drops the lead line from the desktop 20/30
      to 14/22, the middle strip's heading from 20 to 18, and every strip's
      button label from 16 to 14. */
+  /* Bands: left aligned, as the file sets all three. A 324x192 picture, the
+     copy 22 under it, then a full-width 32 button at radius 6, 18 under that.
+     The lead line drops to the body face here. The first band also takes 96
+     above it, where the others take 48. */
+  .kct-reviews-sec + .kct-ctasec{padding-top:96px;}
+  .kct-bookband{min-height:0;padding:16px;gap:0;text-align:left;}
+  .kct-bookband-art{height:192px;margin-bottom:22px;}
   .kct-bookband .kct-band-p--lead,.kct-bookband .kct-band-p--lead:not(#_){
+    font-family:var(--body)!important;font-weight:400!important;
     font-size:14px!important;line-height:22px!important;
   }
   .kct-bookband .kct-band-h,.kct-bookband .kct-band-h:not(#_){
-    font-size:18px!important;line-height:26px!important;
+    font-family:var(--body)!important;font-size:18px!important;font-weight:500!important;
+    line-height:26px!important;
   }
   .kct-bookband .kct-band-p,.kct-bookband .kct-band-p:not(#_){
-    font-size:14px!important;line-height:22px!important;
+    margin:0;font-size:14px!important;line-height:22px!important;
   }
   .kct-bookband .kct-btn-solid,.kct-bookband .kct-btn-solid:not(#_){
+    height:32px;min-width:0;margin-top:18px;padding:0 12px;border-radius:6px;
     font-size:14px!important;
   }
 
-  /* FAQ: the 860 column collapses to the page's own. */
-  .kct-faq{max-width:none;margin-top:24px;gap:12px;}
+  /* FAQ: the 860 column collapses to the page's own. The tabs are a rail that
+     runs edge to edge under two fades, with an arrow over each. The fades are
+     the file's own curves, read off its masks: solid to x65 and gone by x130
+     on the left, starting at x258 and solid by x325 on the right. */
+  .kct-faq-sec{padding:44px 0 48px;}
+  .kct-faq-title{display:none;}
+  .kct-faq-title--phone{display:inline;}
+  .kct-faq-head{display:block;margin:24px 0 0;min-height:0;}
+  .kct-faq-rail{display:block;position:relative;margin:0 -16px;}
+  .kct-faq-rail::before,.kct-faq-rail::after{
+    content:'';position:absolute;top:0;bottom:0;width:135px;z-index:1;pointer-events:none;
+  }
+  .kct-faq-rail::before{
+    left:0;
+    background:linear-gradient(90deg,#F9F9F9 48%,rgba(249,249,249,.97) 52%,rgba(249,249,249,.86) 59%,
+      rgba(249,249,249,.69) 67%,rgba(249,249,249,.44) 74%,rgba(249,249,249,.22) 81%,
+      rgba(249,249,249,.08) 89%,rgba(249,249,249,0) 96%);
+  }
+  .kct-faq-rail::after{
+    right:0;
+    background:linear-gradient(90deg,rgba(249,249,249,0) 2%,rgba(249,249,249,.04) 7%,rgba(249,249,249,.15) 15%,
+      rgba(249,249,249,.33) 22%,rgba(249,249,249,.58) 30%,rgba(249,249,249,.8) 37%,
+      rgba(249,249,249,.93) 44%,#F9F9F9 52%);
+  }
+  .kct-faq-tabs{
+    flex-wrap:nowrap;justify-content:flex-start;gap:8px;border-radius:0;
+    padding:2px calc(100% - 195px) 2px 111px;
+    overflow-x:auto;overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .kct-faq-tabs::-webkit-scrollbar{display:none;}
+  .kct-faq-tab{flex:none;}
+  .kct-faq-tab--first{order:-1;}
+  .kct-faq-arrow{
+    display:inline-flex;align-items:center;justify-content:center;position:absolute;
+    top:2px;z-index:2;width:32px;height:48px;margin:0;padding:0;border:0;background:none;
+    color:var(--p-dark);cursor:pointer;transition:opacity .15s ease;
+  }
+  .kct-faq-arrow--prev{left:20px;}
+  .kct-faq-arrow--next{right:20px;}
+  .kct-faq-arrow:disabled{opacity:.3;cursor:default;}
+  .kct-faq{max-width:none;margin-top:20px;gap:12px;border-top:0;}
+  .kct-faq:not(.is-all) .kct-faq-row:nth-child(n+4){display:none;}
+  .kct-faq-row{min-height:0;padding:16px;border-radius:12px;}
+  .kct-faq-row button{gap:12px;}
+  .kct-faq-row button > span:first-child,.kct-faq-row button > span:first-child:not(#_){
+    font-size:16px!important;font-weight:400!important;line-height:24px!important;
+  }
+  .kct-faq-sign{
+    display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+    font-size:26px;font-weight:300;color:#7C7C7C;
+  }
+  .kct-faq-more{
+    display:flex;align-items:center;justify-content:center;width:111px;height:34px;
+    margin:24px auto 0;padding:0;background:#fff;border:1px solid var(--s-green-1);border-radius:6px;
+    cursor:pointer;color:var(--t-primary);
+    font-family:var(--body)!important;font-size:14px;line-height:22px;
+  }
 }
 `;
