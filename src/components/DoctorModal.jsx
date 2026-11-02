@@ -194,6 +194,7 @@ export default function DoctorModal({
     specializations: [''],
     personalities: [''],
     languages: [''],
+    offersOffline: false,
     coverImage: null,
     faq_question_1: '',
     faq_answer_1: '',
@@ -523,6 +524,7 @@ export default function DoctorModal({
         personality_traits: doctor.personality_traits || doctor.personalities || [],
         languages_json: filteredLanguagesForOriginal.length > 0 ? JSON.stringify(filteredLanguagesForOriginal) : null,
         cover_image_url: resolveDoctorImage(doctor) || null,
+        session_modes: doctor.session_modes?.length ? doctor.session_modes : ['online'],
         faq_question_1: doctor.faq_question_1 || null,
         faq_answer_1: doctor.faq_answer_1 || null,
         faq_question_2: doctor.faq_question_2 || null,
@@ -568,6 +570,7 @@ export default function DoctorModal({
         specializations: doctor.area_of_expertise || doctor.specializations || [''],
         personalities: doctor.personality_traits || doctor.personalities || [''],
         languages: derivedLanguages,
+        offersOffline: Boolean(doctor.session_modes?.includes('offline')),
         coverImage: resolveDoctorImage(doctor),
         faq_question_1: doctor.faq_question_1 || '',
         faq_answer_1: doctor.faq_answer_1 || '',
@@ -1178,6 +1181,10 @@ export default function DoctorModal({
       }
     });
 
+    if (JSON.stringify(currentData.session_modes) !== JSON.stringify(originalData.session_modes)) {
+      changedFields.session_modes = currentData.session_modes;
+    }
+
     // Always include password if it's being changed
     if (currentData.password) {
       changedFields.password = currentData.password;
@@ -1222,6 +1229,7 @@ export default function DoctorModal({
         phone: countryCode + formData.phone,
         designation: formData.designation?.trim() || null,
         cover_image_url: safeImageUrl,
+        session_modes: formData.offersOffline ? ['online', 'offline'] : ['online'],
       };
 
       // Handle password for edit/add mode
@@ -1403,6 +1411,21 @@ export default function DoctorModal({
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm"
                 placeholder="e.g., Consultant Psychologist"
               />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.offersOffline}
+                  onChange={(e) => handleInputChange('offersOffline', e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300 accent-[#025545]"
+                />
+                Sees clients in person at the Kozhikode clinic (Offline)
+              </label>
+              <p className="text-xs text-slate-500 mt-1 ml-6">
+                Every therapist is available online. Tick this to also list them under Offline on the home page.
+              </p>
             </div>
 
             <div className="md:col-span-2">

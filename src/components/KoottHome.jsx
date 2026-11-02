@@ -492,13 +492,14 @@ export default function KoottHome({ content } = {}) {
     if (q && !name.includes(q)) return false;
     const langs = cardFields(t).languages.map((l) => String(l).toLowerCase());
     if (language && !langs.includes(language.toLowerCase())) return false;
+    if (!(t.session_modes?.length ? t.session_modes : ['online']).includes(attend)) return false;
     if (quickOn) {
       const role = `${t.designation || ''} ${t.specialization || ''}`;
       const hay = (quickOn.kind === 'need' ? `${role} ${(t.area_of_expertise || []).join(' ')}` : role).toLowerCase();
       if (![].concat(quickOn.match).some((w) => hay.includes(w))) return false;
     }
     return true;
-  }), [therapists, query, language, quickOn]);
+  }), [therapists, query, language, attend, quickOn]);
   const {
     draft: bookingDraft, slotState: bookingSlotState, suggestion: bookingSuggestion,
     dismiss: dismissBookingDraft, takeSuggestion: takeBookingSuggestion, seeOtherTimes: seeOtherBookingTimes,
@@ -729,7 +730,9 @@ export default function KoottHome({ content } = {}) {
           {cards.length === 0 && !bookingDraft && (
             <p className="kh2-empty">
               {therapists.length
-                ? 'No therapist matches that combination yet. Clear a filter to see everyone.'
+                ? (attend === 'offline'
+                  ? 'No therapist matches that for in-person sessions yet. Try Online to see everyone.'
+                  : 'No therapist matches that combination yet. Clear a filter to see everyone.')
                 : 'Loading therapists…'}
             </p>
           )}
