@@ -156,13 +156,15 @@ export default function KoottHeader() {
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <header className={`kh ${hidden ? 'is-hidden' : ''}`}>
+      <header className={`kh ${pathname === '/' ? 'is-home' : ''} ${hidden ? 'is-hidden' : ''}`}>
         <div className="kh-in">
           <Link href="/" className="kh-logo" aria-label="Koott home">
             {/* public/logo.png is the green wordmark centred in a square with wide
                 margins. The box crops that padding away and the filter renders it
                 white, matching the live 143x56 mark on the dark band. */}
             <img src="/main-logo.png" alt="Koott" width={210} height={210} />
+            {/* The home frame's own white wordmark, shown from the laptop up. */}
+            <img className="kh-logo-fig" src="/design/home/logo-white.svg" alt="" width={127} height={39} />
           </Link>
 
           {/* ---- desktop nav ---- */}
@@ -226,9 +228,11 @@ export default function KoottHeader() {
               </div>
             ) : (
               <button type="button" className="kh-book" data-track="header_sign_in" onClick={() => setShowAuth(true)}>
-                SIGN IN
+                Sign In
               </button>
             )}
+
+            <Link href={BOOK_HREF} className="kh-book2" data-track="header_book_now">Book now</Link>
 
             <button
               type="button"
@@ -345,9 +349,11 @@ const CSS = `
   border:1px solid #fff;background:transparent;
   font-family:inherit!important;font-size:13px!important;font-weight:400!important;
   letter-spacing:.01em!important;color:#fff!important;text-decoration:none;white-space:nowrap;
+  text-transform:uppercase;
   transition:background .18s ease,color .18s ease;
 }
 .kh-book:hover{background:#fff;color:#29653D!important;}
+.kh-logo-fig,.kh-book2{display:none;}
 
 /* Signed-in account pill: white, soft grey rim, a warm initial avatar. */
 .kh-pill{
@@ -455,6 +461,35 @@ const CSS = `
 @media (min-width:1024px) and (max-width:1180px){
   .kh-in{gap:16px;padding:0 20px;}
   .kh-nav{gap:20px;}
+}
+/* The home page's header, from Figma frame 268:1794, laptop and up. Only home for
+   now: every other page reserves 63 for the header and has its own sign-off. */
+@media (min-width:1024px){
+  .kh.is-home{height:84px;}
+  .kh.is-home .kh-in{max-width:1228px;justify-content:space-between;gap:16px;}
+  .kh.is-home .kh-logo{width:126.844px;height:38.641px;overflow:visible;}
+  .kh.is-home .kh-logo img{display:none;}
+  .kh.is-home .kh-logo img.kh-logo-fig{
+    display:block;position:static;transform:none;filter:none;width:100%;height:100%;
+  }
+  .kh.is-home .kh-nav{gap:56px;margin-left:0;}
+  .kh.is-home .kh-link{font-size:12px!important;line-height:18px!important;letter-spacing:0!important;}
+  .kh.is-home .kh-link--plain{opacity:1;}
+  .kh.is-home .kh-right{gap:16px;}
+  .kh.is-home .kh-book{
+    width:auto;height:32px;margin:0;padding:0 18px;border-radius:6px;text-transform:none;
+    font-size:14px!important;font-weight:500!important;line-height:22px!important;letter-spacing:0!important;
+  }
+  .kh.is-home .kh-book2{
+    display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 22px;
+    border-radius:6px;background:#189E4F;color:#fff!important;text-decoration:none;white-space:nowrap;
+    font-size:14px!important;font-weight:500!important;line-height:22px!important;letter-spacing:0!important;
+    transition:background-color .18s ease;
+  }
+  .kh.is-home .kh-book2:hover{background:#0D4F1F;}
+}
+@media (min-width:1024px) and (max-width:1180px){
+  .kh.is-home .kh-nav{gap:32px;}
 }
 @media (max-width:520px){
   .kh-in{padding:0 14px 0 16px;gap:8px;}

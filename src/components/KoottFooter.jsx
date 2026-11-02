@@ -321,7 +321,7 @@ const CSS = `
   position:absolute;top:-13px;left:50%;transform:translateX(-50%);
   display:inline-flex;align-items:center;justify-content:center;height:26px;min-width:76px;
   background:#189E4F;color:#fff;border-radius:13px;padding:0 12px;
-  font-size:12px;font-weight:400;line-height:18px;white-space:nowrap;
+  font-size:12px;font-weight:500;line-height:18px;white-space:nowrap;
 }
 
 .kf-social{display:flex;justify-content:flex-end;gap:15px;margin-top:51.5px;}

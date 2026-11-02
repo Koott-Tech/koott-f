@@ -6,10 +6,10 @@
  *   laptop  figma-ref/Home_Final.pdf           1920 x 8651
  *   phone   figma-ref/Home mobile Updated.pdf  390 x 9409
  *
- * Sizes, spacing, type and colours were read off the exported .fig
- * ("Koott 29 10 26.fig", frames 268:1792 and 558:2822) and checked against the
- * PDFs; where the two disagree the PDF wins, because it is the render of the
- * same frame. The photos in public/design/home come out of the .fig's images
+ * Laptop sizes, spacing, type and colours follow the live Figma file (Koott
+ * 20-10-26, frame 268:1792), which wins over the PDF wherever they disagree; the
+ * phone was read off the exported .fig ("Koott 29 10 26.fig", frame 558:2822)
+ * and its PDF. The photos in public/design/home come out of the .fig's images
  * folder, and the icons are rendered off the PDF.
  *
  * The page is static: every word is in data/koottHomeContent.js. The therapist
@@ -44,54 +44,47 @@ const ART = '/design/home';
 
 const Chevron = ({ dir = 'down', size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     {dir === 'down' && <path d="M6 9l6 6 6-6" />}
     {dir === 'left' && <path d="M15 6l-6 6 6 6" />}
     {dir === 'right' && <path d="M9 6l6 6-6 6" />}
   </svg>
 );
 
-/* star-06: the four-pointed sparkle on the primary buttons. */
-const Sparkle = ({ size = 24 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-    <path d="M12 1.5c.5 0 .9.3 1 .8l1.2 4.6c.4 1.6 1.7 2.9 3.3 3.3l4.6 1.2c.5.1.8.5.8 1s-.3.9-.8 1l-4.6 1.2c-1.6.4-2.9 1.7-3.3 3.3L13 21.5c-.1.5-.5.8-1 .8s-.9-.3-1-.8l-1.2-4.6c-.4-1.6-1.7-2.9-3.3-3.3L1.9 12.4c-.5-.1-.8-.5-.8-1s.3-.9.8-1l4.6-1.2c1.6-.4 2.9-1.7 3.3-3.3L11 2.3c.1-.5.5-.8 1-.8z" />
+/* star-06, as the design draws it: one large sparkle and two small crosses. */
+const Sparkle = ({ size = 24, className }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M5.5 2C5.5 1.44772 5.05228 1 4.5 1C3.94772 1 3.5 1.44772 3.5 2V3.5H2C1.44772 3.5 1 3.94772 1 4.5C1 5.05228 1.44772 5.5 2 5.5H3.5V7C3.5 7.55228 3.94772 8 4.5 8C5.05228 8 5.5 7.55228 5.5 7V5.5H7C7.55228 5.5 8 5.05228 8 4.5C8 3.94772 7.55228 3.5 7 3.5H5.5V2Z" />
+    <path d="M5.5 17C5.5 16.4477 5.05228 16 4.5 16C3.94772 16 3.5 16.4477 3.5 17V18.5H2C1.44772 18.5 1 18.9477 1 19.5C1 20.0523 1.44772 20.5 2 20.5H3.5V22C3.5 22.5523 3.94772 23 4.5 23C5.05228 23 5.5 22.5523 5.5 22V20.5H7C7.55228 20.5 8 20.0523 8 19.5C8 18.9477 7.55228 18.5 7 18.5H5.5V17Z" />
+    <path d="M13.9333 2.64102C13.7848 2.25483 13.4138 2 13 2C12.5862 2 12.2152 2.25483 12.0667 2.64102L10.3325 7.14988C10.0321 7.93093 9.93768 8.156 9.80855 8.33759C9.67899 8.5198 9.5198 8.67899 9.33759 8.80855C9.156 8.93768 8.93093 9.03207 8.14988 9.33248L3.64102 11.0667C3.25483 11.2152 3 11.5862 3 12C3 12.4138 3.25483 12.7848 3.64102 12.9333L8.14988 14.6675C8.93093 14.9679 9.156 15.0623 9.33759 15.1914C9.5198 15.321 9.67899 15.4802 9.80855 15.6624C9.93768 15.844 10.0321 16.0691 10.3325 16.8501L12.0667 21.359C12.2152 21.7452 12.5862 22 13 22C13.4138 22 13.7848 21.7452 13.9333 21.359L15.6675 16.8501C15.9679 16.0691 16.0623 15.844 16.1914 15.6624C16.321 15.4802 16.4802 15.321 16.6624 15.1914C16.844 15.0623 17.0691 14.9679 17.8501 14.6675L22.359 12.9333C22.7452 12.7848 23 12.4138 23 12C23 11.5862 22.7452 11.2152 22.359 11.0667L17.8501 9.33248C17.0691 9.03207 16.844 8.93768 16.6624 8.80855C16.4802 8.67899 16.321 8.5198 16.1914 8.33759C16.0623 8.156 15.9679 7.93093 15.6675 7.14988L13.9333 2.64102Z" />
   </svg>
 );
 
-/* Three sparkles, as drawn beside "Find therapist by concern". */
-const SparkleTrio = () => (
-  <svg className="kh2-trio" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-    <path d="M9.5 5.5C9.5 10.9 13.1 14.5 18.5 14.5C13.1 14.5 9.5 18.1 9.5 23.5C9.5 18.1 5.9 14.5 0.5 14.5C5.9 14.5 9.5 10.9 9.5 5.5Z" />
-    <path d="M18.5 3.1C18.5 6.34 20.66 8.5 23.9 8.5C20.66 8.5 18.5 10.66 18.5 13.9C18.5 10.66 16.34 8.5 13.1 8.5C16.34 8.5 18.5 6.34 18.5 3.1Z" />
-    <path d="M13.5 0.2C13.5 2.24 14.86 3.6 16.9 3.6C14.86 3.6 13.5 4.96 13.5 7C13.5 4.96 12.14 3.6 10.1 3.6C12.14 3.6 13.5 2.24 13.5 0.2Z" />
-  </svg>
-);
-
-/* check-circle, solid: a green disc with a white tick. */
+/* check-circle, solid. */
 const Check = ({ size = 20 }) => (
-  <svg className="kh2-check" width={size} height={size} viewBox="0 0 24 24" aria-hidden>
-    <circle cx="12" cy="12" r="11" fill="currentColor" />
-    <path d="M7.5 12.3l3 3 6-6.3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  <svg className="kh2-check" width={size} height={size} viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+    <path fillRule="evenodd" clipRule="evenodd" d="M10 0.833333C4.93739 0.833333 0.833333 4.93739 0.833333 10C0.833333 15.0626 4.93739 19.1667 10 19.1667C15.0626 19.1667 19.1667 15.0626 19.1667 10C19.1667 4.93739 15.0626 0.833333 10 0.833333ZM14.3393 8.08926C14.6647 7.76382 14.6647 7.23618 14.3393 6.91074C14.0138 6.58531 13.4862 6.58531 13.1607 6.91074L8.75 11.3215L6.83926 9.41074C6.51382 9.08531 5.98618 9.08531 5.66074 9.41074C5.33531 9.73618 5.33531 10.2638 5.66074 10.5893L8.16074 13.0893C8.48618 13.4147 9.01382 13.4147 9.33926 13.0893L14.3393 8.08926Z" />
   </svg>
 );
 
+/* 1.25 at the panel link's 18, 2 at the blog cards' 24. */
 const ArrowUpRight = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M7 17L17 7M8 7h9v9" />
+    strokeWidth={size < 24 ? 1.667 : 2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M7 17L17 7M17 17V7H7" />
   </svg>
 );
 
 const ArrowRight = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M4 12h16M14 6l6 6-6 6" />
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M4 12H20M14 18L20 12L14 6" />
   </svg>
 );
 
 const PlusMinus = ({ open }) => (
   <svg className="kh2-pm" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+    strokeWidth="2" strokeLinecap="round" aria-hidden>
     <path d="M5 12h14" />
     {!open && <path d="M12 5v14" />}
   </svg>
@@ -99,15 +92,15 @@ const PlusMinus = ({ open }) => (
 
 const SearchIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="1.6" strokeLinecap="round" aria-hidden>
-    <circle cx="11" cy="11" r="7.5" /><path d="M21 21l-4.5-4.5" />
+    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M21 21L17.5001 17.5M20 11.5C20 16.1944 16.1944 20 11.5 20C6.80558 20 3 16.1944 3 11.5C3 6.80558 6.80558 3 11.5 3C16.1944 3 20 6.80558 20 11.5Z" />
   </svg>
 );
 
 const Clock = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <circle cx="12" cy="12" r="9.5" /><path d="M12 7v5l3 2" />
+    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" />
   </svg>
 );
 
@@ -304,7 +297,7 @@ function StepArt({ step }) {
    named testimonial reads as that client, so — as on the condition pages — the
    frame carries the person's initials until a review has a real photo. */
 const ReviewCard = ({ r, big = false }) => (
-  <figure className={`kh2-review${big ? ' kh2-review--big' : ''}${r.repeat ? ' kh2-review--repeat' : ''}`}>
+  <figure className={`kh2-review${big ? ' kh2-review--big' : ''}${r.repeat ? ' kh2-review--repeat' : ''}${r.pill ? ' kh2-review--pill' : ''}`}>
     <span className="kh2-review-av" aria-hidden>
       {(r.name || '').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('')}
     </span>
@@ -575,7 +568,7 @@ export default function KoottHome({ content } = {}) {
                 />
               </div>
               <button type="button" className="kh2-concern" data-track="hero_find_by_concern">
-                <SparkleTrio />{HERO.concernCta}
+                <Sparkle className="kh2-trio" />{HERO.concernCta}
               </button>
             </div>
             <Link href={BOOK} className="kh2-book" data-track="hero_book_slot">{HERO.bookCta}</Link>
@@ -1067,12 +1060,16 @@ const CSS = `
 .kh2{
   --green:#189E4F; --green-hover:#0D4F1F; --green-dark:#1B6930; --green-light:#EFFFEA;
   --deep:#063327; --ink:#0F0F0F; --body:#373737; --soft:#5C5C5C; --hint:#BCBCBC;
-  --line:#E3E2E2; --line-green:#BFE3CB; --line-soft:#DDEED8; --grey-bg:#F8F8F8;
+  --line:#E3E2E2; --line-green:#BFE3CB; --line-soft:#DDEED8; --grey-bg:#F9F9F9;
   --sans:'Poppins',ui-sans-serif,system-ui,sans-serif;
   --text:'Inter',ui-sans-serif,system-ui,sans-serif;
   background:#fff;color:var(--ink);font-family:var(--text);
 }
 .kh2 *{box-sizing:border-box;}
+/* globals.css spaces spans, links, buttons and list items by .01em with an
+   !important; every text style in the frame has 0, and that is enough to wrap
+   a line differently. */
+.kh2,.kh2 *{letter-spacing:0!important;}
 :where(.kh2) p{margin:0;}
 :where(.kh2) ul{list-style:none;margin:0;padding:0;}
 .kh2 button{font:inherit;}
@@ -1083,6 +1080,8 @@ const CSS = `
    narrower set --w. 24px gutters either side. */
 .kh2-in{width:100%;max-width:calc(var(--w,1180px) + 48px);margin:0 auto;padding:0 24px;}
 .kh2-sec{padding:80px 0;}
+/* The header is 84 in this frame against the 63 every other page reserves. */
+@media (min-width:1024px){ .kh2{margin-top:21px;} }
 
 /* ---- type ---- */
 .kh2-h1,.kh2-h1:not(#_){
@@ -1096,9 +1095,10 @@ const CSS = `
 .kh2-sub{
   font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;
   line-height:24px!important;letter-spacing:0!important;color:var(--body)!important;margin:8px 0 0;
+  padding-bottom:.59px;
 }
 .kh2-chip{
-  display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:4px;
+  display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:6px;
   background:#F9FFF8;box-shadow:0 1px 4px rgba(36,36,36,.10);
   font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;
 }
@@ -1112,16 +1112,17 @@ const CSS = `
   line-height:24px!important;letter-spacing:0!important;
   transition:background-color .18s ease,border-color .18s ease,color .18s ease;
 }
-.kh2-btn2--xl{height:56px;padding:0 22px;font-weight:600!important;}
+.kh2-btn2--xl{height:56px;padding:0 22px;}
 .kh2-btn2--m{height:40px;padding:0 18px;}
 .kh2-btn2--pri{background:var(--green);color:#fff!important;border:0;}
+.kh2-btn2--pri.kh2-btn2--m{padding:0 22px;gap:12px;}
 .kh2-btn2--pri:hover{background:var(--green-hover);}
 .kh2-btn2--sec{background:#fff;color:var(--ink)!important;border:1px solid var(--line-green);}
 .kh2-btn2--sec:hover{border-color:var(--green);}
 .kh2-textlink{
   display:inline-flex;align-items:center;justify-content:center;gap:12px;height:40px;padding:0 18px;
   color:var(--green)!important;text-decoration:none;
-  font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;
+  font-family:var(--text)!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;
 }
 .kh2-textlink svg{transition:transform .2s ease;}
 .kh2-textlink:hover svg{transform:translateX(3px);}
@@ -1138,7 +1139,8 @@ const CSS = `
 .kh2-reveal--phone > .kh2-reveal-in{visibility:visible;opacity:1;}
 
 /* ════ hero ════ */
-.kh2-hero{background:#FAFCF9;padding-top:132px;position:relative;overflow:hidden;}
+/* The frame's 132 top holds a block lifted 1 above it. */
+.kh2-hero{background:#FAFCF9;padding-top:131px;position:relative;overflow:hidden;}
 .kh2-hero-in{text-align:center;position:relative;z-index:2;}
 .kh2-h1 > span{display:block;}
 /* The rotating line: hidden sizers set its box, the visible word overlays. */
@@ -1165,7 +1167,7 @@ const CSS = `
 }
 .kh2-ask{display:contents;}
 .kh2-ask-box{
-  grid-column:1 / -1;background:var(--green-light);border:1px solid var(--line-soft);
+  grid-column:1 / -1;background:var(--green-light);border:0;border-bottom:1px solid var(--line-soft);
   border-radius:16px;padding:8px;
 }
 .kh2-ask-input{
@@ -1176,12 +1178,13 @@ const CSS = `
   box-shadow:0 8px 24px -8px rgba(24,158,79,.10),0 2px 8px -4px rgba(24,158,79,.08);
   font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;letter-spacing:0!important;
 }
-.kh2-ask-input::placeholder{color:var(--hint);}
+/* One line in the frame, where it fills the box to within a pixel. */
+.kh2-ask-input::placeholder{color:var(--hint);white-space:nowrap;letter-spacing:-.05px;}
 .kh2-ask-input:focus{outline:none;border-color:var(--green);}
 .kh2-concern{
   height:56px;display:inline-flex;align-items:center;justify-content:center;gap:12px;
   background:#fff;border:1px solid var(--line-green);border-radius:8px;padding:0 18px;cursor:pointer;
-  font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;color:#000!important;
+  font-family:var(--text)!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:var(--ink)!important;
   transition:border-color .18s ease;
 }
 .kh2-concern:hover{border-color:var(--green);}
@@ -1189,14 +1192,14 @@ const CSS = `
 .kh2-book{
   height:56px;display:inline-flex;align-items:center;justify-content:center;
   background:var(--green);color:#fff!important;border-radius:8px;text-decoration:none;
-  font-family:var(--text)!important;font-size:16px!important;font-weight:600!important;line-height:24px!important;
+  font-family:var(--text)!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;
   transition:background-color .18s ease;
 }
 .kh2-book:hover{background:var(--green-hover);}
 
-/* The clip band, 227 tall. The frame puts it 72 under a 362 box that its
-   380 of content overflows, so it sits 54.4 under the buttons. */
-.kh2-foliage{position:relative;margin-top:54.4px;height:227px;pointer-events:none;}
+/* The clip band, 227 tall, at y=566 of the 793 section: 56 under the buttons,
+   because its 72 is measured from a 362 box that the content overflows. */
+.kh2-foliage{position:relative;margin-top:56px;height:227px;pointer-events:none;}
 .kh2-clips{
   position:absolute;left:0;right:0;bottom:-1px;width:100%;height:100%;
   background:url('/hero-calm-desktop.webp') center bottom / 100% 100% no-repeat;
@@ -1214,9 +1217,9 @@ const CSS = `
 }
 .kh2-badge-deck{position:relative;height:85px;}
 .kh2-badge{
-  position:absolute;inset:0;display:flex;align-items:center;gap:12px;padding:18px;
+  position:absolute;inset:0;display:flex;align-items:flex-start;gap:12px;padding:17px;
   border:1px solid var(--line-soft);border-radius:12px;
-  background:linear-gradient(180deg,#fff 0%,#F9FBF6 30%,#E7F1DF 100%);
+  background:linear-gradient(180deg,#fff 38.471%,#E7F1DF 128.24%);
 }
 .kh2-badge.is-out{z-index:1;animation:kh2-card-under .55s cubic-bezier(.4,0,.2,1) both;}
 .kh2-badge.is-in{z-index:2;animation:kh2-card-in .55s cubic-bezier(.22,.7,.3,1) both;}
@@ -1251,10 +1254,10 @@ const CSS = `
 .kh2-ther-h{max-width:1120px;margin:0 auto!important;}
 .kh2-filters{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:40px;min-height:64px;}
 .kh2-fsearch{
-  flex:0 0 375px;height:56px;display:flex;align-items:center;gap:8px;
+  flex:0 0 375px;min-width:0;height:56px;display:flex;align-items:center;gap:8px;
   background:#fff;border:1px solid var(--line);border-radius:8px;padding:0 8px 0 16px;
 }
-.kh2-fsearch-q{flex:1;min-width:0;display:flex;align-items:center;gap:8px;color:#9CA3AF;}
+.kh2-fsearch-q{flex:1;min-width:0;display:flex;align-items:center;gap:8px;color:var(--hint);}
 .kh2-fsearch-q svg{flex:none;}
 .kh2-fsearch input{
   flex:1;min-width:0;border:0;outline:0;background:none;padding:0;color:var(--ink);
@@ -1264,7 +1267,7 @@ const CSS = `
 .kh2-fsearch input::-webkit-search-cancel-button{cursor:pointer;}
 .kh2-flang{
   position:relative;flex:none;width:157px;height:40px;display:flex;align-items:center;justify-content:space-between;
-  background:#F9F9F9;border:1px solid var(--line);border-radius:4px;padding:0 8px 0 12px;color:#9CA3AF;cursor:pointer;
+  background:#F9F9F9;border:1px solid var(--line);border-radius:4px;padding:0 8px 0 12px;color:var(--hint);cursor:pointer;
 }
 .kh2-flang-v{
   display:inline-flex;align-items:baseline;gap:4px;
@@ -1274,7 +1277,7 @@ const CSS = `
 .kh2-flang select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;}
 .kh2-quicks{flex:none;display:flex;gap:16px;padding:4px;border-radius:8px;background:#fff;}
 .kh2-quick{
-  height:56px;display:inline-flex;align-items:center;gap:8px;padding:0 12px;
+  height:56px;display:inline-flex;align-items:center;gap:8px;padding:0 11px;
   background:#fff;border:1px solid var(--line);border-radius:8px;cursor:pointer;
   font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;color:var(--ink)!important;
   transition:background-color .18s ease,border-color .18s ease,color .18s ease;
@@ -1285,17 +1288,24 @@ const CSS = `
 .kh2-empty{margin-top:24px!important;text-align:center;font-family:var(--text)!important;font-size:14px!important;color:var(--soft)!important;}
 .kh2-tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:16px;}
 .kh2-ther-more{margin-top:24px;}
+/* Home's frame draws the card's chips 24 tall in Medium, with 16 between every
+   block, and a 24 play button; the condition pages' frame does not. */
+.kh2 .ktc{padding:19px;}
+.kh2 .ktc-panel,.kh2 .ktc-tags-wrap{margin-bottom:16px;}
+.kh2 .ktc-chip{height:24px;border-radius:999px;font-weight:500!important;}
+.kh2 .ktc-wave-btn{width:24px;height:24px;margin:0 -.7px;border-width:1.25px;}
 
 /* ════ how it works ════ */
-.kh2-how{background:var(--grey-bg);}
+.kh2-how{background:var(--grey-bg);padding-bottom:80.41px;}
 .kh2-how-head{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:12px;}
 .kh2-how-head > div{max-width:640px;}
 .kh2-how-cta{width:220px;}
 .kh2-how-foot{display:none;}
 .kh2-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:40px;}
 .kh2-step{
+  /* The frame's stroke sits inside its 24 of padding. */
   display:flex;flex-direction:column;gap:24px;min-height:206px;overflow:hidden;
-  background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;
+  background:#fff;border:1px solid var(--line);border-radius:16px;padding:23px;
 }
 .kh2-step-head{display:flex;align-items:flex-start;gap:12px;}
 .kh2-step-n{
@@ -1314,23 +1324,31 @@ const CSS = `
 .kh2-step-art{display:flex;align-items:center;height:58px;margin-top:auto;}
 .kh2-step-faces{gap:10px;}
 .kh2-step-faces img{width:58px;height:58px;border-radius:50%;object-fit:cover;flex:none;background:#EFF4F0;}
+/* As drawn: the second face keeps a square top-left corner. */
+.kh2-step-faces img:nth-child(2){border-top-left-radius:0;}
 /* The strip is 70 tall in a 58 slot, overhanging 6 each way. It is 344 wide
-   and starts 138 left of the card's padding, so the card clips it and only
-   the last days show, fading in from the left; the time box sits 15.7 on. */
-.kh2-step-dates{gap:15.7px;margin-left:-24px;}
+   and starts 138 left of the card's padding, so the card clips it; white
+   blurred ellipses over both ends leave only the middle days showing. The time
+   box sits 15.7 on. */
+.kh2-step-dates{gap:15.7px;margin-left:-23px;}
 .kh2-step-days{
-  flex:0 0 230px;min-width:0;height:70px;display:flex;align-items:center;justify-content:flex-end;gap:16px;
+  flex:0 0 229px;min-width:0;height:70px;display:flex;align-items:center;justify-content:flex-end;gap:16px;
   overflow:hidden;background:#F9F9F9;border-radius:0 8px 8px 0;padding:0 12px 0 0;
-  -webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
-  mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
+  -webkit-mask-image:linear-gradient(90deg,transparent 47px,#000 115px,#000 129px,transparent 197px);
+  mask-image:linear-gradient(90deg,transparent 47px,#000 115px,#000 129px,transparent 197px);
 }
 .kh2-step-days span{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:32px;}
 .kh2-step-days small{font-family:var(--text);font-size:12px;font-weight:500;line-height:18px;color:var(--ink);}
 .kh2-step-days b{
-  width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+  position:relative;isolation:isolate;display:block;width:100%;text-align:center;
   font-family:var(--text);font-size:12px;font-weight:400;line-height:18px;color:#9CA3AF;
 }
-.kh2-step-days .is-on b{background:var(--green-dark);color:#fff;}
+.kh2-step-days .is-on b{color:#fff;}
+/* The 24 disc behind the chosen date. */
+.kh2-step-days .is-on b::before{
+  content:"";position:absolute;left:4px;top:-4px;width:24px;height:24px;border-radius:50%;
+  background:var(--green-dark);z-index:-1;
+}
 .kh2-step-days span:not(.is-past):not(.is-on) b{color:var(--body);}
 .kh2-step-slot{
   flex:none;width:104px;height:70px;display:flex;flex-direction:column;justify-content:center;gap:8px;
@@ -1340,8 +1358,8 @@ const CSS = `
 .kh2-step-slot b{font-family:var(--text);font-size:16px;font-weight:500;line-height:24px;color:var(--green-dark);}
 .kh2-step-call{gap:8px;height:60px;}
 .kh2-step-tile{position:relative;height:60px;border-radius:8px;overflow:hidden;background:#EFF4F0;}
-.kh2-step-tile--a{flex:196 1 0;}
-.kh2-step-tile--b{flex:125 1 0;}
+.kh2-step-tile--a{flex:0 0 196px;}
+.kh2-step-tile--b{flex:1 1 0;}
 .kh2-step-tile img{width:100%;height:100%;object-fit:cover;display:block;}
 .kh2-step-dots{position:absolute;right:4px;top:13px;display:flex;flex-direction:column;gap:2.5px;}
 .kh2-step-dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.9);display:block;}
@@ -1352,7 +1370,7 @@ const CSS = `
 .kh2-offer-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;}
 .kh2-offer-tile{
   min-height:241px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:16px;
-  padding:20px 22px;text-align:left;cursor:pointer;
+  padding:19px 21px;text-align:left;cursor:pointer;
   background:#fff;border:1px solid var(--line);border-radius:16px;
   transition:border-color .2s ease,box-shadow .2s ease;
 }
@@ -1368,7 +1386,7 @@ const CSS = `
 .kh2-offer-n{font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;}
 .kh2-offer-panel{
   position:relative;display:grid;align-items:center;
-  background:#F9FBF9;border:1px solid var(--line);border-radius:16px;padding:32px;
+  background:#FAFCF9;border:1px solid var(--line);border-radius:16px;padding:32px;
 }
 .kh2-offer-body{grid-area:1 / 1;}
 .kh2-offer-body.is-out{animation:kh2-offer-out .18s cubic-bezier(.4,0,1,1) both;}
@@ -1393,12 +1411,14 @@ const CSS = `
   font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;
 }
 .kh2-check{color:var(--green);flex:none;}
+.kh2-panel-l .kh2-check{color:#51B763;}
 .kh2-panel-pack{margin-top:24px!important;font-family:var(--text)!important;font-size:12px!important;line-height:18px!important;color:var(--soft)!important;}
 .kh2-panel-cta{display:flex;align-items:center;gap:16px;margin-top:24px;flex-wrap:wrap;}
 .kh2-panel-link{
   display:inline-flex;align-items:center;gap:4px;text-decoration:none;
   font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;
 }
+.kh2-panel-link svg{color:var(--green-dark);}
 .kh2-panel-link:hover{color:var(--green)!important;}
 
 /* ════ care ════ */
@@ -1413,34 +1433,44 @@ const CSS = `
 .kh2-care-ps{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
 .kh2-care-p{font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;color:var(--body)!important;}
 .kh2-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:24px;}
-.kh2-stat{border-left:2px solid var(--green-dark);padding-left:18px;min-height:91px;}
+.kh2-stat{border-left:2px solid var(--green-dark);padding-left:16px;min-height:91.3px;}
 .kh2-stat-v{
   font-family:var(--sans)!important;font-size:32px!important;font-weight:600!important;
   line-height:48px!important;letter-spacing:0!important;color:var(--green-dark)!important;
+  margin-top:-1px;
 }
-.kh2-stat-l{white-space:pre-line;font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;}
-.kh2-care-cta{margin-top:24px;}
+.kh2-stat-l{margin-top:.17px;white-space:pre-line;font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;}
+.kh2-care-cta{margin-top:32px;}
 .kh2-care-media{
   position:relative;border-radius:16px;overflow:hidden;min-height:598px;
   background:#EFF4F0 url('/design/home/care.webp') center/cover no-repeat;
 }
 .kh2-play{
   position:absolute;left:50%;top:50%;width:88px;height:64px;margin:-32px 0 0 -44px;
-  display:flex;align-items:center;justify-content:center;border-radius:8px;
-  background:var(--green);color:#fff;font-size:22px;line-height:33px;
+  display:flex;align-items:center;justify-content:center;border-radius:12px;
+  background:var(--green);color:#fff;font-family:var(--text);font-size:22px;line-height:33px;letter-spacing:.22px!important;
 }
 
 /* ════ reviews ════ */
 .kh2-rev-sec{background:var(--deep);overflow:hidden;}
-.kh2-rev-head{--w:1132px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+/* 13 right of the 1132 column, where the frame puts this one row. */
+.kh2-rev-head{--w:1132px;display:flex;align-items:center;justify-content:space-between;gap:24px;transform:translateX(13px);}
 .kh2-rev-h,.kh2-rev-h:not(#_){color:#fff!important;}
 .kh2-rating{display:flex;align-items:center;gap:12px;flex:none;}
 .kh2-rating-t{display:flex;flex-direction:column;}
 .kh2-rating-t small{font-family:var(--text);font-size:12px;line-height:18px;color:#fff;}
-.kh2-rating-t b{font-family:var(--text);font-size:14px;font-weight:400;line-height:21px;color:#fff;}
-.kh2-rating-t em{font-style:normal;font-size:14px;line-height:21px;color:#F5A623;}
+.kh2-rating-t b{font-family:var(--text);font-size:14px;font-weight:400;line-height:22px;color:#fff;}
+.kh2 .kh2-rating-t em{font-style:normal;font-size:14px;line-height:21px;letter-spacing:.14px!important;color:#F5A623;}
 .kh2-reviews{position:relative;overflow:hidden;margin-top:80px;}
 .kh2-reviews::-webkit-scrollbar{display:none;}
+/* The dark blurs over both ends: 189 wide, 40 off the left and 53 off the right,
+   the right one drawn twice in the frame. */
+.kh2-reviews::before,.kh2-reviews::after{
+  content:"";position:absolute;z-index:2;top:-106px;width:189px;height:604px;pointer-events:none;
+  filter:blur(43.5px);
+}
+.kh2-reviews::before{left:-40px;background:rgba(6,51,39,.88);}
+.kh2-reviews::after{right:-53px;background:rgba(6,51,39,.986);}
 .kh2-rev-track{display:flex;width:max-content;animation:kh2-roll 72s linear infinite;}
 .kh2-reviews:hover .kh2-rev-track{animation-play-state:paused;}
 .kh2-rev-set{display:flex;align-items:flex-start;gap:24px;flex:none;margin-right:24px;}
@@ -1448,15 +1478,17 @@ const CSS = `
 .kh2-rev-spare{display:none;}
 @media (min-width:1921px){ .kh2-rev-spare{display:contents;} .kh2-rev-track{animation-duration:216s;} }
 @media (prefers-reduced-motion:reduce){ .kh2-rev-track{animation:none;} }
-.kh2-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;width:473px;}
+.kh2-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;width:438px;}
+/* The frame's columns are 438 and 473; this one's longer quote needs the 473. */
+.kh2-rev-col:nth-child(4){width:473px;}
 .kh2-review{
-  position:relative;isolation:isolate;flex:none;margin:0;min-height:192px;padding:20px;
+  position:relative;isolation:isolate;flex:none;margin:0;min-height:192px;padding:20px 20px 18px;
   display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-areas:"av who" "q q" "rate rate";
   align-content:start;align-items:center;column-gap:12px;row-gap:8px;
   background:#0A4636;border-radius:12px;
 }
 .kh2-review-av{
-  grid-area:av;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.14);
+  grid-area:av;width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,.14);
   display:inline-flex;align-items:center;justify-content:center;
   font-family:var(--text);font-size:14px;font-weight:500;color:rgba(255,255,255,.72);
 }
@@ -1473,12 +1505,20 @@ const CSS = `
   display:inline-flex;align-items:center;justify-content:center;font-family:var(--text);font-size:12px;
 }
 .kh2-review-s{font-family:var(--text);font-size:12px;line-height:18px;color:#fff;}
+.kh2 .kh2-review-stars{letter-spacing:.16px!important;}
 .kh2-review-stars{font-size:16px;line-height:24px;color:#F5A623;}
+/* One card in the frame carries its rating in a dark pill. */
+.kh2-review--pill .kh2-review-rate{
+  justify-self:start;gap:8px;padding:6px 10px;border-radius:8px;background:var(--deep);
+}
+.kh2-review--pill .kh2-review-g{width:auto;height:auto;background:none;}
+.kh2 .kh2-review--pill .kh2-review-stars{letter-spacing:0!important;}
+.kh2-review--pill .kh2-review-stars{font-size:14px;line-height:17px;color:#F7B84B;}
 .kh2-review--big{
   width:452px;min-height:415px;border-radius:16px;
-  grid-template-columns:124px minmax(0,1fr);grid-template-areas:"av who" "av rate" "q q";
+  grid-template-columns:124px minmax(0,1fr);grid-template-areas:"av ." "q q";
   column-gap:26px;row-gap:16px;
-  background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+  background:linear-gradient(180deg,#0A4636 9.13%,#18AC85 156.96%);
 }
 /* Figma lays a monotone grain over the gradient; the same noise tile the
    condition pages use. */
@@ -1487,8 +1527,14 @@ const CSS = `
   background:url('/design/noise.png') 0 0/150px 150px repeat;
 }
 .kh2-review--big .kh2-review-av{width:124px;height:124px;border-radius:12px;font-size:36px;align-self:start;}
-.kh2-review--big .kh2-review-who{align-self:end;}
-.kh2-review--big .kh2-review-rate{align-self:start;}
+/* Beside the photo: the name at 31, then the G with the score over the stars at 89. */
+.kh2-review--big .kh2-review-who{position:absolute;left:170px;top:31px;}
+.kh2-review--big .kh2-review-rate{
+  position:absolute;left:177px;top:89px;display:grid;grid-template-columns:26px 85px;column-gap:4px;
+}
+.kh2-review--big .kh2-review-g{grid-row:1 / span 2;margin-top:4px;}
+.kh2-review--big .kh2-review-s{height:19.5px;}
+.kh2-review--big .kh2-review-stars{height:16px;line-height:16px;}
 .kh2-review--big .kh2-review-q{font-size:23px!important;font-weight:500!important;line-height:32px!important;}
 .kh2-dots{display:flex;justify-content:center;align-items:center;gap:7px;}
 .kh2-dots button{
@@ -1502,8 +1548,8 @@ const CSS = `
 .kh2-exp-h{max-width:1120px;margin:0 auto!important;}
 .kh2-strip{
   position:relative;margin-top:40px;display:flex;flex-direction:column;gap:16px;overflow:hidden;
-  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);
-  mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 12.8%,#000 21.8%,#000 77.7%,transparent 86.8%);
+  mask-image:linear-gradient(90deg,transparent 12.8%,#000 21.8%,#000 77.7%,transparent 86.8%);
 }
 .kh2-strip-row{overflow:hidden;}
 .kh2-strip-track{display:flex;gap:16px;width:max-content;animation:kh2-roll3 55s linear infinite;}
@@ -1514,7 +1560,7 @@ const CSS = `
 .kh2-tile{width:132px;height:132px;border-radius:8px;object-fit:cover;flex:none;background:#EFF4F0;}
 .kh2-feats{--w:1132px;display:grid;grid-template-columns:556fr 544fr;gap:32px;margin:48px auto 0;max-width:1132px;}
 /* 182 tall with its hairline, as the fill is drawn. */
-.kh2-feat{background:#FAFCF9;border:1px solid #E8EFE5;border-radius:12px;padding:23px 24px;}
+.kh2-feat{background:#FAFCF9;border:1px solid #E8EFE5;border-radius:12px;padding:23px;}
 .kh2-feat-head{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
   background:none;border:0;padding:0;text-align:left;cursor:default;color:var(--soft);
@@ -1531,7 +1577,6 @@ const CSS = `
 }
 .kh2-exp-ctas{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:40px;}
 .kh2-exp-ctas .kh2-textlink{width:220px;}
-.kh2-exp-ctas .kh2-btn2{width:214px;}
 
 /* ════ services ════ */
 .kh2-svc-sec{background:var(--grey-bg);overflow:hidden;}
@@ -1539,13 +1584,13 @@ const CSS = `
 .kh2-rail-arrow{display:none;}
 .kh2-tabs{display:flex;gap:16px;padding:4px;border-radius:8px;}
 .kh2-tab{
-  flex:none;height:48px;padding:0 12px;border-radius:8px;cursor:pointer;white-space:nowrap;
+  flex:none;height:48px;padding:0 11px;border-radius:8px;cursor:pointer;white-space:nowrap;
   background:#fff;border:1px solid var(--line);
   font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;color:var(--ink)!important;
   transition:background-color .15s ease,border-color .15s ease,color .15s ease;
 }
 .kh2-tab:hover{border-color:var(--line-green);}
-.kh2-tab.is-on{background:var(--green-light);border-color:var(--line-green);color:var(--green-dark)!important;}
+.kh2-tab.is-on{background:var(--green-light);border-color:var(--line-green);color:var(--green-dark)!important;font-weight:500!important;}
 /* The track starts on the 1132 column (x=394) and runs off the right edge. */
 .kh2-slides{
   --pw:984.83px;--pg:24px;
@@ -1560,7 +1605,7 @@ const CSS = `
 .kh2-slide{
   position:relative;isolation:isolate;flex:0 0 var(--pw);min-height:371px;
   display:grid;grid-template-columns:444.41fr 444.42fr;gap:26px;padding:35px 34px;
-  border-radius:16px;background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+  border-radius:16px;background:linear-gradient(180deg,#0A4636 9.13%,#18AC85 156.96%);
 }
 .kh2-slide::before{
   content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;
@@ -1585,19 +1630,18 @@ const CSS = `
 .kh2-faq-sec .kh2-in{--w:860px;}
 .kh2-faq{display:flex;flex-direction:column;gap:16px;margin-top:40px;}
 .kh2-faq-row{
-  border-radius:16px;background:#F7F7F7;
-  transition:background-color .4s ease,box-shadow .4s ease;
+  border:1px solid #F4F4F4;border-radius:16px;background:#F9F9F9;
+  transition:background-color .4s ease,border-color .4s ease,box-shadow .4s ease;
 }
-/* The open row's white hairline is drawn as a ring so it adds no height. */
-.kh2-faq-row.is-open{background:#F9FBF9;box-shadow:0 0 0 1px #fff,0 6px 15px rgba(0,0,0,.05);}
+.kh2-faq-row.is-open{background:#FAFCF9;border-color:#E8EFE5;box-shadow:0 6px 15px rgba(0,0,0,.05);}
 .kh2-faq-q{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:16px;background:none;border:0;text-align:left;cursor:pointer;color:var(--ink);
 }
 .kh2-faq-q > span{font-family:var(--text)!important;font-size:18px!important;font-weight:500!important;line-height:26px!important;color:var(--ink)!important;}
-.kh2-faq-q .kh2-pm{flex:none;color:var(--ink);}
+.kh2-faq-q .kh2-pm{flex:none;color:var(--soft);}
 .kh2-faq-row.is-open .kh2-faq-q .kh2-pm{color:var(--green);}
-.kh2-faq-a{padding:1px 16px 25px;font-family:var(--text)!important;font-size:18px!important;line-height:26px!important;color:var(--body)!important;}
+.kh2-faq-a{padding:0 16px 24px;font-family:var(--text)!important;font-size:18px!important;line-height:26px!important;color:var(--body)!important;}
 
 /* ════ blogs ════ */
 .kh2-blog-sec{background:var(--grey-bg);}
@@ -1623,13 +1667,13 @@ const CSS = `
 }
 
 /* ════ final cta ════ */
-.kh2-final{background:linear-gradient(180deg,#FFFFFF 0%,#E7F1DF 100%);padding:78px 0 80px;}
+.kh2-final{background:linear-gradient(180deg,#FFFFFF 0%,#E7F1DF 100%);padding:78.5px 0 79.5px;}
 .kh2-final-tag{
   display:inline-flex;align-items:center;gap:4px;height:40px;padding:0 12px;color:var(--ink);
   font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;
 }
 .kh2-final-tag span,.kh2-final-tag{color:var(--body)!important;}
-.kh2-final-tag svg{color:var(--ink);}
+.kh2-final-tag svg{color:var(--body);}
 .kh2-final-h{margin-top:16px!important;}
 .kh2-final-b{width:220px;margin-top:16px;}
 
@@ -1689,6 +1733,7 @@ const CSS = `
     height:88px;border-width:1px;padding:11px 12px;box-shadow:none;
     font-size:14px!important;line-height:22px!important;
   }
+  .kh2-ask-input::placeholder{white-space:normal;letter-spacing:0;}
   .kh2-concern{
     height:32px;gap:8px;padding:0 12px;border-color:var(--line);border-radius:6px;
     font-size:14px!important;font-weight:500!important;line-height:22px!important;color:#9CA3AF!important;
@@ -1701,7 +1746,7 @@ const CSS = `
   .kh2-badge-wrap{top:76px;width:292px;margin-left:-146px;}
   .kh2-badge-stack{left:11px;right:11px;bottom:-9px;height:40px;}
   .kh2-badge-deck{height:56px;}
-  .kh2-badge{padding:0 10px 0 11px;gap:12px;}
+  .kh2-badge{align-items:center;padding:0 10px 0 11px;gap:12px;}
   .kh2-badge-i{width:27px;height:27px;}
   .kh2-badge-t{font-size:12px!important;line-height:18px!important;}
   .kh2-badge-b{font-size:12px!important;line-height:18px!important;}
@@ -1739,7 +1784,14 @@ const CSS = `
   /* edge to edge of the card: the days from its left edge, the time box
      against its right one */
   .kh2-step-dates{margin:0 -16px;gap:16px;}
-  .kh2-step-days{flex-basis:238px;}
+  .kh2-step-days{
+    flex-basis:238px;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
+    mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
+  }
+  .kh2-step-tile--a{flex:196 1 0;}
+  .kh2-step-tile--b{flex:125 1 0;}
+  .kh2-step-faces img:nth-child(2){border-top-left-radius:50%;}
   .kh2-step-slot{border-radius:8px 0 0 8px;}
   .kh2-how-foot{display:block;margin-top:24px;}
   .kh2-how-foot .kh2-btn2{width:189px;color:var(--body)!important;}
@@ -1757,7 +1809,7 @@ const CSS = `
   .kh2-offer-n{display:none;}
   .kh2-offer-t,.kh2-offer-t:not(#_){font-family:var(--text)!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;}
   .kh2-offer-tile.is-on .kh2-offer-t{font-weight:500!important;color:var(--green)!important;}
-  .kh2-offer-panel{padding:24px;background:#F9FBF9;}
+  .kh2-offer-panel{padding:24px;}
   .kh2-panel-head{display:flex;align-items:center;gap:18px;}
   .kh2-panel-i{display:block;width:56px;height:56px;flex:none;}
   .kh2-panel-h,.kh2-panel-h:not(#_){font-size:20px!important;line-height:28px!important;}
@@ -1779,7 +1831,7 @@ const CSS = `
   .kh2-care-p{font-size:14px!important;line-height:22px!important;}
   .kh2-stats{gap:24px 16px;margin-top:20px;}
   .kh2-stat{min-height:92px;border-left-width:1px;padding-left:10px;}
-  .kh2-stat-v{font-size:24px!important;line-height:32px!important;}
+  .kh2-stat-v{margin-top:0;font-size:24px!important;line-height:32px!important;}
   .kh2-stat-l{margin-top:6px;white-space:normal;font-size:12px!important;line-height:18px!important;}
   .kh2-care-cta{margin-top:20px;color:var(--green-dark)!important;}
   .kh2-care-media{min-height:280px;}
@@ -1788,7 +1840,8 @@ const CSS = `
   /* reviews: a band 48 in from the white, swiped one card at a time. */
   .kh2-rev-sec{background:#fff;padding:48px 0;}
   .kh2-rev-sec > *{background:var(--deep);}
-  .kh2-rev-head{padding-top:32px;}
+  .kh2-rev-head{padding-top:32px;transform:none;}
+  .kh2-reviews::before,.kh2-reviews::after{display:none;}
   .kh2-rating{display:none;}
   .kh2-reviews{
     margin-top:24px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
@@ -1809,21 +1862,27 @@ const CSS = `
     background:url('/design/noise.png') 0 0/150px 150px repeat;
   }
   .kh2-review-av,.kh2-review--big .kh2-review-av{width:56px;height:56px;border-radius:12px;font-size:18px;align-self:center;}
-  .kh2-review--big .kh2-review-who{align-self:center;}
+  .kh2-review--big .kh2-review-who{position:static;align-self:center;}
   .kh2-review-who{gap:3px;}
   .kh2-review-q,.kh2-review--big .kh2-review-q{font-size:18px!important;font-weight:500!important;line-height:26px!important;}
   .kh2-review-rate,.kh2-review--big .kh2-review-rate{
-    justify-self:start;align-self:end;height:30px;gap:8px;padding:0 10px;border-radius:8px;background:var(--deep);
+    position:static;display:flex;justify-self:start;align-self:end;height:30px;gap:8px;padding:0 10px;border-radius:8px;background:var(--deep);
   }
-  .kh2-review-g{width:auto;height:auto;background:none;}
-  .kh2-review-stars{font-size:14px;line-height:17px;color:#F7B84B;}
+  .kh2-review-g,.kh2-review--big .kh2-review-g{width:auto;height:auto;margin-top:0;background:none;}
+  .kh2-review--big .kh2-review-s{height:auto;}
+  .kh2 .kh2-review-stars{letter-spacing:0!important;}
+  .kh2-review-stars,.kh2-review--big .kh2-review-stars{height:auto;font-size:14px;line-height:17px;color:#F7B84B;}
   .kh2-rev-dots{display:flex;justify-content:flex-start;gap:5px;padding:24px 16px 32px;}
   .kh2-rev-dots button{width:6px;height:6px;}
   .kh2-rev-dots button.is-on{width:20px;}
 
   /* experts: smaller faces, and the four cards fold into an accordion. */
   .kh2-exp-h{max-width:358px;}
-  .kh2-strip{margin-top:24px;gap:8px;}
+  .kh2-strip{
+    margin-top:24px;gap:8px;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);
+  }
   .kh2-strip-track{gap:8px;padding-right:8px;}
   .kh2-tile{width:64px;height:70px;border-radius:10px;}
   .kh2-feats{grid-template-columns:1fr;gap:10px;margin-top:24px;}
@@ -1870,6 +1929,7 @@ const CSS = `
   .kh2-faq{gap:12px;margin-top:20px;}
   .kh2-faq-q{padding:17px 16px;}
   .kh2-faq-q > span{font-size:16px!important;line-height:24px!important;}
+  .kh2-faq-row{border:0;}
   .kh2-faq-row.is-open{box-shadow:0 0 0 1px #E8EFE4,0 6px 15px rgba(0,0,0,.05);}
   .kh2-faq-a{padding:0 16px 27px;font-size:14px!important;line-height:22px!important;}
 
@@ -1887,6 +1947,7 @@ const CSS = `
 
   /* the closing band */
   .kh2-final{padding:50px 0 42px;}
+  .kh2-final-tag svg{color:var(--ink);}
   .kh2-final-h,.kh2-final-h:not(#_){margin-top:11px!important;font-size:20px!important;line-height:28px!important;}
   .kh2-final-b{width:165px;margin-top:17px;}
 }
