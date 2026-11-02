@@ -421,10 +421,9 @@ export default function KoottHome({ content } = {}) {
     const langs = cardFields(t).languages.map((l) => String(l).toLowerCase());
     if (language && !langs.includes(language.toLowerCase())) return false;
     if (quickOn) {
-      const hay = quickOn.kind === 'need'
-        ? (t.area_of_expertise || []).join(' ')
-        : `${t.designation || ''} ${t.specialization || ''}`;
-      if (!hay.toLowerCase().includes(quickOn.match)) return false;
+      const role = `${t.designation || ''} ${t.specialization || ''}`;
+      const hay = (quickOn.kind === 'need' ? `${role} ${(t.area_of_expertise || []).join(' ')}` : role).toLowerCase();
+      if (![].concat(quickOn.match).some((w) => hay.includes(w))) return false;
     }
     return true;
   }), [therapists, query, language, quickOn]);
@@ -1132,6 +1131,9 @@ const CSS = `
 .kh2-reveal.is-open{grid-template-rows:1fr;}
 .kh2-reveal-in{min-height:0;overflow:hidden;visibility:hidden;opacity:0;transition:opacity .25s ease,visibility 0s linear .4s;}
 .kh2-reveal.is-open > .kh2-reveal-in{visibility:visible;opacity:1;transition:opacity .35s ease .05s,visibility 0s;}
+@media (prefers-reduced-motion:reduce){
+  .kh2-reveal,.kh2-reveal-in,.kh2-reveal.is-open > .kh2-reveal-in,.kh2-faq-row{transition:none;}
+}
 .kh2-reveal--phone,.kh2-reveal--phone > .kh2-reveal-in{display:contents;}
 .kh2-reveal--phone > .kh2-reveal-in{visibility:visible;opacity:1;}
 

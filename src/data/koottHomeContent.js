@@ -62,13 +62,14 @@ export const THERAPISTS_SECTION = {
   languageLabel: 'Online',
   languages: ['English', 'Malayalam'],
   // One-tap filters. `kind` says what a chip matches: 'role' the therapist's
-  // title (any title containing `match`), 'need' what they work with.
+  // title, 'need' what they work with or a title that names it. `match` is
+  // one or more words, any of which counts.
   // `icon` is a file in public/design/home.
   quickFilters: [
     { label: 'Consultant Psychologist', kind: 'role', match: 'consultant', icon: 'tab-consultant' },
     { label: 'Psychiatrist', kind: 'role', match: 'psychiatr', icon: 'tab-psychiatrist' },
     { label: 'Clinical', kind: 'role', match: 'clinical', icon: 'tab-clinical' },
-    { label: 'Sexual Health', kind: 'need', match: 'sex', icon: 'tab-sexual' },
+    { label: 'Sexual Health', kind: 'need', match: ['sex', 'intimacy', 'vaginismus', 'erectile', 'ejaculation', 'libido'], icon: 'tab-sexual' },
   ],
   moreLabel: 'View more therapists',
 };
