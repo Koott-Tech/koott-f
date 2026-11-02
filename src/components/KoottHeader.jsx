@@ -228,7 +228,8 @@ export default function KoottHeader() {
               </div>
             ) : (
               <button type="button" className="kh-book" data-track="header_sign_in" onClick={() => setShowAuth(true)}>
-                Sign In
+                <span className="kh-lbl">Sign In</span>
+                <span className="kh-lbl-phone">Log In</span>
               </button>
             )}
 
@@ -353,7 +354,7 @@ const CSS = `
   transition:background .18s ease,color .18s ease;
 }
 .kh-book:hover{background:#fff;color:#29653D!important;}
-.kh-logo-fig,.kh-book2{display:none;}
+.kh-logo-fig,.kh-book2,.kh-lbl-phone{display:none;}
 
 /* Signed-in account pill: white, soft grey rim, a warm initial avatar. */
 .kh-pill{
@@ -490,6 +491,29 @@ const CSS = `
 }
 @media (min-width:1024px) and (max-width:1180px){
   .kh.is-home .kh-nav{gap:32px;}
+}
+/* The home page's header in the 390 phone frame: 72 tall, a green Log In. Tablets
+   have no frame and share it, so home has one header below the laptop layout. */
+@media (max-width:1023px){
+  .kh.is-home{height:72px;}
+  .kh.is-home .kh-in{padding:0 16px;gap:16px;}
+  .kh.is-home .kh-logo{width:99.4px;height:30.3px;overflow:visible;}
+  .kh.is-home .kh-logo img{display:none;}
+  .kh.is-home .kh-logo img.kh-logo-fig{
+    display:block;position:static;transform:none;filter:none;width:100%;height:100%;
+  }
+  .kh.is-home .kh-right{gap:16px;}
+  .kh.is-home .kh-book{
+    width:73px;height:32px;margin:0;border:0;border-radius:8px;background:#189E4F;text-transform:none;
+    font-size:14px!important;font-weight:500!important;line-height:22px!important;letter-spacing:0!important;
+  }
+  .kh.is-home .kh-book:hover{background:#0D4F1F;color:#fff!important;}
+  .kh.is-home .kh-lbl{display:none;}
+  .kh.is-home .kh-lbl-phone{display:inline;}
+  .kh.is-home .kh-burger{margin:0;}
+  .kh.is-home .kh-burger span{width:20px;}
+  .kh.is-home .kh-scrim,.kh.is-home .kh-drawer{top:72px;}
+  .kh.is-home .kh-drawer{max-height:calc(100vh - 72px);max-height:calc(100dvh - 72px);}
 }
 @media (max-width:520px){
   .kh-in{padding:0 14px 0 16px;gap:8px;}

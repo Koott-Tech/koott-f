@@ -205,10 +205,10 @@ export const REVIEWS = {
   phoneTitle: ['We Helped 🤝 30,000+', 'Malayalees Around', 'The Globe.'],
   rating: { score: '4.9', label: 'Google Rating' },
   // Run in threes: the first of each three is the tall card, the other two
-  // stack beside it, so the longest quotes go first in a three.
+  // stack beside it. Praveen leads, as both frames draw it.
   items: [
-    { name: 'Divya Menon', place: 'London', quote: 'Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were going through. But we finally opened up, at our own pace. Love it. Thank you.' },
     { name: 'Praveen', place: 'Bangalore', quote: 'There were constant misunderstandings and it gets messier when family interferes. A professional therapist helped us hear each other out. Love it. Thank you.' },
+    { name: 'Divya Menon', place: 'London', quote: 'Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were going through. But we finally opened up, at our own pace. Love it. Thank you.' },
     { name: 'Anjali R', place: 'Toronto', pill: true, quote: 'Online counselling helped me regain control when everything felt overwhelming. My therapist helped me track small improvements week by week. Love it. Thank you.' },
     { name: 'Fathima Noora', place: 'Kochi', quote: 'There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made. Love it. Thank you.' },
     { name: 'Jithin Mohan', place: 'Dubai', quote: 'Things had been really stressful lately and we were constantly misunderstanding each other. Counselling helped us learn to express things better. Love it. Thank you.' },

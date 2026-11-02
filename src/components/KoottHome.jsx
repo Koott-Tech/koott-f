@@ -127,39 +127,34 @@ const Reveal = ({ open, phone = false, children }) => (
 /* ------------------------------ hero clip -------------------------------- */
 
 /*
- * The looped clip along the foot of the hero, a wide cut and a taller one for
- * phones. It mounts once the viewport is known, so a phone never downloads the
- * desktop file. Two copies play in turn — the spare starts a breath before the
+ * The looped clip along the foot of the hero. Both frames draw the same wide
+ * image, the phone squeezing it into a 390 x 94 strip. Two copies play in turn — the spare starts a breath before the
  * front one ends — because a native loop paints nothing for a frame while the
  * decoder wraps, which reads as a flash. MP4 first: iOS WebKit has no VP9 alpha.
  */
-const CUTS = {
-  desk: { mp4: '/hero-calm-desktop.mp4', webm: '/hero-calm-desktop.webm', poster: '/hero-calm-desktop.webp' },
-  mob: { mp4: '/hero-calm-mobile.mp4', webm: '/hero-calm-mobile.webm', poster: '/hero-calm-mobile.webp' },
-};
+const CLIP = { mp4: '/hero-calm-desktop.mp4', webm: '/hero-calm-desktop.webm', poster: '/hero-calm-desktop.webp' };
 const HANDOVER = 0.12;
 const SERVICE_AUTO_MS = 5000;
 
 const HeroClip = () => {
-  const [cut, setCut] = useState(null);
+  const [ready, setReady] = useState(false);
   const [still, setStill] = useState(false);
   const a = useRef(null);
   const b = useRef(null);
 
   useEffect(() => {
-    const phone = window.matchMedia('(max-width:640px)');
     const calm = window.matchMedia('(prefers-reduced-motion:reduce)');
-    const read = () => { setCut(phone.matches ? 'mob' : 'desk'); setStill(calm.matches); };
+    const read = () => { setStill(calm.matches); };
     read();
-    phone.addEventListener('change', read);
+    setReady(true);
     calm.addEventListener('change', read);
-    return () => { phone.removeEventListener('change', read); calm.removeEventListener('change', read); };
+    return () => { calm.removeEventListener('change', read); };
   }, []);
 
   useEffect(() => {
     let front = a.current;
     let back = b.current;
-    if (!cut || !front || !back) return undefined;
+    if (!ready || !front || !back) return undefined;
     if (still) { front.pause(); back.pause(); front.currentTime = 0; return undefined; }
     let busy = false;
     let raf = 0;
@@ -199,17 +194,16 @@ const HeroClip = () => {
       two.removeEventListener('ended', rescue);
       document.removeEventListener('visibilitychange', wake);
     };
-  }, [cut, still]);
+  }, [ready, still]);
 
-  const clip = cut ? CUTS[cut] : null;
   return (
-    <span className={`kh2-clips is-${cut || 'desk'}`}>
-      {clip && [null, 'is-buffer'].map((extra, i) => (
+    <span className="kh2-clips">
+      {ready && [null, 'is-buffer'].map((extra, i) => (
         <video
-          key={`${cut}-${i}`}
+          key={i}
           ref={i === 0 ? a : b}
           className={`kh2-clip ${extra || ''}`}
-          poster={clip.poster}
+          poster={CLIP.poster}
           autoPlay={i === 0}
           muted
           playsInline
@@ -217,8 +211,8 @@ const HeroClip = () => {
           aria-hidden
           tabIndex={-1}
         >
-          <source src={clip.mp4} type="video/mp4" />
-          <source src={clip.webm} type="video/webm" />
+          <source src={CLIP.mp4} type="video/mp4" />
+          <source src={CLIP.webm} type="video/webm" />
         </video>
       ))}
     </span>
@@ -1103,6 +1097,7 @@ const CSS = `
 .kh2-sec{padding:80px 0;}
 /* The header is 84 in this frame against the 63 every other page reserves. */
 @media (min-width:1024px){ .kh2{margin-top:21px;} }
+@media (max-width:1023px){ .kh2{margin-top:9px;} }
 
 /* ---- type ---- */
 .kh2-h1,.kh2-h1:not(#_){
@@ -1222,11 +1217,13 @@ const CSS = `
    because its 72 is measured from a 362 box that the content overflows. */
 .kh2-foliage{position:relative;margin-top:56px;height:227px;pointer-events:none;}
 .kh2-clips{
-  position:absolute;left:0;right:0;bottom:-1px;width:100%;height:100%;
-  background:url('/hero-calm-desktop.webp') center bottom / 100% 100% no-repeat;
+  /* The image is 105.73% of the band with its top cut off. Its pale ground is a
+     shade off the hero's, and darken leaves the hero's colour showing instead. */
+  position:absolute;left:0;right:0;bottom:-1px;width:100%;height:100%;overflow:hidden;
+  mix-blend-mode:darken;
+  background:url('/hero-calm-desktop.webp') center bottom / 100% 105.73% no-repeat;
 }
-.kh2-clips.is-mob{background-image:url('/hero-calm-mobile.webp');}
-.kh2-clip{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill;}
+.kh2-clip{position:absolute;left:0;bottom:0;width:100%;height:105.73%;display:block;object-fit:fill;}
 .kh2-clip.is-buffer{opacity:0;}
 
 /* The stat card: 431 x 85, 81 down the band, with a 416-wide card showing
@@ -1320,11 +1317,13 @@ const CSS = `
 .kh2-ther-more-b{width:201px;}
 /* Home's frame draws the card's chips 24 tall in Medium, with 16 between every
    block, and a 24 play button; the condition pages' frame does not. */
-.kh2 .ktc{padding:19px;}
 .kh2 .ktc-panel,.kh2 .ktc-tags-wrap{margin-bottom:16px;}
-.kh2 .ktc-chip{height:24px;padding-top:2px;border-radius:999px;font-weight:500!important;}
-.kh2 .ktc-wave-btn{width:24px;height:24px;margin:0 -.7px;border-width:1.25px;}
 .kh2 .ktc-who{align-self:center;}
+@media (min-width:641px){
+  .kh2 .ktc{padding:19px;}
+  .kh2 .ktc-chip{height:24px;padding-top:2px;border-radius:999px;font-weight:500!important;}
+  .kh2 .ktc-wave-btn{width:24px;height:24px;margin:0 -.7px;border-width:1.25px;}
+}
 
 /* ════ how it works ════ */
 .kh2-how{background:var(--grey-bg);padding-bottom:80.41px;}
@@ -1486,8 +1485,9 @@ const CSS = `
 
 /* ════ reviews ════ */
 .kh2-rev-sec{background:var(--deep);overflow:hidden;}
+.kh2-rev-head{--w:1132px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
 /* 13 right of the 1132 column, where the frame puts this one row. */
-.kh2-rev-head{--w:1132px;display:flex;align-items:center;justify-content:space-between;gap:24px;transform:translateX(13px);}
+@media (min-width:1241px){ .kh2-rev-head{transform:translateX(13px);} }
 .kh2-rev-h,.kh2-rev-h:not(#_){color:#fff!important;}
 .kh2-rating{display:flex;align-items:center;gap:12px;flex:none;}
 .kh2-rating-t{display:flex;flex-direction:column;}
@@ -1511,9 +1511,8 @@ const CSS = `
 .kh2-rev-spare{display:none;}
 @media (min-width:1921px){ .kh2-rev-spare{display:contents;} .kh2-rev-track{animation-duration:216s;} }
 @media (prefers-reduced-motion:reduce){ .kh2-rev-track{animation:none;} }
-.kh2-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;width:438px;}
-/* The frame's columns are 438 and 473; this one's longer quote needs the 473. */
-.kh2-rev-col:nth-child(4){width:473px;}
+/* The frame's columns are 473 and 438; these quotes need the 473 to stay at three lines. */
+.kh2-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;width:473px;}
 .kh2-review{
   position:relative;isolation:isolate;flex:none;margin:0;min-height:192px;padding:20px 20px 18px;
   display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-areas:"av who" "q q" "rate rate";
@@ -1777,15 +1776,15 @@ const CSS = `
     height:32px;gap:8px;padding:0 12px;border-color:var(--line);border-radius:6px;
     font-size:14px!important;font-weight:500!important;line-height:22px!important;color:#9CA3AF!important;
   }
-  .kh2-concern .kh2-trio{width:16px;height:16px;}
+  .kh2-concern .kh2-trio{width:16px;height:16px;color:#9CA3AF;}
   .kh2-book{width:165px;height:40px;font-weight:500!important;}
   .kh2-foliage{margin-top:0;height:249px;}
-  .kh2-clips{height:89px;top:auto;}
-  .kh2-clip{object-fit:cover;object-position:center bottom;}
+  .kh2-clips{height:94px;top:auto;background-size:100% 100%;}
+  .kh2-clip{height:100%;}
   .kh2-badge-wrap{top:76px;width:292px;margin-left:-146px;}
   .kh2-badge-stack{left:11px;right:11px;bottom:-9px;height:40px;}
   .kh2-badge-deck{height:56px;}
-  .kh2-badge{align-items:center;padding:0 10px 0 11px;gap:12px;}
+  .kh2-badge{align-items:center;padding:0 4px 0 9px;gap:13px;}
   .kh2-badge-i{width:27px;height:27px;}
   .kh2-badge-t{font-size:12px!important;line-height:18px!important;}
   .kh2-badge-b{font-size:12px!important;line-height:18px!important;}
@@ -1799,10 +1798,15 @@ const CSS = `
   /* filled down the columns, as the phone frame orders them */
   .kh2-quicks{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;grid-auto-flow:column;gap:8px;padding:0;}
   .kh2-quick{
-    height:76px;align-items:center;gap:4px;padding:0 16px;border-radius:16px;text-align:left;
+    height:76px;align-items:center;gap:8px;padding:0 11px;border-radius:16px;text-align:left;
     font-size:14px!important;line-height:22px!important;
   }
-  .kh2-quick img{margin-right:4px;}
+  /* The home phone frame's card: 28 chips, the session language under its name. */
+  .kh2 .ktc{padding:15px;}
+  .kh2 .ktc-head{gap:10px;}
+  .kh2 .ktc-chip{height:28px;border-radius:14px;}
+  .kh2 .ktc-lang-lap{display:block;}
+  .kh2 .ktc-lang-phone{display:none;}
   .kh2-tgrid{grid-template-columns:1fr;gap:20px;margin-top:20px;}
   .kh2-tgrid > :nth-child(n+3){display:none;}
   .kh2-ther-more{margin-top:20px;}
@@ -1818,20 +1822,26 @@ const CSS = `
   .kh2-steps{grid-template-columns:1fr;gap:16px;margin-top:24px;max-width:none;}
   .kh2-step{min-height:182px;padding:16px;gap:16px;}
   .kh2-step-n{width:30px;height:30px;color:var(--green-dark)!important;}
+  /* The middle card's number is 32 and black in this frame. */
+  .kh2-step:nth-child(2) .kh2-step-n{width:32px;height:32px;color:var(--ink)!important;}
+  .kh2-step-faces img:nth-child(1){order:2;}
+  .kh2-step-faces img:nth-child(2){order:1;}
+  .kh2-step-faces img:nth-child(n+3){order:3;}
   .kh2-step-b{color:#7C7C7C!important;}
   .kh2-step-faces{gap:9px;}
-  /* edge to edge of the card: the days from its left edge, the time box
-     against its right one */
-  .kh2-step-dates{margin:0 -16px;gap:16px;}
+  /* 58 where they fit, smaller rather than cut off on a narrow phone */
+  .kh2-step-faces img{flex:0 1 58px;width:auto;min-width:0;height:auto;aspect-ratio:1;}
+  /* the days from the card's left edge, the time box on its right padding */
+  .kh2-step-dates{margin:0 0 0 -16px;gap:0;}
   .kh2-step-days{
-    flex-basis:238px;align-items:center;padding-top:0;
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
-    mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
+    flex:0 1 219.8px;align-items:center;padding-top:0;
+    -webkit-mask-image:linear-gradient(90deg,transparent 30px,#000 85px,#000 150px,transparent 205px);
+    mask-image:linear-gradient(90deg,transparent 30px,#000 85px,#000 150px,transparent 205px);
   }
   .kh2-step-tile--a{flex:196 1 0;}
   .kh2-step-tile--b{flex:125 1 0;}
   .kh2-step-faces img:nth-child(2){border-top-left-radius:50%;}
-  .kh2-step-slot{border-radius:8px 0 0 8px;}
+  .kh2-step-slot{margin-left:auto;}
   .kh2-how-foot{display:block;margin-top:24px;}
   .kh2-how-foot .kh2-btn2{width:189px;color:var(--body)!important;}
 
@@ -1841,10 +1851,10 @@ const CSS = `
   .kh2-offer-tiles{gap:8px;}
   .kh2-offer-tile{
     order:var(--ph-order);min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start;
-    gap:4px;padding:0 16px;
+    gap:8px;padding:0 11px;
   }
   .kh2-offer-tile.is-on{box-shadow:none;}
-  .kh2-offer-i,.kh2-offer-i--offer-1{width:32px;height:32px;margin-right:4px;}
+  .kh2-offer-i,.kh2-offer-i--offer-1{width:32px;height:32px;}
   .kh2-offer-n{display:none;}
   .kh2-offer-t,.kh2-offer-t:not(#_){font-family:var(--text)!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;}
   .kh2-offer-tile.is-on .kh2-offer-t{font-weight:500!important;color:var(--green)!important;}
@@ -1860,7 +1870,7 @@ const CSS = `
   .kh2-panel-l .kh2-check{width:18px;height:18px;color:#BBBBBB;}
   .kh2-panel-pack{margin-top:16px!important;color:#7C7C7C!important;}
   .kh2-panel-cta{flex-direction:column;align-items:flex-start;gap:16px;margin-top:16px;}
-  .kh2-panel-link{order:-1;gap:6px;font-weight:500!important;color:var(--green-dark)!important;}
+  .kh2-panel-link{order:-1;gap:6px;padding:6px 0;margin:-6px 0;font-weight:500!important;color:var(--green-dark)!important;}
 
   /* care: the card, then the photo under it. */
   .kh2-care{grid-template-columns:1fr;gap:16px;}
@@ -1879,22 +1889,22 @@ const CSS = `
   /* reviews: a band 48 in from the white, swiped one card at a time. */
   .kh2-rev-sec{background:#fff;padding:48px 0;}
   .kh2-rev-sec > *{background:var(--deep);}
-  .kh2-rev-head{padding-top:32px;transform:none;}
+  .kh2-rev-head{padding-top:32px;}
   .kh2-reviews::before,.kh2-reviews::after{display:none;}
   .kh2-rating{display:none;}
   .kh2-reviews{
-    margin-top:24px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
-    padding:0 16px;scroll-padding:0 16px;
+    margin-top:0;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+    padding:24px 16px 0;scroll-padding:0 16px;
   }
   .kh2-rev-track{animation:none;width:auto;}
   .kh2-rev-set{align-items:flex-start;gap:12px;margin-right:0;}
   .kh2-rev-set + .kh2-rev-set,.kh2-rev-spare,.kh2-review--repeat{display:none!important;}
   .kh2-rev-col{display:contents;}
   .kh2-review,.kh2-review--big{
-    width:326px;min-height:330px;padding:20px;border-radius:16px;scroll-snap-align:start;
+    width:min(326px,calc(100vw - 64px));min-height:330px;padding:20px;border-radius:16px;scroll-snap-align:start;
     grid-template-columns:56px minmax(0,1fr);grid-template-areas:"av who" "q q" "rate rate";
     column-gap:12px;row-gap:20px;align-content:start;
-    background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+    background:linear-gradient(180deg,#0A4636 9.13%,#18AC85 156.96%);
   }
   .kh2-review::before{
     content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;
@@ -1905,13 +1915,13 @@ const CSS = `
   .kh2-review-who{gap:3px;}
   .kh2-review-q,.kh2-review--big .kh2-review-q{font-size:18px!important;font-weight:500!important;line-height:26px!important;}
   .kh2-review-rate,.kh2-review--big .kh2-review-rate{
-    position:static;display:flex;justify-self:start;align-self:end;height:30px;gap:8px;padding:0 10px;border-radius:8px;background:var(--deep);
+    position:static;display:flex;justify-self:start;align-self:start;height:30px;margin-top:-2px;gap:4px;padding:0 10px;border-radius:8px;background:var(--deep);
   }
   .kh2-review-g,.kh2-review--big .kh2-review-g{width:auto;height:auto;margin-top:0;background:none;}
   .kh2-review--big .kh2-review-s{height:auto;}
   .kh2 .kh2-review-stars{letter-spacing:0!important;}
   .kh2-review-stars,.kh2-review--big .kh2-review-stars{height:auto;font-size:14px;line-height:17px;color:#F7B84B;}
-  .kh2-rev-dots{display:flex;justify-content:flex-start;gap:5px;padding:24px 16px 32px;}
+  .kh2-rev-dots{display:flex;justify-content:flex-start;gap:5px;padding:24px 16px 40px;}
   .kh2-rev-dots button{width:6px;height:6px;}
   .kh2-rev-dots button.is-on{width:20px;}
 
@@ -1925,8 +1935,10 @@ const CSS = `
   .kh2-strip-track{gap:8px;padding-right:8px;}
   .kh2-tile{width:64px;height:70px;border-radius:10px;}
   .kh2-feats{grid-template-columns:1fr;gap:10px;margin-top:24px;}
-  .kh2-feat{padding:16px;border-radius:16px;background:#F9FBF9;border-color:#DDEDD8;}
-  .kh2-feat-head{cursor:pointer;}
+  .kh2-feat{padding:16px;border-radius:16px;background:#F9FBF9;border-color:#F3F3F3;}
+  .kh2-feat.is-open{border-color:#DDEDD8;}
+  .kh2-feat.is-open .kh2-pm{color:var(--green-dark);}
+  .kh2-feat-head{padding:8px 0;margin:-8px 0;cursor:pointer;}
   .kh2-feat-head .kh2-pm{display:block;flex:none;}
   .kh2-feat-l{padding-bottom:8px;}
   .kh2-feat-t,.kh2-feat-t:not(#_){font-family:var(--text)!important;font-size:18px!important;font-weight:500!important;line-height:26px!important;}
@@ -1940,10 +1952,10 @@ const CSS = `
   .kh2-rail{position:relative;margin-top:20px;justify-content:flex-start;}
   .kh2-rail-arrow{
     display:flex;align-items:center;justify-content:center;position:absolute;top:50%;z-index:2;
-    width:40px;height:40px;margin-top:-20px;padding:0;border:0;background:none;color:var(--ink);cursor:pointer;
+    width:40px;height:40px;margin-top:-20px;padding:0;border:0;background:none;color:var(--green-dark);cursor:pointer;
   }
-  .kh2-rail-arrow:first-child{left:-8px;}
-  .kh2-rail-arrow:last-child{right:-8px;}
+  .kh2-rail-arrow:first-child{left:0;}
+  .kh2-rail-arrow:last-child{right:0;}
   .kh2-rail-arrow:disabled{opacity:.3;cursor:default;}
   .kh2-rail .kh2-tabs{
     width:100%;overflow-x:auto;scrollbar-width:none;gap:8px;padding:2px 32px;
@@ -1951,25 +1963,27 @@ const CSS = `
     mask-image:linear-gradient(90deg,transparent 0,#000 64px,#000 calc(100% - 64px),transparent 100%);
   }
   .kh2-rail .kh2-tabs::-webkit-scrollbar{display:none;}
-  .kh2-svc-sec .kh2-tab{height:40px;}
-  .kh2-svc-sec .kh2-rail .kh2-tabs{padding-top:6px;padding-bottom:6px;}
-  .kh2-slides{--pw:326px;--pg:12px;padding:0 16px;margin-top:20px;}
+  .kh2-svc-sec .kh2-tab{height:42px;}
+  .kh2-svc-sec .kh2-rail .kh2-tabs{padding-top:5px;padding-bottom:5px;}
+  .kh2-slides{--pw:min(316px,calc(100vw - 74px));--pg:12px;padding:0 16px;margin-top:20px;}
   .kh2-slide{min-height:538px;display:flex;flex-direction:column;gap:20px;padding:20px;}
   .kh2-slide-media{height:194px;flex:none;}
   .kh2-slide-body{flex:1;}
   .kh2-slide-t,.kh2-slide-t:not(#_){font-size:20px!important;line-height:28px!important;}
   .kh2-slide-lead{margin-top:20px!important;font-size:14px!important;line-height:22px!important;}
-  .kh2-slide-l{margin-top:20px!important;gap:10px;}
-  .kh2-slide-l li{font-size:14px!important;line-height:22px!important;}
-  .kh2-slide-cta{width:100%;min-width:0;height:48px;margin-top:auto;justify-content:center;}
+  .kh2-slide-l{margin-top:20px!important;padding-left:0!important;gap:10px;}
+  .kh2-slide-l li{list-style-position:inside;font-size:14px!important;line-height:22px!important;}
+  .kh2-slide-cta{width:252px;max-width:100%;min-width:0;margin-top:20px;color:var(--green-dark)!important;}
   .kh2-svc-dots{display:none;}
 
   /* faq */
   .kh2-faq{gap:12px;margin-top:20px;}
   .kh2-faq-q{padding:17px 16px;}
   .kh2-faq-q > span{font-size:16px!important;line-height:24px!important;}
-  .kh2-faq-row{border:0;}
-  .kh2-faq-row.is-open{box-shadow:0 0 0 1px #E8EFE4,0 6px 15px rgba(0,0,0,.05);}
+  .kh2-faq-row{border:0;background:#F8F8F8;box-shadow:inset 0 0 0 1px #F3F3F3;}
+  .kh2-faq-row.is-open{background:#F9FBF9;box-shadow:0 0 0 1px #E8EFE4,0 6px 15px rgba(0,0,0,.05);}
+  .kh2-faq-row.is-open .kh2-faq-q .kh2-pm{color:var(--green-dark);}
+  .kh2-faq-sec .kh2-tabs{background:none;}
   .kh2-faq-a{padding:0 16px 27px;font-size:14px!important;line-height:22px!important;}
 
   /* blogs: one card at a time, the next peeking in. */
@@ -1978,16 +1992,16 @@ const CSS = `
     scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;
   }
   .kh2-posts::-webkit-scrollbar{display:none;}
-  .kh2-post{flex:0 0 326px;min-height:351px;padding:14px;box-shadow:none;scroll-snap-align:start;}
+  .kh2-post{flex:0 0 min(326px,calc(100vw - 64px));min-height:351px;padding:14px;box-shadow:none;scroll-snap-align:start;}
   .kh2-post:hover{box-shadow:none;transform:none;}
   .kh2-post-img{height:195px;}
   .kh2-post-t{font-weight:500!important;}
   .kh2-post-more{padding-top:16px;}
 
   /* the closing band */
-  .kh2-final{padding:50px 0 42px;}
+  .kh2-final{padding:48px 0 39px;}
   .kh2-final-tag svg{color:var(--ink);}
-  .kh2-final-h,.kh2-final-h:not(#_){margin-top:11px!important;font-size:20px!important;line-height:28px!important;}
-  .kh2-final-b{width:165px;margin-top:17px;}
+  .kh2-final-h,.kh2-final-h:not(#_){margin-top:16px!important;font-size:20px!important;line-height:28px!important;}
+  .kh2-final-b{width:122px;margin-top:17px;}
 }
 `;

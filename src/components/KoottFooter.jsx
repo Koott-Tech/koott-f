@@ -453,8 +453,9 @@ const CSS = `
   .kf-join{display:none;}
 
   .kf-brand{margin-bottom:17px;}
-  .kf-logo{width:108px;height:34px;margin:0 0 25px;}
-  .kf-logo img{width:133px;height:133px;margin:-50px 0 0 -21px;}
+  .kf-logo{width:99.4px;height:30.3px;margin:0 0 28.7px;}
+  .kf-logo img{display:none;}
+  .kf-logo img.kf-logo-fig{display:block;width:100%;height:100%;margin:0;filter:none;}
   .kf-co,.kf-co:not(#_),.kf-ad,.kf-ad:not(#_){display:none;}
   .kf-contact{gap:6px;margin-top:14px;}
   .kf-logo + .kf-co + .kf-ad + .kf-ad + .kf-contact{margin-top:0;}
@@ -463,7 +464,7 @@ const CSS = `
     border:1px solid #0A4636;border-radius:16px;
     transition:padding .4s cubic-bezier(.4,0,.2,1),background-color .4s ease,border-color .4s ease;
   }
-  .kf-col.is-open{background:#0A4636;border-color:#DDEED8;padding-bottom:28px;}
+  .kf-col.is-open{background:#0A4636;border-color:#DDEED8;padding-bottom:24px;}
   .kf-h,.kf-h:not(#_){display:none;}
   .kf-acc{
     display:flex;align-items:center;justify-content:space-between;width:100%;height:56px;
@@ -480,7 +481,7 @@ const CSS = `
     display:grid;grid-template-rows:0fr;
     transition:grid-template-rows .4s cubic-bezier(.4,0,.2,1),margin .4s cubic-bezier(.4,0,.2,1);
   }
-  .kf-col.is-open .kf-reveal{grid-template-rows:1fr;margin-top:-4px;}
+  .kf-col.is-open .kf-reveal{grid-template-rows:1fr;}
   .kf-reveal-in{
     display:block;min-height:0;overflow:hidden;visibility:hidden;opacity:0;
     transition:opacity .25s ease,visibility 0s linear .4s;
@@ -517,7 +518,7 @@ const CSS = `
   .kf-crisis,.kf-crisis:not(#_){grid-column:1 / -1;grid-row:2;margin:24px 0 0;}
   /* Narrow enough that the number drops to its own line whole, as the file has it. */
   .kf-help,.kf-help:not(#_){grid-column:1 / -1;grid-row:3;max-width:305px;margin:24px 0 0;color:#fff!important;}
-  .kf-marks{grid-column:1 / -1;grid-row:4;gap:19px;margin:24px 0 0;}
+  .kf-marks{grid-column:1 / -1;grid-row:4;gap:16.3px;margin:24px 0 0;}
   .kf-mark,.kf-mark:not(#_){gap:5px;}
   .kf-shield{width:19px;height:23px;}
 }
