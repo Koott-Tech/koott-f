@@ -1,5 +1,7 @@
 /**
- * Home — built from the design file "Koott Website Sep-26 (3).pdf".
+ * Home — built from the design files "Home_Final.pdf" (laptop) and
+ * "Home mobile Updated.pdf" (phone). Its copy is static, in
+ * data/koottHomeContent.js; nothing is fetched for it.
  *
  * Server component on purpose: `metadata` cannot be exported from a client
  * component. The UI lives in KoottHome, which is a client component because the

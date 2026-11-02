@@ -1,120 +1,104 @@
 /**
- * Copy for the redesigned home page, transcribed from the design file
- * "Koott Website Sep-26 (3).pdf".
+ * Copy for the home page, transcribed from the two design files:
  *
- * Two kinds of change were made to what the artboards show, both deliberate and
- * both listed here so they are easy to review:
+ *   laptop  figma-ref/Home_Final.pdf           (1920 frame "Home_Final")
+ *   phone   figma-ref/Home mobile Updated.pdf  (390 frame "Home mobile Updated")
  *
- *  1. Placeholder text from the template the design was built on has been
- *     replaced. The artboards carry another company's name in two places — a
- *     "Join Rula" panel under "What Koott offers" (the file's own later artboard
- *     shows the intended Koott version, which is what is used here) and FAQ
- *     entries reading "What is Hopely?". Shipping either would put a competitor's
- *     brand on Koott's home page.
- *  2. Spelling in the artboards has been corrected: Indviduals, Conernces,
- *     Convinient, Trianed, Emapthy, judgentmental, scheudling, Tecnhically,
- *     deliverering, countires, Professionaly, coomunication, Malayaalees, and
- *     HIPPA (the standard is HIPAA).
+ * The page is static: this file is its only source of copy and nothing is
+ * fetched for it. Where the two frames word something differently, the phone's
+ * wording sits beside the laptop's under a `phone…` key and each size shows its
+ * own.
  *
- * Everything else is the design's own wording.
+ * Changes made to what the frames show, all deliberate:
+ *
+ *  1. The FAQ answers are Koott's own. Both frames carry lorem ipsum there.
+ *  2. Only the first two service panels are drawn; the other five tabs keep the
+ *     copy and photos this page already had for them.
+ *  3. The phone frame names two therapist chips "Consultant Psychologist"; the
+ *     second is the laptop's "Clinical", which is what is used.
+ *  4. "100% confidential, HIPAA-secure protection-" loses its stray hyphen.
  */
 
 export const HERO = {
   /**
-   * The first line of the headline cycles through these; the second line stays
-   * put. Written with full stops in the brief — dropped here because the line
-   * runs straight into "all with Koott", where a full stop would read as a typo.
-   * Each must fit ONE line on a 320px phone (~276px at the 30px headline size),
-   * or the headline jumps a line every time it rotates.
+   * The first line cycles through these; the second line stays put. The first
+   * one is the line both frames draw. Each must fit one line on a 320px phone.
    */
   rotatingTitles: [
-    'Feel understood',
     'Feel less anxious',
+    'Feel understood',
     'Heal relationships',
     'Manage stress',
     'Gain better sleep',
   ],
   titleTail: 'all with Koott',
-  title: ['Feel less anxious', 'all with Koott'],
-  subtitle: 'Online Therapy with Malayali Psychologists, Anytime!',
-  searchPlaceholder: "Type in what's on your mind.\nWe'll help you find the right therapist for you.",
+  // Whatever follows the last comma is set in green.
+  subtitle: 'Online Therapy with Malayali Psychologists, 24/7',
+  searchPlaceholder: "Type in what's on your mind. We'll help you find the right therapist for you.",
   concernCta: 'Find therapist by concern',
   bookCta: 'Book a slot now',
   /**
-   * The hero stat card cycles through these. The design draws it as a small
-   * stack, which implies more than one; the first is the card shown on the
-   * artboard and the rest carry figures used elsewhere in the same design.
+   * The stat card under the headline cycles through these. The first is the
+   * card both frames draw; the phone words its line differently.
    */
   badges: [
     {
-      icon: '⛅',
-      title: '9 out of 10 Clients',
-      body: 'Felt comfortable, heard, and understood right from session one.',
-    },
-    {
-      icon: '🌱',
       title: '30,000+ Sessions',
       body: 'Delivered to Malayalees living across 97 countries.',
+      phoneBody: 'Across 97 countries, where ever you are.',
     },
-    {
-      icon: '👥',
-      title: '60+ Therapists',
-      body: 'Licensed, experienced, and culturally sensitive to Kerala.',
-    },
-    {
-      icon: '⭐',
-      title: '4.9 Google Rating',
-      body: 'From clients who found the right person to talk to.',
-    },
-    {
-      icon: '💚',
-      title: 'Sessions from ₹749',
-      body: 'With packages of 3, 6 and 9 sessions when you need them.',
-    },
+    // The rest are not drawn; each line fits the card on one line at both sizes.
+    { title: '9 out of 10 Clients', body: 'Felt heard and understood from session one.', phoneBody: 'Felt heard from the very first session.' },
+    { title: '60+ Therapists', body: 'Licensed, experienced and culturally sensitive.', phoneBody: 'Licensed and culturally sensitive.' },
+    { title: '4.9 Google Rating', body: 'From clients who found the right person.', phoneBody: 'From clients who found their person.' },
+    { title: 'Sessions from ₹749', body: 'With packages of 3, 6 and 9 sessions.', phoneBody: 'Packages of 3, 6 and 9 sessions.' },
   ],
 };
 
 export const THERAPISTS_SECTION = {
   title: "Kerala's best Malayali counsellors and therapists are your Koott now.",
-  subtitle: 'Licensed, experienced, and culturally sensitive. Book them instantly',
-  filters: ['Speciality', 'Needs'],
-  // The Sep-26 artboard replaces the two dropdowns with a name search and a row
-  // of one-tap filters. `kind` says which filter a chip drives: 'role' matches
-  // the therapist's title, 'need' matches what they work with — the artboard
-  // mixes both in one row ("Sexual Health" is a concern, the rest are roles).
-  // `icon` names one of the glyphs drawn in KoottHome's QuickIcon.
-  searchPlaceholder: 'Search by therapist name',
+  searchPlaceholder: 'Search',
+  // The dropdown inside the search field: the language a session is held in.
+  languageLabel: 'Online',
+  languages: ['English', 'Malayalam'],
+  // One-tap filters. `kind` says what a chip matches: 'role' the therapist's
+  // title (any title containing `match`), 'need' what they work with.
+  // `icon` is a file in public/design/home.
   quickFilters: [
-    { label: 'Consultant Psychologist', kind: 'role', icon: 'chat' },
-    { label: 'Clinical Psychologist', kind: 'role', icon: 'check' },
-    { label: 'Sexual Health', kind: 'need', icon: 'heart' },
-    { label: 'Psychiatrist', kind: 'role', icon: 'pill' },
+    { label: 'Consultant Psychologist', kind: 'role', match: 'consultant', icon: 'tab-consultant' },
+    { label: 'Psychiatrist', kind: 'role', match: 'psychiatr', icon: 'tab-psychiatrist' },
+    { label: 'Clinical', kind: 'role', match: 'clinical', icon: 'tab-clinical' },
+    { label: 'Sexual Health', kind: 'need', match: 'sex', icon: 'tab-sexual' },
   ],
-  moreLabel: 'more.',
+  moreLabel: 'View more therapists',
 };
 
 export const HOW_IT_WORKS = {
   eyebrow: 'How it works',
+  phoneEyebrow: 'How Koott works',
   title: 'Koott is easy, simple & confidential',
   subtitle: 'At Koott, we believe feeling understood is where healing begins. Our experienced',
-  cta: 'Find the Therapist',
-  // The Sep-26 artboard reduces this to three steps, each with its own caption
-  // under the card instead of one shared line.
+  cta: 'Find the therapist',
+  phoneCta: 'Find your therapist',
   steps: [
-    { n: 1, title: 'Choose your therapist', avatars: true, caption: 'Browse and choose your psychologist' },
-    { n: 2, title: 'Book a session', slot: 'Evenings After 4pm', days: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], caption: 'Choose your slot & day' },
-    { n: 3, title: 'Start getting better', photos: true, caption: 'Start healing to a better life.' },
+    { n: 1, title: 'Choose your therapist', body: 'Browse and select your ideal psychologist easily and quickly.' },
+    { n: 2, title: 'Book a session', body: 'Choose your slot & day Browse and choose your psychologist' },
+    { n: 3, title: 'Start getting better', body: 'Start healing to a better life. Browse and choose your psychologist' },
   ],
 };
 
 export const OFFERS = {
   title: 'What Koott offers',
   subtitle: 'At Koott, we believe feeling understood is where healing begins. Our experienced',
+  // Laptop order, two by two. The phone puts psychiatry second (`phoneOrder`).
   items: [
     {
       key: 'individuals',
       title: 'Counselling & Therapy for Individuals',
+      short: ['Individuals', 'Therapy'],
+      phoneOrder: 1,
       note: 'For any individual from age 16 onwards',
+      icon: 'offer-1',
       panel: {
         heading: ['Counselling &', 'Therapy for Individuals'],
         lead: 'A 50-minute clinical & counselling session.',
@@ -133,10 +117,13 @@ export const OFFERS = {
     {
       key: 'couples',
       title: 'Couple Counselling for Relationships',
+      short: ['Couple', 'Therapy'],
+      phoneOrder: 3,
       note: 'For any individual from age 16 onwards',
+      icon: 'offer-2',
       panel: {
         heading: ['Couple Counselling', 'for Relationships'],
-        lead: 'A 50-minute session for you and your partner.',
+        lead: 'An 80-minute session for you and your partner.',
         bullets: [
           'Communication and conflict',
           'Trust and intimacy',
@@ -152,7 +139,10 @@ export const OFFERS = {
     {
       key: 'sexual',
       title: 'Sexual & Intimacy Concerns',
+      short: ['Sexual', 'Health'],
+      phoneOrder: 4,
       note: 'For any individual from age 16 onwards',
+      icon: 'offer-3',
       panel: {
         heading: ['Sexual & Intimacy', 'Concerns'],
         lead: 'A private, 50-minute session with a specialist.',
@@ -171,7 +161,10 @@ export const OFFERS = {
     {
       key: 'psychiatry',
       title: 'Psychiatry/Medicine support',
+      short: ['Psychiatry', 'support'],
+      phoneOrder: 2,
       note: 'For any individual from age 16 onwards',
+      icon: 'offer-4',
       panel: {
         heading: ['Psychiatry &', 'Medicine support'],
         lead: 'Consultation with a qualified psychiatrist.',
@@ -193,107 +186,84 @@ export const OFFERS = {
 export const CARE = {
   title: ['Care that', 'understands you.'],
   paragraphs: [
-    'At Koott, we believe feeling understood is where healing begins. Our experienced and qualified mental health professionals provide personalised, quality care for what you’re going through — with a genuine understanding of Malayalee culture, families, relationships, and everyday life.',
+    'At Koott, we believe feeling understood is where healing begins. Our experienced and qualified mental health professionals provide personalised, quality care for what you’re going through with a genuine understanding of Malayalee culture, families, relationships, and everyday life.',
     'Because getting help should feel safe, comfortable, and human.',
   ],
+  // Line breaks are the laptop frame's own; the phone ignores them.
   stats: [
-    { value: '60+', label: 'Qualified therapists across diverse specialties' },
-    // The artboard repeats the "Qualified therapists" label against ₹749; that is
-    // plainly a copy-paste slip, so the label describes the price instead.
-    { value: '₹749', label: 'Starting price for a full counselling session' },
-    { value: '30,000+', label: 'Sessions delivered by touching 97 countries' },
-    { value: '9 in 10', label: 'Clients say they felt heard, understood, and supported' },
+    { value: '60+', label: 'Qualified therapists across diverse\nspecialties' },
+    { value: '₹749', label: 'Starting price for a full counselling\nsession' },
+    { value: '30,000+', label: 'Sessions delivered by touching 97\ncountries' },
+    { value: '9 in 10', label: 'Clients say they felt heard, understood,\nand supported' },
   ],
-  cta: { label: 'Our story & team.', href: '/about-us' },
+  cta: { label: 'Our Story & Team', href: '/about-us' },
 };
 
 export const REVIEWS = {
-  eyebrow: 'Reviews',
   title: 'We Helped 🤝 30,000+ Malayalees Around The Globe.',
+  phoneTitle: ['We Helped 🤝 30,000+', 'Malayalees Around', 'The Globe.'],
   rating: { score: '4.9', label: 'Google Rating' },
+  // Run in threes: the first of each three is the tall card, the other two
+  // stack beside it, so the longest quotes go first in a three.
   items: [
-    { name: 'Divya Menon', place: 'London', source: 'google', quote: 'Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were going through. But we finally opened up, at our own pace. Love it. Thank you.' },
-    { name: 'Jithin Mohan', place: 'Dubai', source: 'whatsapp', quote: 'Things had been really stressful lately and we were constantly misunderstanding each other. Counselling helped us learn to express things better. Love it. Thank you.' },
-    { name: 'Fathima Noora', place: 'Kochi', source: 'google', quote: 'There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made. Love it. Thank you.' },
-    { name: 'Praveen', place: 'Bangalore', source: 'zoho', quote: 'There were constant misunderstandings and it gets messier when family interferes. A professional therapist helped us hear each other out. Love it. Thank you.' },
-    { name: 'Anjali R', place: 'Toronto', source: 'google', quote: 'Online counselling helped me regain control when everything felt overwhelming. My therapist helped me track small improvements week by week. Love it. Thank you.' },
+    { name: 'Divya Menon', place: 'London', quote: 'Being in a new country was not easy. Our relationship felt distant, and we struggled to express what we were going through. But we finally opened up, at our own pace. Love it. Thank you.' },
+    { name: 'Praveen', place: 'Bangalore', quote: 'There were constant misunderstandings and it gets messier when family interferes. A professional therapist helped us hear each other out. Love it. Thank you.' },
+    { name: 'Anjali R', place: 'Toronto', quote: 'Online counselling helped me regain control when everything felt overwhelming. My therapist helped me track small improvements week by week. Love it. Thank you.' },
+    { name: 'Fathima Noora', place: 'Kochi', quote: 'There were a lot of unresolved issues, and we struggled to understand what we felt. Counselling was the best decision we made. Love it. Thank you.' },
+    { name: 'Jithin Mohan', place: 'Dubai', quote: 'Things had been really stressful lately and we were constantly misunderstanding each other. Counselling helped us learn to express things better. Love it. Thank you.' },
   ],
 };
 
 export const EXPERTS = {
-  eyebrow: '60+ experts, one integrated team, All focused on your care',
   title: "Kerala's best Malayali counsellors and therapists are your Koott now.",
   cards: [
     {
-      icon: '⛅',
-      title: ['Quality Care', 'with Experience'],
-      lines: ['Clinical.', 'PhD’s', 'Publications.', 'University toppers.', 'Industry toppers.', 'Trained.', 'In house trained'],
+      title: 'Quality Care with Experience',
+      lines: ['Clinical PhDs & Published Researchers', 'Top-ranked graduates and industry experts', 'Professionally trained & in-house experts'],
     },
     {
-      icon: '🌸',
-      title: ['Non judgemental', '& Confidential'],
-      lines: ['Trust.', 'Human care.', 'Empathy.', 'Acceptance.', 'Non judgemental', '100% confidential with HIPAA security protection'],
+      title: 'Non judgemental & Confidential',
+      lines: ['Trust, empathy & human-centered care', 'A safe space built on acceptance, not judgement', '100% confidential, HIPAA-secure protection'],
     },
     {
-      icon: '👍',
-      title: ['Affordable &', 'Easily Accessible'],
-      lines: ['Online counselling.', 'Best value on the price.', 'Easy scheduling.', 'Instant Support.', 'Technically advanced, still easy for any Malayalee.'],
+      title: 'Affordable & Easily Accessible',
+      lines: ['Online counselling at the best value', 'Easy scheduling with instant support', 'Simple, accessible technology for every Malayalee'],
     },
     {
-      icon: '🌍',
-      title: ['Personalized for', 'Malayalees, every where.'],
-      lines: ['24*7 care', 'Delivering around 96 countries.', 'Professionally inclined therapists with strong English & Malayalam communication.', 'Growth focused.'],
+      title: 'Personalized for Malayalees, Everywhere.',
+      lines: ['24/7 care, delivered to 96+ countries', 'Growth-focused, personalized support', 'Therapists fluent in English & Malayalam'],
     },
   ],
-  secondaryCta: { label: 'Work with us.', href: '/jobs' },
-  primaryCta: { label: 'Choose your Therapist', href: '/book-malayali-psychologists' },
+  secondaryCta: { label: 'Work with us', href: '/jobs' },
+  primaryCta: { label: 'Choose your therapist', href: '/book-malayali-psychologists' },
 };
 
 export const SERVICES = {
-  eyebrow: 'Why Koott - services & pricing',
   title: 'Koott is right with you, the way you want',
-  // One panel per tab: pressing a tab swaps the panel below it. The tab labels
-  // and the first panel are the artboard's; the rest describe services Koott
-  // actually runs, and each links to the page we host for it. Prices repeat the
-  // two the artboard states (₹749 therapy, ₹1699 psychiatry) — anything we do
-  // not have a published price for says "on the booking page" rather than
-  // inventing a number.
-  // Photos are free Unsplash-licence images (images.unsplash.com), cropped by
-  // the URL; swap `image` for a Koott photo whenever one exists.
-  tabs: [
-    'Kalyana Raman', 'Counselling', 'Psychiatry', 'Assessments',
-    'Child & Teens', 'Better Parenting', "Women's Health", 'Therapy',
-  ],
+  // One panel per tab. The first two panels are the design's own; the frames
+  // draw the rest as empty cards, so they keep the copy this page had.
+  tabs: ['Counselling', 'Psychiatry', 'Assessments', 'Child & Teens', 'Better Parenting', 'Women’s Health', 'Therapy'],
   panels: [
     {
-      title: ['Convenient online', 'therapy'],
+      title: 'Convenient online therapy',
       lead: 'Therapists, psychiatrists, doctors and care teams stay connected throughout.',
       bullets: ['Decisions are consistent and informed', 'Based on a full understanding of your needs'],
       price: 'Starting from ₹749 onwards',
-      href: '/pre-marital-counselling',
-      image: 'https://images.unsplash.com/photo-1758691462743-f9fc9e430d39?auto=format&fit=crop&w=900&q=70',
+      href: '/book-malayali-psychologists',
+      image: '/design/home/service-1.webp',
       imageAlt: 'A therapist talking with a client over a video call on a laptop',
     },
     {
-      title: ['Counselling in', 'your own language'],
-      lead: 'A 50-minute session with a Malayali psychologist, online, from anywhere.',
-      bullets: ['Same therapist, session after session', 'Evening and weekend slots'],
-      price: 'Starting from ₹749 onwards',
-      href: '/book-malayali-psychologists',
-      image: 'https://images.unsplash.com/photo-1714976694810-85add1a29c96?auto=format&fit=crop&w=900&q=70',
-      imageAlt: 'A counsellor in conversation with a client',
-    },
-    {
-      title: ['Psychiatry when', 'you need it'],
+      title: 'Psychiatry when you need it',
       lead: 'Medical review alongside your therapy, from qualified psychiatrists.',
       bullets: ['Diagnosis, prescription and follow-up', 'Coordinated with your therapist'],
       price: 'Starting from ₹1699 onwards',
       href: '/book-malayali-psychologists',
-      image: 'https://images.unsplash.com/photo-1714976694525-71eb29a7c500?auto=format&fit=crop&w=900&q=70',
-      imageAlt: 'A client talking with a specialist on a sofa',
+      image: '/design/home/service-2.webp',
+      imageAlt: 'A counsellor in conversation with a client',
     },
     {
-      title: ['Assessments that', 'point somewhere'],
+      title: 'Assessments that point somewhere',
       lead: 'Structured psychological assessment, with the results explained to you.',
       bullets: ['Administered by trained psychologists', 'A written report you can take with you'],
       price: 'Pricing on the booking page',
@@ -302,7 +272,7 @@ export const SERVICES = {
       imageAlt: 'A psychologist taking notes on a clipboard during a session',
     },
     {
-      title: ['Care for children', 'and teenagers'],
+      title: 'Care for children and teenagers',
       lead: 'Sessions built around younger clients, with parents kept in the loop.',
       bullets: ['Child and adolescent psychologists', 'School, friendship and family concerns'],
       price: 'Starting from ₹749 onwards',
@@ -311,7 +281,7 @@ export const SERVICES = {
       imageAlt: 'A therapist talking with a young girl',
     },
     {
-      title: ['Support for', 'parents'],
+      title: 'Support for parents',
       lead: 'Practical guidance for the part of parenting nobody hands you a manual for.',
       bullets: ['Behaviour, boundaries and routines', 'Sessions for one parent or both'],
       price: 'Starting from ₹749 onwards',
@@ -320,7 +290,7 @@ export const SERVICES = {
       imageAlt: 'A mother holding her laughing child',
     },
     {
-      title: ["Women's health", 'and wellbeing'],
+      title: 'Women’s health and wellbeing',
       lead: 'Space for the concerns that come with each stage of life.',
       bullets: ['Fertility, pregnancy and postpartum', 'Confidential, judgement-free sessions'],
       price: 'Starting from ₹749 onwards',
@@ -329,7 +299,7 @@ export const SERVICES = {
       imageAlt: 'A woman in a sari outdoors in soft light',
     },
     {
-      title: ['Therapy that fits', 'your week'],
+      title: 'Therapy that fits your week',
       lead: 'Evidence-based therapy, rescheduled up to 24 hours before your session.',
       bullets: ['Sessions on Google Meet, from anywhere', 'Packages of 3, 6 and 9 sessions'],
       price: 'Starting from ₹749 onwards',
@@ -342,9 +312,8 @@ export const SERVICES = {
 
 export const FAQ = {
   title: 'Frequently Asked Questions',
+  phoneTitle: 'FAQ’s',
   tabs: ['General', 'Appointments', 'Therapy', 'Payments', 'Privacy'],
-  // The artboards use another platform's name here ("What is Hopely?"); these are
-  // the equivalent questions written for Koott.
   groups: {
     General: [
       { q: 'What is Koott?', a: 'Koott is an online therapy platform built for Malayalees. You book a licensed Malayali psychologist and meet them over a secure video or audio call, from anywhere in the world.' },
@@ -377,19 +346,17 @@ export const FAQ = {
 export const BLOGS = {
   eyebrow: 'Blogs & Events',
   title: 'We touch millions of life every year',
+  phoneTitle: ['Understand more', 'and become better.'],
+  readMore: 'Read more',
 };
 
 export const FINAL_CTA = {
+  eyebrow: 'Available 24x7',
   title: 'Your first session could be today.',
-  secondary: 'Available 24*7',
   primary: 'Book Now',
 };
 
-/**
- * The whole page's built-in copy. The admin "Pages → Home" editor stores
- * changes under site-config `site_home` with these same keys, merged over this
- * one section at a time (lib/siteContent.js).
- */
+/** The whole page's copy, as one object (the admin preview merges over it). */
 export const HOME_DEFAULTS = {
   HERO, THERAPISTS_SECTION, HOW_IT_WORKS, OFFERS, CARE,
   REVIEWS, EXPERTS, SERVICES, FAQ, BLOGS, FINAL_CTA,

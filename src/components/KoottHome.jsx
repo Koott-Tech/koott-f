@@ -1,160 +1,153 @@
 'use client';
 
-import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
-import TherapistCard, { THERAPIST_CARD_CSS, cardFields } from '@/components/TherapistCard';
-import { whenLabel } from '@/lib/nextAvailable';
-import CustomSelect from '@/components/CustomSelect';
-
 /**
- * KoottHome — the home page from "Koott Website Sep-26 (3).pdf".
+ * KoottHome — the home page, built to two design frames:
  *
- * The design was read by rendering the PDF at 2x (2049 x 14489) and working
- * from the slices, so the values below are measured rather than guessed:
+ *   laptop  figma-ref/Home_Final.pdf           1920 x 8651
+ *   phone   figma-ref/Home mobile Updated.pdf  390 x 9409
  *
- * Colours are sampled from the render, not eyeballed (modal colour of a patch,
- * so antialiasing does not skew them):
+ * Sizes, spacing, type and colours were read off the exported .fig
+ * ("Koott 29 10 26.fig", frames 268:1792 and 558:2822) and checked against the
+ * PDFs; where the two disagree the PDF wins, because it is the render of the
+ * same frame. The photos in public/design/home come out of the .fig's images
+ * folder, and the icons are rendered off the PDF.
  *
- *   header band   #063327      footer band   #012F23
- *   primary       #189E4F      CTA arch      #D5FFC4 base -> #E6FFDE apex
- *   display text  #012F23      section head  #000000      body #3B3B3B
- *   page          #FFFFFF      placeholder   #A8A8A8
- *   step card     #F7FFF5 -> #F3FFF2         care card   #EFFFEA
- *   services panel #F9FFF8                   feature card #FAFCF9
+ * The page is static: every word is in data/koottHomeContent.js. The therapist
+ * cards and the blog posts are live (/api/public/psychologists, /api/blogs),
+ * as on the condition pages, because that data changes all the time.
  *
- * Headings are Inter, body copy Inter (standing in for Avenir, a licensed
- * Wix face). Everything is scoped to .kh2 and marked !important because
- * globals.css (marked "never edit") forces Poppins and 60/48/36px on h1–h3.
+ * Motion the design cannot show, kept from the previous build: the rotating
+ * headline, the stat-card deck, the looping foliage clip, the offer panel's
+ * hand-over, the reviews and faces running on loops, the services slider, and
+ * the accordions easing open.
  *
- * Live data where we have it: therapists come from /api/public/psychologists and
- * posts from /api/blogs, both falling back to the design's own placeholders so
- * the page is never empty. Copy lives in data/koottHomeContent.js, which also
- * records the two places where the artboards carried another company's
- * placeholder text.
+ * Styles are scoped to .kh2 and carry !important (and :not(#_) on headings)
+ * because globals.css sets type site-wide that way.
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { track } from '@/analytics';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { track } from '@/analytics';
+import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
+import TherapistCard, { THERAPIST_CARD_CSS, cardFields, designCardCss } from '@/components/TherapistCard';
 import { therapistSlug } from '@/components/TherapistProfile';
+import { whenLabel } from '@/lib/nextAvailable';
 import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
-import {
-  HERO, THERAPISTS_SECTION, HOW_IT_WORKS, OFFERS, CARE,
-  REVIEWS, EXPERTS, SERVICES, FAQ, BLOGS, FINAL_CTA, HOME_DEFAULTS,
-} from '@/data/koottHomeContent';
+import { HOME_DEFAULTS } from '@/data/koottHomeContent';
 import { mergeSiteContent } from '@/lib/siteContent';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 const BOOK = '/book-malayali-psychologists';
+const ART = '/design/home';
 
 /* ----------------------------- small pieces ----------------------------- */
 
-const Chevron = ({ dir = 'down', className = '' }) => (
-  <svg className={className} width="18" height="18" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    {dir === 'down' ? <path d="M6 9l6 6 6-6" /> : <path d="M9 6l6 6-6 6" />}
+const Chevron = ({ dir = 'down', size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    {dir === 'down' && <path d="M6 9l6 6 6-6" />}
+    {dir === 'left' && <path d="M15 6l-6 6 6 6" />}
+    {dir === 'right' && <path d="M9 6l6 6-6 6" />}
   </svg>
 );
 
-const Sparkle = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-    <path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z" />
+/* star-06: the four-pointed sparkle on the primary buttons. */
+const Sparkle = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 1.5c.5 0 .9.3 1 .8l1.2 4.6c.4 1.6 1.7 2.9 3.3 3.3l4.6 1.2c.5.1.8.5.8 1s-.3.9-.8 1l-4.6 1.2c-1.6.4-2.9 1.7-3.3 3.3L13 21.5c-.1.5-.5.8-1 .8s-.9-.3-1-.8l-1.2-4.6c-.4-1.6-1.7-2.9-3.3-3.3L1.9 12.4c-.5-.1-.8-.5-.8-1s.3-.9.8-1l4.6-1.2c1.6-.4 2.9-1.7 3.3-3.3L11 2.3c.1-.5.5-.8 1-.8z" />
   </svg>
 );
 
-/**
- * The mark on "Find therapist by concern": three four-pointed sparkles — a large
- * one low-left with a medium and a small one stacked up to its right, as drawn
- * in the design. Concave sides, so they read as twinkles rather than diamonds.
- */
+/* Three sparkles, as drawn beside "Find therapist by concern". */
 const SparkleTrio = () => (
-  <svg className="kh2-trio" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-    {/* large, sitting low-left. The control points sit at 0.40r rather than
-        0.28r, which fattens the arms — thinner waists read as spindly. */}
+  <svg className="kh2-trio" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
     <path d="M9.5 5.5C9.5 10.9 13.1 14.5 18.5 14.5C13.1 14.5 9.5 18.1 9.5 23.5C9.5 18.1 5.9 14.5 0.5 14.5C5.9 14.5 9.5 10.9 9.5 5.5Z" />
-    {/* medium, to the right */}
     <path d="M18.5 3.1C18.5 6.34 20.66 8.5 23.9 8.5C20.66 8.5 18.5 10.66 18.5 13.9C18.5 10.66 16.34 8.5 13.1 8.5C16.34 8.5 18.5 6.34 18.5 3.1Z" />
-    {/* small, above */}
     <path d="M13.5 0.2C13.5 2.24 14.86 3.6 16.9 3.6C14.86 3.6 13.5 4.96 13.5 7C13.5 4.96 12.14 3.6 10.1 3.6C12.14 3.6 13.5 2.24 13.5 0.2Z" />
   </svg>
 );
 
-/**
- * One of the two working filters over the therapist list — the shared custom
- * dropdown, with the empty option ("Speciality" / "Need") as "show all".
- */
-/* The artboard draws a different outline glyph beside each quick filter. */
-const QuickIcon = ({ name }) => {
-  const d = {
-    chat: 'M21 11.5a8.4 8.4 0 0 1-9 8.4L3 21l1.1-3.3A8.4 8.4 0 1 1 21 11.5z',
-    check: 'M9 11.5l2 2 4-4M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z',
-    heart: 'M20.8 6.6a5 5 0 0 0-7.1 0L12 8.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 22l8.8-8.3a5 5 0 0 0 0-7.1z',
-    pill: 'M10.5 20.5a5 5 0 0 1-7-7l6-6a5 5 0 0 1 7 7zM8 11l5 5',
-  }[name] || '';
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d={d} />
-    </svg>
-  );
-};
-
-const FilterSelect = ({ label, value, options, onChange, format }) => (
-  <CustomSelect
-    className="kh2-filter"
-    aria-label={label}
-    placeholder={label}
-    value={value}
-    onChange={(e) => onChange(e.target.value)}
-    options={[
-      { value: '', label },
-      ...options.map((o) => ({ value: o, label: format ? format(o) : o.charAt(0).toUpperCase() + o.slice(1) })),
-    ]}
-  />
-);
-
-const Tick = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <circle cx="12" cy="12" r="9" /><path d="M8.5 12.5l2.5 2.5 4.5-5" />
+/* check-circle, solid: a green disc with a white tick. */
+const Check = ({ size = 20 }) => (
+  <svg className="kh2-check" width={size} height={size} viewBox="0 0 24 24" aria-hidden>
+    <circle cx="12" cy="12" r="11" fill="currentColor" />
+    <path d="M7.5 12.3l3 3 6-6.3" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
-const Stars = () => (
-  <span className="kh2-stars" aria-hidden>★★★★★</span>
+const ArrowUpRight = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M7 17L17 7M8 7h9v9" />
+  </svg>
 );
 
-/** Source mark on a review card. */
-const SOURCE = { google: 'G', whatsapp: '✆', zoho: 'Z' };
+const ArrowRight = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M4 12h16M14 6l6 6-6 6" />
+  </svg>
+);
+
+const PlusMinus = ({ open }) => (
+  <svg className="kh2-pm" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+    <path d="M5 12h14" />
+    {!open && <path d="M12 5v14" />}
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+    <circle cx="11" cy="11" r="7.5" /><path d="M21 21l-4.5-4.5" />
+  </svg>
+);
+
+const Clock = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <circle cx="12" cy="12" r="9.5" /><path d="M12 7v5l3 2" />
+  </svg>
+);
+
+/** The four-colour Google mark beside the rating. */
+const GoogleMark = ({ size = 38 }) => (
+  <svg viewBox="0 0 48 48" width={size} height={size} aria-hidden focusable="false">
+    <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z" />
+    <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z" />
+    <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z" />
+    <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z" />
+  </svg>
+);
 
 /**
- * The looped clip along the foot of the hero — one wide band, with a taller cut
- * for phones. It is decoration, so it plays silent and inline with no controls.
- *
- * The element mounts only once the client knows which cut applies, so a phone
- * never downloads the desktop file and vice versa; the band's height is
- * reserved in CSS, so nothing jumps while it loads. Anyone who asks for less
- * motion gets the first frame, held still.
+ * A box that eases between no height and its own. Every accordion on the page
+ * opens this way. `phone` ones are plain content above the phone breakpoint.
  */
-/* Two copies of the clip this viewport needs; the second is served from cache,
-   so it costs no download. They are React elements, not hand-written HTML:
-   anything written into the band by hand is wiped on every re-render of the
-   hero, which happens constantly because the badge deck above rotates on a
-   timer. The band itself carries the still frame as its background, so the
-   greenery is painted with no JavaScript and no video decoded. */
-/* H.264 MP4 first: every iPhone browser is WebKit, and WebKit would not play
-   the WebM — it is VP9 flagged alpha_mode=1, and Apple's WebKit has no VP9
-   alpha, so on iOS the band sat on its still frame. The alpha was never used
-   (every pixel of every frame is opaque), so a plain MP4 loses nothing; it is
-   hardware-decoded on every phone and about half the size. The WebM stays as
-   the fallback for a browser with no H.264. */
+const Reveal = ({ open, phone = false, children }) => (
+  <div className={`kh2-reveal${phone ? ' kh2-reveal--phone' : ''}${open ? ' is-open' : ''}`}>
+    <div className="kh2-reveal-in">{children}</div>
+  </div>
+);
+
+/* ------------------------------ hero clip -------------------------------- */
+
+/*
+ * The looped clip along the foot of the hero, a wide cut and a taller one for
+ * phones. It mounts once the viewport is known, so a phone never downloads the
+ * desktop file. Two copies play in turn — the spare starts a breath before the
+ * front one ends — because a native loop paints nothing for a frame while the
+ * decoder wraps, which reads as a flash. MP4 first: iOS WebKit has no VP9 alpha.
+ */
 const CUTS = {
   desk: { mp4: '/hero-calm-desktop.mp4', webm: '/hero-calm-desktop.webm', poster: '/hero-calm-desktop.webp' },
   mob: { mp4: '/hero-calm-mobile.mp4', webm: '/hero-calm-mobile.webm', poster: '/hero-calm-mobile.webp' },
 };
-const HANDOVER = 0.12;   // seconds of overlap before a clip reaches its end
+const HANDOVER = 0.12;
 
 const HeroClip = () => {
-  const [cut, setCut] = useState(null);   // null until the viewport is known
+  const [cut, setCut] = useState(null);
   const [still, setStill] = useState(false);
   const a = useRef(null);
   const b = useRef(null);
@@ -169,10 +162,6 @@ const HeroClip = () => {
     return () => { phone.removeEventListener('change', read); calm.removeEventListener('change', read); };
   }, []);
 
-  /* A native loop paints nothing for a frame while the decoder wraps, and that
-     reads as a flash. So the spare copy starts a breath before the front one
-     ends and takes the front; the spent one rewinds and waits its turn.
-     Something is always mid-frame, so there is no gap to see. */
   useEffect(() => {
     let front = a.current;
     let back = b.current;
@@ -198,9 +187,8 @@ const HeroClip = () => {
         .catch(() => { busy = false; });
     };
 
-    // rAF is frozen while the tab is in the background, so a clip can reach its
-    // end with no handover waiting. Rewind it there, and again on the way back,
-    // so nobody returns to a stalled frame.
+    // rAF stops in a background tab, so a clip can reach its end with no
+    // hand-over waiting; rewind it there, and again on the way back.
     const rescue = (e) => { e.target.currentTime = 0; if (e.target === front) Promise.resolve(front.play()).catch(() => {}); };
     const wake = () => { if (!document.hidden && front.paused) Promise.resolve(front.play()).catch(() => {}); };
     const one = a.current; const two = b.current;
@@ -228,8 +216,6 @@ const HeroClip = () => {
           ref={i === 0 ? a : b}
           className={`kh2-clip ${extra || ''}`}
           poster={clip.poster}
-          // The front clip carries autoplay too, for browsers that start a
-          // muted video on its own but refuse a scripted play().
           autoPlay={i === 0}
           muted
           playsInline
@@ -248,48 +234,102 @@ const HeroClip = () => {
 /** One card in the hero deck. `incoming` is the one animating in on top. */
 const BadgeCard = ({ card, incoming = false }) => (
   <div className={`kh2-badge ${incoming ? 'is-in' : 'is-out'}`}>
-    <span className="kh2-badge-i" aria-hidden>{card.icon}</span>
-    <div>
+    <img className="kh2-badge-i" src={`${ART}/badge-orb.png`} alt="" width={47} height={47} />
+    <div className="kh2-badge-copy">
       <p className="kh2-badge-t">{card.title}</p>
-      <p className="kh2-badge-b">{card.body}</p>
+      <p className="kh2-badge-b">
+        {card.phoneBody ? (
+          <>
+            <span className="kh2-lap">{card.body}</span>
+            <span className="kh2-ph">{card.phoneBody}</span>
+          </>
+        ) : card.body}
+      </p>
     </div>
   </div>
 );
 
-/** The body of one "What Koott offers" entry. */
-const OfferBody = ({ o }) => (
-  <>
-    <h3 className="kh2-offer-h">
-      {o.panel.heading.map((l, i) => <span key={i}>{l}</span>)}
-    </h3>
-    <p className="kh2-offer-lead">{o.panel.lead}</p>
+/* --------------------------- how it works art ---------------------------- */
 
-    <div className="kh2-offer-cta">
-      <Link href={BOOK} className="kh2-offer-price">{o.panel.price}</Link>
-      <Link href={o.panel.link.href} className="kh2-offer-link">
-        {o.panel.link.label}
-        <span className="kh2-offer-link-i" aria-hidden><Chevron /></span>
-      </Link>
+/* The picture at the foot of each step card: five faces, a date strip with a
+   time, then a video call. The photographs are the design's own (the same
+   files the condition pages use). */
+function StepArt({ step }) {
+  if (step === 0) {
+    return (
+      <div className="kh2-step-art kh2-step-faces" aria-hidden>
+        {[1, 2, 3, 4, 5].map((i) => <img key={i} src={`/design/steps/face-${i}.webp`} alt="" loading="lazy" />)}
+      </div>
+    );
+  }
+  if (step === 1) {
+    // Real dates, so the strip never shows a day that has gone by.
+    const today = new Date();
+    // Four days back to two ahead, today picked, as the strip is drawn.
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i - 4);
+      return {
+        label: d.toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'Asia/Kolkata' }),
+        day: d.toLocaleDateString('en-GB', { day: '2-digit', timeZone: 'Asia/Kolkata' }),
+      };
+    });
+    return (
+      <div className="kh2-step-art kh2-step-dates" aria-hidden>
+        <div className="kh2-step-days">
+          {days.map((d, i) => (
+            <span key={i} className={i === 4 ? 'is-on' : i < 4 ? 'is-past' : ''}>
+              <small>{d.label}</small><b>{d.day}</b>
+            </span>
+          ))}
+        </div>
+        <div className="kh2-step-slot"><small>Today</small><b>4 PM</b></div>
+      </div>
+    );
+  }
+  return (
+    <div className="kh2-step-art kh2-step-call" aria-hidden>
+      <span className="kh2-step-tile kh2-step-tile--a"><img src="/design/steps/call-1.webp" alt="" loading="lazy" /></span>
+      <span className="kh2-step-tile kh2-step-tile--b">
+        <img src="/design/steps/call-2.webp" alt="" loading="lazy" />
+        <span className="kh2-step-dots"><i /><i /><i /></span>
+      </span>
     </div>
+  );
+}
 
-    <ul className="kh2-offer-list">
-      {o.panel.bullets.map((b) => (
-        <li key={b}><span className="kh2-offer-i"><Tick /></span>{b}</li>
-      ))}
-    </ul>
-    <p className="kh2-offer-pack">{o.panel.packages}</p>
-  </>
+/* ------------------------------- reviews --------------------------------- */
+
+/* The design fills the review photos with stock faces. A stock face beside a
+   named testimonial reads as that client, so — as on the condition pages — the
+   frame carries the person's initials until a review has a real photo. */
+const ReviewCard = ({ r, big = false }) => (
+  <figure className={`kh2-review${big ? ' kh2-review--big' : ''}${r.repeat ? ' kh2-review--repeat' : ''}`}>
+    <span className="kh2-review-av" aria-hidden>
+      {(r.name || '').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('')}
+    </span>
+    <figcaption className="kh2-review-who">
+      <span className="kh2-review-n">{r.name}</span>
+      <span className="kh2-review-p">{r.place}</span>
+    </figcaption>
+    <blockquote className="kh2-review-q">{r.quote}</blockquote>
+    <span className="kh2-review-rate">
+      <span className="kh2-review-g">G</span>
+      <span className="kh2-review-s">4.9/5</span>
+      <span className="kh2-review-stars">★★★★★</span>
+    </span>
+  </figure>
 );
 
 /* -------------------------------- data ---------------------------------- */
 
-function useTherapists(limit = 3) {
+function useTherapists() {
   const [rows, setRows] = useState([]);
   useEffect(() => {
     let off = false;
     (async () => {
       try {
-        // Soonest-available therapists first (the booking page uses the admin's group pattern instead).
+        // Soonest-available first; the same answer carries each next free start.
         const [res, order] = await Promise.all([
           fetch(`${API}/public/psychologists`),
           fetchTherapistOrder('default'),
@@ -298,18 +338,16 @@ function useTherapists(limit = 3) {
         const json = await res.json();
         const d = json?.data ?? json?.message ?? json;
         const list = d?.psychologists || (Array.isArray(d) ? d : []);
-        // The same order answer carries each therapist's next free start, so the
-        // cards show it without a single extra request.
         if (!off && Array.isArray(list)) {
-          setRows(applyTherapistOrder(list, order).slice(0, limit).map((p) => ({
+          setRows(applyTherapistOrder(list, order).map((p) => ({
             ...p,
             nextAvailable: whenLabel(order?.nextAt?.get(String(p.id))),
           })));
         }
-      } catch (_) { /* keep the design's placeholder cards */ }
+      } catch (_) { /* the section shows its empty line */ }
     })();
     return () => { off = true; };
-  }, [limit]);
+  }, []);
   return rows;
 }
 
@@ -325,354 +363,233 @@ function usePosts(limit = 3) {
         const d = json?.data ?? json?.message ?? json;
         const list = d?.blogs || (Array.isArray(d) ? d : []);
         if (!off && Array.isArray(list)) setRows(list.slice(0, limit));
-      } catch (_) { /* section falls back to the design's captions */ }
+      } catch (_) { /* the section hides itself */ }
     })();
     return () => { off = true; };
   }, [limit]);
   return rows;
 }
 
-/** No filters set. One object so "cleared" is always the same value. */
-const EMPTY_FILTERS = { concerns: [], roles: [], minExp: '', maxPrice: 0 };
+const hasRecord = (t) => Boolean(t.first_name || t.last_name);
+const bookingHref = (t) => (hasRecord(t) ? `/book/${therapistSlug(t)}` : BOOK);
+const profileHref = (t) => (hasRecord(t) ? `/service-page/${therapistSlug(t)}` : BOOK);
 
-/**
- * Where a card's View Profile goes: the therapist's own page when we have a
- * real record, the booking page for the artboard's placeholder cards, which have
- * no row behind them.
- */
-const bookingHref = (t) => (t.first_name || t.last_name
-  ? '/book/' + therapistSlug(t)
-  : BOOK);
-
-const profileHref = (t) => (t.first_name || t.last_name
-  ? '/service-page/' + therapistSlug(t)
-  : BOOK);
-
-/** The three cards the artboards show, used until the API answers. */
-const FALLBACK_THERAPISTS = [
-  { name: 'Dr. Aswathi Usha Raman', designation: 'Chief Consultant Psychologist' },
-  { name: 'Aswathy Sampath', designation: 'Clinical Psychologist' },
-  { name: 'Dr. Thaniya K Leela', designation: 'Consultant Psychologist' },
-];
-
-/* Placeholder therapist portraits for the experts strip — the same DiceBear
-   "notionists" style the demo therapist rows use — until real photos exist. */
-const FACE_BGS = ['F1FBF3', 'E8F1FB', 'FCEADB', 'F6EFFB', 'EAF3E2', 'FBF3E1'];
-const EXPERT_FACES = [
-  ['Anjali Menon', 'Rahul Nair', 'Fathima Noora', 'Vishnu Prasad', 'Sneha Thomas', 'Arun Krishnan', 'Meera Pillai',
-    'Nikhil Varghese', 'Divya Raj', 'Aswin Kumar', 'Lakshmi Nair', 'Joel Mathew', 'Reshma Babu', 'Hari Shankar'],
-  ['Aparna Das', 'Sreejith Mohan', 'Nisha Joseph', 'Anand Menon', 'Gayathri Suresh', 'Faisal Rahman', 'Keerthi Varma',
-    'Midhun Jose', 'Ann Maria', 'Rohit Chandran', 'Swathi Krishna', 'Sanjay George', 'Neethu Paul', 'Akhil Ravi'],
-];
-const faceUrl = (seed, i) =>
-  `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(seed)}&backgroundColor=${FACE_BGS[i % FACE_BGS.length]}&scale=110`;
+/* The faces strip: the design's 28 portraits, two rows. */
+const FACES = [1, 2].map((r) => Array.from({ length: 14 }, (_, i) => `${ART}/faces/r${r}-${String(i + 1).padStart(2, '0')}.webp`));
 
 /* -------------------------------- page ---------------------------------- */
 
 export default function KoottHome({ content } = {}) {
-  // Copy from data/koottHomeContent.js, with whatever the admin "Pages → Home"
-  // The home page is static: its copy is data/koottHomeContent.js and nothing
-  // is fetched for it. `content` is still honoured so a preview can pass copy
-  // in, but there is no stored version to merge any more. These shadow the
-  // module imports of the same name.
+  // `content` exists only for the admin preview; the public page passes none.
   const {
     HERO, THERAPISTS_SECTION, HOW_IT_WORKS, OFFERS, CARE,
     REVIEWS, EXPERTS, SERVICES, FAQ, BLOGS, FINAL_CTA,
   } = useMemo(() => (content ? mergeSiteContent(HOME_DEFAULTS, content) : HOME_DEFAULTS), [content]);
-  const therapists = useTherapists(60);
-  // The home page's therapist cards count as a counsellor list view once loaded.
+
+  const therapists = useTherapists();
+  const posts = usePosts(3);
   const listSeen = useRef(false);
   useEffect(() => {
     if (!listSeen.current && therapists.length) { listSeen.current = true; track('counsellor_list_view', { count: Math.min(therapists.length, 3) }); }
   }, [therapists.length]);
-  const posts = usePosts(3);
 
-  // `out` is the phrase leaving, kept mounted so phones can fade it away before
-  // the next one rises, rather than have it vanish; same shape as the badge deck.
+  /* hero: the headline's first line and the stat card both rotate. `out` is
+     the one leaving, kept mounted so it can animate away. */
   const [title, setTitle] = useState({ cur: 0, out: null });
-  // Both indices in one piece of state so the swap happens in a single update:
-  // `cur` is the card landing on top, `out` the one it is covering.
   const [deck, setDeck] = useState({ cur: 0, out: null });
-  const [speciality, setSpeciality] = useState('');
-  const [need, setNeed] = useState('');
-  // Name search, as the artboard's first control.
+  useEffect(() => {
+    // For everyone, reduced motion included: the CSS swaps movement for a fade.
+    const timers = [];
+    if (HERO.rotatingTitles.length > 1) {
+      timers.push(setInterval(() => setTitle(({ cur }) => ({ cur: (cur + 1) % HERO.rotatingTitles.length, out: cur })), 2600));
+    }
+    if (HERO.badges.length > 1) {
+      timers.push(setInterval(() => setDeck(({ cur }) => ({ cur: (cur + 1) % HERO.badges.length, out: cur })), 3800));
+    }
+    return () => timers.forEach(clearInterval);
+  }, [HERO.rotatingTitles.length, HERO.badges.length]);
+
+  /* therapists: a name search, a language, and one quick filter at a time. */
   const [query, setQuery] = useState('');
-  const [panelOpen, setPanelOpen] = useState(false);
-  // The panel edits a draft; nothing reaches the list until Apply is pressed.
-  const [draft, setDraft] = useState(EMPTY_FILTERS);
-  const [applied, setApplied] = useState(EMPTY_FILTERS);
-  // "How it works" is a swipe carousel on phones. The row scrolls natively
-  // (scroll-snap); this only tracks which card is in view, for the dots.
-  const stepsRef = useRef(null);
-  const [stepIndex, setStepIndex] = useState(0);
-  const onStepsScroll = () => {
-    const el = stepsRef.current;
-    if (!el || !el.children.length) return;
-    const card = el.children[0].getBoundingClientRect().width;
-    const gap = parseFloat(getComputedStyle(el).columnGap || getComputedStyle(el).gap) || 0;
-    setStepIndex(Math.round(el.scrollLeft / (card + gap)));
-  };
-  const goToStep = (i) => {
-    const el = stepsRef.current;
-    const card = el?.children[i];
-    if (card) el.scrollTo({ left: card.offsetLeft - el.offsetLeft - (el.clientWidth - card.clientWidth) / 2, behavior: 'smooth' });
-  };
+  const [language, setLanguage] = useState(THERAPISTS_SECTION.languages[0]);
+  const [quick, setQuick] = useState('');
+  const quickOn = THERAPISTS_SECTION.quickFilters.find((f) => f.label === quick);
+  const matches = useMemo(() => therapists.filter((t) => {
+    const q = query.trim().toLowerCase();
+    const name = String(t.name || `${t.first_name || ''} ${t.last_name || ''}`).toLowerCase();
+    if (q && !name.includes(q)) return false;
+    const langs = cardFields(t).languages.map((l) => String(l).toLowerCase());
+    if (language && !langs.includes(language.toLowerCase())) return false;
+    if (quickOn) {
+      const hay = quickOn.kind === 'need'
+        ? (t.area_of_expertise || []).join(' ')
+        : `${t.designation || ''} ${t.specialization || ''}`;
+      if (!hay.toLowerCase().includes(quickOn.match)) return false;
+    }
+    return true;
+  }), [therapists, query, language, quickOn]);
+  const {
+    draft: bookingDraft, slotState: bookingSlotState, suggestion: bookingSuggestion,
+    dismiss: dismissBookingDraft, takeSuggestion: takeBookingSuggestion, seeOtherTimes: seeOtherBookingTimes,
+  } = useBookingDraft();
+  // An unfinished booking takes the first card's place, so the row stays at three.
+  const cards = matches.slice(0, bookingDraft ? 2 : 3);
+
+  /* what koott offers: the tile picks the panel. The outgoing panel stays just
+     long enough to fade; the first one does not animate on load. */
   const [openOffer, setOpenOffer] = useState(OFFERS.items[0].key);
-  // The laptop panel hands over like the hero headline: the previous entry is
-  // kept mounted just long enough to fade out, then the new one rises in.
-  // `offerTouched` stops the very first entry animating on page load.
   const [prevOffer, setPrevOffer] = useState(null);
   const [offerTouched, setOfferTouched] = useState(false);
-  // Once an entry has finished opening on a phone/tablet, glide the whole entry
-  // (its row and the body under it) to the middle of the screen below the
-  // 63px header. Taller than the screen: its row goes just under the header.
-  const centreOpenOffer = (rowEl) => {
-    const item = rowEl.closest('.kh2-offer-item') || rowEl;
-    const r = item.getBoundingClientRect();
-    const top = 63;
-    const room = window.innerHeight - top;
-    const want = r.height < room - 24 ? top + (room - r.height) / 2 : top + 12;
-    const delta = r.top - want;
-    if (Math.abs(delta) > 2) window.scrollBy({ top: delta, behavior: 'smooth' });
-  };
-  const pickOffer = (key, rowEl) => {
+  const offer = OFFERS.items.find((o) => o.key === openOffer) || OFFERS.items[0];
+  const pickOffer = (key) => {
     if (key === openOffer) return;
+    track('ui_toggle', { element: 'offers_row', index: OFFERS.items.findIndex((o) => o.key === key) });
     setPrevOffer(openOffer);
     setOpenOffer(key);
     setOfferTouched(true);
-    // Phones/tablets: the entry above may be collapsing as this one opens,
-    // which drags the tapped row up out from under the finger. Pin it for the
-    // length of the transition. (Chrome's own scroll anchoring may already do
-    // this; then the row never moves and the loop does nothing. Safari has no
-    // scroll anchoring.) 'instant' because <html> has scroll-behavior:smooth.
-    // Measured against the row's starting position, not the previous frame:
-    // scroll offsets are whole pixels, so frame-to-frame corrections each lose
-    // a fraction and the row crept 12px over one transition.
-    if (rowEl && window.matchMedia('(max-width:1000px)').matches) {
-      const start = performance.now();
-      const target = rowEl.getBoundingClientRect().top;
-      const hold = (t) => {
-        const drift = rowEl.getBoundingClientRect().top - target;
-        if (Math.abs(drift) >= 0.5) window.scrollBy({ top: drift, behavior: 'instant' });
-        if (t - start < 420) requestAnimationFrame(hold);
-      };
-      requestAnimationFrame(hold);
-      // After the .38s open (and the hold above) has settled.
-      setTimeout(() => centreOpenOffer(rowEl), 440);
-    }
   };
-  const [faqTab, setFaqTab] = useState(FAQ.tabs[0]);
-  const [openFaq, setOpenFaq] = useState(null);
+
+  /* reviews: chunked in threes — a tall card, then two stacked. A short last
+     group borrows from the start of the list (skipping the first, which the
+     loop runs straight back to). */
+  const reviewGroups = useMemo(() => {
+    const items = REVIEWS.items || [];
+    const out = [];
+    for (let i = 0; i < items.length; i += 3) out.push(items.slice(i, i + 3));
+    const last = out[out.length - 1];
+    if (last && last.length < 3 && items.length > 3) {
+      for (let i = 1; last.length < 3; i += 1) last.push({ ...items[i], repeat: true });
+    }
+    return out;
+  }, [REVIEWS.items]);
+  // The phone swipes the reviews one at a time; this tracks which, for the dots.
+  const reviewsRef = useRef(null);
+  const [reviewAt, setReviewAt] = useState(0);
+  const reviewCards = () => Array.from(
+    reviewsRef.current?.querySelectorAll('.kh2-rev-set:first-child .kh2-review:not(.kh2-review--repeat)') || [],
+  ).filter((c) => !c.closest('.kh2-rev-spare'));
+  const onReviewsScroll = () => {
+    const el = reviewsRef.current;
+    if (!el) return;
+    const left = el.getBoundingClientRect().left + 16;
+    const gaps = reviewCards().map((c) => Math.abs(c.getBoundingClientRect().left - left));
+    if (gaps.length) setReviewAt(gaps.indexOf(Math.min(...gaps)));
+  };
+  const goToReview = (i) => {
+    const el = reviewsRef.current;
+    const card = reviewCards()[i];
+    if (!el || !card) return;
+    el.scrollTo({ left: el.scrollLeft + card.getBoundingClientRect().left - el.getBoundingClientRect().left - 16, behavior: 'smooth' });
+  };
+
+  /* experts: four cards; on the phone they fold into an accordion. */
+  const [openExpert, setOpenExpert] = useState(0);
+
+  /* services: a tab (or a dot, or a swipe) slides the track. */
   const [serviceTab, setServiceTab] = useState(0);
-  // On phones the tab row scrolls sideways; keep the selected tab in view when
-  // a swipe or a dot changes it (scrolls only the row, never the page).
   const serviceTabsRef = useRef(null);
+  const serviceSwipe = useRef(null);
+  const lastService = SERVICES.panels.length - 1;
+  const pickService = (i) => {
+    const n = Math.max(0, Math.min(lastService, i));
+    if (n !== serviceTab) track('ui_toggle', { element: 'services_tab', index: n });
+    setServiceTab(n);
+  };
+  // Keep the chosen tab in view where the row scrolls (the phone); scrolls the
+  // row only, never the page.
   useEffect(() => {
     const row = serviceTabsRef.current;
     const tab = row?.children[serviceTab];
     if (!row || !tab || row.scrollWidth <= row.clientWidth) return;
-    const offset = tab.getBoundingClientRect().left - row.getBoundingClientRect().left + row.scrollLeft;
-    row.scrollTo({ left: offset - (row.clientWidth - tab.offsetWidth) / 2, behavior: 'smooth' });
+    const by = tab.getBoundingClientRect().left - row.getBoundingClientRect().left - (row.clientWidth - tab.offsetWidth) / 2;
+    row.scrollTo({ left: row.scrollLeft + by, behavior: 'smooth' });
   }, [serviceTab]);
-  // Phones can swipe the services panels as well as tapping a tab or dot.
-  const serviceSwipe = useRef(null);
   const onServiceTouchStart = (e) => { serviceSwipe.current = e.touches[0].clientX; };
   const onServiceTouchEnd = (e) => {
     if (serviceSwipe.current === null) return;
     const dx = e.changedTouches[0].clientX - serviceSwipe.current;
     serviceSwipe.current = null;
-    if (Math.abs(dx) < 40) return;
-    setServiceTab((t) => Math.min(SERVICES.panels.length - 1, Math.max(0, t + (dx < 0 ? 1 : -1))));
+    if (Math.abs(dx) >= 40) pickService(serviceTab + (dx < 0 ? 1 : -1));
   };
 
-  const offer = useMemo(
-    () => OFFERS.items.find((o) => o.key === openOffer) || OFFERS.items[0],
-    [openOffer]
-  );
+  /* faq: tabs filter, one question open at a time. */
+  const [faqTab, setFaqTab] = useState(FAQ.tabs[0]);
+  const [openFaq, setOpenFaq] = useState(0);
   const faqs = FAQ.groups[faqTab] || [];
-  // Real therapists come first; the pool is topped up from the artboard's own
-  // cards so the section is never half empty (the psychologists table currently
-  // holds a single seed row).
-  const pool = useMemo(() => {
-    const out = [...therapists];
-    for (const f of FALLBACK_THERAPISTS) {
-      if (!out.some((t) => t.name === f.name)) out.push(f);
-    }
-    return out;
-  }, [therapists]);
-
-  // Both filters are built from the data rather than hard-coded, so they can
-  // never offer a value that matches nothing.
-  const roleOf = (t) => t.designation || t.specialization || '';
-  const needsOf = (t) => t.area_of_expertise || t.areas_of_expertise || [];
-  const specialityOptions = useMemo(
-    () => [...new Set(pool.map(roleOf).filter(Boolean))].sort(),
-    [pool]
-  );
-  const needOptions = useMemo(
-    () => [...new Set(pool.flatMap(needsOf).filter(Boolean))].sort(),
-    [pool]
-  );
-
-  // The design shows a row of three.
-  const priceOf = (t) => Number(t.individual_session_price || t.price || 0);
-  const matches = useMemo(() => pool.filter((t) => {
-    const q = query.trim().toLowerCase();
-    if (q && !String(t.name || t.full_name || '').toLowerCase().includes(q)) return false;
-    if (speciality && roleOf(t) !== speciality) return false;
-    if (need && !needsOf(t).includes(need)) return false;
-    if (applied.concerns.length && !needsOf(t).some((n) => applied.concerns.includes(n))) return false;
-    if (applied.roles.length && !applied.roles.includes(roleOf(t))) return false;
-    if (applied.minExp && Number(t.experience_years || 0) < Number(applied.minExp)) return false;
-    // A card with no price recorded is not excluded by a budget filter.
-    if (applied.maxPrice && priceOf(t) && priceOf(t) > applied.maxPrice) return false;
-    return true;
-  }), [pool, query, speciality, need, applied]);
-
-  const activeCount = (query.trim() ? 1 : 0) + (speciality ? 1 : 0) + (need ? 1 : 0)
-    + applied.concerns.length + applied.roles.length
-    + (applied.minExp ? 1 : 0) + (applied.maxPrice ? 1 : 0);
-  const clearAll = () => {
-    setQuery(''); setSpeciality(''); setNeed('');
-    setDraft(EMPTY_FILTERS); setApplied(EMPTY_FILTERS);
+  const faqAt = FAQ.tabs.indexOf(faqTab);
+  const faqTabsRef = useRef(null);
+  const pickFaq = (t) => {
+    if (!t) return;
+    track('ui_toggle', { element: 'faq_tab', index: FAQ.tabs.indexOf(t) });
+    setFaqTab(t);
+    setOpenFaq(0);
   };
-  // Escape closes the sheet, as a dialog should.
   useEffect(() => {
-    if (!panelOpen) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') setPanelOpen(false); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [panelOpen]);
+    const row = faqTabsRef.current;
+    const tab = row?.querySelector('.is-on');
+    if (!row || !tab || row.scrollWidth <= row.clientWidth) return;
+    const by = tab.getBoundingClientRect().left - row.getBoundingClientRect().left - (row.clientWidth - tab.offsetWidth) / 2;
+    row.scrollTo({ left: row.scrollLeft + by, behavior: 'smooth' });
+  }, [faqTab]);
 
-  const toggleDraft = (key, value) => setDraft((d) => ({
-    ...d,
-    [key]: d[key].includes(value) ? d[key].filter((v) => v !== value) : [...d[key], value],
-  }));
-  // An unfinished booking (this browser only) takes the first card's place, so the
-  // row stays at three.
-  // (`draft` here is the filter panel's; this is the booking one.)
-  const {
-    draft: bookingDraft, slotState: bookingSlotState, suggestion: bookingSuggestion,
-    dismiss: dismissBookingDraft, takeSuggestion: takeBookingSuggestion, seeOtherTimes: seeOtherBookingTimes,
-  } = useBookingDraft();
-  const cards = matches.slice(0, bookingDraft ? 2 : 3);
-
-  // Rotate the headline and the stat card — for everyone, including anyone who
-  // has asked the system for reduced motion. That setting is on for a lot of
-  // iPhones, and holding still there froze the hero on its first headline and
-  // first card, so those visitors never saw the other five of each. Reduced
-  // motion means no movement, not no change: the CSS swaps the slide-up for a
-  // plain fade under that preference (Apple's own guidance), and the looping
-  // clip — pure decoration — still holds its first frame.
-  useEffect(() => {
-    const timers = [];
-    if (HERO.rotatingTitles.length > 1) {
-      timers.push(setInterval(() => {
-        setTitle(({ cur }) => ({ cur: (cur + 1) % HERO.rotatingTitles.length, out: cur }));
-      }, 2600));
-    }
-    if (HERO.badges.length > 1) {
-      timers.push(setInterval(() => {
-        setDeck(({ cur }) => ({ cur: (cur + 1) % HERO.badges.length, out: cur }));
-      }, 3800));
-    }
-    return () => timers.forEach(clearInterval);
-  }, []);
+  const subtitle = (() => {
+    const s = HERO.subtitle || '';
+    const cut = s.lastIndexOf(', ');
+    if (cut < 0) return s;
+    return <>{s.slice(0, cut + 2)}<span className="kh2-accent">{s.slice(cut + 2)}</span></>;
+  })();
 
   return (
     <main className="kh2">
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <style dangerouslySetInnerHTML={{ __html: THERAPIST_CARD_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: THERAPIST_CARD_CSS + RESUME_CARD_CSS + designCardCss('.kh2') + CSS }} />
 
       {/* ══ hero ══════════════════════════════════════════════════════════ */}
       <section className="kh2-hero">
         <div className="kh2-in kh2-hero-in">
-          {/* Only the first line rotates. aria-live announces the change, and the
-              tail stays in the same node so the sentence is never read broken. */}
+          {/* Only the first line rotates; hidden sizers hold its width and
+              height so nothing below moves. */}
           <h1 className="kh2-h1">
             <span className="kh2-h1-rot" aria-live="polite">
-              {HERO.rotatingTitles.map((w) => (
-                <span key={w} className="kh2-h1-size" aria-hidden>{w}</span>
-              ))}
+              {HERO.rotatingTitles.map((w) => <span key={w} className="kh2-h1-size" aria-hidden>{w}</span>)}
               {title.out !== null && (
-                <span className="kh2-h1-word is-out" key={`out-${title.out}`} aria-hidden>
-                  {HERO.rotatingTitles[title.out]}
-                </span>
+                <span className="kh2-h1-word is-out" key={`out-${title.out}`} aria-hidden>{HERO.rotatingTitles[title.out]}</span>
               )}
               <span className={`kh2-h1-word is-in${title.out === null ? ' is-first' : ''}`} key={`in-${title.cur}`}>
                 {HERO.rotatingTitles[title.cur]}
               </span>
             </span>
-            <span>{HERO.titleTail}</span>
+            <span className="kh2-h1-tail">{HERO.titleTail}</span>
           </h1>
-          <p className="kh2-hero-sub">
-            {/* Whatever follows the last comma ("24/7") is set in green — keyed
-                to the punctuation rather than one word, so the accent survives
-                an edit in the admin Pages → Home editor. */}
-            {(() => {
-              const s = HERO.subtitle || '';
-              const cut = s.lastIndexOf(', ');
-              if (cut < 0) return s;
-              return <>{s.slice(0, cut + 2)}<span className="kh2-hero-accent">{s.slice(cut + 2)}</span></>;
-            })()}
-          </p>
+          <p className="kh2-hero-sub">{subtitle}</p>
 
-          {/* On phones this is a pale green panel holding the text box and both
-              buttons; on desktop it dissolves (display:contents). */}
-          <div className="kh2-hero-panel">
-          <div className="kh2-search">
-            <div className="kh2-search-box">
-              <textarea
-                className="kh2-search-input ph-no-capture"
-                rows={3}
-                placeholder={HERO.searchPlaceholder}
-                aria-label="Tell us what's on your mind"
-              />
-              <span className="kh2-search-spark" aria-hidden><SparkleTrio /></span>
-            </div>
-            <div className="kh2-search-row">
+          {/* Laptop: the green frame holds only the text box, with both buttons
+              in a row under it. Phone: the frame holds the box and the concern
+              button, and "Book a slot now" sits on its own below. */}
+          <div className="kh2-ask-wrap">
+            <div className="kh2-ask">
+              <div className="kh2-ask-box">
+                <textarea
+                  className="kh2-ask-input ph-no-capture"
+                  rows={2}
+                  placeholder={HERO.searchPlaceholder}
+                  aria-label="Tell us what's on your mind"
+                />
+              </div>
               <button type="button" className="kh2-concern" data-track="hero_find_by_concern">
-                {HERO.concernCta}<SparkleTrio />
+                <SparkleTrio />{HERO.concernCta}
               </button>
-              <Link href={BOOK} className="kh2-book" data-track="hero_book_slot">
-                <span className="kh2-book-l">{HERO.bookCta}</span>
-                <Chevron dir="right" className="kh2-book-c" />
-              </Link>
             </div>
-          </div>
-
-          {/* phone only (hidden on desktop): the two hero actions side by side */}
-          <div className="kh2-hero-actions">
-            <Link href={BOOK} className="kh2-match" data-track="hero_find_match">Find the match<Chevron dir="right" /></Link>
-            <Link href={BOOK} className="kh2-consult" data-track="hero_consult_now">
-              Consult now
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          </div>
+            <Link href={BOOK} className="kh2-book" data-track="hero_book_slot">{HERO.bookCta}</Link>
           </div>
         </div>
 
-        {/* The looped clip runs along the foot of the hero. The badge is
-            positioned inside this band rather than pulled up with a negative
-            margin — a margin shortened the section, so the band overflowed and
-            was clipped by the hero's overflow:hidden. */}
+        {/* The clip band, with the stat deck floating in it. */}
         <div className="kh2-foliage">
           <HeroClip />
-
-          {/* The design draws this as a small stack: a second card, inset on both
-              sides, peeks out about 9px below the one carrying the copy.
-              The deck plays that idea out — each whole card rises and fades in
-              on top of the one it replaces, which stays put underneath until it
-              is covered. aria-live keeps the rotation announced, not silent. */}
           <div className="kh2-badge-wrap">
             <span className="kh2-badge-stack" aria-hidden />
             <div className="kh2-badge-deck" aria-live="polite">
-              {deck.out !== null && (
-                <BadgeCard key={`out-${deck.out}`} card={HERO.badges[deck.out]} />
-              )}
-              {/* key remounts the node so the entry animation replays each time */}
+              {deck.out !== null && <BadgeCard key={`out-${deck.out}`} card={HERO.badges[deck.out]} />}
               <BadgeCard key={`in-${deck.cur}`} card={HERO.badges[deck.cur]} incoming />
             </div>
           </div>
@@ -680,194 +597,79 @@ export default function KoottHome({ content } = {}) {
       </section>
 
       {/* ══ therapists ════════════════════════════════════════════════════ */}
-      <section className="kh2-sec">
-        {/* The therapist cards and their filter row were built to a 1180px
-            column; at the artboard's narrower 1090 the three cards lose ~30px
-            each and the condition chips start clipping. This section keeps its
-            own width — the artboard itself insets each section differently. */}
-        <div className="kh2-in kh2-in--wide">
-          <h2 className="kh2-h2 kh2-center">{THERAPISTS_SECTION.title}</h2>
-          <p className="kh2-sub kh2-center">{THERAPISTS_SECTION.subtitle}</p>
+      <section className="kh2-sec kh2-ther">
+        <div className="kh2-in">
+          <h2 className="kh2-h2 kh2-center kh2-ther-h">{THERAPISTS_SECTION.title}</h2>
 
           <div className="kh2-filters">
-            {/* Artboard: a name search, then one-tap chips, then an icon-only
-                button for the full filter sheet. The two dropdowns it replaces
-                are still reachable inside that sheet, so nothing is lost. */}
-            <label className="kh2-fsearch">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                strokeWidth="1.8" strokeLinecap="round" aria-hidden>
-                <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.2-3.2" />
-              </svg>
-              <input
-                type="search"
-                className="ph-no-capture"
-                value={query}
-                placeholder={THERAPISTS_SECTION.searchPlaceholder}
-                aria-label={THERAPISTS_SECTION.searchPlaceholder}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </label>
-
-            {(THERAPISTS_SECTION.quickFilters || []).map((f) => {
-              const on = f.kind === 'need' ? need === f.label : speciality === f.label;
-              const toggle = () => {
-                const next = on ? '' : f.label;
-                if (f.kind === 'need') setNeed(next); else setSpeciality(next);
-                if (next) track('filter_applied', { filter: f.kind, value: f.label });
-              };
-              return (
-                <button
-                  key={f.label} type="button"
-                  className={`kh2-quick${on ? ' is-on' : ''}`}
-                  aria-pressed={on}
-                  onClick={toggle}
+            <div className="kh2-fsearch">
+              <label className="kh2-fsearch-q">
+                <SearchIcon />
+                <input
+                  type="search"
+                  className="ph-no-capture"
+                  value={query}
+                  placeholder={THERAPISTS_SECTION.searchPlaceholder}
+                  aria-label="Search therapists by name"
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </label>
+              <label className="kh2-flang">
+                <span className="kh2-flang-v">
+                  {language}<small>{THERAPISTS_SECTION.languageLabel}</small>
+                </span>
+                <Chevron />
+                <select
+                  value={language}
+                  aria-label="Session language"
+                  onChange={(e) => { setLanguage(e.target.value); track('filter_applied', { filter: 'language', value: e.target.value }); }}
                 >
-                  <span className="kh2-quick-i"><QuickIcon name={f.icon} /></span>
-                  {f.label}
-                </button>
-              );
-            })}
+                  {THERAPISTS_SECTION.languages.map((l) => <option key={l} value={l}>{l}</option>)}
+                </select>
+              </label>
+            </div>
 
-            {activeCount > 0 && (
-              <button type="button" className="kh2-filter-clear" onClick={clearAll}>Clear</button>
-            )}
-
-            <div className="kh2-filter-anchor">
-              <button
-                type="button"
-                className={`kh2-filter-icon ${panelOpen ? 'is-open' : ''}`}
-                aria-expanded={panelOpen}
-                onClick={() => { setDraft(applied); setPanelOpen((v) => !v); }}
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  strokeWidth="1.8" strokeLinecap="round" aria-hidden>
-                  <path d="M4 7h16M7 12h10M10 17h4" />
-                </svg>
-                <span className="kh2-sr">All filters</span>
-                {activeCount > 0 && <span className="kh2-filter-count">{activeCount}</span>}
-              </button>
-
-              {panelOpen && (
-                <>
+            <div className="kh2-quicks">
+              {THERAPISTS_SECTION.quickFilters.map((f) => {
+                const on = quick === f.label;
+                return (
                   <button
-                    type="button" className="kh2-filter-scrim" aria-label="Close filters"
-                    onClick={() => setPanelOpen(false)}
-                  />
-                  <div className="kh2-panel" role="dialog" aria-label="Filters">
-                    <div className="kh2-panel-top">
-                      <p className="kh2-panel-h">Filters</p>
-                      <button
-                        type="button" className="kh2-panel-x" aria-label="Close"
-                        onClick={() => setPanelOpen(false)}
-                      >
-                        ×
-                      </button>
-                    </div>
-
-                    {needOptions.length > 0 && (
-                      <div className="kh2-panel-sec">
-                        <p className="kh2-panel-l">Concern</p>
-                        <div className="kh2-fchips">
-                          {needOptions.map((o) => (
-                            <button
-                              key={o} type="button"
-                              className={`kh2-fchip ${draft.concerns.includes(o) ? 'is-on' : ''}`}
-                              onClick={() => toggleDraft('concerns', o)}
-                            >
-                              {o.charAt(0).toUpperCase() + o.slice(1)}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {specialityOptions.length > 0 && (
-                      <div className="kh2-panel-sec">
-                        <p className="kh2-panel-l">Speciality</p>
-                        <div className="kh2-fchips">
-                          {specialityOptions.map((o) => (
-                            <button
-                              key={o} type="button"
-                              className={`kh2-fchip ${draft.roles.includes(o) ? 'is-on' : ''}`}
-                              onClick={() => toggleDraft('roles', o)}
-                            >
-                              {o}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="kh2-panel-sec">
-                      <p className="kh2-panel-l">Experience</p>
-                      <div className="kh2-fchips">
-                        {['3', '5', '8', '10'].map((o) => (
-                          <button
-                            key={o} type="button"
-                            className={`kh2-fchip ${draft.minExp === o ? 'is-on' : ''}`}
-                            onClick={() => setDraft((d) => ({ ...d, minExp: d.minExp === o ? '' : o }))}
-                          >
-                            {o}+ yrs
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="kh2-panel-sec">
-                      <div className="kh2-panel-row">
-                        <p className="kh2-panel-l">Max price</p>
-                        <span className="kh2-panel-v">
-                          {draft.maxPrice ? `₹${draft.maxPrice}` : 'Any'}
-                        </span>
-                      </div>
-                      {/* Full right is "Any", so dragging left tightens the budget. */}
-                      <input
-                        className="kh2-range" type="range" min="500" max="5250" step="250"
-                        value={draft.maxPrice || 5250} aria-label="Maximum price"
-                        onChange={(e) => setDraft((d) => ({
-                          ...d, maxPrice: Number(e.target.value) >= 5250 ? 0 : Number(e.target.value),
-                        }))}
-                      />
-                    </div>
-
-                    <div className="kh2-panel-foot">
-                      <button type="button" className="kh2-panel-clear" onClick={clearAll}>Clear</button>
-                      <button
-                        type="button" className="kh2-panel-apply"
-                        onClick={() => { setApplied(draft); setPanelOpen(false); }}
-                      >
-                        Apply
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
+                    key={f.label} type="button"
+                    className={`kh2-quick${on ? ' is-on' : ''}`}
+                    aria-pressed={on}
+                    onClick={() => {
+                      setQuick(on ? '' : f.label);
+                      if (!on) track('filter_applied', { filter: f.kind, value: f.label });
+                    }}
+                  >
+                    <img src={`${ART}/${f.icon}.png`} alt="" width={32} height={32} />
+                    {f.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {cards.length === 0 && (
-            <p className="kh2-filter-empty">
-              No therapist matches that combination yet. Clear a filter to see everyone.
+          {cards.length === 0 && !bookingDraft && (
+            <p className="kh2-empty">
+              {therapists.length
+                ? 'No therapist matches that combination yet. Clear a filter to see everyone.'
+                : 'Loading therapists…'}
             </p>
           )}
 
           <div className="kh2-tgrid">
             {bookingDraft && (
-              <>
-                <style dangerouslySetInnerHTML={{ __html: RESUME_CARD_CSS }} />
-                <ResumeBookingCard
-                  draft={bookingDraft} slotState={bookingSlotState} suggestion={bookingSuggestion}
-                  onDismiss={dismissBookingDraft} onTakeSuggestion={takeBookingSuggestion}
-                  onSeeOtherTimes={seeOtherBookingTimes}
-                />
-              </>
+              <ResumeBookingCard
+                draft={bookingDraft} slotState={bookingSlotState} suggestion={bookingSuggestion}
+                onDismiss={dismissBookingDraft} onTakeSuggestion={takeBookingSuggestion}
+                onSeeOtherTimes={seeOtherBookingTimes}
+              />
             )}
-            {/* The same card the listing and the condition pages use. The
-                artboard's placeholder therapists have no row behind them, so
-                they get no availability lookup and no invented times. */}
             {cards.map((t, i) => (
               <TherapistCard
-                key={t.id || t.name || i}
+                key={t.id || i}
+                design
                 t={{ ...cardFields(t), availability: t.nextAvailable }}
                 profileHref={profileHref(t)}
                 bookHref={bookingHref(t)}
@@ -875,85 +677,81 @@ export default function KoottHome({ content } = {}) {
             ))}
           </div>
 
-          <div className="kh2-center">
-            <Link href={BOOK} className="kh2-more" data-track="therapists_more">{THERAPISTS_SECTION.moreLabel}<Chevron /></Link>
+          <div className="kh2-center kh2-ther-more">
+            <Link href={BOOK} className="kh2-btn2 kh2-btn2--sec kh2-btn2--m kh2-ther-more-b" data-track="therapists_more">
+              {THERAPISTS_SECTION.moreLabel}
+            </Link>
           </div>
         </div>
       </section>
 
       {/* ══ how it works ══════════════════════════════════════════════════ */}
-      <section className="kh2-sec">
+      <section className="kh2-sec kh2-how">
         <div className="kh2-in">
-          <span className="kh2-eyebrow">{HOW_IT_WORKS.eyebrow}</span>
-          <div className="kh2-headrow">
+          <span className="kh2-chip">
+            <span className="kh2-lap">{HOW_IT_WORKS.eyebrow}</span>
+            <span className="kh2-ph">{HOW_IT_WORKS.phoneEyebrow}</span>
+          </span>
+          <div className="kh2-how-head">
             <div>
               <h2 className="kh2-h2">{HOW_IT_WORKS.title}</h2>
               <p className="kh2-sub">{HOW_IT_WORKS.subtitle}</p>
             </div>
-            <Link href={BOOK} className="kh2-btn">{HOW_IT_WORKS.cta}<Sparkle /></Link>
+            <Link href={BOOK} className="kh2-btn2 kh2-btn2--pri kh2-btn2--xl kh2-how-cta">
+              <Sparkle />{HOW_IT_WORKS.cta}
+            </Link>
           </div>
 
-          <div className="kh2-steps" ref={stepsRef} onScroll={onStepsScroll}>
-            {HOW_IT_WORKS.steps.map((s) => (
+          <div className="kh2-steps">
+            {HOW_IT_WORKS.steps.map((s, i) => (
               <div key={s.n} className="kh2-step">
-                {/* The artboard drops the step number and centres the card. */}
-                <h3 className="kh2-step-t">{s.title}</h3>
-
-                <div className="kh2-step-body">
-                  {s.avatars && (
-                    <div className="kh2-avatars" aria-hidden>
-                      {[0, 1, 2, 3, 4].map((i) => <span key={i} className={`kh2-av kh2-av--${i}`} />)}
-                    </div>
-                  )}
-                  {s.slot && (
-                    <>
-                      <p className="kh2-slot"><span aria-hidden>📅</span>{s.slot}</p>
-                      <ul className="kh2-days">
-                        {s.days.map((d, i) => (
-                          <li key={d} className={i === 1 || i === 4 ? 'is-on' : ''}>{d}</li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
-                  {s.photos && (
-                    <div className="kh2-join" aria-hidden>
-                      <span className="kh2-join-a" /><span className="kh2-join-b" /><span className="kh2-join-c" />
-                    </div>
-                  )}
+                <div className="kh2-step-head">
+                  <span className="kh2-step-n" aria-hidden>{s.n}</span>
+                  <div>
+                    <h3 className="kh2-step-t">{s.title}</h3>
+                    <p className="kh2-step-b">{s.body}</p>
+                  </div>
                 </div>
-
-                <p className="kh2-step-c">{s.caption}</p>
+                <StepArt step={i} />
               </div>
             ))}
           </div>
 
-          {/* phone only: which of the four steps is in view */}
-          <div className="kh2-step-dots">
-            {HOW_IT_WORKS.steps.map((s, i) => (
-              <button
-                key={s.n} type="button" aria-label={`Step ${s.n}`}
-                className={i === stepIndex ? 'is-on' : ''} onClick={() => goToStep(i)}
-              />
-            ))}
+          <div className="kh2-center kh2-how-foot">
+            <Link href={BOOK} className="kh2-btn2 kh2-btn2--sec kh2-btn2--m">{HOW_IT_WORKS.phoneCta}</Link>
           </div>
         </div>
       </section>
 
       {/* ══ what koott offers ═════════════════════════════════════════════ */}
-      <section className="kh2-sec">
+      <section className="kh2-sec kh2-offers-sec">
         <div className="kh2-in">
-          <h2 className="kh2-h2 kh2-h2--offers kh2-center">{OFFERS.title}</h2>
-          <p className="kh2-sub kh2-center">{OFFERS.subtitle}</p>
+          <h2 className="kh2-h2 kh2-center">{OFFERS.title}</h2>
+          <p className="kh2-sub kh2-center kh2-offers-sub">{OFFERS.subtitle}</p>
 
           <div className="kh2-offers">
+            <div className="kh2-offer-tiles">
+              {OFFERS.items.map((o) => (
+                <button
+                  key={o.key} type="button"
+                  className={`kh2-offer-tile${o.key === openOffer ? ' is-on' : ''}`}
+                  style={{ '--ph-order': o.phoneOrder }}
+                  aria-pressed={o.key === openOffer}
+                  onClick={() => pickOffer(o.key)}
+                >
+                  <img className={`kh2-offer-i kh2-offer-i--${o.icon}`} src={`${ART}/${o.icon}.png`} alt="" />
+                  <span className="kh2-offer-copy">
+                    <span className="kh2-offer-t kh2-lap">{o.title}</span>
+                    <span className="kh2-offer-t kh2-ph">{o.short[0]}<br />{o.short[1]}</span>
+                    <span className="kh2-offer-n">{o.note}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+
             <div className="kh2-offer-panel">
               {prevOffer && prevOffer !== openOffer && (
-                <div
-                  key={`out-${prevOffer}`}
-                  className="kh2-offer-body is-out"
-                  aria-hidden
-                  onAnimationEnd={() => setPrevOffer(null)}
-                >
+                <div key={`out-${prevOffer}`} className="kh2-offer-body is-out" aria-hidden onAnimationEnd={() => setPrevOffer(null)}>
                   <OfferBody o={OFFERS.items.find((o) => o.key === prevOffer) || offer} />
                 </div>
               )}
@@ -961,48 +759,21 @@ export default function KoottHome({ content } = {}) {
                 <OfferBody o={offer} />
               </div>
             </div>
-
-            <div className="kh2-offer-list-col">
-              {OFFERS.items.map((o) => (
-                <div key={o.key} className="kh2-offer-item">
-                  <button
-                    type="button"
-                    className={`kh2-offer-row ${o.key === openOffer ? 'is-on' : ''}`}
-                    onClick={(e) => { track('ui_toggle', { element: 'offers_row', index: OFFERS.items.indexOf(o) }); pickOffer(o.key, e.currentTarget); }}
-                    aria-expanded={o.key === openOffer}
-                  >
-                    <span>
-                      <span className="kh2-offer-t">{o.title}</span>
-                      <span className="kh2-offer-n">{o.note}</span>
-                    </span>
-                    {/* one arrow that turns, rather than two icons swapped */}
-                    <Chevron dir="right" className="kh2-offer-chev" />
-                  </button>
-                  {/* Phones and tablets only: the body opens under its own row.
-                      Every body is always rendered so its height can animate
-                      (0fr → 1fr); closed ones are visibility:hidden, so their
-                      links are out of the tab order and the accessibility tree. */}
-                  <div className={`kh2-offer-inline${o.key === openOffer ? ' is-open' : ''}`}>
-                    <div className="kh2-offer-inline-in">
-                      <div className="kh2-offer-inline-body"><OfferBody o={o} /></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
       {/* ══ care that understands you ═════════════════════════════════════ */}
-      <section className="kh2-sec">
+      <section className="kh2-sec kh2-care-sec">
         <div className="kh2-in kh2-care">
           <div className="kh2-care-card">
-            <h2 className="kh2-h2 kh2-h2--feature">
+            <img className="kh2-care-mark" src={`${ART}/care-mark.svg`} alt="" aria-hidden />
+            <h2 className="kh2-h2">
               {CARE.title.map((l, i) => <span key={i} className="kh2-block">{l}</span>)}
             </h2>
-            {CARE.paragraphs.map((p, i) => <p key={i} className="kh2-care-p">{p}</p>)}
-
+            <div className="kh2-care-ps">
+              {CARE.paragraphs.map((p, i) => <p key={i} className="kh2-care-p">{p}</p>)}
+            </div>
             <div className="kh2-stats">
               {CARE.stats.map((s) => (
                 <div key={s.value} className="kh2-stat">
@@ -1011,10 +782,8 @@ export default function KoottHome({ content } = {}) {
                 </div>
               ))}
             </div>
-
-            <Link href={CARE.cta.href} className="kh2-outline">{CARE.cta.label}</Link>
+            <Link href={CARE.cta.href} className="kh2-btn2 kh2-btn2--sec kh2-btn2--m kh2-care-cta">{CARE.cta.label}</Link>
           </div>
-
           <div className="kh2-care-media">
             <span className="kh2-play" aria-hidden>▶</span>
           </div>
@@ -1022,1404 +791,1101 @@ export default function KoottHome({ content } = {}) {
       </section>
 
       {/* ══ reviews ═══════════════════════════════════════════════════════ */}
-      <section className="kh2-sec">
-        <div className="kh2-in">
-          <span className="kh2-eyebrow">{REVIEWS.eyebrow}</span>
-          <div className="kh2-headrow">
-            <h2 className="kh2-h2 kh2-h2--reviews">{REVIEWS.title}</h2>
-            <div className="kh2-google">
-              <span className="kh2-google-g" aria-hidden>G</span>
-              <div>
-                <p className="kh2-google-l">{REVIEWS.rating.label}</p>
-                <p className="kh2-google-s">{REVIEWS.rating.score} <Stars /></p>
-              </div>
-            </div>
+      <section className="kh2-sec kh2-rev-sec">
+        <div className="kh2-in kh2-rev-head">
+          <h2 className="kh2-h2 kh2-rev-h">
+            <span className="kh2-lap">{REVIEWS.title}</span>
+            <span className="kh2-ph">{REVIEWS.phoneTitle.map((l) => <span key={l} className="kh2-block">{l}</span>)}</span>
+          </h2>
+          <div className="kh2-rating">
+            <GoogleMark />
+            <span className="kh2-rating-t">
+              <small>{REVIEWS.rating.label}</small>
+              <span><b>{REVIEWS.rating.score}</b> <em>★★★★★</em></span>
+            </span>
           </div>
-
-          <div className="kh2-reviews">
-            {/* The list is rendered twice; the track scrolls exactly one copy
-                and restarts, so the join is invisible. The second copy is
-                hidden from screen readers. */}
-            <div className="kh2-reviews-track">
-              {[0, 1].map((copy) => (
-                <div className="kh2-reviews-set" key={copy} aria-hidden={copy === 1 || undefined}>
-                  {REVIEWS.items.map((r) => (
-                    <article key={r.name} className="kh2-review">
-                      <div className="kh2-review-head">
-                        <span className="kh2-review-av" aria-hidden />
-                        <div>
-                          <p className="kh2-review-n">{r.name}</p>
-                          <p className="kh2-review-p">{r.place}</p>
+        </div>
+        {/* Laptop: a tall card, then two stacked, running on a loop (the set
+            is drawn twice and the track slides one set). Phone: a swipe
+            carousel of equal cards with dots. */}
+        <div className="kh2-reviews" ref={reviewsRef} onScroll={onReviewsScroll}>
+          <div className="kh2-rev-track">
+            {[0, 1].map((pass) => (
+              <div className="kh2-rev-set" key={pass} aria-hidden={pass === 1 || undefined}>
+                {[0, 1, 2].map((run) => {
+                  const groups = reviewGroups.map((group, g) => (
+                    <Fragment key={g}>
+                      <ReviewCard r={group[0]} big />
+                      {group.length > 1 && (
+                        <div className="kh2-rev-col">
+                          {group.slice(1).map((r, i) => <ReviewCard key={i} r={r} />)}
                         </div>
-                      </div>
-                      <p className="kh2-review-q">{r.quote}</p>
-                      <div className="kh2-review-foot">
-                        <span className="kh2-review-src" aria-hidden>{SOURCE[r.source] || 'G'}</span>
-                        <span className="kh2-review-score">4.9/5</span>
-                        <Stars />
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              ))}
-            </div>
+                      )}
+                    </Fragment>
+                  ));
+                  // Past 1920 one run is not wide enough to loop, so the spares show.
+                  return run === 0
+                    ? <Fragment key={run}>{groups}</Fragment>
+                    : <div className="kh2-rev-spare" key={run} aria-hidden>{groups}</div>;
+                })}
+              </div>
+            ))}
           </div>
+        </div>
+        <div className="kh2-dots kh2-rev-dots">
+          {REVIEWS.items.map((r, i) => (
+            <button
+              key={i} type="button"
+              className={i === reviewAt ? 'is-on' : ''}
+              aria-label={`Show review ${i + 1} of ${REVIEWS.items.length}`}
+              aria-current={i === reviewAt || undefined}
+              onClick={() => goToReview(i)}
+            />
+          ))}
         </div>
       </section>
 
       {/* ══ experts ═══════════════════════════════════════════════════════ */}
-      <section className="kh2-sec">
+      <section className="kh2-sec kh2-exp-sec">
         <div className="kh2-in">
-          <p className="kh2-sub kh2-center">{EXPERTS.eyebrow}</p>
-          <h2 className="kh2-h2 kh2-center">{EXPERTS.title}</h2>
+          <h2 className="kh2-h2 kh2-center kh2-exp-h">{EXPERTS.title}</h2>
+        </div>
 
-          {/* Two rows of faces running edge to edge without stopping, the second
-              the other way. Each row is drawn twice so the loop never shows a
-              seam: the track slides exactly one copy's width, then restarts. */}
-          <div className="kh2-strip" aria-hidden>
-            {EXPERT_FACES.map((row, r) => (
-              <div key={r} className={`kh2-strip-row${r % 2 ? ' is-rev' : ''}`}>
-                <div className="kh2-strip-track">
-                  {[...row, ...row].map((seed, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      key={i}
-                      className="kh2-tile"
-                      src={faceUrl(seed, i)}
-                      alt=""
-                      loading="lazy"
-                      width={112}
-                      height={132}
-                    />
-                  ))}
-                </div>
+        {/* Two rows of faces running edge to edge, the second the other way.
+            Each row is drawn three times and slides one copy's width, so there
+            is no seam even where one copy (2072) is narrower than the screen.
+            White fades at both ends, as the design blurs them. */}
+        <div className="kh2-strip" aria-hidden>
+          {FACES.map((row, r) => (
+            <div key={r} className={`kh2-strip-row${r % 2 ? ' is-rev' : ''}`}>
+              <div className="kh2-strip-track">
+                {[...row, ...row, ...row].map((src, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={i} className="kh2-tile" src={src} alt="" loading="lazy" width={132} height={132} />
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
 
+        <div className="kh2-in">
           <div className="kh2-feats">
-            {EXPERTS.cards.map((c) => (
-              <div key={c.title.join(' ')} className="kh2-feat">
-                <span className="kh2-feat-i" aria-hidden>{c.icon}</span>
-                <h3 className="kh2-feat-t">
-                  {c.title.map((l, i) => <span key={i} className="kh2-block">{l}</span>)}
-                </h3>
-                <ul className="kh2-feat-l">
-                  {c.lines.map((l) => <li key={l}>{l}</li>)}
-                </ul>
-              </div>
-            ))}
+            {EXPERTS.cards.map((c, i) => {
+              const open = openExpert === i;
+              return (
+                <div key={c.title} className={`kh2-feat${open ? ' is-open' : ''}`}>
+                  <button type="button" className="kh2-feat-head" aria-expanded={open} onClick={() => setOpenExpert(open ? -1 : i)}>
+                    <h3 className="kh2-feat-t">{c.title}</h3>
+                    <PlusMinus open={open} />
+                  </button>
+                  <Reveal open={open} phone>
+                    <ul className="kh2-feat-l">
+                      {c.lines.map((l) => <li key={l}><Check size={18} />{l}</li>)}
+                    </ul>
+                  </Reveal>
+                </div>
+              );
+            })}
           </div>
 
-          <div className="kh2-ctarow">
-            <Link href={EXPERTS.secondaryCta.href} className="kh2-outline">{EXPERTS.secondaryCta.label}</Link>
-            <Link href={EXPERTS.primaryCta.href} className="kh2-btn">{EXPERTS.primaryCta.label}<Sparkle /></Link>
+          <div className="kh2-exp-ctas">
+            <Link href={EXPERTS.secondaryCta.href} className="kh2-textlink">
+              {EXPERTS.secondaryCta.label}<ArrowRight />
+            </Link>
+            <Link href={EXPERTS.primaryCta.href} className="kh2-btn2 kh2-btn2--pri kh2-btn2--m">{EXPERTS.primaryCta.label}</Link>
           </div>
         </div>
       </section>
 
-      {/* ══ services & pricing ════════════════════════════════════════════ */}
-      <section className="kh2-sec">
+      {/* ══ services ══════════════════════════════════════════════════════ */}
+      <section className="kh2-sec kh2-svc-sec">
         <div className="kh2-in">
-          <span className="kh2-eyebrow kh2-eyebrow--c">{SERVICES.eyebrow}</span>
-          <h2 className="kh2-h2 kh2-h2--services kh2-center">{SERVICES.title}</h2>
-
-          <div className="kh2-tabs kh2-tabs--scroll" ref={serviceTabsRef}>
-            {SERVICES.tabs.map((t, i) => (
-              <button key={t} type="button"
-                className={`kh2-tab ${i === serviceTab ? 'is-on' : ''}`}
-                aria-pressed={i === serviceTab}
-                onClick={() => { track('ui_toggle', { element: 'services_tab', index: i }); setServiceTab(i); }}>{t}</button>
-            ))}
-          </div>
-
-          {/* All eight panels sit on one track; the tab (or a dot) slides it
-              along. The next panel peeks in from the right, as in the artboard. */}
-          <div
-            className="kh2-slides" role="region" aria-label={SERVICES.title}
-            onTouchStart={onServiceTouchStart} onTouchEnd={onServiceTouchEnd}
-          >
-            <div
-              className="kh2-track"
-              style={{ transform: `translateX(calc(${-serviceTab} * (var(--pw) + var(--pg))))` }}
-            >
-              {SERVICES.panels.map((p, i) => (
-                <article
-                  key={p.title.join(' ')}
-                  className={`kh2-slide ${i === serviceTab ? 'is-on' : ''}`}
-                  aria-hidden={i === serviceTab ? undefined : true}
-                >
-                  <div className="kh2-slide-media">
-                    {p.image && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      // Off-screen sideways never counts as "near", so lazy panels
-                      // would blink in on switch; load this one and the next early.
-                      <img
-                        src={p.image} alt={p.imageAlt || ''} width={900} height={600}
-                        loading={i <= serviceTab + 1 ? 'eager' : 'lazy'}
-                      />
-                    )}
-                  </div>
-                  <div className="kh2-slide-body">
-                    <h3 className="kh2-slide-t">
-                      {p.title.map((l, j) => <span key={j} className="kh2-block">{l}</span>)}
-                    </h3>
-                    <p className="kh2-slide-lead">{p.lead}</p>
-                    <ul className="kh2-slide-l">{p.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
-                    <Link
-                      href={p.href || BOOK}
-                      className="kh2-btn kh2-btn--sm"
-                      tabIndex={i === serviceTab ? undefined : -1}
-                    >
-                      {p.price}
-                    </Link>
-                  </div>
-                </article>
+          <h2 className="kh2-h2 kh2-center kh2-svc-h">{SERVICES.title}</h2>
+          <div className="kh2-rail">
+            <button type="button" className="kh2-rail-arrow" aria-label="Previous service"
+              disabled={serviceTab <= 0} onClick={() => pickService(serviceTab - 1)}>
+              <Chevron dir="left" />
+            </button>
+            <div className="kh2-tabs" ref={serviceTabsRef} role="tablist">
+              {SERVICES.tabs.map((t, i) => (
+                <button key={t} type="button" role="tab"
+                  className={`kh2-tab${i === serviceTab ? ' is-on' : ''}`}
+                  aria-selected={i === serviceTab}
+                  onClick={() => pickService(i)}>{t}</button>
               ))}
             </div>
+            <button type="button" className="kh2-rail-arrow" aria-label="Next service"
+              disabled={serviceTab >= lastService} onClick={() => pickService(serviceTab + 1)}>
+              <Chevron dir="right" />
+            </button>
           </div>
+        </div>
 
-          <div className="kh2-dots">
+        {/* Every panel sits on one track; the next one peeks in from the right. */}
+        <div className="kh2-slides" role="region" aria-label={SERVICES.title}
+          onTouchStart={onServiceTouchStart} onTouchEnd={onServiceTouchEnd}>
+          <div className="kh2-track" style={{ '--at': serviceTab }}>
             {SERVICES.panels.map((p, i) => (
-              <button
-                key={p.title.join(' ')} type="button"
-                aria-label={SERVICES.tabs[i]} aria-current={i === serviceTab || undefined}
-                className={i === serviceTab ? 'is-on' : ''}
-                onClick={() => setServiceTab(i)}
-              />
+              <article key={p.title} className={`kh2-slide${i === serviceTab ? ' is-on' : ''}`}
+                aria-hidden={i === serviceTab ? undefined : true}>
+                <div className="kh2-slide-media">
+                  {/* Sideways off-screen never counts as near, so lazy panels
+                      would blink in; load this one and the next early. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.image} alt={p.imageAlt || ''} width={445} height={301}
+                    loading={i <= serviceTab + 1 ? 'eager' : 'lazy'} />
+                </div>
+                <div className="kh2-slide-body">
+                  <h3 className="kh2-slide-t">{p.title}</h3>
+                  <p className="kh2-slide-lead">{p.lead}</p>
+                  <ul className="kh2-slide-l">{p.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
+                  <Link href={p.href || BOOK} className="kh2-btn2 kh2-btn2--sec kh2-btn2--m kh2-slide-cta"
+                    tabIndex={i === serviceTab ? undefined : -1}>{p.price}</Link>
+                </div>
+              </article>
             ))}
           </div>
+        </div>
+
+        <div className="kh2-dots kh2-svc-dots">
+          {SERVICES.panels.map((p, i) => (
+            <button key={p.title} type="button"
+              aria-label={SERVICES.tabs[i]} aria-current={i === serviceTab || undefined}
+              className={i === serviceTab ? 'is-on' : ''}
+              onClick={() => pickService(i)} />
+          ))}
         </div>
       </section>
 
       {/* ══ faq ═══════════════════════════════════════════════════════════ */}
-      <section className="kh2-sec">
+      <section className="kh2-sec kh2-faq-sec">
         <div className="kh2-in">
-          <h2 className="kh2-h2 kh2-center kh2-h2--big">{FAQ.title}</h2>
-
-          <div className="kh2-tabs kh2-tabs--center">
-            {FAQ.tabs.map((t) => (
-              <button key={t} type="button"
-                className={`kh2-tab ${t === faqTab ? 'is-on' : ''}`}
-                onClick={() => { track('ui_toggle', { element: 'faq_tab', index: FAQ.tabs.indexOf(t) }); setFaqTab(t); setOpenFaq(null); }}>{t}</button>
-            ))}
+          <h2 className="kh2-h2 kh2-center">
+            <span className="kh2-lap">{FAQ.title}</span>
+            <span className="kh2-ph">{FAQ.phoneTitle}</span>
+          </h2>
+          <div className="kh2-rail kh2-faq-rail">
+            <button type="button" className="kh2-rail-arrow" aria-label="Previous category"
+              disabled={faqAt <= 0} onClick={() => pickFaq(FAQ.tabs[faqAt - 1])}>
+              <Chevron dir="left" />
+            </button>
+            <div className="kh2-tabs" ref={faqTabsRef} role="tablist">
+              {FAQ.tabs.map((t) => (
+                <button key={t} type="button" role="tab"
+                  className={`kh2-tab${t === faqTab ? ' is-on' : ''}`}
+                  aria-selected={t === faqTab}
+                  onClick={() => pickFaq(t)}>{t}</button>
+              ))}
+            </div>
+            <button type="button" className="kh2-rail-arrow" aria-label="Next category"
+              disabled={faqAt >= FAQ.tabs.length - 1} onClick={() => pickFaq(FAQ.tabs[faqAt + 1])}>
+              <Chevron dir="right" />
+            </button>
           </div>
 
           <div className="kh2-faq">
-            {faqs.map((f, i) => (
-              <div key={f.q} className="kh2-faq-row">
-                <button type="button" className="kh2-faq-q"
-                  aria-expanded={openFaq === i}
-                  onClick={() => { if (openFaq !== i) track('ui_toggle', { element: 'faq_question', index: i }); setOpenFaq(openFaq === i ? null : i); }}>
-                  <span>{f.q}</span>
-                  <span className="kh2-faq-plus" aria-hidden>{openFaq === i ? '−' : '+'}</span>
-                </button>
-                {openFaq === i && <p className="kh2-faq-a">{f.a}</p>}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══ blogs & events ════════════════════════════════════════════════ */}
-      <section className="kh2-sec">
-        <div className="kh2-in">
-          <span className="kh2-eyebrow kh2-eyebrow--c">{BLOGS.eyebrow}</span>
-          <h2 className="kh2-h2 kh2-center">{BLOGS.title}</h2>
-
-          <div className="kh2-posts">
-            {(posts.length ? posts : [0, 1, 2]).map((p, i) => {
-              const post = typeof p === 'object' ? p : null;
+            {faqs.map((f, i) => {
+              const open = openFaq === i;
               return (
-                <Link key={post?.slug || i} href={post ? `/blog/${post.slug}` : '/blog'} className="kh2-post">
-                  {post?.featured_image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img className="kh2-post-img" src={post.featured_image_url} alt={post.title} />
-                  ) : <span className="kh2-post-img is-blank" aria-hidden />}
-                  <p className="kh2-post-t">
-                    {post?.title || EXPERTS.eyebrow}
-                  </p>
-                </Link>
+                <div key={f.q} className={`kh2-faq-row${open ? ' is-open' : ''}`}>
+                  <button type="button" className="kh2-faq-q" aria-expanded={open}
+                    onClick={() => { if (!open) track('ui_toggle', { element: 'faq_question', index: i }); setOpenFaq(open ? -1 : i); }}>
+                    <span>{f.q}</span>
+                    <PlusMinus open={open} />
+                  </button>
+                  <Reveal open={open}><p className="kh2-faq-a">{f.a}</p></Reveal>
+                </div>
               );
             })}
           </div>
         </div>
       </section>
 
+      {/* ══ blogs & events ════════════════════════════════════════════════ */}
+      {posts.length > 0 && (
+        <section className="kh2-sec kh2-blog-sec">
+          <div className="kh2-in">
+            <span className="kh2-chip kh2-chip--c kh2-lap">{BLOGS.eyebrow}</span>
+            <h2 className="kh2-h2 kh2-center">
+              <span className="kh2-lap">{BLOGS.title}</span>
+              <span className="kh2-ph">{BLOGS.phoneTitle.map((l) => <span key={l} className="kh2-block">{l}</span>)}</span>
+            </h2>
+            <div className="kh2-posts">
+              {posts.map((post) => (
+                <Link key={post.slug} href={`/blog/${post.slug}`} className="kh2-post">
+                  {post.featured_image_url
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img className="kh2-post-img" src={post.featured_image_url} alt="" loading="lazy" />
+                    : <span className="kh2-post-img is-blank" aria-hidden />}
+                  <span className="kh2-post-t">{post.title}</span>
+                  <span className="kh2-post-more">
+                    <span className="kh2-ph">{BLOGS.readMore}</span>
+                    <ArrowUpRight size={24} />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ══ final cta ═════════════════════════════════════════════════════ */}
       <section className="kh2-final">
         <div className="kh2-in kh2-center">
-          <h2 className="kh2-h2 kh2-h2--final">{FINAL_CTA.title}</h2>
-          <div className="kh2-ctarow kh2-ctarow--c">
-            <span className="kh2-outline">{FINAL_CTA.secondary}</span>
-            <Link href={BOOK} className="kh2-btn">{FINAL_CTA.primary}</Link>
-          </div>
+          <span className="kh2-final-tag"><Clock />{FINAL_CTA.eyebrow}</span>
+          <h2 className="kh2-h2 kh2-final-h">{FINAL_CTA.title}</h2>
+          <Link href={BOOK} className="kh2-btn2 kh2-btn2--pri kh2-btn2--m kh2-final-b">{FINAL_CTA.primary}</Link>
         </div>
       </section>
     </main>
   );
 }
 
+/** The panel beside the offer tiles. */
+function OfferBody({ o }) {
+  return (
+    <>
+      <div className="kh2-panel-head">
+        <img className="kh2-panel-i" src={`${ART}/${o.icon}.png`} alt="" />
+        <h3 className="kh2-panel-h">{o.panel.heading.map((l, i) => <span key={i} className="kh2-block">{i > 0 && ' '}{l}</span>)}</h3>
+      </div>
+      <p className="kh2-panel-lead">{o.panel.lead}</p>
+      <ul className="kh2-panel-l">
+        {o.panel.bullets.map((b) => <li key={b}><Check />{b}</li>)}
+      </ul>
+      <p className="kh2-panel-pack">{o.panel.packages}</p>
+      <div className="kh2-panel-cta">
+        <Link href={BOOK} className="kh2-btn2 kh2-btn2--pri kh2-btn2--m">{o.panel.price}</Link>
+        <Link href={o.panel.link.href} className="kh2-panel-link">{o.panel.link.label}<ArrowUpRight /></Link>
+      </div>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------------ */
+
 const CSS = `
 .kh2{
-  --deep:#012F23; --header:#063327; --green:#189E4F; --green-d:#12813F;
-  --band:#D5FFC4; --band-t:#E6FFDE; --tint:#F9FFF8; --ink:#000; --body:#3B3B3B; --muted:#6B7280;
-  --line:rgba(38,34,34,.13); --page:#FFFFFF;
-  /* "Koott Website Sep-26 (5)" sets the whole page in Work Sans — headings at
-     Medium (500), never the Poppins SemiBold/Bold this page used before. The
-     artboard's nav, buttons and captions are TT Interphases, which is licensed;
-     Inter stands in for it as the closest free neo-grotesque (--ui). */
-  --sans:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --text:'Work Sans',ui-sans-serif,system-ui,sans-serif;
-  --ui:'Inter',ui-sans-serif,system-ui,sans-serif;
-  --h-weight:500;                /* Work Sans Medium — the artboard's headings */
-  background:var(--page);
+  --green:#189E4F; --green-hover:#0D4F1F; --green-dark:#1B6930; --green-light:#EFFFEA;
+  --deep:#063327; --ink:#0F0F0F; --body:#373737; --soft:#5C5C5C; --hint:#BCBCBC;
+  --line:#E3E2E2; --line-green:#BFE3CB; --line-soft:#DDEED8; --grey-bg:#F8F8F8;
+  --sans:'Poppins',ui-sans-serif,system-ui,sans-serif;
+  --text:'Inter',ui-sans-serif,system-ui,sans-serif;
+  background:#fff;color:var(--ink);font-family:var(--text);
 }
 .kh2 *{box-sizing:border-box;}
-/* The artboard runs its content from x=136 to x=1230 on a 1366 page, so the
-   column is ~1090px, not the 1180 this page used. */
-.kh2-in{max-width:1090px;margin:0 auto;padding:0 24px;}
-.kh2-in--wide{max-width:1180px;}
-/* Viewport-relative so a section still fits one screen under the fixed
-   header on a 768px-tall laptop. The artboard's section gaps run ~230-280px
-   total, so each side is ~115-140 rather than the 122-176 used before. */
-.kh2-sec{padding:clamp(96px,12.6vh,140px) 0;}
-.kh2-center{text-align:center;}
+:where(.kh2) p{margin:0;}
+:where(.kh2) ul{list-style:none;margin:0;padding:0;}
+.kh2 button{font:inherit;}
+.kh2-ph{display:none!important;}
 .kh2-block{display:block;}
+.kh2-center{text-align:center;}
+/* The design's column is 1180 at x=370 on the 1920 frame; sections that sit
+   narrower set --w. 24px gutters either side. */
+.kh2-in{width:100%;max-width:calc(var(--w,1180px) + 48px);margin:0 auto;padding:0 24px;}
+.kh2-sec{padding:80px 0;}
 
-/* Artboard: 52.6px / 51.3px SemiBold over two lines. globals.css forces
-   Poppins onto any bare h1/h2 with an h1:not(#_) rule marked !important, so
-   these carry the same no-op guard or the page still renders in Poppins. */
+/* ---- type ---- */
 .kh2-h1,.kh2-h1:not(#_){
-  font-family:var(--sans)!important;font-size:52.6px!important;font-weight:600!important;
-  line-height:1.08em!important;letter-spacing:-.02em!important;color:var(--deep)!important;margin:0 0 22px;
+  font-family:var(--sans)!important;font-size:58px!important;font-weight:600!important;
+  line-height:64px!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;
 }
-.kh2-h1 span{display:block;}
-/* The rotating line holds its own row so the tail and everything below it stay
-   put as phrases of different length cycle through. */
-/* Grid-stacked: the hidden sizers set the height, the visible word overlays. */
-.kh2-h1-rot{display:grid!important;position:relative;}
-/* bottom-aligned: a one-line title sits on the tail line, and the spare
-   height reserved for two-line titles falls above it, not in the middle */
-.kh2-h1-rot > span{grid-area:1 / 1;align-self:end;}
-.kh2-h1-size{visibility:hidden;}
-.kh2-h1-word{display:block;animation:kh2-word-in .5s cubic-bezier(.22,.7,.3,1) both;}
-@keyframes kh2-word-in{
-  from{opacity:0;transform:translateY(18px);}
-  to{opacity:1;transform:none;}
-}
-/* Reduced motion: the word still changes, it just fades in instead of rising. */
-@keyframes kh2-fade-in{from{opacity:0;}to{opacity:1;}}
-@media (prefers-reduced-motion:reduce){
-  .kh2-h1-word{animation:kh2-fade-in .4s ease both;}
-}
-/* The artboard does not use one heading size: each section is set a little
-   differently, 25.6 -> 28.7, with "Care that understands you." pulled up to
-   45.5 as the page's one feature moment. Modifiers carry those figures. */
 .kh2-h2,.kh2-h2:not(#_){
-  font-family:var(--sans)!important;font-size:28.7px!important;font-weight:var(--h-weight)!important;
-  line-height:1.25em!important;letter-spacing:-.02em!important;color:var(--ink)!important;margin:0 0 10px;
+  font-family:var(--sans)!important;font-size:32px!important;font-weight:600!important;
+  line-height:48px!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;
 }
-.kh2-h2--offers,.kh2-h2--offers:not(#_){font-size:26.8px!important;}     /* What Koott offers */
-.kh2-h2--reviews,.kh2-h2--reviews:not(#_){font-size:27.6px!important;}    /* We Helped 30,000+ … */
-.kh2-h2--services,.kh2-h2--services:not(#_){font-size:25.6px!important;}   /* Koott is right with you … */
-.kh2-h2--feature,.kh2-h2--feature:not(#_){                                /* Care that understands you. */
-  font-size:45.5px!important;line-height:1.14em!important;color:var(--deep)!important;
-}
-.kh2-h2--final,.kh2-h2--final:not(#_){font-size:29.9px!important;}      /* Your first session could be today. */
-.kh2-h2--big,.kh2-h2--big:not(#_){font-size:45.5px!important;font-weight:600!important;}
 .kh2-sub{
   font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;
-  line-height:1.6em!important;letter-spacing:0!important;color:var(--body)!important;margin:0 0 14px;
+  line-height:24px!important;letter-spacing:0!important;color:var(--body)!important;margin:8px 0 0;
 }
-.kh2-eyebrow{
-  display:inline-block;background:var(--tint);border-radius:6px;padding:5px 12px;margin-bottom:14px;
-  font-family:var(--text)!important;font-size:14.4px!important;letter-spacing:0!important;color:var(--body)!important;
+.kh2-chip{
+  display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:4px;
+  background:#F9FFF8;box-shadow:0 1px 4px rgba(36,36,36,.10);
+  font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;
 }
-.kh2-eyebrow--c{display:block;width:fit-content;margin-left:auto;margin-right:auto;}
-.kh2-headrow{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:30px;}
+.kh2-chip--c{display:flex;width:fit-content;margin:0 auto 12px;}
 
-.kh2-btn{
-  display:inline-flex;align-items:center;gap:9px;background:var(--green);color:#fff!important;
-  text-decoration:none;border:0;cursor:pointer;padding:14px 26px;border-radius:9px;
-  font-family:var(--text)!important;font-size:16px!important;font-weight:600!important;letter-spacing:0!important;
-  transition:background .18s ease;white-space:nowrap;
+/* ---- buttons (the design's Button component) ---- */
+.kh2-btn2{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap;
+  border-radius:8px;text-decoration:none;cursor:pointer;
+  font-family:var(--text)!important;font-size:16px!important;font-weight:500!important;
+  line-height:24px!important;letter-spacing:0!important;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease;
 }
-.kh2-btn:hover{background:var(--green-d);}
-.kh2-btn--sm{padding:11px 20px;font-size:15px!important;border-radius:8px;}
-.kh2-outline{
-  display:inline-flex;align-items:center;justify-content:center;background:#fff;color:var(--deep)!important;
-  text-decoration:none;border:1px solid rgba(1,47,35,.28);padding:13px 26px;border-radius:9px;
-  font-family:var(--text)!important;font-size:16px!important;letter-spacing:0!important;white-space:nowrap;
+.kh2-btn2--xl{height:56px;padding:0 22px;font-weight:600!important;}
+.kh2-btn2--m{height:40px;padding:0 18px;}
+.kh2-btn2--pri{background:var(--green);color:#fff!important;border:0;}
+.kh2-btn2--pri:hover{background:var(--green-hover);}
+.kh2-btn2--sec{background:#fff;color:var(--ink)!important;border:1px solid var(--line-green);}
+.kh2-btn2--sec:hover{border-color:var(--green);}
+.kh2-textlink{
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;height:40px;padding:0 18px;
+  color:var(--green)!important;text-decoration:none;
+  font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;
 }
-/* On the green care card the button is an outline only — no fill, so the card
-   shows through. Scoped here so the white button in the experts row is left
-   alone. */
-.kh2-care-card .kh2-outline{
-  background:transparent;border-color:rgba(1,47,35,.38);
-  padding:9px 18px;border-radius:8px;font-size:14px!important;
-}
-.kh2-care-card .kh2-outline:hover{border-color:var(--deep);}
-.kh2-outline:hover{background:var(--tint);}
-/* Centred pair, as in the artboard — it was ranged left. The buttons there
-   are wider and shallower than our default (about 24pt tall), so they are
-   restyled here rather than everywhere .kh2-btn is used. */
-.kh2-ctarow{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;justify-content:center;}
-.kh2-ctarow .kh2-btn,.kh2-ctarow .kh2-outline{
-  min-width:220px;justify-content:center;padding:8px 28px;font-size:15px!important;
-}
-.kh2-ctarow--c{justify-content:center;}
-/* The pair inside the arch is narrower than the one under the experts cards,
-   and the first is an outline only — no fill, black label — so the green band
-   shows through it. */
-.kh2-ctarow--c .kh2-btn,.kh2-ctarow--c .kh2-outline{min-width:168px;padding:9px 22px;}
-.kh2-ctarow--c .kh2-outline{
-  background:transparent;border:1px solid rgba(0,0,0,.4);color:#000!important;
-}
-.kh2-ctarow--c .kh2-outline:hover{border-color:#000;background:transparent;}
+.kh2-textlink svg{transition:transform .2s ease;}
+.kh2-textlink:hover svg{transform:translateX(3px);}
 
-/* ---- hero ---- */
-/* Same ground as the page so the foliage does not sit on a visible seam.
-   The vertical rhythm is viewport-relative so the whole hero — greenery and
-   stat card included — fits above the fold on a laptop. At fixed spacing it ran
-   43px past the bottom of a 768px screen and clipped the foliage. */
-.kh2-hero{
-  position:relative;overflow:hidden;background:var(--page);
-  /* One screen exactly, under the 63px fixed header. Column flex with an auto
-     top margin on the foliage means the leftover height is absorbed by the gap
-     above the greenery, so the hero neither runs past the fold nor leaves a
-     band of empty page under it. */
-  display:flex;flex-direction:column;
-  /* On a very tall window an exact 100vh hero opens a 300px+ void between the
-     search card and the greenery, so the fill stops at 860px; past ~920px tall
-     the next section simply starts a little above the fold. min() rather than
-     max-height because min-height always wins over max-height. */
-  min-height:min(calc(100vh - 63px), 860px);
-  padding:clamp(40px,7vh,88px) 0 0;
-}
-/* width:100% matters: .kh2-in carries margin:0 auto, and an auto margin on a
-   flex item cancels the stretch, so without it this box shrink-wraps its text
-   and the search card resizes as the headline rotates. */
-.kh2-hero-in{text-align:center;position:relative;z-index:2;flex:0 0 auto;width:100%;margin-bottom:clamp(28px,5vh,62px);}
+/* ---- accordion body ---- */
+.kh2-reveal{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.4,0,.2,1);}
+.kh2-reveal.is-open{grid-template-rows:1fr;}
+.kh2-reveal-in{min-height:0;overflow:hidden;visibility:hidden;opacity:0;transition:opacity .25s ease,visibility 0s linear .4s;}
+.kh2-reveal.is-open > .kh2-reveal-in{visibility:visible;opacity:1;transition:opacity .35s ease .05s,visibility 0s;}
+.kh2-reveal--phone,.kh2-reveal--phone > .kh2-reveal-in{display:contents;}
+.kh2-reveal--phone > .kh2-reveal-in{visibility:visible;opacity:1;}
+
+/* ════ hero ════ */
+.kh2-hero{background:#FAFCF9;padding-top:132px;position:relative;overflow:hidden;}
+.kh2-hero-in{text-align:center;position:relative;z-index:2;}
+.kh2-h1 > span{display:block;}
+/* The rotating line: hidden sizers set its box, the visible word overlays. */
+.kh2-h1-rot{display:grid!important;}
+.kh2-h1-rot > span{grid-area:1 / 1;}
+.kh2-h1-size{visibility:hidden;}
+.kh2-h1-word{display:block;animation:kh2-word-in .5s cubic-bezier(.22,.7,.3,1) both;}
+.kh2-h1-word.is-out{display:none;}
+.kh2-h1-word.is-first{animation:none;}
+@keyframes kh2-word-in{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@keyframes kh2-fade-in{from{opacity:0;}to{opacity:1;}}
+@keyframes kh2-fade-out{from{opacity:1;}to{opacity:0;}}
+@media (prefers-reduced-motion:reduce){ .kh2-h1-word{animation:kh2-fade-in .4s ease both;} }
 .kh2-hero-sub{
-  font-family:var(--text)!important;font-size:19px!important;letter-spacing:0!important;
-  color:var(--body)!important;margin:0 0 14px;
+  margin-top:8px;font-family:var(--text)!important;font-size:18px!important;font-weight:400!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--body)!important;
 }
-/* Fixed 560 wide whatever the headline is doing. */
-.kh2-search{
-  /* 608px is the artboard's own proportion: the card is 42% of a 1440 page
-     ("Koott Website Sep-26 (3).pdf"). The textarea and the two buttons below it
-     are all full-width inside, so they widen with it. */
-  width:100%;max-width:608px;margin:0 auto;background:#F7FFF3;border-radius:18px;padding:14px;
-  box-shadow:0 10px 40px rgba(24,158,79,.08);
+.kh2-accent{color:var(--green);}
+
+/* The question box and its two buttons: 592 wide, the box framed in green. */
+.kh2-ask-wrap{
+  width:592px;max-width:100%;margin:32px auto 0;
+  display:grid;grid-template-columns:285fr 291fr;gap:24px 16px;
 }
-.kh2-search-input{
-  width:100%;min-height:104px;resize:vertical;border:1px solid #BFE3CB;border-radius:11px;
-  padding:16px 18px;background:#fff;color:var(--ink);
-  font-family:var(--text)!important;font-size:16px!important;line-height:1.5em!important;letter-spacing:0!important;
+.kh2-ask{display:contents;}
+.kh2-ask-box{
+  grid-column:1 / -1;background:var(--green-light);border:1px solid var(--line-soft);
+  border-radius:16px;padding:8px;
 }
-.kh2-search-input::placeholder{color:#A8A8A8;}
-.kh2-search-input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(24,158,79,.14);}
-.kh2-search-row{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
-.kh2-search-box{position:relative;}
-.kh2-search-spark,.kh2-match,.kh2-consult,.kh2-hero-actions{display:none;}
-.kh2-hero-panel{display:contents;}
-.kh2-step-dots{display:none;}
-.kh2-offer-inline{display:none;}
+.kh2-ask-input{
+  display:block;width:100%;height:88px;resize:none;border:2px solid var(--line-soft);border-radius:12px;
+  /* The text sits 16 in from the outer edge, 2 of it border, and gets the
+     full 560 the frame gives it, so the placeholder stays on one line. */
+  background:#fff;padding:14px 0 14px 14px;color:var(--ink);
+  box-shadow:0 8px 24px -8px rgba(24,158,79,.10),0 2px 8px -4px rgba(24,158,79,.08);
+  font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;letter-spacing:0!important;
+}
+.kh2-ask-input::placeholder{color:var(--hint);}
+.kh2-ask-input:focus{outline:none;border-color:var(--green);}
 .kh2-concern{
-  flex:1;min-width:220px;display:inline-flex;align-items:center;justify-content:space-between;gap:10px;
-  background:#fff;border:1px solid #BFE3CB;border-radius:9px;padding:14px 18px;cursor:pointer;
-  font-family:var(--text)!important;font-size:16px!important;letter-spacing:0!important;color:var(--ink)!important;
+  height:56px;display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  background:#fff;border:1px solid var(--line-green);border-radius:8px;padding:0 18px;cursor:pointer;
+  font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;color:#000!important;
+  transition:border-color .18s ease;
 }
 .kh2-concern:hover{border-color:var(--green);}
-/* The sparkles are the design's green, not the button's text colour. */
 .kh2-trio{color:var(--green);flex:none;}
-/* The artboard sets the label centred with the chevron held against the right
-   edge, not tucked beside the text — so the label takes the free space and the
-   arrow keeps its own column. */
 .kh2-book{
-  flex:1;min-width:220px;display:inline-flex;align-items:center;justify-content:space-between;gap:10px;
-  background:var(--green);color:#fff!important;text-decoration:none;border-radius:9px;padding:14px 22px;
-  font-family:var(--text)!important;font-size:16px!important;font-weight:600!important;letter-spacing:0!important;
+  height:56px;display:inline-flex;align-items:center;justify-content:center;
+  background:var(--green);color:#fff!important;border-radius:8px;text-decoration:none;
+  font-family:var(--text)!important;font-size:16px!important;font-weight:600!important;line-height:24px!important;
+  transition:background-color .18s ease;
 }
-.kh2-book-l{flex:1;text-align:center;}
-.kh2-book-c{flex:none;}
-.kh2-book:hover{background:var(--green-d);}
-/* The looped clip runs along the foot of the hero, full width. */
-/* margin-top:auto eats the slack; the floor for the gap is the margin-bottom
-   on .kh2-hero-in, kept there so the badge (absolute, offset from this box)
-   is not pushed off the band. */
-.kh2-foliage{position:relative;min-height:clamp(148px,20vh,190px);margin-top:auto;pointer-events:none;}
-/* Full width at the clip's own 8:1, so nothing is cropped off the top and no
-   gap is left at the sides. height:auto lets the band grow on a wide monitor
-   rather than the frame being scaled up and trimmed; bottom:-1px keeps a
-   hairline off the section edge. The clip's own top row is near-white, which
-   is the hero's background, so the band has no visible seam. */
-/* The band is its own layer: frame one of the clip is its background, so the
-   greenery is painted from the first response, before any video exists or any
-   script runs. Its aspect ratio is the clip's, so the height follows the width
-   exactly — nothing is cropped off the top, nothing is left white at the sides.
-   bottom:-1px keeps a hairline off the section edge. Stills are 21KB and 15KB. */
+.kh2-book:hover{background:var(--green-hover);}
+
+/* The clip band, 227 tall. The frame puts it 72 under a 362 box that its
+   380 of content overflows, so it sits 54.4 under the buttons. */
+.kh2-foliage{position:relative;margin-top:54.4px;height:227px;pointer-events:none;}
 .kh2-clips{
-  position:absolute;left:0;right:0;bottom:-1px;width:100%;aspect-ratio:1808/226;
+  position:absolute;left:0;right:0;bottom:-1px;width:100%;height:100%;
   background:url('/hero-calm-desktop.webp') center bottom / 100% 100% no-repeat;
-  pointer-events:none;
 }
-.kh2-clips.is-mob{aspect-ratio:750/200;background-image:url('/hero-calm-mobile.webp');}
+.kh2-clips.is-mob{background-image:url('/hero-calm-mobile.webp');}
 .kh2-clip{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:fill;}
-/* The copy waiting its turn. Hidden with opacity, never display:none, because a
-   browser will not keep an undisplayed video decoding — and a stalled decoder
-   is the flash we are removing. */
 .kh2-clip.is-buffer{opacity:0;}
-/* Floats near the top of the greenery band, well clear of the section edge, and
-   above the bushes rather than sitting down among them. */
-.kh2-badge-wrap{position:absolute;top:clamp(22px,4.2vh,52px);left:0;right:0;width:330px;margin:0 auto;z-index:3;}
-/* The card peeking out underneath. Inset each side, showing ~9px of its base. */
+
+/* The stat card: 431 x 85, 81 down the band, with a 416-wide card showing
+   9px beneath it. */
+.kh2-badge-wrap{position:absolute;top:81px;left:50%;width:431px;margin-left:-215.5px;z-index:3;}
 .kh2-badge-stack{
-  position:absolute;left:16px;right:16px;bottom:-9px;height:30px;
-  background:#fff;border:1px solid var(--line);border-radius:12px;
-  box-shadow:0 5px 16px rgba(16,14,14,.05);
+  position:absolute;left:7.5px;right:7.5px;bottom:-9px;height:30px;
+  background:#fff;border:1px solid #E5E5EA;border-radius:12px;box-shadow:0 5px 16px rgba(16,14,14,.05);
 }
-/* The deck holds the height; the cards stack inside it, one over another. */
 .kh2-badge-deck{position:relative;height:85px;}
 .kh2-badge{
-  position:absolute;inset:0;
-  display:flex;gap:12px;align-items:center;
-  background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 18px;
-  box-shadow:0 6px 22px rgba(16,14,14,.07);
+  position:absolute;inset:0;display:flex;align-items:center;gap:12px;padding:18px;
+  border:1px solid var(--line-soft);border-radius:12px;
+  background:linear-gradient(180deg,#fff 0%,#F9FBF6 30%,#E7F1DF 100%);
 }
-/* A deck, not a crossfade: the card being replaced drops back and shrinks — as
-   if being pushed under the pile — while the next one rises over it. Without
-   this the two cards sat in exactly the same place and only the words seemed to
-   change. */
 .kh2-badge.is-out{z-index:1;animation:kh2-card-under .55s cubic-bezier(.4,0,.2,1) both;}
-@keyframes kh2-card-under{
-  0%{opacity:1;transform:none;box-shadow:0 6px 22px rgba(16,14,14,.07);}
-  55%{opacity:.55;transform:translateY(7px) scale(.955);}
-  100%{opacity:0;transform:translateY(11px) scale(.94);box-shadow:0 2px 8px rgba(16,14,14,.04);}
-}
 .kh2-badge.is-in{z-index:2;animation:kh2-card-in .55s cubic-bezier(.22,.7,.3,1) both;}
-/* Opacity reaches 1 by 35%, while the card is still low and clear of the copy
-   underneath. Fading the whole way up would leave both cards' text readable at
-   once, which looked like a rendering fault. */
+@keyframes kh2-card-under{
+  0%{opacity:1;transform:none;}
+  55%{opacity:.55;transform:translateY(7px) scale(.955);}
+  100%{opacity:0;transform:translateY(11px) scale(.94);}
+}
 @keyframes kh2-card-in{
-  0%{opacity:0;transform:translateY(30px) scale(.93);box-shadow:0 2px 8px rgba(16,14,14,.05);}
+  0%{opacity:0;transform:translateY(30px) scale(.93);}
   40%{opacity:1;transform:translateY(13px) scale(.975);}
-  100%{opacity:1;transform:none;box-shadow:0 6px 22px rgba(16,14,14,.07);}
+  100%{opacity:1;transform:none;}
 }
 @media (prefers-reduced-motion:reduce){
   .kh2-badge.is-in{animation:kh2-fade-in .45s ease both;}
   .kh2-badge.is-out{animation:kh2-fade-out .45s ease both;}
 }
-.kh2-badge-i{font-size:22px;line-height:1.2;align-self:flex-start;}
+.kh2-badge-i{flex:none;width:47px;height:47px;}
+.kh2-badge-copy{min-width:0;text-align:left;}
 .kh2-badge-t{
-  font-family:var(--text)!important;font-size:16px!important;font-weight:600!important;
-  line-height:1.3em!important;letter-spacing:0!important;color:var(--green)!important;margin:0 0 2px;
+  font-family:var(--text)!important;font-size:16px!important;font-weight:500!important;
+  line-height:24px!important;letter-spacing:0!important;color:var(--green)!important;
 }
 .kh2-badge-b{
-  font-family:var(--text)!important;font-size:14px!important;line-height:1.45em!important;
-  letter-spacing:0!important;color:var(--body)!important;margin:0;
+  margin-top:2px;font-family:var(--text)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--body)!important;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
-/* ---- therapist cards ---- */
-.kh2-filters{display:flex;gap:6px;align-items:center;margin:16px 0 16px;flex-wrap:wrap;}
-/* Measured off the artboard at 1366: the row is 38px tall, the chips sit 6px
-   apart, and the search field is held 22px clear of the first chip. Labels are
-   13px semibold with a 14px green glyph. */
+/* ════ therapists ════ */
+.kh2-ther{padding:112px 0 80px;}
+.kh2-ther-h{max-width:1120px;margin:0 auto!important;}
+.kh2-filters{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:40px;min-height:64px;}
 .kh2-fsearch{
-  display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;
-  background:#F2F4F3;border-radius:9px;color:#8A8A8A;
-  flex:0 0 201px;max-width:100%;margin-right:16px;
+  flex:0 0 375px;height:56px;display:flex;align-items:center;gap:8px;
+  background:#fff;border:1px solid var(--line);border-radius:8px;padding:0 8px 0 16px;
 }
-.kh2-fsearch svg{width:15px;height:15px;flex:none;}
+.kh2-fsearch-q{flex:1;min-width:0;display:flex;align-items:center;gap:8px;color:#9CA3AF;}
+.kh2-fsearch-q svg{flex:none;}
 .kh2-fsearch input{
-  border:0;background:none;outline:none;width:100%;min-width:0;
-  font-family:var(--ui)!important;font-size:13px!important;color:var(--ink);
+  flex:1;min-width:0;border:0;outline:0;background:none;padding:0;color:var(--ink);
+  font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;
 }
-.kh2-fsearch input::placeholder{color:#8A8A8A;}
+.kh2-fsearch input::placeholder{color:var(--hint);}
 .kh2-fsearch input::-webkit-search-cancel-button{cursor:pointer;}
+.kh2-flang{
+  position:relative;flex:none;width:157px;height:40px;display:flex;align-items:center;justify-content:space-between;
+  background:#F9F9F9;border:1px solid var(--line);border-radius:4px;padding:0 8px 0 12px;color:#9CA3AF;cursor:pointer;
+}
+.kh2-flang-v{
+  display:inline-flex;align-items:baseline;gap:4px;
+  font-family:var(--text)!important;font-size:14px!important;font-weight:500!important;line-height:22px!important;color:var(--ink)!important;
+}
+.kh2-flang-v small{font-size:12px;font-weight:400;line-height:18px;color:var(--soft);}
+.kh2-flang select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;}
+.kh2-quicks{flex:none;display:flex;gap:16px;padding:4px;border-radius:8px;background:#fff;}
 .kh2-quick{
-  display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 10px;
-  background:#fff;border:1px solid var(--line);border-radius:9px;cursor:pointer;
-  font-family:var(--ui)!important;font-size:13px!important;font-weight:600!important;
-  letter-spacing:-.1px!important;color:var(--ink);white-space:nowrap;
-  transition:border-color .18s ease,background .18s ease;
+  height:56px;display:inline-flex;align-items:center;gap:8px;padding:0 12px;
+  background:#fff;border:1px solid var(--line);border-radius:8px;cursor:pointer;
+  font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;color:var(--ink)!important;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease;
 }
-.kh2-quick-i{display:inline-flex;color:var(--green);}
-.kh2-quick-i svg{width:14px;height:14px;}
-.kh2-quick:hover{border-color:var(--green);}
-.kh2-quick.is-on{border-color:var(--green);background:#F2FBF5;}
-.kh2-quick.is-on .kh2-quick-i{color:var(--green-d);}
-/* Reachable by keyboard and screen readers, invisible on screen. */
-.kh2-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
-.kh2-filter{
-  display:inline-flex;align-items:center;justify-content:space-between;gap:26px;min-width:210px;
-  /* Same 12px radius as the therapist cards, and shallower than the default
-     control height. */
-  background:#fff;border:1px solid var(--line);border-radius:12px;padding:0 18px;cursor:pointer;
-  font-family:var(--text)!important;font-size:15px!important;letter-spacing:0!important;color:var(--body)!important;
-  position:relative;min-height:37px;
-}
-.kh2-filter:hover,.kh2-filter.is-open{border-color:var(--green);}
+.kh2-quick img{width:32px;height:32px;flex:none;}
+.kh2-quick:hover{border-color:var(--line-green);}
+.kh2-quick.is-on{background:var(--green-light);border-color:var(--line-green);color:var(--green-dark)!important;}
+.kh2-empty{margin-top:24px!important;text-align:center;font-family:var(--text)!important;font-size:14px!important;color:var(--soft)!important;}
+.kh2-tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:16px;}
+.kh2-ther-more{margin-top:24px;}
 
-/* ── Filters popover ────────────────────────────────────────────────────────
-   The icon button opens a real filter sheet rather than more dropdowns:
-   sections of toggle chips, a price slider, and Clear / Apply. Everything the
-   sheet offers is built from the therapist data, so no control here is
-   decorative — a chip exists only if some therapist carries that value. */
-.kh2-filter-anchor{position:relative;margin-left:auto;}
-.kh2-filter-icon{width:40px;height:38px;padding:0;justify-content:center;border-radius:9px;}
-.kh2-filter-icon{
-  display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
-  border-radius:12px;min-height:37px;padding:0 16px;cursor:pointer;color:var(--body);
-  font-family:var(--text)!important;font-size:15px!important;letter-spacing:0!important;
-}
-.kh2-filter-icon.is-open{border-color:var(--green);color:var(--green);}
-.kh2-filter-count{
-  display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;
-  border-radius:999px;background:var(--green);color:#fff;font-size:12px;padding:0 5px;
-}
-/* Catches the click that closes the sheet. */
-.kh2-filter-scrim{position:fixed;inset:0;z-index:40;background:none;border:0;cursor:default;}
-.kh2-panel{
-  position:absolute;top:calc(100% + 10px);right:0;z-index:41;width:344px;max-width:88vw;
-  max-height:min(560px,72vh);overflow-y:auto;
-  background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px 16px;
-  box-shadow:0 18px 50px rgba(16,14,14,.16);
-}
-.kh2-panel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.kh2-panel-h{
-  font-family:var(--text)!important;font-size:17px!important;font-weight:600!important;
-  letter-spacing:0!important;color:var(--ink)!important;margin:0;
-}
-.kh2-panel-x{
-  background:none;border:0;cursor:pointer;font-size:22px;line-height:1;color:var(--muted);padding:0 2px;
-}
-.kh2-panel-sec{margin-bottom:16px;}
-.kh2-panel-row{display:flex;align-items:baseline;justify-content:space-between;}
-.kh2-panel-l{
-  font-family:var(--text)!important;font-size:12px!important;font-weight:600!important;
-  letter-spacing:.06em!important;text-transform:uppercase;color:var(--muted)!important;margin:0 0 9px;
-}
-.kh2-panel-v{
-  font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--body)!important;
-}
-.kh2-fchips{display:flex;flex-wrap:wrap;gap:8px;}
-/* flex:0 0 auto — globals.css stretches bare buttons to the row. */
-.kh2-fchip{
-  flex:0 0 auto;width:auto;
-  background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;
-  font-family:var(--text)!important;font-size:14px!important;letter-spacing:0!important;color:var(--body)!important;
-}
-.kh2-fchip:hover{border-color:rgba(1,47,35,.35);}
-.kh2-fchip.is-on{background:#EAF9E4;border-color:var(--green);color:var(--deep)!important;}
-.kh2-range{
-  -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;
-  background:linear-gradient(90deg,#BFE8A8,var(--green));outline:none;margin:2px 0 0;
-}
-.kh2-range::-webkit-slider-thumb{
-  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
-  background:var(--green);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer;
-}
-.kh2-range::-moz-range-thumb{
-  width:18px;height:18px;border-radius:50%;background:var(--green);border:2px solid #fff;cursor:pointer;
-}
-/* Sticky so Clear / Apply stay reachable when the sections scroll. */
-.kh2-panel-foot{position:sticky;bottom:-16px;display:flex;gap:10px;margin-top:18px;padding:12px 0 4px;background:#fff;}
-.kh2-panel-clear,.kh2-panel-apply{
-  flex:1;border-radius:12px;padding:11px 0;cursor:pointer;
-  font-family:var(--text)!important;font-size:15px!important;font-weight:600!important;letter-spacing:0!important;
-}
-.kh2-panel-clear{background:#fff;border:1px solid var(--line);color:var(--body)!important;}
-.kh2-panel-apply{background:var(--green);border:1px solid var(--green);color:#fff!important;}
-.kh2-panel-apply:hover{background:var(--green-d);}
-.kh2-filter:focus-within{border-color:var(--green);}
-.kh2-filter-clear{
-  background:none;border:0;cursor:pointer;padding:6px 8px;
-  font-family:var(--text)!important;font-size:14px!important;letter-spacing:0!important;
-  color:var(--green)!important;text-decoration:underline;
-}
-.kh2-filter-empty{
-  font-family:var(--text)!important;font-size:15px!important;letter-spacing:0!important;
-  color:var(--body)!important;margin:0 0 18px;
-}
-.kh2-tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
-/* Therapist card — measured off the first card of the Sep-26 PDF (rendered at
-   2x and sampled). The design's card is 240pt wide inside a 1024pt page; every
-   value below is that measurement scaled to our 363px card (x1.51):
-
-     card              240 -> 363      head band      87 -> 132
-     portrait width     91 -> 137      head inset   13.7 -> 20
-     meta inset       26.6 -> 40       row rhythm   18.8 -> 28 (centre to centre)
-     Book Now       69 x 27 -> 104 x 40
-
-   Note the meta rows (hours / price / voice) are indented twice as far as the
-   name and the bio — that stagger is in the design, not a mistake. */
-.kh2-tcard{
-  background:linear-gradient(180deg,#fff 0%,#F6FFF3 100%);
-  border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;
-}
-.kh2-tcard.is-plain{background:#fff;}
-/* Fixed height, so the View Profile button and everything under it lands in the
-   same place on every card whatever the name does. Tall enough for a two-line name,
-   a two-line designation and the button below them (it was 118px and the button ran
-   into longer designations). */
-.kh2-tcard-head{
-  /* The band is an inset panel, not a full-bleed header: a small margin all
-     round and a tighter radius than the card itself. */
-  position:relative;overflow:hidden;height:150px;box-sizing:border-box;
-  margin:6px;border-radius:10px;padding:18px 18px 12px;
-  background:linear-gradient(180deg,#F0FFEE 0%,#E2FFD7 100%);
-}
-.kh2-tcard.is-plain .kh2-tcard-head{background:#FBFBFB;}
-/* The text column clears the portrait; the button is pushed to the band foot. */
-.kh2-tcard-head > div{
-  position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;
-  height:100%;width:60%;
-}
-.kh2-tcard-n{
-  font-family:var(--text)!important;font-size:16px!important;font-weight:600!important;
-  letter-spacing:0!important;color:var(--ink)!important;margin:0 0 1px;line-height:1.25em!important;
-  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
-}
-.kh2-tcard-r{
-  font-family:var(--text)!important;font-size:13.5px!important;letter-spacing:0!important;
-  /* bottom margin: a guaranteed gap above the View Profile button */
-  color:var(--body)!important;margin:0 0 12px;line-height:1.3em!important;
-  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
-}
-.kh2-viewprofile{
-  /* Pill, transparent, on a darker line than the card border. */
-  margin-top:auto;flex:none;display:inline-block;background:transparent;border:1px solid rgba(1,47,35,.45);
-  border-radius:999px;padding:5px 15px;
-  text-decoration:none;font-family:var(--text)!important;font-size:13px!important;
-  letter-spacing:0!important;color:var(--ink)!important;
-}
-.kh2-viewprofile:hover{border-color:var(--deep);}
-/* In the design the portrait is a cut-out sitting in the band's bottom-right
-   corner and bleeding off both edges; with rectangular photos the closest
-   honest equivalent is a full-bleed crop of the band's right-hand third. */
-.kh2-tcard-img{
-  position:absolute;right:0;bottom:0;width:38%;height:100%;
-  object-fit:cover;object-position:top center;border-radius:16px 0 0 0;
-}
-.kh2-tcard-img.is-blank{background:linear-gradient(160deg,#D8F0DC,#BFE3CB);}
-.kh2-tcard-meta{list-style:none!important;margin:14px 0 0;padding:0 20px 0 40px;display:flex;flex-direction:column;gap:12px;}
-.kh2-tcard-meta li{
-  display:flex!important;align-items:center;gap:10px;
-  font-family:var(--text)!important;font-size:14px!important;letter-spacing:0!important;color:var(--ink)!important;
-}
-.kh2-wave{display:flex;align-items:center;gap:10px;margin-top:12px;padding:0 20px 0 40px;}
-.kh2-wave-play{color:var(--body);font-size:12px;}
-.kh2-wave-bars{
-  flex:1;height:18px;
-  background:repeating-linear-gradient(90deg,#9AA5A0 0 2px,transparent 2px 5px);
-  mask-image:linear-gradient(90deg,#000 0 100%);opacity:.55;
-}
-.kh2-tcard-bio{
-  font-family:var(--text)!important;font-size:14px!important;line-height:1.45em!important;
-  letter-spacing:0!important;color:var(--body)!important;margin:12px 0 0;padding:0 20px;flex:1;
-}
-.kh2-tcard-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:12px 20px 14px;}
-.kh2-avail-l{font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--ink)!important;margin:0 0 2px;}
-.kh2-avail-v{font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--green)!important;margin:0;}
-/* Card CTA only — the services section keeps the default small button. */
-.kh2-tcard-foot .kh2-btn--sm{min-width:104px;height:40px;border-radius:14px;padding:0 18px;font-size:15px!important;justify-content:center;}
-.kh2-more{
-  display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:#fff;
-  border:1px solid var(--line);border-radius:12px;padding:11px 26px;text-decoration:none;
-  font-family:var(--text)!important;font-size:15px!important;letter-spacing:0!important;color:var(--body)!important;
-}
-
-/* ---- how it works ---- */
-/* Sampled from the Sep-26 artboard: card 236pt wide with a 31pt gutter (13%),
-   height 254pt — a squarer card than the one we had. The fill is a very light
-   green that deepens slightly downwards (#F7FFF5 -> #F1FFF0), edged with a soft
-   shadow rather than a line. */
-/* Three cards on the Sep-26 artboard, not four. */
-.kh2-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+/* ════ how it works ════ */
+.kh2-how{background:var(--grey-bg);}
+.kh2-how-head{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:12px;}
+.kh2-how-head > div{max-width:640px;}
+.kh2-how-cta{width:220px;}
+.kh2-how-foot{display:none;}
+.kh2-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:40px;}
 .kh2-step{
-  background:linear-gradient(180deg,#F7FFF5 0%,#F1FFF0 100%);
-  border:1px solid rgba(24,158,79,.10);border-radius:16px;
-  box-shadow:0 6px 22px rgba(16,14,14,.05);
-  padding:18px 18px 16px;display:flex;flex-direction:column;text-align:center;
+  display:flex;flex-direction:column;gap:24px;min-height:206px;overflow:hidden;
+  background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;
+}
+.kh2-step-head{display:flex;align-items:flex-start;gap:12px;}
+.kh2-step-n{
+  flex:none;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--line-green);border-radius:8px;
+  font-family:var(--text)!important;font-size:12px!important;font-weight:500!important;line-height:18px!important;color:var(--ink)!important;
 }
 .kh2-step-t,.kh2-step-t:not(#_){
-  font-family:var(--text)!important;font-size:18.6px!important;font-weight:400!important;
-  letter-spacing:0!important;color:var(--ink)!important;margin:0 0 16px;line-height:1.3em!important;
+  font-family:var(--text)!important;font-size:18px!important;font-weight:500!important;
+  line-height:26px!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;
 }
-.kh2-step-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:118px;}
-.kh2-chips{list-style:none!important;margin:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:9px;width:100%;}
-.kh2-chips li{
-  display:inline-flex!important;align-items:center;gap:8px;background:#fff;border:1px solid rgba(24,158,79,.14);
-  border-radius:999px;padding:8px 15px;box-shadow:0 2px 8px rgba(16,14,14,.05);max-width:100%;
-  font-family:var(--text)!important;font-size:13.5px!important;letter-spacing:0!important;color:var(--ink)!important;
+.kh2-step-b{
+  margin-top:4px;font-family:var(--text)!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;letter-spacing:0!important;color:var(--soft)!important;
 }
-.kh2-chip-i{color:var(--green);display:inline-flex;}
-.kh2-avatars{display:flex;align-items:center;justify-content:center;}
-.kh2-av{width:38px;height:38px;border-radius:50%;border:2px solid #fff;margin-left:-7px;background:#CFE7D4;}
-/* The centre face is larger and sits proud of the row in the artboard. */
-.kh2-av--2{width:52px;height:52px;z-index:1;}
-.kh2-av--0{background:#E4CDBF;} .kh2-av--1{background:#CFE7D4;} .kh2-av--2{background:#BFD9E7;}
-.kh2-av--3{background:#E7DCBF;} .kh2-av--4{background:#DCCFE7;}
-.kh2-match-n{font-family:var(--text)!important;font-size:15px!important;font-weight:600!important;letter-spacing:0!important;color:var(--ink)!important;margin:6px 0 0;}
-.kh2-match-r{font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--body)!important;margin:0;}
-.kh2-slot{
-  display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(24,158,79,.14);
-  border-radius:999px;padding:9px 18px;margin:0;box-shadow:0 2px 8px rgba(16,14,14,.05);
-  font-family:var(--text)!important;font-size:14px!important;letter-spacing:0!important;color:var(--ink)!important;
+.kh2-step-art{display:flex;align-items:center;height:58px;margin-top:auto;}
+.kh2-step-faces{gap:10px;}
+.kh2-step-faces img{width:58px;height:58px;border-radius:50%;object-fit:cover;flex:none;background:#EFF4F0;}
+/* The strip is 70 tall in a 58 slot, overhanging 6 each way. It is 344 wide
+   and starts 138 left of the card's padding, so the card clips it and only
+   the last days show, fading in from the left; the time box sits 15.7 on. */
+.kh2-step-dates{gap:15.7px;margin-left:-24px;}
+.kh2-step-days{
+  flex:0 0 230px;min-width:0;height:70px;display:flex;align-items:center;justify-content:flex-end;gap:16px;
+  overflow:hidden;background:#F9F9F9;border-radius:0 8px 8px 0;padding:0 12px 0 0;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
+  mask-image:linear-gradient(90deg,transparent 0,transparent 24px,#000 96px);
 }
-.kh2-days{list-style:none!important;margin:8px 0 0;padding:0;display:flex;gap:6px;}
-.kh2-days li{
-  display:flex!important;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;
-  font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--body)!important;
+.kh2-step-days span{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:32px;}
+.kh2-step-days small{font-family:var(--text);font-size:12px;font-weight:500;line-height:18px;color:var(--ink);}
+.kh2-step-days b{
+  width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+  font-family:var(--text);font-size:12px;font-weight:400;line-height:18px;color:#9CA3AF;
 }
-.kh2-days li.is-on{border:1px solid rgba(24,158,79,.35);background:#fff;color:var(--ink)!important;}
-.kh2-join{display:flex;gap:8px;}
-.kh2-join-a{width:56px;height:74px;border-radius:8px;background:linear-gradient(160deg,#CFE7D4,#A9CDB2);}
-.kh2-join-b{width:76px;height:74px;border-radius:8px;background:linear-gradient(160deg,#E4CDBF,#CBA894);}
-.kh2-join-c{width:56px;height:74px;border-radius:8px;background:linear-gradient(160deg,#BFD9E7,#94B4CB);}
-.kh2-step-c{
-  font-family:var(--text)!important;font-size:12px!important;line-height:1.5em!important;
-  letter-spacing:0!important;color:var(--muted)!important;margin:12px 0 0;
+.kh2-step-days .is-on b{background:var(--green-dark);color:#fff;}
+.kh2-step-days span:not(.is-past):not(.is-on) b{color:var(--body);}
+.kh2-step-slot{
+  flex:none;width:104px;height:70px;display:flex;flex-direction:column;justify-content:center;gap:8px;
+  background:#F9F9F9;border-radius:8px;padding:0 8px;text-align:center;
 }
+.kh2-step-slot small{font-family:var(--text);font-size:12px;line-height:18px;color:var(--ink);}
+.kh2-step-slot b{font-family:var(--text);font-size:16px;font-weight:500;line-height:24px;color:var(--green-dark);}
+.kh2-step-call{gap:8px;height:60px;}
+.kh2-step-tile{position:relative;height:60px;border-radius:8px;overflow:hidden;background:#EFF4F0;}
+.kh2-step-tile--a{flex:196 1 0;}
+.kh2-step-tile--b{flex:125 1 0;}
+.kh2-step-tile img{width:100%;height:100%;object-fit:cover;display:block;}
+.kh2-step-dots{position:absolute;right:4px;top:13px;display:flex;flex-direction:column;gap:2.5px;}
+.kh2-step-dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.9);display:block;}
+.kh2-step-dots i:nth-child(2){background:#EF4444;}
 
-/* ---- offers ---- */
-/* The artboard splits this 330:275 (1.2:1) with a 20pt gutter, and the panel is
-   a white card like the rows beside it — not the dark slab we had. */
-.kh2-offers{display:grid;grid-template-columns:1.2fr 1fr;gap:22px;margin-top:34px;}
+/* ════ what koott offers ════ */
+.kh2-offers{display:grid;grid-template-columns:664fr 484fr;gap:32px;margin-top:40px;}
+.kh2-offer-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;}
+.kh2-offer-tile{
+  min-height:241px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:16px;
+  padding:20px 22px;text-align:left;cursor:pointer;
+  background:#fff;border:1px solid var(--line);border-radius:16px;
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+.kh2-offer-tile:hover{border-color:var(--line-green);}
+.kh2-offer-tile.is-on{border-color:var(--green);box-shadow:0 8px 12px #EBF3EE;}
+.kh2-offer-i{width:56px;height:56px;flex:none;}
+.kh2-offer-i--offer-1{width:92px;height:92px;}
+.kh2-offer-copy{display:flex;flex-direction:column;gap:4px;}
+.kh2-offer-t{
+  font-family:var(--sans)!important;font-size:20px!important;font-weight:500!important;
+  line-height:30px!important;letter-spacing:0!important;color:var(--ink)!important;
+}
+.kh2-offer-n{font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;}
 .kh2-offer-panel{
-  position:relative;border-radius:14px;padding:34px 36px;overflow:hidden;
-  background:#fff;border:1px solid var(--line);
-  /* No floor of its own: the four rows beside it set the height, as in the
-     artboard where both columns end on the same line. */
-  display:flex;flex-direction:column;
+  position:relative;display:grid;align-items:center;
+  background:#F9FBF9;border:1px solid var(--line);border-radius:16px;padding:32px;
 }
-.kh2-offer-h,.kh2-offer-h:not(#_){
-  font-family:var(--sans)!important;font-size:27px!important;font-weight:600!important;
-  line-height:1.22em!important;letter-spacing:-.01em!important;color:var(--deep)!important;margin:0 0 12px;
-}
-.kh2-offer-h span{display:block;}
-.kh2-offer-lead{
-  font-family:var(--text)!important;font-size:14px!important;line-height:1.5em!important;
-  letter-spacing:0!important;color:var(--body)!important;margin:0 0 20px;max-width:33ch;
-}
-/* Green pill next to a quiet text link, as drawn. */
-.kh2-offer-cta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:0 0 22px;}
-.kh2-offer-price{
-  background:var(--green);color:#fff!important;text-decoration:none;border-radius:999px;padding:9px 20px;
-  font-family:var(--text)!important;font-size:14px!important;font-weight:600!important;letter-spacing:0!important;
-}
-.kh2-offer-price:hover{background:var(--green-d);}
-.kh2-offer-link{
-  display:inline-flex;align-items:center;gap:7px;text-decoration:none;
-  font-family:var(--text)!important;font-size:14px!important;letter-spacing:0!important;color:var(--ink)!important;
-}
-.kh2-offer-link-i{
-  display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;
-  border:1px solid var(--line);border-radius:50%;color:var(--body);
-}
-.kh2-offer-link-i svg{width:13px;height:13px;}
-.kh2-offer-list{list-style:none!important;margin:0 0 14px;padding:0;}
-.kh2-offer-list li{
-  display:flex!important;align-items:flex-start;gap:9px;margin:0 0 9px;
-  font-family:var(--text)!important;font-size:14px!important;line-height:1.4em!important;
-  letter-spacing:0!important;color:var(--body)!important;
-}
-.kh2-offer-i{color:var(--green);display:inline-flex;flex:none;margin-top:1px;}
-.kh2-offer-pack{
-  font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;
-  color:var(--muted)!important;margin:auto 0 0;
-}
-/* space-between so the four rows finish level with the panel beside them. */
-.kh2-offer-list-col{display:flex;flex-direction:column;justify-content:space-between;gap:14px;}
-/* width:100% — a <button> shrink-wraps its text rather than filling the column,
-   so the four rows came out 443 / 441 / 352 / 359px wide in a 505px column. */
-.kh2-offer-row{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;text-align:left;
-  width:100%;box-sizing:border-box;
-  background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px;cursor:pointer;
-  color:var(--body);transition:box-shadow .18s ease,border-color .2s ease,border-radius .25s ease;
-}
-.kh2-offer-chev{flex:none;transition:transform .3s cubic-bezier(.4,0,.2,1);}
-.kh2-offer-row.is-on .kh2-offer-chev{transform:rotate(90deg);}
-
-/* Panel hand-over (laptop): the old entry fades up and out, then the new one
-   rises in — one after the other, never both on screen (the new entry's delay
-   is longer than the old one's exit). The leaving copy is laid over the panel's
-   padding box so the panel's height is set by the incoming entry alone.
-   Transform and opacity only, so the compositor runs it. */
-.kh2-offer-body{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;}
-.kh2-offer-body.is-out{
-  position:absolute;inset:34px 36px;pointer-events:none;
-  animation:kh2-offer-out .18s cubic-bezier(.4,0,1,1) both;
-}
+.kh2-offer-body{grid-area:1 / 1;}
+.kh2-offer-body.is-out{animation:kh2-offer-out .18s cubic-bezier(.4,0,1,1) both;}
 .kh2-offer-body.is-in{animation:kh2-offer-in .38s .2s cubic-bezier(0,0,.2,1) both;}
 .kh2-offer-body.is-first{animation:none;}
-@keyframes kh2-offer-out{from{opacity:1;transform:translate3d(0,0,0);}to{opacity:0;transform:translate3d(0,-6px,0);}}
-@keyframes kh2-offer-in{from{opacity:0;transform:translate3d(0,10px,0);}to{opacity:1;transform:translate3d(0,0,0);}}
+@keyframes kh2-offer-out{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(-6px);}}
+@keyframes kh2-offer-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 @media (prefers-reduced-motion:reduce){
   .kh2-offer-body.is-out{animation:kh2-fade-out .16s ease-in both;}
   .kh2-offer-body.is-in{animation:kh2-fade-in .26s .18s ease-out both;}
   .kh2-offer-body.is-first{animation:none;}
-  .kh2-offer-chev{transition:none;}
 }
-.kh2-offer-row:hover{box-shadow:0 4px 18px rgba(16,14,14,.07);}
-.kh2-offer-row.is-on{border-color:#5EA277;}
-.kh2-offer-t{
-  display:block;font-family:var(--sans)!important;font-size:17.2px!important;font-weight:400!important;
-  letter-spacing:0!important;color:var(--ink)!important;margin-bottom:4px;
+.kh2-panel-i{display:none;}
+.kh2-panel-h,.kh2-panel-h:not(#_){
+  font-family:var(--sans)!important;font-size:24px!important;font-weight:600!important;
+  line-height:36px!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;
 }
-.kh2-offer-n{
-  display:block;font-family:var(--text)!important;font-size:13.3px!important;
-  letter-spacing:0!important;color:var(--muted)!important;
+.kh2-panel-lead{margin-top:8px!important;font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;color:var(--body)!important;}
+.kh2-panel-l{display:flex;flex-direction:column;gap:12px;margin-top:24px!important;}
+.kh2-panel-l li{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;
 }
+.kh2-check{color:var(--green);flex:none;}
+.kh2-panel-pack{margin-top:24px!important;font-family:var(--text)!important;font-size:12px!important;line-height:18px!important;color:var(--soft)!important;}
+.kh2-panel-cta{display:flex;align-items:center;gap:16px;margin-top:24px;flex-wrap:wrap;}
+.kh2-panel-link{
+  display:inline-flex;align-items:center;gap:4px;text-decoration:none;
+  font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;
+}
+.kh2-panel-link:hover{color:var(--green)!important;}
 
-/* ---- care ---- */
-/* The artboard gives the copy card 399pt against a 220pt photo — 1.8:1. */
-.kh2-care{display:grid;grid-template-columns:1.8fr 1fr;gap:22px;align-items:stretch;}
-.kh2-care-card{background:#EFFFEA;border-radius:16px;padding:32px;}
-.kh2-care-p{
-  font-family:var(--text)!important;font-size:16px!important;line-height:1.6em!important;
-  letter-spacing:0!important;color:var(--body)!important;margin:0 0 14px;
+/* ════ care ════ */
+.kh2-care{--w:1132px;display:grid;grid-template-columns:713.57fr 396.43fr;gap:22px;}
+.kh2-care-card{
+  position:relative;overflow:hidden;border-radius:16px;padding:32px;
+  background:linear-gradient(180deg,#E8F2E1 0%,rgba(190,219,172,0) 100%);
 }
-.kh2-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px 34px;margin:22px 0 24px;}
-.kh2-stat{border-left:2px solid var(--deep);padding-left:16px;}
+/* The Malayalam letter cut off at the card's top right. */
+.kh2-care-mark{position:absolute;inset:0;width:100%;height:auto;pointer-events:none;}
+.kh2-care-card > *:not(.kh2-care-mark){position:relative;}
+.kh2-care-ps{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
+.kh2-care-p{font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;color:var(--body)!important;}
+.kh2-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:24px;}
+.kh2-stat{border-left:2px solid var(--green-dark);padding-left:18px;min-height:91px;}
 .kh2-stat-v{
-  font-family:var(--sans)!important;font-size:48.2px!important;font-weight:500!important;
-  line-height:1.1em!important;letter-spacing:-.01em!important;color:var(--deep)!important;margin:0 0 6px;
+  font-family:var(--sans)!important;font-size:32px!important;font-weight:600!important;
+  line-height:48px!important;letter-spacing:0!important;color:var(--green-dark)!important;
 }
-.kh2-stat-l{
-  font-family:var(--text)!important;font-size:16.9px!important;font-weight:500!important;line-height:1.35em!important;
-  letter-spacing:0!important;color:var(--ink)!important;margin:0;
-}
+.kh2-stat-l{white-space:pre-line;font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;}
+.kh2-care-cta{margin-top:24px;}
 .kh2-care-media{
-  position:relative;border-radius:16px;min-height:520px;
-  background:linear-gradient(160deg,#D9D2CC,#B9AFA7);display:flex;align-items:center;justify-content:center;
+  position:relative;border-radius:16px;overflow:hidden;min-height:598px;
+  background:#EFF4F0 url('/design/home/care.webp') center/cover no-repeat;
 }
 .kh2-play{
-  width:64px;height:64px;border-radius:12px;background:var(--green);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:22px;
+  position:absolute;left:50%;top:50%;width:88px;height:64px;margin:-32px 0 0 -44px;
+  display:flex;align-items:center;justify-content:center;border-radius:8px;
+  background:var(--green);color:#fff;font-size:22px;line-height:33px;
 }
 
-/* ---- reviews ---- */
-.kh2-google{display:flex;align-items:center;gap:12px;}
-.kh2-google-g{
-  width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;font-weight:700;color:#4285F4;
-}
-.kh2-google-l{font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--body)!important;margin:0;}
-.kh2-google-s{font-family:var(--text)!important;font-size:14px!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;}
-.kh2-stars{color:#F5A623;letter-spacing:1px;}
-/* Full-bleed: the row breaks out of the 1180px container and runs the width of
-   the window, drifting continuously. Held still for anyone who has asked for
-   reduced motion, and paused while the pointer is over it so a quote can
-   actually be read. */
-.kh2-reviews{
-  width:100vw;margin-left:calc(50% - 50vw);
-  overflow:hidden;padding-bottom:8px;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);
-  mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);
-}
-.kh2-reviews-track{display:flex;width:max-content;animation:kh2-marquee 60s linear infinite;}
-.kh2-reviews:hover .kh2-reviews-track{animation-play-state:paused;}
-.kh2-reviews-set{display:flex;gap:20px;padding-right:20px;}
-@keyframes kh2-marquee{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
-@media (prefers-reduced-motion:reduce){
-  .kh2-reviews-track{animation:none;}
-  .kh2-reviews{overflow-x:auto;}
-}
-/* The artboard card is 185 x 221pt — 1.19 tall for its width — and carries
-   three short paragraphs. Matched here at 320 x 382 with the footer pinned to
-   the foot, so every card is the same height whatever the quote runs to. */
+/* ════ reviews ════ */
+.kh2-rev-sec{background:var(--deep);overflow:hidden;}
+.kh2-rev-head{--w:1132px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.kh2-rev-h,.kh2-rev-h:not(#_){color:#fff!important;}
+.kh2-rating{display:flex;align-items:center;gap:12px;flex:none;}
+.kh2-rating-t{display:flex;flex-direction:column;}
+.kh2-rating-t small{font-family:var(--text);font-size:12px;line-height:18px;color:#fff;}
+.kh2-rating-t b{font-family:var(--text);font-size:14px;font-weight:400;line-height:21px;color:#fff;}
+.kh2-rating-t em{font-style:normal;font-size:14px;line-height:21px;color:#F5A623;}
+.kh2-reviews{position:relative;overflow:hidden;margin-top:80px;}
+.kh2-reviews::-webkit-scrollbar{display:none;}
+.kh2-rev-track{display:flex;width:max-content;animation:kh2-roll 72s linear infinite;}
+.kh2-reviews:hover .kh2-rev-track{animation-play-state:paused;}
+.kh2-rev-set{display:flex;align-items:flex-start;gap:24px;flex:none;margin-right:24px;}
+@keyframes kh2-roll{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
+.kh2-rev-spare{display:none;}
+@media (min-width:1921px){ .kh2-rev-spare{display:contents;} .kh2-rev-track{animation-duration:216s;} }
+@media (prefers-reduced-motion:reduce){ .kh2-rev-track{animation:none;} }
+.kh2-rev-col{flex:none;display:flex;flex-direction:column;gap:27px;width:473px;}
 .kh2-review{
-  flex:0 0 320px;min-height:382px;background:#fff;border:1px solid var(--line);
-  border-radius:12px;padding:20px 20px 18px;display:flex;flex-direction:column;
+  position:relative;isolation:isolate;flex:none;margin:0;min-height:192px;padding:20px;
+  display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-areas:"av who" "q q" "rate rate";
+  align-content:start;align-items:center;column-gap:12px;row-gap:8px;
+  background:#0A4636;border-radius:12px;
 }
-.kh2-review-head{display:flex;gap:11px;align-items:center;margin-bottom:10px;}
-.kh2-review-av{width:34px;height:34px;border-radius:50%;background:#CFE7D4;flex:none;}
-.kh2-review-n{font-family:var(--text)!important;font-size:14px!important;font-weight:500!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;}
-.kh2-review-p{font-family:var(--text)!important;font-size:12px!important;letter-spacing:0!important;color:var(--muted)!important;margin:0;}
+.kh2-review-av{
+  grid-area:av;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.14);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--text);font-size:14px;font-weight:500;color:rgba(255,255,255,.72);
+}
+.kh2-review-who{grid-area:who;display:flex;flex-direction:column;gap:4px;min-width:0;}
+.kh2-review-n{font-family:var(--text);font-size:16px;font-weight:500;line-height:24px;color:#fff;}
+.kh2-review-p{font-family:var(--text);font-size:12px;line-height:18px;color:#fff;}
 .kh2-review-q{
-  font-family:var(--text)!important;font-size:12.7px!important;line-height:1.45em!important;
-  letter-spacing:0!important;color:var(--body)!important;margin:0 0 12px;flex:1;
-  /* Four lines is what the artboard shows; a longer quote is trimmed rather
-     than allowed to stretch one card past its neighbours. */
-  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:9;overflow:hidden;
+  grid-area:q;margin:0;padding:0;border:0;
+  font-family:var(--text)!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#fff!important;
 }
-.kh2-review-foot{display:flex;align-items:center;gap:10px;}
-.kh2-review-src{
-  width:26px;height:26px;border-radius:50%;background:#F3F4F6;display:flex;align-items:center;
-  justify-content:center;font-size:13px;color:var(--body);
+.kh2-review-rate{grid-area:rate;display:flex;align-items:center;gap:8px;}
+.kh2-review-g{
+  width:26px;height:26px;border-radius:50%;background:var(--deep);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-family:var(--text);font-size:12px;
 }
-.kh2-review-score{font-family:var(--text)!important;font-size:12px!important;letter-spacing:0!important;color:var(--body)!important;}
+.kh2-review-s{font-family:var(--text);font-size:12px;line-height:18px;color:#fff;}
+.kh2-review-stars{font-size:16px;line-height:24px;color:#F5A623;}
+.kh2-review--big{
+  width:452px;min-height:415px;border-radius:16px;
+  grid-template-columns:124px minmax(0,1fr);grid-template-areas:"av who" "av rate" "q q";
+  column-gap:26px;row-gap:16px;
+  background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+}
+/* Figma lays a monotone grain over the gradient; the same noise tile the
+   condition pages use. */
+.kh2-review--big::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;
+  background:url('/design/noise.png') 0 0/150px 150px repeat;
+}
+.kh2-review--big .kh2-review-av{width:124px;height:124px;border-radius:12px;font-size:36px;align-self:start;}
+.kh2-review--big .kh2-review-who{align-self:end;}
+.kh2-review--big .kh2-review-rate{align-self:start;}
+.kh2-review--big .kh2-review-q{font-size:23px!important;font-weight:500!important;line-height:32px!important;}
+.kh2-dots{display:flex;justify-content:center;align-items:center;gap:7px;}
+.kh2-dots button{
+  width:8px;height:8px;padding:0;border:0;border-radius:999px;background:#D6DCD8;cursor:pointer;
+  transition:width .2s ease,background-color .2s ease;
+}
+.kh2-dots button.is-on{width:20px;background:var(--green);}
+.kh2-rev-dots{display:none;}
 
-/* ---- experts ---- */
-/* No box: the rows run the full width of the window, past the content column,
-   with a soft fade at each edge. */
+/* ════ experts ════ */
+.kh2-exp-h{max-width:1120px;margin:0 auto!important;}
 .kh2-strip{
-  width:100vw;margin:20px 0 32px calc(50% - 50vw);overflow:hidden;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
-          mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  position:relative;margin-top:40px;display:flex;flex-direction:column;gap:16px;overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);
 }
-.kh2-strip-row{overflow:hidden;margin-bottom:14px;}
-.kh2-strip-row:last-child{margin-bottom:0;}
-/* The track holds the row twice; gap is on the tiles (margin) so both copies
-   are exactly the same width and -50% lands on the seam. */
-.kh2-strip-track{display:flex;width:max-content;animation:kh2-marquee 55s linear infinite;}
+.kh2-strip-row{overflow:hidden;}
+.kh2-strip-track{display:flex;gap:16px;width:max-content;animation:kh2-roll3 55s linear infinite;}
+@keyframes kh2-roll3{from{transform:translate3d(0,0,0);}to{transform:translate3d(-33.3333%,0,0);}}
 .kh2-strip-row.is-rev .kh2-strip-track{animation-direction:reverse;animation-duration:62s;}
-/* Portrait tiles, a touch taller than wide. */
-.kh2-tile{
-  flex:none;display:block;width:112px;height:132px;margin-right:14px;
-  border-radius:14px;background:#EEF3EF;object-fit:cover;
+.kh2-strip-track{padding-right:16px;}
+@media (prefers-reduced-motion:reduce){ .kh2-strip-track{animation:none;} }
+.kh2-tile{width:132px;height:132px;border-radius:8px;object-fit:cover;flex:none;background:#EFF4F0;}
+.kh2-feats{--w:1132px;display:grid;grid-template-columns:556fr 544fr;gap:32px;margin:48px auto 0;max-width:1132px;}
+/* 182 tall with its hairline, as the fill is drawn. */
+.kh2-feat{background:#FAFCF9;border:1px solid #E8EFE5;border-radius:12px;padding:23px 24px;}
+.kh2-feat-head{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  background:none;border:0;padding:0;text-align:left;cursor:default;color:var(--soft);
 }
-@media (prefers-reduced-motion:reduce){.kh2-strip-track{animation:none;}}
-.kh2-feats{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;}
-/* Card ground is a hair off-white in the artboard (250,252,249), not pure. */
-.kh2-feat{background:#FAFCF9;border:1px solid rgba(1,47,35,.08);border-radius:12px;padding:16px 16px 18px;}
-.kh2-feat-i{font-size:24px;display:block;margin-bottom:8px;}
+.kh2-feat-head .kh2-pm{display:none;}
 .kh2-feat-t,.kh2-feat-t:not(#_){
-  font-family:var(--sans)!important;font-size:18.7px!important;font-weight:400!important;
-  line-height:1.25em!important;letter-spacing:0!important;color:var(--deep)!important;margin:0 0 12px;
+  font-family:var(--sans)!important;font-size:20px!important;font-weight:600!important;
+  line-height:28px!important;letter-spacing:0!important;color:var(--ink)!important;margin:0;
 }
-.kh2-feat-l{list-style:none!important;margin:0;padding:0;}
+.kh2-feat-l{display:flex;flex-direction:column;gap:12px;margin-top:16px!important;}
 .kh2-feat-l li{
-  display:block!important;margin:0 0 3px;
-  font-family:var(--text)!important;font-size:13.2px!important;line-height:1.5em!important;
-  letter-spacing:0!important;color:#59514D!important;   /* artboard's warm grey */
+  display:flex;align-items:center;gap:4px;
+  font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;color:var(--body)!important;
 }
+.kh2-exp-ctas{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:40px;}
+.kh2-exp-ctas .kh2-textlink{width:220px;}
+.kh2-exp-ctas .kh2-btn2{width:214px;}
 
-/* ---- services ---- */
-/* All eight service tabs fit the 1132px row once the pills are not padded out
-   to 22px a side — before this the last one was clipped by the scroller. */
-.kh2-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 26px;}
-/* The artboard runs the eight pills as one row that overflows the right edge
-   (its last pill is clipped), so this scrolls sideways rather than wrapping. */
-.kh2-tabs--scroll{
-  flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
-}
-.kh2-tabs--scroll::-webkit-scrollbar{display:none;}
-.kh2-tabs--scroll .kh2-tab{scroll-snap-align:start;}
-.kh2-tabs--center{justify-content:center;flex-wrap:wrap;}
-/* The FAQ's category pills are set larger than the pricing tabs: 17.3px Medium,
-   and the artboard draws them without the pricing pills' border. */
-.kh2-tabs--center .kh2-tab{font-size:17.3px!important;font-weight:500!important;border-color:transparent;background:transparent;}
-.kh2-tabs--center .kh2-tab.is-on{background:var(--green);border-color:var(--green);}
+/* ════ services ════ */
+.kh2-svc-sec{background:var(--grey-bg);overflow:hidden;}
+.kh2-rail{display:flex;justify-content:center;align-items:center;margin-top:16px;}
+.kh2-rail-arrow{display:none;}
+.kh2-tabs{display:flex;gap:16px;padding:4px;border-radius:8px;}
 .kh2-tab{
-  flex:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 15px;cursor:pointer;
-  font-family:var(--text)!important;font-size:14.1px!important;letter-spacing:0!important;color:var(--body)!important;
-  white-space:nowrap;
+  flex:none;height:48px;padding:0 12px;border-radius:8px;cursor:pointer;white-space:nowrap;
+  background:#fff;border:1px solid var(--line);
+  font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;color:var(--ink)!important;
+  transition:background-color .15s ease,border-color .15s ease,color .15s ease;
 }
-.kh2-tab.is-on{background:var(--green);border-color:var(--green);color:#fff!important;font-weight:500!important;}
-/* Carousel: the track holds every panel and slides one step per tab. A panel is
-   87% of the row with a 24px gutter — the artboard's proportion, which is what
-   leaves the next panel peeking at the right edge. */
-/* Full-bleed rail: the row runs the width of the window so the next panel
-   comes in from the screen edge instead of being clipped inside the 1180px
-   container. The left padding puts panel one flush with the page's text column.
-   --pw is the panel width the track steps by. */
+.kh2-tab:hover{border-color:var(--line-green);}
+.kh2-tab.is-on{background:var(--green-light);border-color:var(--line-green);color:var(--green-dark)!important;}
+/* The track starts on the 1132 column (x=394) and runs off the right edge. */
 .kh2-slides{
-  --cw:min(1132px, calc(100vw - 48px));
-  --pw:calc(var(--cw) * .87);
-  --pg:24px;
-  width:100vw;margin-left:calc(50% - 50vw);overflow:hidden;
-  padding-left:max(24px, calc((100vw - 1180px) / 2 + 24px));
+  --pw:984.83px;--pg:24px;
+  width:100%;max-width:calc(1132px + 48px);margin:24px auto 0;padding:0 24px;overflow:visible;
 }
 .kh2-track{
-  display:flex;gap:var(--pg);will-change:transform;
+  display:flex;gap:var(--pg);
+  transform:translateX(calc(var(--at,0) * -1 * (var(--pw) + var(--pg))));
   transition:transform .5s cubic-bezier(.22,.7,.3,1);
 }
+@media (prefers-reduced-motion:reduce){ .kh2-track{transition:none;} }
 .kh2-slide{
-  flex:0 0 var(--pw);
-  display:grid;grid-template-columns:1fr 1fr;gap:26px;
-  background:#F9FFF8;border:1px solid var(--line);border-radius:16px;padding:34px;
+  position:relative;isolation:isolate;flex:0 0 var(--pw);min-height:371px;
+  display:grid;grid-template-columns:444.41fr 444.42fr;gap:26px;padding:35px 34px;
+  border-radius:16px;background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
 }
-@media (prefers-reduced-motion:reduce){.kh2-track{transition:none;}}
-.kh2-slide-media{
-  position:relative;border-radius:14px;min-height:300px;overflow:hidden;background:#E6EEE8;
+.kh2-slide::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;
+  background:url('/design/noise.png') 0 0/150px 150px repeat;
 }
-.kh2-slide-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.kh2-slide-media{border-radius:12px;overflow:hidden;background:var(--ink);height:301px;}
+.kh2-slide-media img{width:100%;height:100%;object-fit:cover;display:block;}
+.kh2-slide-body{display:flex;flex-direction:column;align-items:flex-start;}
 .kh2-slide-t,.kh2-slide-t:not(#_){
-  font-family:var(--sans)!important;font-size:32.2px!important;font-weight:var(--h-weight)!important;
-  line-height:1.2em!important;letter-spacing:-.01em!important;color:var(--ink)!important;margin:0 0 18px;
+  font-family:var(--sans)!important;font-size:24px!important;font-weight:600!important;
+  line-height:36px!important;letter-spacing:0!important;color:#fff!important;margin:0;
 }
-.kh2-slide-lead{font-family:var(--text)!important;font-size:16px!important;line-height:1.6em!important;letter-spacing:0!important;color:var(--body)!important;margin:0 0 10px;}
-.kh2-slide-l{list-style:disc!important;margin:0 0 22px;padding-left:20px;}
+.kh2-slide-lead{margin-top:16px!important;font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;color:#fff!important;}
+.kh2-slide-l{display:flex;flex-direction:column;gap:6px;margin-top:8px!important;padding-left:20px!important;}
 .kh2-slide-l li{
-  display:list-item!important;margin:0 0 6px;
-  font-family:var(--text)!important;font-size:16px!important;letter-spacing:0!important;color:var(--body)!important;
+  list-style:disc;font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;color:#fff!important;
 }
-.kh2-dots{display:flex;gap:7px;justify-content:center;margin-top:18px;}
-.kh2-dots button{
-  width:8px;height:8px;border-radius:50%;border:0;background:#D6DCD8;cursor:pointer;padding:0;
-  transition:background .2s ease,width .2s ease;
-}
-.kh2-dots button.is-on{background:var(--green);width:20px;border-radius:999px;}
+.kh2-slide-cta{margin-top:24px;}
+.kh2-svc-dots{margin-top:20px;height:8px;}
 
-/* ---- faq ---- */
-.kh2-faq{max-width:860px;margin:0 auto;}
-.kh2-faq-row{border-bottom:1px solid rgba(38,34,34,.1);}
+/* ════ faq ════ */
+.kh2-faq-sec .kh2-in{--w:860px;}
+.kh2-faq{display:flex;flex-direction:column;gap:16px;margin-top:40px;}
+.kh2-faq-row{
+  border-radius:16px;background:#F7F7F7;
+  transition:background-color .4s ease,box-shadow .4s ease;
+}
+/* The open row's white hairline is drawn as a ring so it adds no height. */
+.kh2-faq-row.is-open{background:#F9FBF9;box-shadow:0 0 0 1px #fff,0 6px 15px rgba(0,0,0,.05);}
 .kh2-faq-q{
-  width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;
-  background:none;border:0;cursor:pointer;padding:22px 4px;
-  font-family:var(--text)!important;font-size:16px!important;letter-spacing:0!important;color:var(--ink)!important;
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:16px;background:none;border:0;text-align:left;cursor:pointer;color:var(--ink);
 }
-.kh2-faq-plus{font-size:22px;color:var(--body);line-height:1;}
-.kh2-faq-a{
-  font-family:var(--text)!important;font-size:16px!important;line-height:1.7em!important;
-  letter-spacing:0!important;color:var(--body)!important;margin:0 0 22px;padding:0 4px;max-width:760px;
-}
+.kh2-faq-q > span{font-family:var(--text)!important;font-size:18px!important;font-weight:500!important;line-height:26px!important;color:var(--ink)!important;}
+.kh2-faq-q .kh2-pm{flex:none;color:var(--ink);}
+.kh2-faq-row.is-open .kh2-faq-q .kh2-pm{color:var(--green);}
+.kh2-faq-a{padding:1px 16px 25px;font-family:var(--text)!important;font-size:18px!important;line-height:26px!important;color:var(--body)!important;}
 
-/* ---- posts ---- */
-.kh2-posts{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:30px;}
-.kh2-post{text-decoration:none;display:block;}
-.kh2-post-img{width:100%;height:210px;object-fit:cover;border-radius:12px;display:block;}
-.kh2-post-img.is-blank{background:linear-gradient(160deg,#D9D2CC,#B9AFA7);}
+/* ════ blogs ════ */
+.kh2-blog-sec{background:var(--grey-bg);}
+.kh2-blog-sec .kh2-in{--w:1140px;}
+.kh2-posts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:40px;}
+.kh2-post{
+  /* The hairline is a ring so the title gets the full 326.67 the frame gives
+     it and wraps where the design wraps. */
+  display:flex;flex-direction:column;min-height:346px;padding:16px;text-decoration:none;
+  background:#fff;box-shadow:0 0 0 1px #F4F4F4;border-radius:16px;
+  transition:box-shadow .2s ease,transform .2s ease;
+}
+.kh2-post:hover{box-shadow:0 0 0 1px var(--line-green);transform:translateY(-2px);}
+.kh2-post-img{display:block;width:100%;height:210px;object-fit:cover;border-radius:12px;background:#EFF4F0;}
+.kh2-post-img.is-blank{background:linear-gradient(180deg,#F0FFEC 0%,#D4FFC2 100%);}
 .kh2-post-t{
-  font-family:var(--text)!important;font-size:16px!important;line-height:1.5em!important;
-  letter-spacing:0!important;color:var(--ink)!important;margin:14px 0 0;text-align:center;
+  margin-top:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-family:var(--text)!important;font-size:16px!important;line-height:24px!important;color:var(--ink)!important;
+}
+.kh2-post-more{
+  margin-top:auto;padding-top:16px;display:flex;align-items:center;justify-content:space-between;
+  color:var(--green-dark);font-family:var(--text);font-size:14px;font-weight:500;line-height:22px;
 }
 
-/* ---- final cta ---- */
-/* Same vertical rhythm as .kh2-sec, so the gap into this band matches every
-   other gap on the page; it was 120/90 and read as a hole. */
-/* The arch: an ellipse as wide as the section rising the full height of the
-   band, so it meets the footer exactly at the two bottom corners — the shape in
-   the artboard. The heading and buttons sit inside it (centred in the band),
-   where before the ellipse only reached 60% of the height and the text floated
-   on white above it. */
-.kh2-final{
-  /* Deepest at the base, easing lighter towards the apex — the artboard
-     grades #D5FFC4 at the foot to #E3FFDA near the top of the arch. */
-  background:radial-gradient(50% 100% at 50% 100%, var(--band) 0%, var(--band-t) 99.5%, #fff 100%);
-  min-height:318px;display:flex;flex-direction:column;justify-content:center;
-  padding:clamp(122px,16.3vh,176px) 0 44px;
+/* ════ final cta ════ */
+.kh2-final{background:linear-gradient(180deg,#FFFFFF 0%,#E7F1DF 100%);padding:78px 0 80px;}
+.kh2-final-tag{
+  display:inline-flex;align-items:center;gap:4px;height:40px;padding:0 12px;color:var(--ink);
+  font-family:var(--text)!important;font-size:14px!important;line-height:22px!important;
 }
+.kh2-final-tag span,.kh2-final-tag{color:var(--body)!important;}
+.kh2-final-tag svg{color:var(--ink);}
+.kh2-final-h{margin-top:16px!important;}
+.kh2-final-b{width:220px;margin-top:16px;}
 
-/* Short screens (a 720px-tall laptop, say): the same layout on a tighter
-   vertical grid, so every section still fits between the fixed header and the
-   fold. Nothing is hidden or reflowed — only the air comes out. */
-/* Not on phones: there the address bar sliding in and out changes the height
-   mid-scroll, and crossing 760px would reflow the page under the finger. */
-@media (max-height:760px) and (min-width:641px){
-  .kh2-sec{padding:104px 0;}
-  .kh2-tcard-head{height:146px;}
-  .kh2-tcard-meta{margin-top:12px;gap:11px;}
-  .kh2-tcard-bio{margin-top:12px;}
-  .kh2-tcard-foot{padding:12px 20px 14px;}
-  .kh2-feat{padding:13px;}
-  .kh2-slide{padding:26px;}
-  .kh2-care-card{padding:26px;}
+/* ════ between the two frames ════
+   Neither design has a tablet layout. Below the 1180 column the laptop layout
+   keeps its proportions and the grids fold where they would crush. */
+@media (max-width:1240px){
+  .kh2-filters{flex-direction:column;align-items:stretch;}
+  .kh2-fsearch{flex:none;width:100%;max-width:375px;margin:0 auto;}
+  .kh2-quicks{justify-content:center;flex-wrap:wrap;}
+  .kh2-slides{--pw:min(984.83px, calc(100vw - 96px));}
 }
-
-@media (max-width:1000px){
-  .kh2-tabs--scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;}
-  .kh2-tgrid,.kh2-steps,.kh2-feats,.kh2-posts{grid-template-columns:1fr 1fr;}
-  .kh2-offers,.kh2-care{grid-template-columns:1fr;}
-  .kh2-care-media{min-height:320px;}
+@media (max-width:1100px){
+  .kh2-tgrid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  /* two across, so a third card would sit alone: show two, as the phone does */
+  .kh2-tgrid > :nth-child(n+3){display:none;}
+  .kh2-steps{grid-template-columns:1fr;max-width:560px;margin-left:auto;margin-right:auto;}
+  .kh2-offers{grid-template-columns:1fr;}
+  .kh2-care{grid-template-columns:1fr;}
+  .kh2-care-media{min-height:480px;}
+  .kh2-rev-head{flex-direction:column;align-items:flex-start;}
+  .kh2-slide{grid-template-columns:1fr 1fr;}
+  .kh2-posts{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:860px) and (min-width:641px){
+  .kh2-quicks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;max-width:560px;margin:0 auto;}
+  .kh2-feats{grid-template-columns:1fr;}
   .kh2-slide{grid-template-columns:1fr;}
+  .kh2-how-head{flex-direction:column;align-items:flex-start;}
+  .kh2-tabs{overflow-x:auto;scrollbar-width:none;max-width:100%;}
+  .kh2-tabs::-webkit-scrollbar{display:none;}
+  .kh2-rail{justify-content:flex-start;}
 }
+
+/* ════ the 390 phone frame ("Home mobile Updated") ════
+   Last in the sheet so it wins on equal specificity. 16px gutters, headings
+   24/32, body 14/22. */
 @media (max-width:640px){
+  .kh2-lap{display:none!important;}
+  .kh2-ph{display:revert!important;}
+  .kh2-in{padding:0 16px;}
   .kh2-sec{padding:48px 0;}
-  .kh2-h1,.kh2-h1:not(#_){font-size:38px!important;}
+  .kh2-h2,.kh2-h2:not(#_){font-size:24px!important;line-height:32px!important;}
 
-  /* ── Mobile hero, to the phone comp ─────────────────────────────────────
-     Left-aligned copy, the sparkle inside the text box, a "Find the match"
-     chip beneath it, a standalone green CTA, then the stat card and greenery.
-     A soft grey wash runs down from under the header. */
-  .kh2-hero{
-    background:linear-gradient(180deg,#EDEEED 0%,#FFFFFF 22%,#FFFFFF 100%);
-    /* Sized from svh — the viewport with the address bar showing, which never
-       changes while scrolling. A max-height media query used to tighten this on
-       short phones, but the bar sliding away crossed its breakpoint mid-scroll
-       and the whole hero jumped. ~64px on an iPhone SE, ~92px on a 812px phone. */
-    padding-top:clamp(56px,calc(20svh - 70px),120px)!important;
-    min-height:calc(100vh - 63px);
-    min-height:calc(100svh - 63px);
-    max-height:none;
+  /* hero: 123 under the header, the deck 76 under the button, the 89-tall
+     garden flush with the foot — 707 in all. */
+  .kh2-hero{padding-top:123px;}
+  .kh2-h1,.kh2-h1:not(#_){font-size:32px!important;line-height:38.4px!important;}
+  .kh2-hero-sub{margin-top:12px;font-size:14px!important;line-height:22px!important;}
+  .kh2-ask-wrap{width:100%;margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:16px;}
+  .kh2-ask{
+    display:flex;flex-direction:column;align-items:flex-start;gap:8px;width:100%;
+    background:var(--green-light);border-radius:16px;padding:8px;
   }
-  .kh2-hero-in{text-align:left;padding:0 22px;}
-  .kh2-h1,.kh2-h1:not(#_){font-size:clamp(30px,8.6vw,36px)!important;line-height:1.14em!important;margin-bottom:clamp(6px,1.4svh,12px)!important;}
-  /* One line on every phone. At 15px the sentence is ~22.2px wide per px of
-     font (333px), so it wrapped on anything under ~390px — iPhone SE/mini,
-     360px Androids. 15px where it fits, otherwise scaled to the width left
-     inside the 22px side padding; 23.4 rather than 22.2 leaves ~5% slack, since
-     small sizes render a touch wider than straight scaling (320px missed by 2px
-     at 3%). Wrapping is still allowed, so a slow font load can
-     never clip "24/7" off the end. */
-  .kh2-hero-sub{font-size:min(15px, calc((100vw - 44px) / 23.4))!important;margin:0 0 clamp(10px,2.2svh,18px)!important;color:var(--body)!important;}
-  .kh2-hero-accent{color:var(--green);}
+  .kh2-ask-box{background:none;border:0;border-radius:0;padding:0;width:100%;}
+  .kh2-ask-input{
+    height:88px;border-width:1px;padding:11px 12px;box-shadow:none;
+    font-size:14px!important;line-height:22px!important;
+  }
+  .kh2-concern{
+    height:32px;gap:8px;padding:0 12px;border-color:var(--line);border-radius:6px;
+    font-size:14px!important;font-weight:500!important;line-height:22px!important;color:#9CA3AF!important;
+  }
+  .kh2-concern .kh2-trio{width:16px;height:16px;}
+  .kh2-book{width:165px;height:40px;font-weight:500!important;}
+  .kh2-foliage{margin-top:0;height:249px;}
+  .kh2-clips{height:89px;top:auto;}
+  .kh2-clip{object-fit:cover;object-position:center bottom;}
+  .kh2-badge-wrap{top:76px;width:292px;margin-left:-146px;}
+  .kh2-badge-stack{left:11px;right:11px;bottom:-9px;height:40px;}
+  .kh2-badge-deck{height:56px;}
+  .kh2-badge{padding:0 10px 0 11px;gap:12px;}
+  .kh2-badge-i{width:27px;height:27px;}
+  .kh2-badge-t{font-size:12px!important;line-height:18px!important;}
+  .kh2-badge-b{font-size:12px!important;line-height:18px!important;}
 
-  .kh2-search{
-    max-width:none;margin:0;padding:0;background:transparent;box-shadow:none;border-radius:0;
+  /* therapists: search, the four chips two by two, then two cards. */
+  .kh2-ther{padding:56px 0 48px;}
+  .kh2-ther-h{max-width:358px;}
+  .kh2-filters{margin-top:20px;gap:20px;}
+  .kh2-fsearch{flex:none;width:100%;max-width:none;height:48px;padding:0 4px 0 16px;}
+  .kh2-flang{width:151px;height:38px;padding:0 6px 0 10px;}
+  /* filled down the columns, as the phone frame orders them */
+  .kh2-quicks{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;grid-auto-flow:column;gap:8px;padding:0;}
+  .kh2-quick{
+    height:76px;align-items:center;gap:4px;padding:0 16px;border-radius:16px;text-align:left;
+    font-size:14px!important;line-height:22px!important;
   }
-  .kh2-search-input{
-    min-height:0!important;height:clamp(68px,10svh,76px);resize:none;padding:12px 44px 12px 12px!important;
-    border:1.5px solid #6FB8C6!important;border-radius:10px!important;
-    font-size:13px!important;line-height:1.55em!important;
-  }
-  .kh2-search-spark{
-    display:block;position:absolute;right:12px;top:50%;transform:translateY(-50%);
-    color:var(--green);line-height:0;pointer-events:none;
-  }
-  .kh2-search-spark .kh2-trio{width:22px;height:22px;}
-  .kh2-search-row{display:none;}
-
-  /* the text box and both buttons sit together on a pale green panel, pulled
-     8px past the text column each side so the box keeps most of its width */
-  .kh2-hero-panel{
-    /* collapses into the subtitle's own margin (up to 18px): ~34px on a tall
-       phone, back to 18px on an iPhone SE so the plants stay on screen */
-    display:block;margin:clamp(18px,calc(12svh - 64px),34px) -8px 0;padding:12px;
-    background:#EEF8F0;border:1px solid rgba(24,158,79,.12);border-radius:16px;
-  }
-  .kh2-hero-panel .kh2-search-input{background:#fff!important;}
-  .kh2-hero-panel .kh2-hero-actions{margin-top:12px!important;}
-  /* "Find the match" and "Consult now" share one row under the text box,
-     at the same height */
-  .kh2-hero-actions{display:flex;align-items:stretch;gap:10px;margin-top:clamp(14px,calc(9svh - 45px),28px);}
-  /* equal halves, so the pair lines up with the text box's left and right edges */
-  .kh2-hero-actions > a{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;}
-  .kh2-match{
-    display:inline-flex;align-items:center;gap:10px;padding:0 14px;min-height:44px;
-    background:#fff;border:1px solid rgba(24,158,79,.12);border-radius:8px;
-    box-shadow:0 6px 16px rgba(24,158,79,.10);text-decoration:none;
-    font-family:var(--text)!important;font-size:13px!important;letter-spacing:0!important;color:var(--body)!important;
-  }
-  .kh2-match svg{width:14px;height:14px;color:var(--green);}
-
-  .kh2-consult{
-    display:inline-flex;align-items:center;gap:10px;padding:0 16px;min-height:44px;
-    background:var(--green);color:#fff!important;border-radius:6px;text-decoration:none;
-    box-shadow:0 2px 0 rgba(1,47,35,.18);
-    font-family:var(--text)!important;font-size:15px!important;font-weight:600!important;letter-spacing:0!important;
+  .kh2-quick img{margin-right:4px;}
+  .kh2-tgrid{grid-template-columns:1fr;gap:20px;margin-top:20px;}
+  .kh2-tgrid > :nth-child(n+3){display:none;}
+  .kh2-ther-more{margin-top:20px;}
+  .kh2-ther-more-b{
+    width:207px;height:32px;border-radius:6px;background:var(--green);border:0;color:#fff!important;
   }
 
-  /* The comp puts the stat card just under the CTA with the clip pinned to the
-     foot of the screen. display:contents dissolves the band, so the card joins
-     the hero's flow after the CTA while the clip stays absolutely positioned —
-     now against the hero itself — at the bottom. */
-  .kh2-foliage{display:contents;}
-  /* the clip hugs the foot of the hero; padding-bottom reserves exactly the
-     height the phone cut takes at full width (750x200, so width / 3.75) — the
-     card is never drawn over, and the frame is never trimmed */
-  .kh2-hero{padding-bottom:calc(100vw / 3.75)!important;}
-  .kh2-clips{aspect-ratio:750/200;background-image:url('/hero-calm-mobile.webp');}
-  .kh2-hero-in{margin-bottom:0!important;}
-  .kh2-badge-wrap{
-    position:relative!important;top:auto!important;left:auto!important;right:auto!important;
-    width:auto!important;margin:auto 58px 40px!important;
-  }
-  /* margin-top:auto drops the card to the foot of the hero, just above the
-     plant clip; the gap under the buttons keeps a floor on short screens */
-  .kh2-hero-in{padding-bottom:28px!important;}
-  /* a smaller stat card on phones: narrower (58px in from each side), shorter,
-     with type a step down */
-  .kh2-badge-deck{height:78px;}
-  .kh2-badge{gap:12px;padding:12px 18px;border-radius:10px;}
-  .kh2-badge-i{font-size:18px;}
-  .kh2-badge-t{font-size:14px!important;margin:0 0 1px;}
-  .kh2-badge-b{font-size:12px!important;line-height:1.4em!important;}
-  .kh2-badge-stack{left:14px;right:14px;bottom:-7px;border-radius:10px;}
-  /* The negative bottom margin lets the card sit over the top edge of the
-     greenery — the clip's top rows are near-white, and the desktop hero floats
-     its card over the band the same way. That is what buys the room for the
-     extra space above the headline and under the CTA without pushing the
-     plants below the fold on a typical iPhone. Only bites on short screens; a
-     tall phone has slack under the card and the card never reaches the band. */
-  .kh2-h1,.kh2-h1:not(#_){font-weight:700!important;}
-  .kh2-h2,.kh2-h2:not(#_){font-size:24px!important;}
-  .kh2-h2--big,.kh2-h2--big:not(#_){font-size:30px!important;}
-  .kh2-tgrid,.kh2-steps,.kh2-feats,.kh2-posts,.kh2-stats{grid-template-columns:1fr;}
-  .kh2-care-card,.kh2-offer-panel{padding:24px;}
-  .kh2-headrow{flex-direction:column;}
-}
+  /* how it works: a plain label, a left heading, three stacked cards and
+     the button under them. */
+  .kh2-chip{display:block;height:auto;padding:0;background:none;box-shadow:none;font-size:12px!important;font-weight:500!important;line-height:18px!important;}
+  .kh2-how .kh2-sub,.kh2-how-cta{display:none;}
+  .kh2-how-head{margin-top:12px;}
+  .kh2-steps{grid-template-columns:1fr;gap:16px;margin-top:24px;max-width:none;}
+  .kh2-step{min-height:182px;padding:16px;gap:16px;}
+  .kh2-step-n{width:30px;height:30px;color:var(--green-dark)!important;}
+  .kh2-step-b{color:#7C7C7C!important;}
+  .kh2-step-faces{gap:9px;}
+  /* edge to edge of the card: the days from its left edge, the time box
+     against its right one */
+  .kh2-step-dates{margin:0 -16px;gap:16px;}
+  .kh2-step-days{flex-basis:238px;}
+  .kh2-step-slot{border-radius:8px 0 0 8px;}
+  .kh2-how-foot{display:block;margin-top:24px;}
+  .kh2-how-foot .kh2-btn2{width:189px;color:var(--body)!important;}
 
-/* Phones: "How it works" becomes a swipe carousel — one card at a time with
-   the next peeking in, snapping to centre, dots beneath. Native scrolling, so
-   it follows the finger and respects momentum. */
-@media (max-width:640px){
-  .kh2-steps{
-    display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;
-    gap:14px;margin:0 -22px;padding:4px 22px 10px;
-    scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  /* what koott offers: four small tiles, then the chosen one's panel. */
+  .kh2-offers{grid-template-columns:1fr;gap:24px;margin-top:24px;}
+  .kh2-offers-sub{display:none;}
+  .kh2-offer-tiles{gap:8px;}
+  .kh2-offer-tile{
+    order:var(--ph-order);min-height:76px;flex-direction:row;align-items:center;justify-content:flex-start;
+    gap:4px;padding:0 16px;
   }
-  .kh2-steps::-webkit-scrollbar{display:none;}
-  .kh2-step{flex:0 0 82%;scroll-snap-align:center;}
-  .kh2-step-dots{display:flex;justify-content:center;gap:7px;margin-top:14px;}
-  .kh2-step-dots button{
-    width:8px;height:8px;border-radius:50%;border:0;padding:0;cursor:pointer;background:#D6DCD8;
-    transition:width .2s ease,background .2s ease;
-  }
-  .kh2-step-dots button.is-on{width:20px;border-radius:999px;background:var(--green);}
+  .kh2-offer-tile.is-on{box-shadow:none;}
+  .kh2-offer-i,.kh2-offer-i--offer-1{width:32px;height:32px;margin-right:4px;}
+  .kh2-offer-n{display:none;}
+  .kh2-offer-t,.kh2-offer-t:not(#_){font-family:var(--text)!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;}
+  .kh2-offer-tile.is-on .kh2-offer-t{font-weight:500!important;color:var(--green)!important;}
+  .kh2-offer-panel{padding:24px;background:#F9FBF9;}
+  .kh2-panel-head{display:flex;align-items:center;gap:18px;}
+  .kh2-panel-i{display:block;width:56px;height:56px;flex:none;}
+  .kh2-panel-h,.kh2-panel-h:not(#_){font-size:20px!important;line-height:28px!important;}
+  .kh2-panel-h .kh2-block{display:inline;}
+  /* the frame's 234 box holds a 235.5 line; let it overhang as drawn */
+  .kh2-panel-h,.kh2-panel-h:not(#_){margin-right:-4px!important;}
+  .kh2-panel-lead{margin-top:16px!important;font-size:14px!important;line-height:22px!important;}
+  .kh2-panel-l{gap:10px;margin-top:16px!important;}
+  .kh2-panel-l .kh2-check{width:18px;height:18px;color:#BBBBBB;}
+  .kh2-panel-pack{margin-top:16px!important;color:#7C7C7C!important;}
+  .kh2-panel-cta{flex-direction:column;align-items:flex-start;gap:16px;margin-top:16px;}
+  .kh2-panel-link{order:-1;gap:6px;font-weight:500!important;color:var(--green-dark)!important;}
 
-  /* Posts: a swipe row, so the phone reads one card at a time instead of a
-     long stack. */
+  /* care: the card, then the photo under it. */
+  .kh2-care{grid-template-columns:1fr;gap:16px;}
+  .kh2-care-card{padding:20px;}
+  .kh2-care-mark{inset:auto;left:85px;top:7px;width:283px;}
+  .kh2-care-ps{gap:20px;margin-top:12px;}
+  .kh2-care-p{font-size:14px!important;line-height:22px!important;}
+  .kh2-stats{gap:24px 16px;margin-top:20px;}
+  .kh2-stat{min-height:92px;border-left-width:1px;padding-left:10px;}
+  .kh2-stat-v{font-size:24px!important;line-height:32px!important;}
+  .kh2-stat-l{margin-top:6px;white-space:normal;font-size:12px!important;line-height:18px!important;}
+  .kh2-care-cta{margin-top:20px;color:var(--green-dark)!important;}
+  .kh2-care-media{min-height:280px;}
+  .kh2-play{width:64px;height:48px;margin:-24px 0 0 -32px;border-radius:12px;font-size:20px;}
+
+  /* reviews: a band 48 in from the white, swiped one card at a time. */
+  .kh2-rev-sec{background:#fff;padding:48px 0;}
+  .kh2-rev-sec > *{background:var(--deep);}
+  .kh2-rev-head{padding-top:32px;}
+  .kh2-rating{display:none;}
+  .kh2-reviews{
+    margin-top:24px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+    padding:0 16px;scroll-padding:0 16px;
+  }
+  .kh2-rev-track{animation:none;width:auto;}
+  .kh2-rev-set{gap:12px;margin-right:0;}
+  .kh2-rev-set + .kh2-rev-set,.kh2-rev-spare,.kh2-review--repeat{display:none!important;}
+  .kh2-rev-col{display:contents;}
+  .kh2-review,.kh2-review--big{
+    width:326px;min-height:330px;padding:20px;border-radius:16px;scroll-snap-align:start;
+    grid-template-columns:56px minmax(0,1fr);grid-template-areas:"av who" "q q" "rate rate";
+    column-gap:12px;row-gap:20px;align-content:start;
+    background:linear-gradient(180deg,#0A4636 0%,#18AC85 100%);
+  }
+  .kh2-review::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;pointer-events:none;
+    background:url('/design/noise.png') 0 0/150px 150px repeat;
+  }
+  .kh2-review-av,.kh2-review--big .kh2-review-av{width:56px;height:56px;border-radius:12px;font-size:18px;align-self:center;}
+  .kh2-review--big .kh2-review-who{align-self:center;}
+  .kh2-review-who{gap:3px;}
+  .kh2-review-q,.kh2-review--big .kh2-review-q{font-size:18px!important;font-weight:500!important;line-height:26px!important;}
+  .kh2-review-rate,.kh2-review--big .kh2-review-rate{
+    justify-self:start;align-self:end;height:30px;gap:8px;padding:0 10px;border-radius:8px;background:var(--deep);
+  }
+  .kh2-review-g{width:auto;height:auto;background:none;}
+  .kh2-review-stars{font-size:14px;line-height:17px;color:#F7B84B;}
+  .kh2-rev-dots{display:flex;justify-content:flex-start;gap:5px;padding:24px 16px 32px;}
+  .kh2-rev-dots button{width:6px;height:6px;}
+  .kh2-rev-dots button.is-on{width:20px;}
+
+  /* experts: smaller faces, and the four cards fold into an accordion. */
+  .kh2-exp-h{max-width:358px;}
+  .kh2-strip{margin-top:24px;gap:8px;}
+  .kh2-strip-track{gap:8px;padding-right:8px;}
+  .kh2-tile{width:64px;height:70px;border-radius:10px;}
+  .kh2-feats{grid-template-columns:1fr;gap:10px;margin-top:24px;}
+  .kh2-feat{padding:16px;border-radius:16px;background:#F9FBF9;border-color:#DDEDD8;}
+  .kh2-feat-head{cursor:pointer;}
+  .kh2-feat-head .kh2-pm{display:block;flex:none;}
+  .kh2-feat-l{padding-bottom:8px;}
+  .kh2-feat-t,.kh2-feat-t:not(#_){font-family:var(--text)!important;font-size:18px!important;font-weight:500!important;line-height:26px!important;}
+  .kh2-reveal--phone{display:grid;}
+  .kh2-reveal--phone > .kh2-reveal-in{display:block;visibility:hidden;opacity:0;}
+  .kh2-reveal--phone.is-open > .kh2-reveal-in{visibility:visible;opacity:1;}
+  .kh2-exp-ctas{justify-content:flex-start;flex-wrap:wrap;gap:12px;margin-top:24px;}
+  .kh2-exp-ctas .kh2-textlink{width:132px;}
+
+  /* services: the tab rail gets arrows and fades, the stories swipe. */
+  .kh2-rail{position:relative;margin-top:20px;justify-content:flex-start;}
+  .kh2-rail-arrow{
+    display:flex;align-items:center;justify-content:center;position:absolute;top:50%;z-index:2;
+    width:40px;height:40px;margin-top:-20px;padding:0;border:0;background:none;color:var(--ink);cursor:pointer;
+  }
+  .kh2-rail-arrow:first-child{left:-8px;}
+  .kh2-rail-arrow:last-child{right:-8px;}
+  .kh2-rail-arrow:disabled{opacity:.3;cursor:default;}
+  .kh2-rail .kh2-tabs{
+    width:100%;overflow-x:auto;scrollbar-width:none;gap:8px;padding:2px 32px;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 64px,#000 calc(100% - 64px),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 64px,#000 calc(100% - 64px),transparent 100%);
+  }
+  .kh2-rail .kh2-tabs::-webkit-scrollbar{display:none;}
+  .kh2-svc-sec .kh2-tab{height:40px;}
+  .kh2-svc-sec .kh2-rail .kh2-tabs{padding-top:6px;padding-bottom:6px;}
+  .kh2-slides{--pw:326px;--pg:12px;padding:0 16px;margin-top:20px;}
+  .kh2-slide{min-height:538px;display:flex;flex-direction:column;gap:20px;padding:20px;}
+  .kh2-slide-media{height:194px;flex:none;}
+  .kh2-slide-body{flex:1;}
+  .kh2-slide-t,.kh2-slide-t:not(#_){font-size:20px!important;line-height:28px!important;}
+  .kh2-slide-lead{margin-top:20px!important;font-size:14px!important;line-height:22px!important;}
+  .kh2-slide-l{margin-top:20px!important;gap:10px;}
+  .kh2-slide-l li{font-size:14px!important;line-height:22px!important;}
+  .kh2-slide-cta{width:100%;height:48px;margin-top:auto;}
+  .kh2-svc-dots{display:none;}
+
+  /* faq */
+  .kh2-faq{gap:12px;margin-top:20px;}
+  .kh2-faq-q{padding:17px 16px;}
+  .kh2-faq-q > span{font-size:16px!important;line-height:24px!important;}
+  .kh2-faq-row.is-open{box-shadow:0 0 0 1px #E8EFE4,0 6px 15px rgba(0,0,0,.05);}
+  .kh2-faq-a{padding:0 16px 27px;font-size:14px!important;line-height:22px!important;}
+
+  /* blogs: one card at a time, the next peeking in. */
   .kh2-posts{
-    display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;
-    gap:14px;margin-left:-22px;margin-right:-22px;padding:4px 22px 10px;
-    scrollbar-width:none;
+    display:flex;gap:12px;margin:24px -16px 0;padding:0 16px;overflow-x:auto;
+    scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;
   }
   .kh2-posts::-webkit-scrollbar{display:none;}
-  .kh2-tcard,.kh2-post{flex:0 0 84%;scroll-snap-align:center;}
-  /* The four "why Koott" boxes are mostly text: stacked at full width, each as
-     tall as its own copy, rather than cut off at the edge of a swipe row. */
-  .kh2-feats{display:grid!important;grid-template-columns:1fr!important;gap:12px;}
-  .kh2-feat{padding:16px 18px;}
-  .kh2-feat-t{font-size:19px!important;margin-bottom:10px;}
-  /* Therapist cards stack one under another above the "more" button, and run
-     12px from the screen edge (past the section's 24px gutter) for more room. */
-  .kh2-tgrid{display:grid!important;grid-template-columns:1fr!important;gap:16px;margin-left:-12px;margin-right:-12px;}
+  .kh2-post{flex:0 0 326px;min-height:351px;padding:14px;box-shadow:none;scroll-snap-align:start;}
+  .kh2-post:hover{box-shadow:none;transform:none;}
+  .kh2-post-img{height:195px;}
+  .kh2-post-t{font-weight:500!important;}
+  .kh2-post-more{padding-top:16px;}
 
-  /* therapist card: the fixed-height band clipped two-line names and roles
-     in a narrow card — let it grow, with a floor so cards still line up */
-  .kh2-tcard-head{height:auto!important;min-height:156px;}
-  .kh2-tcard-head > div{width:62%;}
-  .kh2-tcard-n{font-size:15.5px!important;}
-  .kh2-tcard-r{font-size:13px!important;}
-
-  /* filters: Speciality and Needs share a row, the Filters button goes icon-only */
-  .kh2-filters{flex-wrap:nowrap;gap:8px;}
-  .kh2-filter{flex:1 1 0;min-width:0;padding:0 12px;gap:6px;}
-  .kh2-filter{font-size:14px!important;}
-  .kh2-filter-anchor{margin-left:0;flex:none;}
-  .kh2-filter-icon{font-size:0!important;padding:0 10px;gap:0;}
-  .kh2-filter-count{font-size:11px!important;margin-left:4px;}
-
-  .kh2-offer-h{font-size:21px!important;}
-  .kh2-offer-t{font-size:17px!important;}
-
-  /* care: the four stats fit two to a row */
-  /* minmax(0,1fr): plain 1fr let "30,000+" claim its min-content width and
-     squeeze the other column until "9 in 10" broke one word per line */
-  .kh2-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px 14px!important;}
-  .kh2-stat{padding-left:12px!important;}
-  /* the care stat numbers are .kh2-stat-v */
-  .kh2-stat-v{font-size:clamp(20px,6vw,26px)!important;white-space:nowrap;}
-  .kh2-care-media{min-height:240px!important;}
-
-  /* experts: seven portraits a row, not fourteen slivers */
-  .kh2-strip{margin:16px 0 24px calc(50% - 50vw);}
-  .kh2-strip-row{margin-bottom:10px;}
-  .kh2-tile{width:84px;height:100px;margin-right:10px;border-radius:12px;}
-  /* experts buttons stack; the pair in the closing arch stays side by side */
-  .kh2-ctarow:not(.kh2-ctarow--c){flex-direction:column;align-items:stretch;}
-  .kh2-ctarow:not(.kh2-ctarow--c) .kh2-btn,.kh2-ctarow:not(.kh2-ctarow--c) .kh2-outline{min-width:0;width:100%;}
-
-  /* closing arch: a wide shallow dome rather than the tall bullet a 50%-wide
-     ellipse becomes on a narrow screen, with two small buttons in one row */
-  .kh2-final{
-    min-height:0!important;padding:64px 0 40px!important;
-    /* green runs to 95% of the radius, so the dome's top sits just under the
-       section edge and the heading is well inside it */
-    background:radial-gradient(130% 100% at 50% 100%, var(--band) 0%, var(--band-t) 94%, #fff 95%)!important;
-  }
-  .kh2-final .kh2-h2--final,.kh2-final .kh2-h2--final:not(#_){font-size:26px!important;line-height:1.25em!important;}
-  .kh2-ctarow--c{flex-direction:row;flex-wrap:nowrap;justify-content:center;gap:10px;margin-top:16px;}
-  .kh2-ctarow--c .kh2-btn,.kh2-ctarow--c .kh2-outline{
-    min-width:0;width:auto;flex:0 1 auto;padding:9px 18px;font-size:14px!important;white-space:nowrap;
-  }
-
-  /* services: one panel fills the width (16px from each screen edge), photo
-     on top at 16:10, then the copy — no neighbour squeezing it from the right */
-  .kh2-slides{--pw:calc(100vw - 32px);--pg:12px;padding-left:16px;}
-  .kh2-slide{padding:14px 14px 18px!important;gap:14px!important;}
-  .kh2-slide-media{min-height:0!important;aspect-ratio:16/10;}
-  .kh2-slide-body{padding:0 4px;}
-  .kh2-slide .kh2-btn--sm{width:100%;justify-content:center;}
-  .kh2-slide-t{font-size:22px!important;margin-bottom:10px!important;}
-  .kh2-slide-lead,.kh2-slide-l li{font-size:14.5px!important;}
-
-  /* posts */
-  .kh2-post-img{height:180px;}
-}
-
-/* Up to 1000px "What Koott offers" is one column, so it becomes an accordion:
-   the body opens under the row that was tapped. */
-@media (max-width:1000px){
-  .kh2-offer-panel{display:none;}
-  /* Height animates open and shut: a one-row grid going 0fr → 1fr sizes
-     itself to the content, with no measuring in JavaScript. It used to mount
-     and unmount instantly, so the page jumped by the body's full height. */
-  .kh2-offer-inline{
-    display:grid;grid-template-rows:0fr;
-    transition:grid-template-rows .38s cubic-bezier(.4,0,.2,1);
-  }
-  .kh2-offer-inline.is-open{grid-template-rows:1fr;}
-  /* visibility waits for the close to finish, then takes the shut body out of
-     the tab order; opening flips it back at once. */
-  .kh2-offer-inline-in{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s .38s;}
-  .kh2-offer-inline.is-open .kh2-offer-inline-in{visibility:visible;transition-delay:0s;}
-  .kh2-offer-inline-body{
-    background:#fff;border:1px solid var(--line);border-top:0;
-    border-radius:0 0 12px 12px;padding:18px 18px 16px;
-    opacity:0;transform:translate3d(0,-6px,0);transition:opacity .22s ease,transform .3s ease;
-  }
-  .kh2-offer-inline.is-open .kh2-offer-inline-body{opacity:1;transform:none;transition-delay:.1s;border-color:#5EA277;}
-  /* The open row and its body read as one card: the row drops its bottom edge
-     and corners, the body carries on from there. (This replaces a -12px
-     overlap, which would have pulled every shut row up into the one above.) */
-  .kh2-offer-row.is-on{border-radius:12px 12px 0 0;border-bottom-color:transparent;}
-  /* the row already names the service; the body's heading would repeat it */
-  .kh2-offer-inline .kh2-offer-h{display:none;}
-}
-@media (max-width:1000px) and (prefers-reduced-motion:reduce){
-  .kh2-offer-inline,.kh2-offer-inline-body{transition:none;}
-}
-
-/* The narrowest phones (320px): keep Speciality and Needs on one line. */
-@media (max-width:360px){
-  .kh2-filter{padding:0 10px!important;font-size:13px!important;}
-}
-
-/* Narrow phones (iPhone SE / mini, 360px Androids): the two-line placeholder
-   wraps to three here, and at the usual height its last line was cut off.
-   Three lines of 13px x 1.55 plus 24px of padding is ~85px. */
-@media (max-width:380px){
-  .kh2-search-input{height:86px!important;}
-}
-
-/* Desktop keeps its original behaviour: the leaving phrase is not drawn. */
-.kh2-h1-word.is-out{display:none;}
-
-/* Phones: smoother hero rotation. Two things stuttered. The old phrase vanished
-   a beat before the new one rose, which read as a blink — so on phones it now
-   drifts up and fades out first, and the new one rises in only once it is fully
-   gone. Strictly one after the other: the new phrase's delay (.3s) is longer
-   than the old one's exit (.28s), so the two are never on screen together —
-   a crossfade here overlapped two lines of large type, which read as a
-   collision rather than a hand-off. The very first phrase has nothing to wait
-   for, so it skips the delay (.is-first). And the card
-   animated box-shadow and scale: a shadow repaints on every frame and scaled
-   text re-rasterises, which is exactly what judders on a phone GPU — so here it
-   moves on transform and opacity alone, which the compositor runs off the main
-   thread. Last in the sheet so it outranks the earlier rules. */
-@keyframes kh2-word-in-m{from{opacity:0;transform:translate3d(0,14px,0);}to{opacity:1;transform:translate3d(0,0,0);}}
-@keyframes kh2-word-out-m{from{opacity:1;transform:translate3d(0,0,0);}to{opacity:0;transform:translate3d(0,-10px,0);}}
-@keyframes kh2-card-in-m{
-  0%{opacity:0;transform:translate3d(0,26px,0) scale(.93);}
-  40%{opacity:1;transform:translate3d(0,11px,0) scale(.975);}
-  100%{opacity:1;transform:translate3d(0,0,0) scale(1);}
-}
-@keyframes kh2-card-under-m{
-  0%{opacity:1;transform:translate3d(0,0,0) scale(1);}
-  55%{opacity:.55;transform:translate3d(0,6px,0) scale(.955);}
-  100%{opacity:0;transform:translate3d(0,10px,0) scale(.94);}
-}
-@keyframes kh2-fade-out{from{opacity:1;}to{opacity:0;}}
-@media (max-width:640px){
-  .kh2-h1-word{will-change:transform,opacity;backface-visibility:hidden;}
-  .kh2-h1-word.is-out{display:block;animation:kh2-word-out-m .28s cubic-bezier(.4,0,1,1) both;}
-  .kh2-h1-word.is-in{animation:kh2-word-in-m .45s .3s cubic-bezier(0,0,.2,1) both;}
-  .kh2-h1-word.is-in.is-first{animation-delay:0s;}
-  .kh2-badge.is-in{will-change:transform,opacity;animation:kh2-card-in-m .6s cubic-bezier(.22,.7,.3,1) both;}
-  .kh2-badge.is-out{will-change:transform,opacity;animation:kh2-card-under-m .6s cubic-bezier(.4,0,.2,1) both;}
-}
-@media (max-width:640px) and (prefers-reduced-motion:reduce){
-  .kh2-h1-word.is-out{animation:kh2-fade-out .28s ease-in both;}
-  .kh2-h1-word.is-in{animation:kh2-fade-in .4s .3s ease-out both;}
-  .kh2-h1-word.is-in.is-first{animation-delay:0s;}
-  .kh2-badge.is-in{animation:kh2-fade-in .45s ease both;}
+  /* the closing band */
+  .kh2-final{padding:50px 0 42px;}
+  .kh2-final-h,.kh2-final-h:not(#_){margin-top:11px!important;font-size:20px!important;line-height:28px!important;}
+  .kh2-final-b{width:165px;margin-top:17px;}
 }
 `;
