@@ -266,10 +266,14 @@ export default function ConditionPageTemplate({ data }) {
      one or two is a normal amount to recognise, more than that warns. */
   const signsTone =
     checked.length === 0 ? 'idle' : checked.length <= 2 ? 'ok' : 'warn';
+  /* Nothing is coloured until something is ticked: at rest the panel and its
+     icon are plain grey, and the green or amber fades in from there. The
+     values are custom properties so the icon inside can follow without a
+     second source of truth. */
   const SIGNS_TONE = {
-    idle: { borderColor: 'var(--s-green-2)', background: '#FAFCF9' },
-    ok:   { borderColor: '#BFE3CB',          background: '#F3FBF4' },
-    warn: { borderColor: '#F0C98A',          background: '#FDF7EC' },
+    idle: { '--tone-line': '#E3E2E2', '--tone-bg': '#FAFAFA', '--tone-ink': '#7C7C7C', '--tone-soft': '#F4F4F4' },
+    ok:   { '--tone-line': '#BFE3CB', '--tone-bg': '#F3FBF4', '--tone-ink': '#1B6930', '--tone-soft': '#DDF1E1' },
+    warn: { '--tone-line': '#F0C98A', '--tone-bg': '#FDF7EC', '--tone-ink': '#B4700C', '--tone-soft': '#FBEBD2' },
   };
 
   const screener = useMemo(() => screenerFor(data.slug), [data.slug]);
@@ -2020,22 +2024,47 @@ const CSS = `
 }
 /* The row keeps #E8EFE5 whether it is open or shut -- the file draws both
    states with the same 1px edge, and only the radius and height change. */
+.kct-sign{transition:border-radius .28s ease;}
 .kct-sign.is-open{border-radius:12px;min-height:82px;}
 /* The box: 18x18 at radius 2.5, #189E4F filled with a white tick when on,
    white with a #7C7C7C edge when off. */
 .kct-signs .kct-sign-tick > span[aria-hidden]{
   width:18px;height:18px;border-radius:2.5px;border:1px solid var(--t-soft);
+  transition:background-color .28s ease,border-color .28s ease;
 }
 .kct-signs .kct-sign-tick input:checked + span[aria-hidden]{
   background:var(--p-main);border-color:var(--p-main);
 }
+/* The check is always drawn; it scales up out of the corner it is anchored
+   to, so ticking reads as the mark being made rather than appearing. */
+.kct-signs .kct-sign-tick > span[aria-hidden]::after{
+  content:'';width:5px;height:9px;margin-top:-2px;
+  border:solid #fff;border-width:0 2px 2px 0;
+  transform:rotate(45deg) scale(.2);transform-origin:50% 50%;opacity:0;
+  transition:transform .28s cubic-bezier(.2,.9,.3,1.3),opacity .18s ease;
+}
+.kct-signs .kct-sign-tick input:checked + span[aria-hidden]::after{
+  transform:rotate(45deg) scale(1);opacity:1;
+}
 /* The outcome panel is the only thing that takes a colour, and only once
    the count says so. */
-/* The panel's colour is set inline from the tick count, not from a class:
+/* The tone is set inline from the tick count, as three custom properties:
    this sheet declares .kct-signs-out twice, hundreds of lines apart, and a
-   modifier class on it would not survive that. Inline wins outright, and
-   nothing here carries !important so it can. */
-.kct-signs-out{transition:border-color .15s ease,background .15s ease;}
+   modifier class on it would not survive that. The panel and the icon both
+   read the properties, so there is one source of truth, and both ease over
+   400ms so the change reads as a shift rather than a flash. */
+.kct-signs-out{
+  border-color:var(--tone-line,#E3E2E2);
+  background:var(--tone-bg,#FAFAFA);
+  transition:border-color .4s ease,background-color .4s ease;
+}
+.kct-signs-out .kct-signs-ico{
+  border-color:var(--tone-line,#E3E2E2);
+  background:var(--tone-soft,#F4F4F4);
+  color:var(--tone-ink,#7C7C7C);
+  transition:border-color .4s ease,background-color .4s ease,color .4s ease;
+}
+.kct-signs-out p{transition:color .4s ease;}
 .kct-sign-t,.kct-sign-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;color:var(--t-primary)!important;
