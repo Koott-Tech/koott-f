@@ -469,7 +469,7 @@ export default function KoottHome({ content } = {}) {
     // For everyone, reduced motion included: the CSS swaps movement for a fade.
     const timers = [];
     if (HERO.rotatingTitles.length > 1) {
-      timers.push(setInterval(() => setTitle(({ cur }) => ({ cur: (cur + 1) % HERO.rotatingTitles.length, out: cur })), 2600));
+      timers.push(setInterval(() => setTitle(({ cur }) => ({ cur: (cur + 1) % HERO.rotatingTitles.length, out: cur })), 1700));
     }
     if (HERO.badges.length > 1) {
       timers.push(setInterval(() => setDeck(({ cur }) => ({ cur: (cur + 1) % HERO.badges.length, out: cur })), 3800));
@@ -632,7 +632,7 @@ export default function KoottHome({ content } = {}) {
           {/* Only the first line rotates; hidden sizers hold its width and
               height so nothing below moves. */}
           <h1 className="kh2-h1">
-            <span className="kh2-h1-rot" aria-live="polite">
+            <span className="kh2-h1-rot">
               {HERO.rotatingTitles.map((w) => <span key={w} className="kh2-h1-size" aria-hidden>{w}</span>)}
               {title.out !== null && (
                 <span className="kh2-h1-word is-out" key={`out-${title.out}`} aria-hidden>{HERO.rotatingTitles[title.out]}</span>
@@ -1251,17 +1251,24 @@ const CSS = `
 .kh2-hero{background:#FAFCF9;padding-top:131px;position:relative;overflow:hidden;}
 .kh2-hero-in{text-align:center;position:relative;z-index:2;}
 .kh2-h1 > span{display:block;}
-/* The rotating line: hidden sizers set its box, the visible word overlays. */
-.kh2-h1-rot{display:grid!important;}
+/* The rotating line: hidden sizers set its box, the visible word overlays. As on
+   headspace.com, the old word rises and fades for .3s, then the new one rises in
+   from below for .3s, both at a steady speed and clipped to the line. The clip's
+   extra .1em keeps descenders whole and takes no room, so nothing moves. */
+.kh2-h1-rot{display:grid!important;clip-path:inset(-.1em 0);}
 .kh2-h1-rot > span{grid-area:1 / 1;}
 .kh2-h1-size{visibility:hidden;}
-.kh2-h1-word{display:block;animation:kh2-word-in .5s cubic-bezier(.22,.7,.3,1) both;}
-.kh2-h1-word.is-out{display:none;}
+.kh2-h1-word{display:block;animation:kh2-word-in .3s linear .3s both;}
+.kh2-h1-word.is-out{animation:kh2-word-out .3s linear both;}
 .kh2-h1-word.is-first{animation:none;}
-@keyframes kh2-word-in{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+@keyframes kh2-word-out{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(-1.25em);}}
+@keyframes kh2-word-in{from{opacity:0;transform:translateY(1.25em);}to{opacity:1;transform:none;}}
 @keyframes kh2-fade-in{from{opacity:0;}to{opacity:1;}}
 @keyframes kh2-fade-out{from{opacity:1;}to{opacity:0;}}
-@media (prefers-reduced-motion:reduce){ .kh2-h1-word{animation:kh2-fade-in .4s ease both;} }
+@media (prefers-reduced-motion:reduce){
+  .kh2-h1-word{animation:kh2-fade-in .3s linear .3s both;}
+  .kh2-h1-word.is-out{animation:kh2-fade-out .3s linear both;}
+}
 .kh2-hero-sub{
   margin-top:8px;font-family:var(--text)!important;font-size:18px!important;font-weight:400!important;
   line-height:26px!important;letter-spacing:0!important;color:var(--body)!important;
