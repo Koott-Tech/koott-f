@@ -82,7 +82,7 @@ export default function PaymentFailure() {
 
   const handleContactSupport = () => {
     // You can implement contact support functionality
-    showInfo('Please contact support at support@koott.com', 'Contact Support');
+    showInfo('Please contact support at care@koott.in or +91 86060 40400', 'Contact Support');
   };
 
   if (loading) {

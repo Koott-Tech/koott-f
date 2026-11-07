@@ -842,6 +842,13 @@ function PaymentSuccessContent() {
           localStorage.removeItem(paymentInitTimeKey);
           
           return;
+        } else if (status === 'SLOT_TAKEN') {
+          // Paid after someone else booked the time: no session, the money goes back.
+          setLoadingSessionDetails(false);
+          setError(message || 'The time you picked was booked by someone else before your payment came through. Our team will refund you.');
+          isFetchingSessionRef.current = false;
+          fetchAbortControllerRef.current = null;
+          return;
         } else if (status === 'FAILED' || status === 'EXPIRED') {
           setLoadingSessionDetails(false);
           let failMsg = message || 'Booking failed. Please contact support.';
@@ -1306,8 +1313,9 @@ function PaymentSuccessContent() {
   }
 
   if (error) {
-    const supportEmail = 'hey@koott.com';
-    const supportPhone = '+91 95390 07766';
+    // Same contact as the site footer (data/footerConfig.js); koott.com is not Koott's domain.
+    const supportEmail = 'care@koott.in';
+    const supportPhone = '+91 86060 40400';
     // Paid but the booking isn't visible yet reads differently from a real failure.
     const stillConfirming = /longer than expected|payment was successful|completed (some time ago|earlier)|check your sessions/i.test(error);
     const message = error.replace(/\s*Please try again\.?\s*/gi, ' ').trim() || 'Payment failed.';
@@ -1336,7 +1344,8 @@ function PaymentSuccessContent() {
           </span>
 
           <div role="heading" aria-level={1} className="text-[26px] font-semibold leading-tight tracking-tight text-slate-900">
-            {stillConfirming ? "We're still confirming your booking" : 'Something went wrong'}
+            {stillConfirming ? "We're still confirming your booking"
+              : /booked by someone else/i.test(message) ? 'That time was just taken' : 'Something went wrong'}
           </div>
           <div className="mx-auto mt-3 max-w-md text-[15px] leading-relaxed text-slate-600">{message}</div>
 
@@ -1363,7 +1372,7 @@ function PaymentSuccessContent() {
             write to{' '}
             <a href={`mailto:${supportEmail}`} className="font-medium text-[#025545] hover:underline">{supportEmail}</a>
             {' '}or call{' '}
-            <a href="tel:+919539007766" className="whitespace-nowrap font-medium text-[#025545] hover:underline">{supportPhone}</a>
+            <a href="tel:+918606040400" className="whitespace-nowrap font-medium text-[#025545] hover:underline">{supportPhone}</a>
             {reference ? (
               <>
                 {' '}with reference <span className="whitespace-nowrap font-mono text-slate-600">{reference}</span>.
