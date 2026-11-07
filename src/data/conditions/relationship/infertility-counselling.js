@@ -331,7 +331,8 @@ export default {
         }
       ],
       "title": "Common Signs You May Need Infertility Counselling",
-      "subtitle": "Infertility can affect your thoughts, emotions, and relationships in many ways. Recognising these signs can help you seek support at the right time."
+      "subtitle": "Infertility can affect your thoughts, emotions, and relationships in many ways. Recognising these signs can help you seek support at the right time.",
+      "result": "You've ticked several signs that infertility is taking a toll. A Malayali psychologist can support you through it."
     },
     "howItWorks": {
       "steps": [

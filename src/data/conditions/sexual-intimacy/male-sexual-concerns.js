@@ -316,7 +316,8 @@ export default {
         }
       ],
       "title": "Common Signs of Men’s Sexual Health Concerns",
-      "subtitle": "Men’s sexual health concerns can affect both physical and emotional well-being. Recognizing these signs can help you seek the right support early."
+      "subtitle": "Men’s sexual health concerns can affect both physical and emotional well-being. Recognizing these signs can help you seek the right support early.",
+      "result": "You've ticked several signs of a sexual health concern. A Malayali psychologist can help, in complete confidence."
     },
     "howItWorks": {
       "steps": [

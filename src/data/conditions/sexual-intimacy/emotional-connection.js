@@ -363,7 +363,8 @@ export default {
         }
       ],
       "title": "Common Signs of Struggling with Emotional Connection",
-      "subtitle": "Battling with an emotional connection in a relationship may feel complicated, lonely, and sometimes even unnoticed. These challenges mostly show up in quiet ways that change how you relate to yourself and your partner."
+      "subtitle": "Battling with an emotional connection in a relationship may feel complicated, lonely, and sometimes even unnoticed. These challenges mostly show up in quiet ways that change how you relate to yourself and your partner.",
+      "result": "You've ticked several signs of emotional distance. A Malayali psychologist can help you feel closer again."
     },
     "howItWorks": {
       "steps": [

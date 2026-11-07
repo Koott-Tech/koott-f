@@ -302,7 +302,7 @@ export default {
           "title": "Rapid Heartbeat"
         },
         {
-          "body": "A heavy sensation in the chest occur, creating fear that something is wrong with your heart.",
+          "body": "A heavy sensation in the chest may occur, creating fear that something is wrong with your heart.",
           "title": "Chest Tightness"
         },
         {
@@ -322,7 +322,7 @@ export default {
           "title": "Fear of Losing Control"
         },
         {
-          "body": "A heavy sensation in the chest may occur, creating fear that something is wrong with your heart.",
+          "body": "You may feel lightheaded, unsteady or faint, as if the room is spinning or you might pass out.",
           "title": "Dizziness"
         },
         {
@@ -335,7 +335,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of a Panic Attack",
-      "subtitle": "You deserve the right support and care if panic attacks are affecting your daily life, thoughts, or confidence. Reaching out for professional help is the first step toward feeling better."
+      "subtitle": "You deserve the right support and care if panic attacks are affecting your daily life, thoughts, or confidence. Reaching out for professional help is the first step toward feeling better.",
+      "result": "You've ticked several signs of panic attacks. A Malayali psychologist can help you feel in control again."
     },
     "howItWorks": {
       "steps": [

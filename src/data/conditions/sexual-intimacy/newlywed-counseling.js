@@ -324,7 +324,8 @@ export default {
         }
       ],
       "title": "Common Signs of Early Marriage Adjustment Issues",
-      "subtitle": "The start of a new life together is beautiful, but it can also feel overwhelming or confusing at times, even when there’s love. Give yourselves the space to understand and grow together."
+      "subtitle": "The start of a new life together is beautiful, but it can also feel overwhelming or confusing at times, even when there’s love. Give yourselves the space to understand and grow together.",
+      "result": "You've ticked several signs of early marriage adjustment. A Malayali psychologist can help you settle in together."
     },
     "howItWorks": {
       "steps": [

@@ -358,7 +358,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of OCD",
-      "subtitle": "You may not notice all the signs at once, but if any of these feel familiar, recognizing them early can help you seek the right support and manage OCD more effectively."
+      "subtitle": "You may not notice all the signs at once, but if any of these feel familiar, recognizing them early can help you seek the right support and manage OCD more effectively.",
+      "result": "You've ticked several signs of OCD. A Malayali psychologist can help you ease these thoughts and habits."
     },
     "howItWorks": {
       "steps": [

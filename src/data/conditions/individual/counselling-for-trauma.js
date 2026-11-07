@@ -313,7 +313,7 @@ export default {
     "symptoms": {
       "items": [
         {
-          "body": "You may have experience repeatedly, and these thoughts tend to come back unexpectedly and be uncontrollable.",
+          "body": "You may relive the experience repeatedly, as memories come back unexpectedly and feel hard to control.",
           "title": "Intrusive Memories"
         },
         {
@@ -337,7 +337,7 @@ export default {
           "title": "Physical Symptoms"
         },
         {
-          "body": "You may avoid people, places, or situations that remind you of the traumatic event in order to not to feel emotionally uncomfortable.",
+          "body": "You may avoid people, places, or situations that remind you of the traumatic event in order not to feel emotionally uncomfortable.",
           "title": "Avoidance"
         },
         {
@@ -350,7 +350,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Trauma",
-      "subtitle": "You may not notice all the signs at once, but recognising them will make you more aware of your situation and allow you to get the necessary help for recovery."
+      "subtitle": "You may not notice all the signs at once, but recognising them will make you more aware of your situation and allow you to get the necessary help for recovery.",
+      "result": "You've ticked several signs of trauma. A Malayali psychologist can help you heal at a pace that feels safe."
     },
     "howItWorks": {
       "steps": [

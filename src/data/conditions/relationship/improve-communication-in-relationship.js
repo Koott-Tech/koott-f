@@ -336,7 +336,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Poor Communication in a Relationship",
-      "subtitle": "You may not feel all the signs, but if any of these symptoms sound familiar, early detection will help you seek out mild online depression counselling services from professional Malayali counsellors in Kerala."
+      "subtitle": "You may not feel all the signs, but if any of these symptoms sound familiar, noticing them early can help you seek couples counselling from professional Malayali counsellors in Kerala.",
+      "result": "You've ticked several signs of communication problems in your relationship. A Malayali psychologist can help you both feel heard."
     },
     "howItWorks": {
       "steps": [

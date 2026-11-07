@@ -327,7 +327,7 @@ export default {
           "title": "Lack of Routine"
         },
         {
-          "body": "You may feel like there is a lot of work to finish, and you either feel overwhelmed or stressed due to thr work load.",
+          "body": "You may feel like there is a lot of work to finish, and you either feel overwhelmed or stressed due to the workload.",
           "title": "Feeling Overwhelmed"
         },
         {
@@ -340,7 +340,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Low Productivity",
-      "subtitle": "Low productivity can show up in different ways and affect your work, focus, and daily routine. It is helpful to recognise these signs and symptoms so that you may address them accordingly."
+      "subtitle": "Low productivity can show up in different ways and affect your work, focus, and daily routine. It is helpful to recognise these signs and symptoms so that you may address them accordingly.",
+      "result": "You've ticked several signs of low productivity. A Malayali psychologist can help you build focus and a steady routine."
     },
     "howItWorks": {
       "steps": [

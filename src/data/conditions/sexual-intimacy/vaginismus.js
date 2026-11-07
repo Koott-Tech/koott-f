@@ -302,7 +302,7 @@ export default {
           "title": "Pain During Intimacy"
         },
         {
-          "body": "You may feel like fear, tension, or panic when thinking about intimacy or any form of vaginal insertion.",
+          "body": "You may feel fear, tension, or panic when thinking about intimacy or any form of vaginal insertion.",
           "title": "Fear Around Penetration"
         },
         {
@@ -323,7 +323,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Vaginismus",
-      "subtitle": "Vaginismus can show up in different ways, and the signs are not always the same for everyone. Some people notice pain, while others mainly feel tightness, fear, or difficulty with penetration."
+      "subtitle": "Vaginismus can show up in different ways, and the signs are not always the same for everyone. Some people notice pain, while others mainly feel tightness, fear, or difficulty with penetration.",
+      "result": "You've ticked several signs of vaginismus. It can be treated, and a Malayali psychologist can help, in complete confidence."
     },
     "howItWorks": {
       "steps": [

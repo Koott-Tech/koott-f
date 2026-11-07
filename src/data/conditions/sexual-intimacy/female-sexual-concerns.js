@@ -330,7 +330,8 @@ export default {
         }
       ],
       "title": "Common Signs of Female Sexual Health Concerns",
-      "subtitle": "Female sexual concerns can show up in both physical and emotional ways. Generally, the signs are very minor at first, but they slowly begin to affect your comfort, confidence, and intimacy."
+      "subtitle": "Female sexual concerns can show up in both physical and emotional ways. Generally, the signs are very minor at first, but they slowly begin to affect your comfort, confidence, and intimacy.",
+      "result": "You've ticked several signs of a sexual health concern. A Malayali psychologist can help, in complete confidence."
     },
     "howItWorks": {
       "steps": [

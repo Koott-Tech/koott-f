@@ -343,7 +343,7 @@ export default {
           "title": "Irritability or Restlessness"
         },
         {
-          "body": "Your mood become unstable shifting between highs and lows, making you feel unsettled.",
+          "body": "Your mood becomes unstable, shifting between highs and lows, making you feel unsettled.",
           "title": "Sudden Mood Changes"
         },
         {
@@ -368,7 +368,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Mood Disorder",
-      "subtitle": "You may not experience all these signs of mood disorder, but if any of it feel familiar, recognising them early can help you take the right step towards healing."
+      "subtitle": "You may not experience all these signs of mood disorder, but if any of it feel familiar, recognising them early can help you take the right step towards healing.",
+      "result": "You've ticked several signs of a mood disorder. A Malayali psychologist can help you find more stability."
     },
     "howItWorks": {
       "steps": [

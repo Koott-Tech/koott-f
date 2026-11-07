@@ -304,7 +304,7 @@ export default {
           "title": "Value Differences"
         },
         {
-          "body": "Even though everything seems fine, apparently but you may have fears about commitment to marriage.",
+          "body": "Even when everything seems fine, you may have fears about committing to marriage.",
           "title": "Fear of Commitment"
         },
         {
@@ -333,7 +333,8 @@ export default {
         }
       ],
       "title": "Common Signs You May Need Premarital Counselling",
-      "subtitle": "Preparing for marriage can bring up important questions and concerns that become hard to manage without support. Recognising these signs can help you seek support early."
+      "subtitle": "Preparing for marriage can bring up important questions and concerns that become hard to manage without support. Recognising these signs can help you seek support early.",
+      "result": "You've ticked several concerns about getting married. A Malayali psychologist can help you both start on a strong footing."
     },
     "howItWorks": {
       "steps": [

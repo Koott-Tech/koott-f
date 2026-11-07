@@ -385,8 +385,9 @@ export default {
           "title": "Guilt & Self-Doubt"
         }
       ],
-      "title": "Common Signs and Symptoms of depression",
-      "subtitle": "You might not feel all these, but if any of these symptoms ring true, spotting them early can help you to find gentle online depression counselling from licensed Malayali psychologists in Kerala."
+      "title": "Common Signs and Symptoms of Depression",
+      "subtitle": "You might not feel all these, but if any of these symptoms ring true, spotting them early can help you to find gentle online depression counselling from licensed Malayali psychologists in Kerala.",
+      "result": "You've ticked several signs of depression. A Malayali psychologist can help you start feeling like yourself again."
     },
     "howItWorks": {
       "steps": [

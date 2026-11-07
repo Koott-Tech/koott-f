@@ -335,7 +335,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Grief",
-      "subtitle": "You may not recognise all the signs at once, but identifying them can help you understand and process your feelings to seek the right support during this time."
+      "subtitle": "You may not recognise all the signs at once, but identifying them can help you understand and process your feelings to seek the right support during this time.",
+      "result": "You've ticked several signs of grief. You don't have to carry this loss alone; a Malayali psychologist can help."
     },
     "howItWorks": {
       "steps": [

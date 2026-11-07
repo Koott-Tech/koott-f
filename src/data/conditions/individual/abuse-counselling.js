@@ -343,7 +343,7 @@ export default {
           "title": "Fear of a Person"
         },
         {
-          "body": "You might experience mood swings that include feelings of depression, frustration, and being overwhelmed.",
+          "body": "You may feel that someone watches, limits or makes decisions for you, leaving you little say over your own life.",
           "title": "Feeling Controlled"
         },
         {
@@ -352,7 +352,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Abuse",
-      "subtitle": "Not all signs are visible immediately, but if some of these symptoms are relatable to you, then recognising them can help you get appropriate assistance."
+      "subtitle": "Not all signs are visible immediately, but if some of these symptoms are relatable to you, then recognising them can help you get appropriate assistance.",
+      "result": "You've ticked several signs of abuse. You deserve to feel safe, and a Malayali psychologist can help you talk it through in confidence."
     },
     "howItWorks": {
       "steps": [

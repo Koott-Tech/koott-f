@@ -340,7 +340,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Burnout",
-      "subtitle": "Burnout can affect you differently depending on your mind, body, and daily life. Recognising these signs early can help you take the necessary steps towards burnout recovery."
+      "subtitle": "Burnout can affect you differently depending on your mind, body, and daily life. Recognising these signs early can help you take the necessary steps towards burnout recovery.",
+      "result": "You've ticked several signs of burnout. A Malayali psychologist can help you recover your energy and balance."
     },
     "howItWorks": {
       "steps": [

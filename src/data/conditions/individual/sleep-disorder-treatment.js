@@ -335,7 +335,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Sleep Disorder",
-      "subtitle": "You may not notice all of them right away, but if a few might feel familiar or keep recurring often, knowing about them is bound to be of great benefit to you."
+      "subtitle": "You may not notice all of them right away, but if a few might feel familiar or keep recurring often, knowing about them is bound to be of great benefit to you.",
+      "result": "You've ticked several signs of a sleep disorder. A Malayali psychologist can help you get back to restful sleep."
     },
     "howItWorks": {
       "steps": [

@@ -340,7 +340,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of PTSD",
-      "subtitle": "You may not experience all these symptoms, but knowing what you can identify early can assist you in seeking the correct treatment."
+      "subtitle": "You may not experience all these symptoms, but knowing what you can identify early can assist you in seeking the correct treatment.",
+      "result": "You've ticked several signs of PTSD. A Malayali psychologist can help you feel safe again, at your own pace."
     },
     "howItWorks": {
       "steps": [

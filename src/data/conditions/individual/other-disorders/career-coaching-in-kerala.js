@@ -331,7 +331,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Career Confusion",
-      "subtitle": "Career confusion can affect your clarity, confidence, and decision-making. Recognizing these signs can help you move forward with better direction."
+      "subtitle": "Career confusion can affect your clarity, confidence, and decision-making. Recognizing these signs can help you move forward with better direction.",
+      "result": "You've ticked several signs of career confusion. A Malayali psychologist can help you find a clear direction."
     },
     "howItWorks": {
       "steps": [

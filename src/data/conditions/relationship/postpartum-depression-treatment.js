@@ -315,7 +315,7 @@ export default {
           "title": "Feeling anxious"
         },
         {
-          "body": "You may feel sad or empty most of the day, even without a clear reason, and it may stay for long hours.",
+          "body": "Things you once enjoyed may no longer interest you, and it can be hard to find joy even in moments with your baby.",
           "title": "Lost interest"
         },
         {
@@ -340,7 +340,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Postpartum Depression",
-      "subtitle": "You may not feel all the signs, but if some seem familiar, it's helpful to be aware of them in order to seek proper support for postpartum depression."
+      "subtitle": "You may not feel all the signs, but if some seem familiar, it's helpful to be aware of them in order to seek proper support for postpartum depression.",
+      "result": "You've ticked several signs of postpartum depression. You're not alone, and a Malayali psychologist can help you feel like yourself again."
     },
     "howItWorks": {
       "steps": [

@@ -344,7 +344,7 @@ export default {
           "title": "Lack of Comfort"
         },
         {
-          "body": "You may start feel like less satisfied or less fulfilled and affect your overall experience in your relationship.",
+          "body": "You may start to feel less satisfied or fulfilled, affecting your overall experience in your relationship.",
           "title": "Reduced Satisfaction"
         },
         {
@@ -361,7 +361,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Sexual Intimacy Issues",
-      "subtitle": "Sexual intimacy concerns can affect both emotional and physical connection in a relationship. Recognizing these signs can help you take the right steps toward improvement."
+      "subtitle": "Sexual intimacy concerns can affect both emotional and physical connection in a relationship. Recognizing these signs can help you take the right steps toward improvement.",
+      "result": "You've ticked several signs of sexual intimacy issues. A Malayali psychologist can help, in complete confidence."
     },
     "howItWorks": {
       "steps": [

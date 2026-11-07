@@ -337,7 +337,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of LGBTQIA+ Related Challenges",
-      "subtitle": "LGBTQIA+ individuals may face unique emotional and social challenges. Recognizing these signs can help you seek the right support and care."
+      "subtitle": "LGBTQIA+ individuals may face unique emotional and social challenges. Recognizing these signs can help you seek the right support and care.",
+      "result": "You've ticked several signs that things feel heavy right now. A Malayali psychologist can support you without judgement."
     },
     "howItWorks": {
       "steps": [

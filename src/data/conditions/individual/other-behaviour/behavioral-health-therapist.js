@@ -309,7 +309,7 @@ export default {
     "symptoms": {
       "items": [
         {
-          "body": "You may constantly overthinking, worrying excessively and unable to relax mentally.",
+          "body": "You may constantly overthink, worrying excessively and unable to relax mentally.",
           "title": "Constant Overthinking"
         },
         {
@@ -346,7 +346,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Behavioral Health",
-      "subtitle": "Behavioural health issues can affect your thoughts, feelings, and actions. Understanding the red flags will make it easier for you to identify your behaviours and seek help accordingly."
+      "subtitle": "Behavioural health issues can affect your thoughts, feelings, and actions. Understanding the red flags will make it easier for you to identify your behaviours and seek help accordingly.",
+      "result": "You've ticked several signs that stress is affecting how you think and act. A Malayali psychologist can help."
     },
     "howItWorks": {
       "steps": [

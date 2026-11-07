@@ -302,7 +302,7 @@ export default {
           "title": "Reduced Emotions"
         },
         {
-          "body": "Your thoughts might be disorganised and difficult to articulate into logical speech and thought processes.",
+          "body": "You may see, hear or feel things that others around you do not, such as hearing voices.",
           "title": "Hallucinations"
         },
         {
@@ -322,7 +322,7 @@ export default {
           "title": "Unusual Behavior"
         },
         {
-          "body": "You might hold on to beliefs that have no basis in reality, despite someone explaining their absurdity to you.",
+          "body": "Your thoughts might be disorganised and hard to put into clear, logical speech, jumping from one idea to another.",
           "title": "Disorganized Thinking"
         },
         {
@@ -335,7 +335,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Schizophrenia",
-      "subtitle": "You may not notice all the signs at first, but if some resonate with you, you will know that it’s time to take action before they start affecting your life."
+      "subtitle": "You may not notice all the signs at first, but if some resonate with you, you will know that it’s time to take action before they start affecting your life.",
+      "result": "You've ticked several signs that can be linked to schizophrenia. Please talk to a mental health professional; a Malayali psychologist can guide your next steps."
     },
     "howItWorks": {
       "steps": [

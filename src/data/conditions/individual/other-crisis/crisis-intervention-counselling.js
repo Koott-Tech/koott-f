@@ -322,7 +322,7 @@ export default {
           "title": "Difficulty Functioning Daily"
         },
         {
-          "body": "Your thoughts feel scattered and confused, affecting your decision-making and problem-solving skills. over time.",
+          "body": "Your thoughts feel scattered and confused, affecting your decision-making and problem-solving skills.",
           "title": "Trouble Thinking Clearly"
         },
         {
@@ -334,8 +334,10 @@ export default {
           "title": "Sudden Mood Changes"
         }
       ],
-      "title": "Common Signs and Symptoms of Crisis Intervention",
-      "subtitle": "You may not notice all the signs at first, but recognizing them early can help you seek immediate support and prevent the situation from worsening."
+      "title": "Common Signs That You May Need Crisis Support",
+      "subtitle": "You may not notice all the signs at first, but recognizing them early can help you seek immediate support and prevent the situation from worsening.",
+      "result": "You don't have to handle this alone. If you feel unsafe or are thinking of harming yourself, please call a free 24x7 helpline now.",
+      "crisis": true
     },
     "howItWorks": {
       "steps": [

@@ -336,7 +336,8 @@ export default {
         }
       ],
       "title": "Common Signs You May Need Family Counselling",
-      "subtitle": "Family challenges can affect communication, emotions, and daily life. Recognising these signs can help you seek support at the right time."
+      "subtitle": "Family challenges can affect communication, emotions, and daily life. Recognising these signs can help you seek support at the right time.",
+      "result": "You've ticked several signs of family strain. A Malayali psychologist can help your family talk and heal together."
     },
     "howItWorks": {
       "steps": [

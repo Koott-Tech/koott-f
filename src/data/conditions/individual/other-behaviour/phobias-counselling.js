@@ -302,7 +302,7 @@ export default {
           "title": "Intense Fear"
         },
         {
-          "body": "You may experience fear, sweating, tremors, rapid heartbeat or breathlessness at moments of fear.",
+          "body": "You may experience sweating, trembling, a rapid heartbeat or breathlessness when you feel afraid.",
           "title": "Physical Reactions"
         },
         {
@@ -310,7 +310,7 @@ export default {
           "title": "Disruption in Routine"
         },
         {
-          "body": "This type of fear occurs when you encounter or think about a certain thing at any time.",
+          "body": "You go out of your way to avoid the object or situation you fear, even when it disrupts your plans or daily life.",
           "title": "Avoidance Behavior"
         },
         {
@@ -335,7 +335,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Phobias",
-      "subtitle": "You might not notice all the signs, but if any of these feel familiar to you, understanding them early can help you seek the right support."
+      "subtitle": "You might not notice all the signs, but if any of these feel familiar to you, understanding them early can help you seek the right support.",
+      "result": "You've ticked several signs of a phobia. A Malayali psychologist can help you face your fear step by step."
     },
     "howItWorks": {
       "steps": [

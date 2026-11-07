@@ -308,7 +308,7 @@ export default {
           "title": "Sleep Problems"
         },
         {
-          "body": "A person may feel like heavy, hopeless, withdrawn, or lose interest in activities you previously enjoyed.",
+          "body": "You may feel heavy, hopeless or withdrawn, or lose interest in activities you previously enjoyed.",
           "title": "Sadness or Low Mood"
         },
         {
@@ -325,7 +325,8 @@ export default {
         }
       ],
       "title": "Common Signs of Sexual Trauma",
-      "subtitle": "Sexual trauma can show up in many different ways, and the signs and symptoms are not necessarily the same for everyone. Some people experience emotional changes, while others feel more in their thoughts, body, sleep, or relationships."
+      "subtitle": "Sexual trauma can show up in many different ways, and the signs and symptoms are not necessarily the same for everyone. Some people experience emotional changes, while others feel more in their thoughts, body, sleep, or relationships.",
+      "result": "You've ticked several signs of sexual trauma. What happened was not your fault, and a Malayali psychologist can help you heal safely."
     },
     "howItWorks": {
       "steps": [

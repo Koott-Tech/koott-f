@@ -341,7 +341,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Poor Communication Skills",
-      "subtitle": "Communication difficulties can affect how you express yourself and connect with others. Recognizing these signs can help you improve."
+      "subtitle": "Communication difficulties can affect how you express yourself and connect with others. Recognizing these signs can help you improve.",
+      "result": "You've ticked several signs of communication difficulties. A Malayali psychologist can help you speak with confidence."
     },
     "howItWorks": {
       "steps": [

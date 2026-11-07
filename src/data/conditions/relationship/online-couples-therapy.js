@@ -351,7 +351,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Relationship Challenges",
-      "subtitle": "Relationship challenges can show up in different ways, affecting communication, emotions, and overall connection. Recognising these signs can help you take the first step toward support for relationship problems."
+      "subtitle": "Relationship challenges can show up in different ways, affecting communication, emotions, and overall connection. Recognising these signs can help you take the first step toward support for relationship problems.",
+      "result": "You've ticked several signs of relationship challenges. A Malayali psychologist can help you both reconnect."
     },
     "howItWorks": {
       "steps": [

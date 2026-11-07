@@ -339,7 +339,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Existential Crisis",
-      "subtitle": "You might not see all the signs together, but if some of them feel familiar, understanding them could help you get clarity and the right support."
+      "subtitle": "You might not see all the signs together, but if some of them feel familiar, understanding them could help you get clarity and the right support.",
+      "result": "You've ticked several signs of an existential crisis. A Malayali psychologist can help you find clarity and meaning."
     },
     "howItWorks": {
       "steps": [

@@ -310,7 +310,7 @@ export default {
           "title": "Difficulty Concentrating"
         },
         {
-          "body": "Anxiety is interfere with your ability to interact with other people disturbing your personal and professional life.",
+          "body": "Anxiety can interfere with your ability to interact with other people, disturbing your personal and professional life.",
           "title": "Impact on Relationships"
         },
         {
@@ -339,7 +339,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Anxiety",
-      "subtitle": "Anxiety can affect your thoughts, emotions, body, and daily life. Recognising these signs can help you seek the right support early."
+      "subtitle": "Anxiety can affect your thoughts, emotions, body, and daily life. Recognising these signs can help you seek the right support early.",
+      "result": "Seems you have signs of common stress, book a consultation now to feel better!"
     },
     "howItWorks": {
       "steps": [

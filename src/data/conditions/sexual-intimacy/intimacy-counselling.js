@@ -316,12 +316,13 @@ export default {
           "title": "Fear of Rejection"
         },
         {
-          "body": "You may sense something which is not right but feel like confused about how to express it or move forward.",
+          "body": "You may sense something which is not right but feel confused about how to express it or move forward.",
           "title": "Feeling Stuck"
         }
       ],
       "title": "Common Signs of Intimacy Concerns",
-      "subtitle": "Intimacy concerns often begin quietly, showing up as distance or discomfort. Recognizing these signs can help you understand what may be affecting your connection."
+      "subtitle": "Intimacy concerns often begin quietly, showing up as distance or discomfort. Recognizing these signs can help you understand what may be affecting your connection.",
+      "result": "You've ticked several signs of intimacy concerns. A Malayali psychologist can help, in complete confidence."
     },
     "howItWorks": {
       "steps": [

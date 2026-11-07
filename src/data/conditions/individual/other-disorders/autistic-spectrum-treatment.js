@@ -324,7 +324,7 @@ export default {
           "title": "Repetitive Behaviors"
         },
         {
-          "body": "You might experience difficulties any kind of change or adapting new habits, causing meltdown and frustration.",
+          "body": "You might experience difficulties with any kind of change or adapting to new habits, causing meltdown and frustration.",
           "title": "Difficulty with Change"
         },
         {
@@ -345,7 +345,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Autism Spectrum",
-      "subtitle": "Autism spectrum disorder can show up in various ways, depending on factors such as communication, behaviour, and daily functioning. Recognising these signs early can help you get the timely support."
+      "subtitle": "Autism spectrum disorder can show up in various ways, depending on factors such as communication, behaviour, and daily functioning. Recognising these signs early can help you get the timely support.",
+      "result": "You've ticked several signs often seen on the autism spectrum. A Malayali psychologist can help you understand them and find support."
     },
     "howItWorks": {
       "steps": [

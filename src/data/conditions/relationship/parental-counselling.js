@@ -326,7 +326,8 @@ export default {
         }
       ],
       "title": "Common Signs You May Need Parental Counselling",
-      "subtitle": "Parenting challenges can affect your thoughts, emotions and daily life. Being aware of these signs will enable you to get the proper assistance when required."
+      "subtitle": "Parenting challenges can affect your thoughts, emotions and daily life. Being aware of these signs will enable you to get the proper assistance when required.",
+      "result": "You've ticked several signs of parenting stress. A Malayali psychologist can help you feel more confident as a parent."
     },
     "howItWorks": {
       "steps": [

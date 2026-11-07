@@ -335,8 +335,8 @@ export default {
           "title": "Increased Tolerance"
         },
         {
-          "body": "You may continue the habit despite its adverse effects on your physical well-being, relationships, and life.",
-          "title": "Continued Use Despite Harm"
+          "body": "You may feel restless, irritable, anxious or unwell when you try to cut down or stop.",
+          "title": "Withdrawal Symptoms"
         },
         {
           "body": "You may no longer be interested in things you once found interesting and focus on more addictive behaviour.",
@@ -344,7 +344,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Addiction",
-      "subtitle": "Addiction can have an effect on your thoughts, behaviour, and daily functioning. Recognising these signs early can help you take the first step toward recovery."
+      "subtitle": "Addiction can have an effect on your thoughts, behaviour, and daily functioning. Recognising these signs early can help you take the first step toward recovery.",
+      "result": "You've ticked several signs of addiction. A Malayali psychologist can help you plan the first steps to recovery."
     },
     "howItWorks": {
       "steps": [

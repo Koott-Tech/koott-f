@@ -312,6 +312,10 @@ export default function ConditionPageTemplate({ data }) {
     { '--signs-glow': '#F6D9C4', '--tone-line': '#FEEEDC', '--tone-bg': '#FFFFFF', '--tone-ink': '#D97706', '--tone-soft': '#FEEEDC', '--tone-ico-line': '#D97706', '--tone-glow': 'rgba(239,180,121,.065)' },
   ];
   const signsStep = SIGNS_STEPS[Math.min(checked.length, SIGNS_STEPS.length - 1)];
+  /* Each page words its own result. The two crisis pages answer from the first
+     tick, with the helplines, since one sign there is already enough to act on. */
+  const crisisSigns = !!data.symptoms?.crisis;
+  const signsMany = crisisSigns || checked.length > 2;
 
   const screener = useMemo(() => screenerFor(data.slug), [data.slug]);
   const result = useMemo(
@@ -735,11 +739,21 @@ export default function ConditionPageTemplate({ data }) {
                   </svg>
                 </span>
                 <p>
-                  {checked.length <= 2
-                    ? `You ticked ${checked.length} of ${d.symptoms.items.length}. Recognising a sign or two is common and not a diagnosis.`
-                    : 'Seems you have signs of common stress, book a consultation now to feel better!'}
+                  {signsMany
+                    ? d.symptoms.result || 'Seems you have signs of common stress, book a consultation now to feel better!'
+                    : `You ticked ${checked.length} of ${d.symptoms.items.length}. Recognising a sign or two is common and not a diagnosis.`}
                 </p>
-                {checked.length > 2 && (
+                {crisisSigns && (
+                  <ul className="kct-signs-lines">
+                    {CRISIS_LINES.map((l) => (
+                      <li key={l.number}>
+                        <a href={`tel:${l.number.replace(/-/g, '')}`}>{l.name} {l.number}</a>
+                        <span>{l.note}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {signsMany && (
                   <BookButton href={d.hero.primaryCta.href}>Book a session</BookButton>
                 )}
               </div>
@@ -2148,6 +2162,15 @@ ${designCardCss('.kct')}
   height:32px;min-width:145px;margin-top:18px;padding:0 22px;border-radius:6px;
   font-size:14px!important;line-height:22px;
 }
+/* The helplines on the two crisis pages, between the message and the button. */
+.kct-signs-lines{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 28px;}
+.kct-signs-lines li{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.kct-signs-lines a{
+  font-family:var(--body)!important;font-size:16px!important;font-weight:600!important;
+  line-height:24px!important;color:#9A3B28!important;text-decoration:none;
+}
+.kct-signs-lines a:hover{text-decoration:underline;}
+.kct-signs-lines span{font-size:12px!important;line-height:18px!important;color:var(--t-soft)!important;}
 .kct-sign-t,.kct-sign-t:not(#_){
   font-family:var(--body)!important;font-size:18px!important;font-weight:600!important;
   line-height:26px!important;color:var(--t-primary)!important;

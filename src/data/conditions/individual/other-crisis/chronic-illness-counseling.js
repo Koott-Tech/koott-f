@@ -315,7 +315,7 @@ export default {
           "title": "Appetite Changes"
         },
         {
-          "body": "You may feel constant pain or physical discomfort that affects your which tend to bound your daily functioning.",
+          "body": "You may feel constant pain or physical discomfort that limits your daily functioning.",
           "title": "Ongoing Pain"
         },
         {
@@ -335,12 +335,13 @@ export default {
           "title": "Reduced Mobility"
         },
         {
-          "body": "Your condition affect work, relationships, and other responsibilities, making it hard to maintain a balanced lifestyle.",
+          "body": "Your condition affects work, relationships, and other responsibilities, making it hard to maintain a balanced lifestyle.",
           "title": "Impact on Daily Life"
         }
       ],
       "title": "Common Signs and Symptoms of Chronic Illness",
-      "subtitle": "Chronic illness affects both your physical and mental health over the period of time. Noticing these signs early can help you understand your condition and seek the right emotional support."
+      "subtitle": "Chronic illness affects both your physical and mental health over the period of time. Noticing these signs early can help you understand your condition and seek the right emotional support.",
+      "result": "You've ticked several signs that your illness is weighing on you. A Malayali psychologist can help you cope."
     },
     "howItWorks": {
       "steps": [

@@ -305,7 +305,7 @@ export default {
           "title": "Constant Conflict"
         },
         {
-          "body": "You may feel unsure, insecure, and distrustful, which may affect your safety in the relationship due past experience..",
+          "body": "You may feel unsure, insecure, and distrustful, which may affect your safety in the relationship due to past experiences.",
           "title": "Loss of Trust"
         },
         {
@@ -338,7 +338,8 @@ export default {
         }
       ],
       "title": "Common Signs You May Need Divorce Counselling",
-      "subtitle": "Certain patterns in a relationship can indicate deeper issues. Observing such signs will assist you in making wise decisions about your marriage."
+      "subtitle": "Certain patterns in a relationship can indicate deeper issues. Observing such signs will assist you in making wise decisions about your marriage.",
+      "result": "You've ticked several signs that your marriage is under strain. A Malayali psychologist can help you decide your next step clearly."
     },
     "howItWorks": {
       "steps": [

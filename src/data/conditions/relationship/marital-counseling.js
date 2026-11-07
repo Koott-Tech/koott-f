@@ -341,7 +341,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Marital Struggles",
-      "subtitle": "If your marriage is quietly sliding away, these are common signs that are probably all too familiar to you, and let's identify them together so we can take that first step on the road to recovery and hope."
+      "subtitle": "If your marriage is quietly sliding away, these are common signs that are probably all too familiar to you, and let's identify them together so we can take that first step on the road to recovery and hope.",
+      "result": "You've ticked several signs of marital struggles. A Malayali psychologist can help you reconnect."
     },
     "howItWorks": {
       "steps": [

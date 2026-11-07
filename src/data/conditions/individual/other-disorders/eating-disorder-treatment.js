@@ -372,7 +372,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of an Eating Disorder",
-      "subtitle": "You may not experience all these signs. But if any of these symptoms feel familiar, recognising them early can help you seek the right online eating disorder treatment and support from qualified therapists."
+      "subtitle": "You may not experience all these signs. But if any of these symptoms feel familiar, recognising them early can help you seek the right online eating disorder treatment and support from qualified therapists.",
+      "result": "You've ticked several signs of an eating disorder. A Malayali psychologist can help you build a kinder relationship with food."
     },
     "howItWorks": {
       "steps": [

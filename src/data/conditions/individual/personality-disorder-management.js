@@ -330,12 +330,13 @@ export default {
           "title": "Difficulty Trusting Others"
         },
         {
-          "body": "You may feel strong feeling of anger at times and find it hard to control or mmanage it calmly.",
+          "body": "You may feel strong feeling of anger at times and find it hard to control or manage it calmly.",
           "title": "Trouble Managing Anger"
         }
       ],
       "title": "Common Signs and Symptoms of Personality Disorder",
-      "subtitle": "You may not possibly notice all these signs, but the more familiar they are, the earlier you will receive proper counselling through licensed Malayali Psychologists."
+      "subtitle": "You may not possibly notice all these signs, but the more familiar they are, the earlier you will receive proper counselling through licensed Malayali Psychologists.",
+      "result": "You've ticked several signs linked to personality disorders. A Malayali psychologist can help you build steadier emotions and relationships."
     },
     "howItWorks": {
       "steps": [

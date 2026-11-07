@@ -344,7 +344,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of ADHD",
-      "subtitle": "ADHD can affect concentration, behaviour, and daily life functioning. Recognising these signs can help you take the necessary steps for support."
+      "subtitle": "ADHD can affect concentration, behaviour, and daily life functioning. Recognising these signs can help you take the necessary steps for support.",
+      "result": "You've ticked several signs often seen with ADHD. A Malayali psychologist can help you understand them and find ways to cope."
     },
     "howItWorks": {
       "steps": [

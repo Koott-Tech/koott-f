@@ -312,7 +312,7 @@ export default {
           "title": "Loss of Interest"
         },
         {
-          "body": "Loss of appetite or sleep disturbance, such as sleeping too much, not enough, or not at all, leaving you tired and restless.",
+          "body": "Sleeping too much, too little or not at all, often along with changes in appetite, leaving you tired and restless.",
           "title": "Changes in Sleep"
         },
         {
@@ -341,7 +341,9 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Suicidal Tendencies",
-      "subtitle": "Noticing the signs of suicidal tendencies is essential for getting timely support. Awareness can help you or a loved one seek help before the situation escalates."
+      "subtitle": "Noticing the signs of suicidal tendencies is essential for getting timely support. Awareness can help you or a loved one seek help before the situation escalates.",
+      "result": "You don't have to go through this alone. If you are thinking about ending your life, please call a free 24x7 helpline now, or reach out to someone you trust.",
+      "crisis": true
     },
     "howItWorks": {
       "steps": [

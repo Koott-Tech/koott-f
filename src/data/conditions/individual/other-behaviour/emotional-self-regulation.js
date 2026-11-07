@@ -312,7 +312,7 @@ export default {
     "symptoms": {
       "items": [
         {
-          "body": "You may struggle with experiencing intense emotions when you find yourself in certain situations that triggers you.",
+          "body": "You may struggle with experiencing intense emotions when you find yourself in certain situations that trigger you.",
           "title": "Intense Emotional Reactions"
         },
         {
@@ -349,7 +349,8 @@ export default {
         }
       ],
       "title": "Common Signs and Symptoms of Emotional Self-Regulation",
-      "subtitle": "Emotional self-regulation challenges can affect how you think, feel, and respond in daily situations. Recognizing these signs can help you take steps toward better control."
+      "subtitle": "Emotional self-regulation challenges can affect how you think, feel, and respond in daily situations. Recognizing these signs can help you take steps toward better control.",
+      "result": "You've ticked several signs of difficulty managing emotions. A Malayali psychologist can help you find calmer ways to respond."
     },
     "howItWorks": {
       "steps": [
