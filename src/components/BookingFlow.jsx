@@ -370,6 +370,9 @@ export default function BookingFlow({ slug }) {
     setSlot({ date: d, time: t, startsAt });
     setDay(key);
     setMonth(new Date(local.getFullYear(), local.getMonth(), 1));
+    // The profile page's list can be minutes old: check the time is still free once
+    // this month's times load (same check as a resumed draft).
+    setVerifyRestoredSlot(true);
     // The profile widget can also carry the plan: then only "About yourself" is
     // left to ask. The plan itself is matched once this therapist's packages load,
     // and the step falls back to 2 if that plan has since been withdrawn.
@@ -419,6 +422,53 @@ export default function BookingFlow({ slug }) {
       .finally(() => { if (!off) setDaysBusy(false); });
     return () => { off = true; };
   }, [therapist, month, kind, tz]);
+
+  // Other people book too. While this page is open the free times are re-read every
+  // 30 s and whenever the tab comes back into view, quietly (no "checking…" flicker),
+  // so a time someone else just took disappears from the calendar. A time this
+  // visitor already picked is checked below.
+  const [liveTick, setLiveTick] = useState(0);
+  useEffect(() => {
+    const bump = () => { if (document.visibilityState === 'visible') setLiveTick((n) => n + 1); };
+    const timer = setInterval(bump, 30 * 1000);
+    document.addEventListener('visibilitychange', bump);
+    window.addEventListener('focus', bump);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', bump);
+      window.removeEventListener('focus', bump);
+    };
+  }, []);
+  const [liveChecked, setLiveChecked] = useState(0);       // bumps after each quiet re-read
+  useEffect(() => {
+    if (!therapist || !liveTick || daysBusy || paying || confirming || booked) return undefined;
+    let off = false;
+    const from = ymd(new Date(month.getFullYear(), month.getMonth(), 1));
+    const to = ymd(new Date(month.getFullYear(), month.getMonth() + 1, 0));
+    fetchSlots(API, therapist.id, from, to, kind, tz)
+      .then((map) => { if (!off) { setOpenDays(map); setLiveChecked((n) => n + 1); } })
+      .catch(() => { /* keep what is shown; the next tick tries again */ });
+    return () => { off = true; };
+  }, [liveTick]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The time this visitor picked was taken by someone else after a re-read: back to
+  // the calendar with the "just booked" notice and the nearest free time. Only judged
+  // when the loaded month holds that day (otherwise the list says nothing about it).
+  useEffect(() => {
+    if (!liveChecked || !slot || !day || step < 2 || paying || confirming || booked || slotNotice) return;
+    const local = fromYmd(day);
+    if (local.getFullYear() !== month.getFullYear() || local.getMonth() !== month.getMonth()) return;
+    const stillFree = (openDays[day] || []).some(
+      (s) => new Date(s.startsAt).getTime() === new Date(slot.startsAt).getTime(),
+    );
+    if (!stillFree) {
+      setLostSlot(slot);
+      setSlot(null);
+      setSlotSuggestion(null);
+      setStep(1);
+      setSlotNotice('taken');
+    }
+  }, [liveChecked]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ---------------------------- derived --------------------------------- */
 
@@ -629,9 +679,23 @@ export default function BookingFlow({ slug }) {
       setPayStage(null); // Razorpay's own window is up
     } catch (e) {
       track('booking_step_error', { step: 'review', code: /slot/i.test(e?.message || '') ? 'slot_taken' : 'order_failed' });
-      setPayErr(e?.message || 'We could not start the payment. Please try again.');
       setPaying(false);
       setPayStage(null);
+      // Someone else took the time a moment ago (the server checks before any money
+      // moves): back to the calendar with the nearest free time, not a dead-end error.
+      if (/no longer available|already booked|just booked/i.test(e?.message || '') && slot) {
+        const lostAt = new Date(slot.startsAt).getTime();
+        setOpenDays((prev) => Object.fromEntries(
+          Object.entries(prev).map(([k, list]) => [k, list.filter((s) => new Date(s.startsAt).getTime() !== lostAt)]),
+        ));
+        setLostSlot(slot);
+        setSlot(null);
+        setSlotSuggestion(null);
+        setStep(1);
+        setSlotNotice('taken');
+        return;
+      }
+      setPayErr(e?.message || 'We could not start the payment. Please try again.');
       // Verification lapsed (token older than 2 h): ask for the number again.
       if (/verify your mobile/i.test(e?.message || '')) forgetVerified();
     }

@@ -179,11 +179,11 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
   };
 
   // EXACT same availability fetching as therapist profile
-  const fetchPsychologistAvailability = async () => {
+  const fetchPsychologistAvailability = async ({ quiet = false } = {}) => {
     if (!session?.psychologist_id) return;
 
     try {
-      setLoadingAvailability(true);
+      if (!quiet) setLoadingAvailability(true); // background refreshes don't flash "loading"
       
       // Check if this is a free assessment session
       if (session.session_type === 'free_assessment') {
@@ -298,6 +298,17 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
       fetchPsychologistAvailability();
     }
   }, [isOpen, session, currentDate]);
+
+  // Others book while this is open: re-read the free times every 30 s and when the
+  // tab comes back, so a time someone just took drops out of the list. (The server
+  // still refuses a taken time on Save.)
+  useEffect(() => {
+    if (!isOpen || !session) return undefined;
+    const refresh = () => { if (document.visibilityState === 'visible') fetchPsychologistAvailability({ quiet: true }); };
+    const timer = setInterval(refresh, 30 * 1000);
+    document.addEventListener('visibilitychange', refresh);
+    return () => { clearInterval(timer); document.removeEventListener('visibilitychange', refresh); };
+  }, [isOpen, session, currentDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Check if reschedule requires approval
   const checkIfRequiresApproval = () => {

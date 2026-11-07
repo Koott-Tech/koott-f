@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import AdminFreeTimes, { kindForPackageType } from '@/components/admin/AdminFreeTimes';
 import { 
   Calendar, 
   Clock, 
@@ -459,79 +460,57 @@ export default function AdminRescheduleModal({
                     <div className="text-sm text-gray-400 py-8">Select a date first.</div>
                   ) : (
                     <div className="space-y-4">
-                      {/* Free starts for this session's length (IST). Admins can still
-                          set any time below; the server blocks only overlaps. */}
-                      {(() => {
-                        const free = psychologistAvailability[selectedDate]?.available_slots || [];
-                        return (
-                          <div>
-                            <div className="text-xs font-medium text-gray-600 mb-2">
-                              Free starts (IST · {durationMinutes} min + 10 min break)
-                            </div>
-                            {free.length ? (
-                              <div className="flex flex-wrap gap-2">
-                                {free.map((label) => {
-                                  const hhmm = convertTo24Hour(label).slice(0, 5);
-                                  return (
-                                    <button
-                                      key={label} type="button"
-                                      onClick={() => setSelectedTime(hhmm)}
-                                      className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${
-                                        selectedTime === hhmm
-                                          ? 'bg-[#025545] text-white border-[#025545]'
-                                          : 'bg-white text-gray-800 border-gray-200 hover:border-[#025545]'
-                                      }`}
-                                    >
-                                      {label}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            ) : (
-                              <div className="text-xs text-gray-400">No free starts in the therapist&apos;s hours that day.</div>
-                            )}
-                          </div>
-                        );
-                      })()}
+                      {/* The therapist's real free starts for this session's length (IST), with
+                          this session's own slot counted as free and refreshed while open.
+                          "Custom time" keeps the manual picker; the server blocks only overlaps. */}
+                      <AdminFreeTimes
+                        psychologistId={session.psychologist_id}
+                        date={selectedDate}
+                        kind={kindForPackageType(session.package?.package_type, session.session_type)}
+                        excludeSessionId={session.id}
+                        value={selectedTime}
+                        onChange={(t) => setSelectedTime(t)}
+                      >
                       <div className="grid grid-cols-3 gap-3">
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Hour</label>
-                          <select
-                            value={selectedHour12}
-                            onChange={(e) => setHourMinuteAmPm(e.target.value, selectedMinute, selectedAmPm)}
-                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
-                          >
-                            <option value="">HH</option>
-                            {hours12.map((hour) => (
-                              <option key={hour} value={hour}>{hour}</option>
-                            ))}
-                          </select>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Hour</label>
+                            <select
+                              value={selectedHour12}
+                              onChange={(e) => setHourMinuteAmPm(e.target.value, selectedMinute, selectedAmPm)}
+                              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                            >
+                              <option value="">HH</option>
+                              {hours12.map((hour) => (
+                                <option key={hour} value={hour}>{hour}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Minute</label>
+                            <select
+                              value={selectedMinute}
+                              onChange={(e) => setHourMinuteAmPm(selectedHour12 || '12', e.target.value, selectedAmPm)}
+                              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                            >
+                              <option value="">MM</option>
+                              {minutes.map((minute) => (
+                                <option key={minute} value={minute}>{minute}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">AM / PM</label>
+                            <select
+                              value={selectedAmPm}
+                              onChange={(e) => setHourMinuteAmPm(selectedHour12 || '12', selectedMinute, e.target.value)}
+                              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                            >
+                              <option value="AM">AM</option>
+                              <option value="PM">PM</option>
+                            </select>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Minute</label>
-                          <select
-                            value={selectedMinute}
-                            onChange={(e) => setHourMinuteAmPm(selectedHour12 || '12', e.target.value, selectedAmPm)}
-                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
-                          >
-                            <option value="">MM</option>
-                            {minutes.map((minute) => (
-                              <option key={minute} value={minute}>{minute}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">AM / PM</label>
-                          <select
-                            value={selectedAmPm}
-                            onChange={(e) => setHourMinuteAmPm(selectedHour12 || '12', selectedMinute, e.target.value)}
-                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
-                          >
-                            <option value="AM">AM</option>
-                            <option value="PM">PM</option>
-                          </select>
-                        </div>
-                      </div>
+                      </AdminFreeTimes>
 
                       <div className="text-xs text-gray-500">
                         Session duration: <span className="font-semibold text-gray-700">{formatDurationLabel(durationMinutes)}</span>

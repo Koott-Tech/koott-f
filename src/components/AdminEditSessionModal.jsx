@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import AdminFreeTimes, { kindForPackageType } from '@/components/admin/AdminFreeTimes';
 import { X, Loader2, DollarSign, CreditCard, Save, User, UserCheck, Calendar, Clock, Tag, CheckCircle, AlertCircle, Search, RefreshCw } from 'lucide-react';
 import { adminApi } from '@/lib/backendApi';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -625,6 +626,20 @@ export default function AdminEditSessionModal({
                   </div>
                 </div>
               </div>
+              {/* The therapist's real free starts that day (IST, this session counted as free) */}
+              {psychologistId && scheduledDate && (
+                <div className="mt-4">
+                  <AdminFreeTimes
+                    suggestionsOnly
+                    psychologistId={psychologistId}
+                    date={scheduledDate}
+                    kind={kindForPackageType(session?.package?.package_type, sessionType || session?.session_type)}
+                    excludeSessionId={session?.id}
+                    value={scheduledTime}
+                    onChange={(t) => setScheduledTime(t)}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Session Type and Package Details Group */}

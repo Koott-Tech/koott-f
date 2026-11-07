@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import AdminFreeTimes, { kindForPackageType } from '@/components/admin/AdminFreeTimes';
 import { 
   Calendar, 
   Clock, 
@@ -84,6 +85,19 @@ const MANUAL_SESSION_TYPE_OPTIONS = [
 ];
 // Types whose size the admin types in (e.g. a package of 5).
 const CUSTOM_PACKAGE_TYPES = new Set(['package_custom', 'couple_package_custom']);
+
+// Package rows keep hour / minute / AM-PM; AdminFreeTimes speaks 'HH:MM' (24 h, IST).
+const rowTime24 = (row) => {
+  if (!row?.hour) return '';
+  let h = parseInt(row.hour, 10) % 12;
+  if ((row.ampm || 'AM') === 'PM') h += 12;
+  return `${String(h).padStart(2, '0')}:${row.minute || '00'}`;
+};
+const rowFromTime24 = (t) => {
+  if (!t) return { hour: '', minute: '00', ampm: 'AM' };
+  const [hh, mm] = t.split(':').map(Number);
+  return { hour: String(hh % 12 || 12).padStart(2, '0'), minute: String(mm).padStart(2, '0'), ampm: hh >= 12 ? 'PM' : 'AM' };
+};
 const MANUAL_SESSION_STAGE_OPTIONS = [
   { value: 'first', label: 'First Session' },
   { value: 'follow_up', label: 'Follow-up' },
@@ -1530,34 +1544,44 @@ export default function AdminManualBookingModal({
                   {packageSchedules.map((row, idx) => (
                     <div key={idx} className="rounded-lg border border-slate-200 bg-white p-3">
                       <div className="text-[11px] font-bold text-[#025545] uppercase tracking-wide mb-2">Session {idx + 1}</div>
-                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                      <div className="space-y-2">
                         <CompactDatePicker
                           value={row.date || ''}
                           onChange={(d) => setPackageSchedules((p) => p.map((r, i) => i === idx ? { ...r, date: d } : r))}
                         />
-                        <select
-                          value={row.hour || ''}
-                          onChange={(e) => setPackageSchedules((p) => p.map((r, i) => i === idx ? { ...r, hour: e.target.value } : r))}
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                        <AdminFreeTimes
+                          psychologistId={psychologistId}
+                          date={row.date || ''}
+                          kind={kindForPackageType(effectiveSessionType)}
+                          value={rowTime24(row)}
+                          onChange={(t) => setPackageSchedules((p) => p.map((r, i) => i === idx ? { ...r, ...rowFromTime24(t) } : r))}
                         >
-                          <option value="">Hour</option>
-                          {HOURS_12.map((h) => <option key={h} value={h}>{h}</option>)}
-                        </select>
+                          <div className="grid grid-cols-3 gap-2">
                         <select
-                          value={row.minute || '00'}
-                          onChange={(e) => setPackageSchedules((p) => p.map((r, i) => i === idx ? { ...r, minute: e.target.value } : r))}
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
-                        >
-                          {MANUAL_BOOKING_MINUTES.map((m) => <option key={m} value={m}>{m} min</option>)}
-                        </select>
-                        <select
-                          value={row.ampm || 'AM'}
-                          onChange={(e) => setPackageSchedules((p) => p.map((r, i) => i === idx ? { ...r, ampm: e.target.value } : r))}
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
-                        >
-                          <option value="AM">AM</option>
-                          <option value="PM">PM</option>
-                        </select>
+                              value={row.hour || ''}
+                              onChange={(e) => setPackageSchedules((p) => p.map((r, i) => i === idx ? { ...r, hour: e.target.value } : r))}
+                              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                            >
+                              <option value="">Hour</option>
+                              {HOURS_12.map((h) => <option key={h} value={h}>{h}</option>)}
+                            </select>
+                            <select
+                              value={row.minute || '00'}
+                              onChange={(e) => setPackageSchedules((p) => p.map((r, i) => i === idx ? { ...r, minute: e.target.value } : r))}
+                              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                            >
+                              {MANUAL_BOOKING_MINUTES.map((m) => <option key={m} value={m}>{m} min</option>)}
+                            </select>
+                            <select
+                              value={row.ampm || 'AM'}
+                              onChange={(e) => setPackageSchedules((p) => p.map((r, i) => i === idx ? { ...r, ampm: e.target.value } : r))}
+                              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                            >
+                              <option value="AM">AM</option>
+                              <option value="PM">PM</option>
+                            </select>
+                          </div>
+                        </AdminFreeTimes>
                       </div>
                     </div>
                   ))}
@@ -1733,49 +1757,59 @@ export default function AdminManualBookingModal({
                 {selectedDateObj && (
                   <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4">
                     <div className="text-sm font-semibold text-gray-900 mb-4">Time</div>
+                    {/* The therapist's real free starts for this session length (IST), refreshed
+                        while open; "Custom time" keeps the manual picker for off-grid times. */}
+                    <AdminFreeTimes
+                      psychologistId={psychologistId}
+                      date={selectedDateObj ? `${selectedDateObj.getFullYear()}-${String(selectedDateObj.getMonth() + 1).padStart(2, '0')}-${String(selectedDateObj.getDate()).padStart(2, '0')}` : ''}
+                      kind={kindForPackageType(effectiveSessionType)}
+                      value={selectedTime}
+                      onChange={(t) => setSelectedTime(t)}
+                    >
                     <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Hour</label>
-                        <select
-                          value={selectedHour}
-                          onChange={(e) => handleManualHourChange(e.target.value)}
-                          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
-                        >
-                          <option value="">HH</option>
-                          {HOURS_12.map((hour) => (
-                            <option key={hour} value={hour}>
-                              {hour}
-                            </option>
-                          ))}
-                        </select>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Hour</label>
+                          <select
+                            value={selectedHour}
+                            onChange={(e) => handleManualHourChange(e.target.value)}
+                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                          >
+                            <option value="">HH</option>
+                            {HOURS_12.map((hour) => (
+                              <option key={hour} value={hour}>
+                                {hour}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Minute</label>
+                          <select
+                            value={selectedMinute}
+                            onChange={(e) => handleManualMinuteChange(e.target.value)}
+                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                          >
+                            <option value="">MM</option>
+                            {MANUAL_BOOKING_MINUTES.map((minute) => (
+                              <option key={minute} value={minute}>
+                                {minute}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">AM / PM</label>
+                          <select
+                            value={selectedAmPm}
+                            onChange={(e) => handleManualAmPmChange(e.target.value)}
+                            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
+                          >
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                          </select>
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Minute</label>
-                        <select
-                          value={selectedMinute}
-                          onChange={(e) => handleManualMinuteChange(e.target.value)}
-                          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
-                        >
-                          <option value="">MM</option>
-                          {MANUAL_BOOKING_MINUTES.map((minute) => (
-                            <option key={minute} value={minute}>
-                              {minute}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">AM / PM</label>
-                        <select
-                          value={selectedAmPm}
-                          onChange={(e) => handleManualAmPmChange(e.target.value)}
-                          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:border-[#025545] focus:outline-none focus:ring-2 focus:ring-[#025545]/15"
-                        >
-                          <option value="AM">AM</option>
-                          <option value="PM">PM</option>
-                        </select>
-                      </div>
-                    </div>
+                    </AdminFreeTimes>
                     {selectedTime && (
                       <div className="mt-4 rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-2 text-sm text-emerald-800">
                         {selectedDateObj.toLocaleDateString('en-IN', {
@@ -1791,7 +1825,7 @@ export default function AdminManualBookingModal({
 
                 {!selectedDateObj && (
                   <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm text-center">
-                    Select a date, then choose the session time manually
+                    Select a date to see the therapist's available times
                   </div>
                 )}
               </div>

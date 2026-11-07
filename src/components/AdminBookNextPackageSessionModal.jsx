@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, CalendarDays, Clock, User, UserCheck, Package, Loader2, ChevronLeft, ChevronRight, Timer } from 'lucide-react';
 import { adminApi } from '@/lib/backendApi';
 import { useNotification } from '@/contexts/NotificationContext';
+import AdminFreeTimes, { kindForPackageType } from '@/components/admin/AdminFreeTimes';
 
 function normRel(r) {
   return (Array.isArray(r) ? r[0] : r) ?? null;
@@ -51,7 +52,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
   const [selectedDateObj, setSelectedDateObj] = useState(null);
 
   // Time picker
-  const [hour, setHour] = useState('10');
+  const [hour, setHour] = useState(''); // '' = no time picked yet
   const [minute, setMinute] = useState('00');
   const [ampm, setAmpm] = useState('AM');
 
@@ -73,7 +74,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
   useEffect(() => {
     if (!isOpen) return;
     setSelectedDateObj(null);
-    setHour('10');
+    setHour('');
     setMinute('00');
     setAmpm('AM');
     setError(null);
@@ -92,6 +93,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDateObj) { setError('Please select a date.'); return; }
+    if (!hour) { setError('Please pick a time.'); return; }
     if (!clientId || !packageId) { setError('Missing client or package information.'); return; }
 
     setError(null);
@@ -131,6 +133,22 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
   const selectedDateStr = selectedDateObj
     ? selectedDateObj.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     : null;
+
+  // AdminFreeTimes speaks 'HH:MM' (24 h, IST); this form keeps hour / minute / AM-PM.
+  const time24 = hour ? buildTime24(hour, minute, ampm).slice(0, 5) : '';
+  const setFromTime24 = (t) => {
+    if (!t) { setHour(''); return; }
+    const [hh, mm] = t.split(':').map(Number);
+    setHour(String(hh % 12 || 12));
+    setMinute(String(mm).padStart(2, '0'));
+    setAmpm(hh >= 12 ? 'PM' : 'AM');
+  };
+  const selectedDateKey = selectedDateObj
+    ? `${selectedDateObj.getFullYear()}-${String(selectedDateObj.getMonth() + 1).padStart(2, '0')}-${String(selectedDateObj.getDate()).padStart(2, '0')}`
+    : '';
+  // Free starts for this length: 80 min and up is the couple grid, else the package's own.
+  const freeKind = duration >= 80 ? 'couple' : kindForPackageType(pkg.package_type, session?.session_type);
+  const psychologistIdForSlots = session?.psychologist_id ?? normRel(session?.psychologist)?.id;
 
   const selectCls = 'w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#025545]/30 focus:border-[#025545] appearance-none';
 
@@ -240,6 +258,15 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
             </div>
             <div className="p-4 space-y-4">
 
+              {/* The therapist's real free starts for this length (IST), refreshed while
+                  open; "Custom time" keeps the manual picker. The server blocks overlaps. */}
+              <AdminFreeTimes
+                psychologistId={psychologistIdForSlots}
+                date={selectedDateKey}
+                kind={freeKind}
+                value={time24}
+                onChange={setFromTime24}
+              >
               {/* Time row */}
               <div className="flex items-end gap-2">
                 {/* Hour */}
@@ -247,6 +274,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
                   <label className="block text-xs text-slate-500 mb-1">Hour</label>
                   <div className="relative">
                     <select value={hour} onChange={(e) => setHour(e.target.value)} className={selectCls}>
+                      <option value="">HH</option>
                       {HOURS.map((h) => <option key={h} value={h}>{h}</option>)}
                     </select>
                   </div>
@@ -278,6 +306,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
                   </div>
                 </div>
               </div>
+              </AdminFreeTimes>
 
               {/* Duration row */}
               <div>
@@ -300,7 +329,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
               {/* Preview */}
               <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2 text-xs text-slate-600 flex items-center justify-between">
                 <span>Start</span>
-                <span className="font-semibold text-slate-800">{hour}:{minute} {ampm}</span>
+                <span className="font-semibold text-slate-800">{hour ? `${hour}:${minute} ${ampm}` : '—'}</span>
                 <span>·</span>
                 <span>Duration</span>
                 <span className="font-semibold text-slate-800">{duration} min</span>
@@ -318,7 +347,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
               className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 text-sm font-medium">
               Cancel
             </button>
-            <button type="submit" disabled={submitting || !selectedDateObj}
+            <button type="submit" disabled={submitting || !selectedDateObj || !hour}
               className="px-4 py-2 bg-[#025545] text-white rounded-lg hover:bg-[#012f23] disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium flex items-center gap-2">
               {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Booking…</> : 'Book next session'}
             </button>
