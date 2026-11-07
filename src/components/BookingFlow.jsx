@@ -601,7 +601,10 @@ export default function BookingFlow({ slug }) {
         amount: o.amountInPaise,
         currency: o.currency || 'INR',
         name: 'Koott',
-        description: `${plan.name} with ${name}`,
+        // Without this Razorpay shows the logo saved on the Razorpay account (the test
+        // account still has the old Little Care one).
+        image: `${window.location.origin}/favicon-512.png`,
+        description: `${plan.name || TYPE_LABEL[kind]} with ${name}`,
         prefill: { name: about.name, email: about.email, contact: verified?.phone || accountPhone || '' },
         notes: o.notes || {},
         theme: { color: '#189E4F' },
@@ -632,7 +635,7 @@ export default function BookingFlow({ slug }) {
       // Verification lapsed (token older than 2 h): ask for the number again.
       if (/verify your mobile/i.test(e?.message || '')) forgetVerified();
     }
-  }, [isAuthenticated, user, therapist, slot, plan, about, name, tz, verified, accountPhone]);
+  }, [isAuthenticated, user, therapist, slot, plan, about, name, tz, verified, accountPhone, kind]);
 
   /* ----------------------------- analytics ------------------------------ */
   // booking_started once the therapist is known; then one event per screen

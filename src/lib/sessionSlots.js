@@ -8,6 +8,8 @@
  * time on each slot for booking.
  */
 
+import { getStoredToken } from '@/lib/authStorage';
+
 export const IST = 'Asia/Kolkata';
 export const SESSION_MINUTES = { individual: 50, couple: 80, psychiatry_15: 15, psychiatry_30: 30 };
 export const SESSION_LENGTH_LABEL = {
@@ -110,9 +112,14 @@ export function sameAsIst(tz) {
  * still the evening of the 31st in the Americas.
  */
 export async function fetchSlots(api, psychologistId, fromKey, toKey, kind, tz) {
+  // Signed in: the server leaves this client's own payment hold out, so a time they
+  // were paying for (window closed, page reloaded) still shows as theirs to book.
+  let token = null;
+  try { token = getStoredToken(); } catch (_) { /* storage blocked */ }
   const res = await fetch(
     `${api}/availability/public/psychologist/${psychologistId}/slots`
       + `?startDate=${addDays(fromKey, -1)}&endDate=${addDays(toKey, 1)}&type=${kind}`,
+    token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
   );
   if (!res.ok) throw new Error(`Slots request failed (${res.status})`);
   const json = await res.json();
