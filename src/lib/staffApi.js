@@ -63,6 +63,7 @@ export const leadsApi = {
   convert: (id, body = {}) => staffFetch(`/leads/${id}/convert`, { method: 'POST', body }),
   sources: (query) => staffFetch('/leads/sources', { query }),
   viewed: (id) => staffFetch(`/leads/${id}/viewed`, { method: 'POST' }),
+  contact: (id, channel) => staffFetch(`/leads/${id}/contact`, { method: 'POST', body: { channel } }),
   accessLog: (query) => staffFetch('/leads/access-log', { query }),
 };
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDashBase } from '@/lib/dashBase';
 import { useAuth } from '@/contexts/AuthContext';
 import { adminApi } from '@/lib/backendApi';
 import { Eye, Edit, Trash2, MoreVertical } from 'lucide-react';
@@ -16,6 +17,7 @@ import {
 export default function AssessmentsAdminPage() {
   const { isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const dashBase = useDashBase();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -25,7 +27,7 @@ export default function AssessmentsAdminPage() {
   useEffect(() => {
     if (!authLoading) {
       if (!isAuthenticated()) return router.push('/');
-      if (!hasRole('admin') && !hasRole('superadmin')) return router.push('/profile');
+      if (!hasRole('admin') && !hasRole('superadmin') && !hasRole('marketing')) return router.push('/profile');
       fetchRows();
     }
   }, [authLoading]);
@@ -85,7 +87,7 @@ export default function AssessmentsAdminPage() {
           <h5 className="font-bold text-gray-900">Assessments</h5>
           <p className="text-gray-600 mt-2">Manage assessment pages and content</p>
         </div>
-        <button onClick={() => router.push('/admin/assessments/create')} className="bg-[#189e4f] text-white px-6 py-3 rounded-lg hover:bg-[#189e4f]">Create New</button>
+        <button onClick={() => router.push(`${dashBase}/assessments/create`)} className="bg-[#189e4f] text-white px-6 py-3 rounded-lg hover:bg-[#189e4f]">Create New</button>
       </div>
 
       {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">{error}</div>}
@@ -146,7 +148,7 @@ export default function AssessmentsAdminPage() {
                             View
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => router.push(`/admin/assessments/edit/${r.id}`)} className="cursor-pointer">
+                          <DropdownMenuItem onClick={() => router.push(`${dashBase}/assessments/edit/${r.id}`)} className="cursor-pointer">
                             <Edit className="h-4 w-4 mr-2" />
                             Edit
                           </DropdownMenuItem>

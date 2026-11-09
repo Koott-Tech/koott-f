@@ -65,6 +65,8 @@ function LeadPanel({ lead, onClose, onSaved, meKey }) {
     setBusy(true); setErr(''); setMsg('');
     try { const { lead: l } = await leadsApi.update(lead.id, patch); onSaved(l); setMsg('Saved.'); } catch (e) { setErr(e.message); } finally { setBusy(false); }
   };
+  // Call / WhatsApp / Email are logged on the lead; a New lead becomes Contacted.
+  const logContact = (channel) => { leadsApi.contact(lead.id, channel).then((r) => onSaved(r.lead)).catch(() => {}); };
   const convert = async () => {
     if (!window.confirm('Convert this lead to a client? An existing client with the same phone or email is linked; otherwise a client login is created.')) return;
     setBusy(true); setErr('');
@@ -90,9 +92,9 @@ function LeadPanel({ lead, onClose, onSaved, meKey }) {
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
-          {lead.phone && <a href={`tel:${lead.phone}`} className="rounded-lg bg-[#025545] px-3 py-1.5 text-sm font-semibold text-white">Call</a>}
-          {lead.phone && <a href={waLink(lead.phone)} target="_blank" rel="noreferrer" className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white">WhatsApp</a>}
-          {lead.email && <a href={`mailto:${lead.email}`} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700">Email</a>}
+          {lead.phone && <a href={`tel:${lead.phone}`} onClick={() => logContact('call')} className="rounded-lg bg-[#025545] px-3 py-1.5 text-sm font-semibold text-white">Call</a>}
+          {lead.phone && <a href={waLink(lead.phone)} target="_blank" rel="noreferrer" onClick={() => logContact('whatsapp')} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white">WhatsApp</a>}
+          {lead.email && <a href={`mailto:${lead.email}`} onClick={() => logContact('email')} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700">Email</a>}
           <button type="button" onClick={() => setTasking(true)} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700">+ Task</button>
         </div>
 
@@ -133,6 +135,12 @@ function LeadPanel({ lead, onClose, onSaved, meKey }) {
           </label>
         </div>
         {lead.meta?.message && <div className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700"><span className="text-xs font-semibold text-slate-500">Their message: </span>{lead.meta.message}</div>}
+        {Array.isArray(lead.meta?.contacts) && lead.meta.contacts.length > 0 && (
+          <div className="mt-3 text-xs text-slate-500">
+            <span className="font-semibold">Contact log:</span>{' '}
+            {lead.meta.contacts.slice(-5).reverse().map((c) => `${c.channel} · ${fmtWhen(c.at)}`).join('  ·  ')}
+          </div>
+        )}
         {lead.therapistName && <div className="mt-2 text-xs text-slate-500">Was booking with <strong>{lead.therapistName}</strong></div>}
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
