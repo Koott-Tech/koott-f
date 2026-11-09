@@ -11,6 +11,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { tasksApi } from '@/lib/staffApi';
+import { useVisiblePoll } from '@/lib/useVisiblePoll';
 import { useAuth } from '@/contexts/AuthContext';
 import TaskDrawer from './TaskDrawer';
 import {
@@ -253,7 +254,7 @@ export default function TasksPage({ title = 'Tasks' }) {
   }, [list, q, priority, assignee]);
   useEffect(() => { const t = setTimeout(load, q ? 250 : 0); return () => clearTimeout(t); }, [load, q, tick]);
   // Others change tasks too: refresh every minute while the page is open.
-  useEffect(() => { const t = setInterval(() => setTick((n) => n + 1), 60000); return () => clearInterval(t); }, []);
+  useVisiblePoll(() => setTick((n) => n + 1), 60000);
 
   const moveTask = async (id, status) => {
     setTasks((ts) => ts.map((t) => (t.id === id ? { ...t, status } : t)));

@@ -110,9 +110,12 @@ export default function TaskDrawer({ taskId, me, role, onClose, onChanged }) {
   const sendComment = async () => {
     if (!comment.trim()) return;
     try {
-      await tasksApi.comment(taskId, comment.trim(), mentions);
+      const out = await tasksApi.comment(taskId, comment.trim(), mentions);
       setComment(''); setMentions([]);
       load();
+      // Need to know: only people who can see the task are told about a mention.
+      const skipped = out?.skippedMentions || [];
+      if (skipped.length) setErr(`${skipped.map((s) => s.name).join(', ')} can't see this task, so ${skipped.length > 1 ? 'they were' : 'it was'} not told. Give them the task or make a new one for them.`);
     } catch (e) { setErr(e.message); }
   };
 

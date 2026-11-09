@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { leadsApi } from '@/lib/staffApi';
 import { AssigneePicker, Modal, TaskForm, fmtWhen, toInputValue, fromInputValue, usePeople } from '@/components/tasks/taskUi';
 import { useAuth } from '@/contexts/AuthContext';
+import { useVisiblePoll } from '@/lib/useVisiblePoll';
 
 export const STAGES = [
   { value: 'new', label: 'New', tone: 'bg-sky-500' },
@@ -183,7 +184,7 @@ export default function LeadsPipeline() {
     } catch (e) { setErr(e.message); }
   }, [q, source, mine, due]);
   useEffect(() => { const t = setTimeout(load, q ? 250 : 0); return () => clearTimeout(t); }, [load, q]);
-  useEffect(() => { const t = setInterval(load, 60000); return () => clearInterval(t); }, [load]);
+  useVisiblePoll(load, 60000);
   useEffect(() => {
     if (!data) return;
     try { const id = new URLSearchParams(window.location.search).get('lead'); if (id && !open) { const l = data.leads.find((x) => x.id === id); if (l) setOpen(l); } } catch (_) { /* ignore */ }

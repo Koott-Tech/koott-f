@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { tasksApi } from '@/lib/staffApi';
+import { useVisiblePoll } from '@/lib/useVisiblePoll';
 import { TASKS_PATH_BY_ROLE } from '@/lib/staffRoles';
 import { Modal, TaskForm, fmtWhen } from './taskUi';
 
@@ -36,9 +37,10 @@ export default function TaskDock({ bottom = 16 }) {
   useEffect(() => {
     if (!signedIn || !tasksPath) return undefined;
     load();
-    const t = setInterval(load, 60000);
-    return () => clearInterval(t);
+    return undefined;
   }, [signedIn, tasksPath, load]);
+  // The bell: every minute while the tab is visible (not in background tabs).
+  useVisiblePoll(load, 60000, Boolean(signedIn && tasksPath));
   useEffect(() => {
     const close = (e) => { if (box.current && !box.current.contains(e.target)) setOpen(false); };
     document.addEventListener('mousedown', close);

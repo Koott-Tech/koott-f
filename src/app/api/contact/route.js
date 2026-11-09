@@ -19,7 +19,27 @@ function clean(v, max = 2000) {
   return typeof v === 'string' ? v.trim().slice(0, max) : '';
 }
 
+/** The visitor's IP as the hosting proxy reports it (first X-Forwarded-For hop). */
+function clientIp(request) {
+  const xff = request.headers.get('x-forwarded-for') || '';
+  return (xff.split(',')[0] || request.headers.get('x-real-ip') || 'unknown').trim().slice(0, 64);
+}
+
+// A small per-visitor limit here too (per server instance): 5 messages in 10 minutes.
+const recent = new Map();
+function tooMany(ip) {
+  const now = Date.now();
+  const list = (recent.get(ip) || []).filter((t) => now - t < 10 * 60 * 1000);
+  list.push(now);
+  recent.set(ip, list);
+  if (recent.size > 5000) recent.clear();
+  return list.length > 5;
+}
+
 export async function POST(request) {
+  if (tooMany(clientIp(request))) {
+    return NextResponse.json({ message: 'Too many messages. Please try again in a few minutes.' }, { status: 429 });
+  }
   let body;
   try {
     body = await request.json();
@@ -52,7 +72,15 @@ export async function POST(request) {
     const backend = String(process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api').replace(/\/+$/, '');
     const leadRes = await fetch(`${backend}/leads/inbound`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      // The visitor's own IP (so the backend limits each visitor, not this server) and the
+      // shared secret that lets the backend trust it (CONTACT_RELAY_SECRET, server-only).
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.CONTACT_RELAY_SECRET ? {
+          'x-koott-relay': process.env.CONTACT_RELAY_SECRET,
+          'x-client-ip': clientIp(request),
+        } : {}),
+      },
       body: JSON.stringify({ name, email, phone, topic: [reason, position].filter(Boolean).join(' · ') || 'Contact form', message }),
       signal: AbortSignal.timeout(5000),
     });
