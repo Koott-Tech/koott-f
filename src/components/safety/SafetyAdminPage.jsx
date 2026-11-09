@@ -16,6 +16,7 @@ export default function SafetyAdminPage() {
   const [lead, setLead] = useState(undefined);
   const [pick, setPick] = useState('');
   const [backup, setBackup] = useState('');
+  const [phone, setPhone] = useState('');
   const [alerts, setAlerts] = useState(null);
   const [canAct, setCanAct] = useState(false);
   const [err, setErr] = useState('');
@@ -24,14 +25,14 @@ export default function SafetyAdminPage() {
   const load = useCallback(async () => {
     try {
       const [l, a] = await Promise.all([safetyApi.lead(), safetyApi.list()]);
-      setLead(l.lead); setPick(l.lead?.key || ''); setBackup(l.lead?.backupEmail || '');
+      setLead(l.lead); setPick(l.lead?.key || ''); setBackup(l.lead?.backupEmail || ''); setPhone(l.lead?.phone || '');
       setAlerts(a.alerts); setCanAct(a.canAct); setErr('');
     } catch (e) { setErr(e.message); setAlerts([]); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
   const saveLead = async () => {
-    try { await safetyApi.setLead({ person: pick, backup_email: backup || undefined }); setMsg('Clinical lead saved.'); load(); } catch (e) { setErr(e.message); }
+    try { await safetyApi.setLead({ person: pick, backup_email: backup || undefined, phone: phone || undefined }); setMsg('Clinical lead saved.'); load(); } catch (e) { setErr(e.message); }
   };
   const act = async (a, status) => {
     const note = status === 'closed' ? window.prompt('Closing note (what was done)') : undefined;
@@ -52,6 +53,7 @@ export default function SafetyAdminPage() {
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
           <AssigneePicker value={pick} onChange={setPick} people={people} teams={[]} allowTeams={false} placeholder="Pick the clinical lead" />
           <input value={backup} onChange={(e) => setBackup(e.target.value)} placeholder="Backup email (optional)" className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Lead's mobile for WhatsApp (optional)" className="rounded-lg border border-slate-200 px-3 py-2 text-sm sm:col-span-2" />
           <button type="button" disabled={!pick} onClick={saveLead} className="rounded-lg bg-[#025545] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40">Save</button>
         </div>
         {msg && <div className="mt-2 text-xs text-emerald-700">{msg}</div>}
