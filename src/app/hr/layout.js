@@ -1,7 +1,7 @@
 'use client';
 
 /** /hr - people (onboarding, offboarding), therapist onboarding, calendar sync, teams, job postings, tasks. */
-import { Briefcase, CalendarCheck, ClipboardList, FileText, ListChecks, UserCheck, Users, UsersRound } from 'lucide-react';
+import { Briefcase, CalendarCheck, ClipboardList, FileText, GraduationCap, ListChecks, UserCheck, Users, UsersRound } from 'lucide-react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 
 const NAV = [
@@ -15,6 +15,7 @@ const NAV = [
     { label: 'Therapists', href: '/hr/therapists', icon: UserCheck },
     { label: 'Therapist groups', href: '/hr/therapist-groups', icon: Users },
     { label: 'Calendar sync', href: '/hr/calendar', icon: CalendarCheck },
+    { label: 'Training', href: '/hr/training', icon: GraduationCap },
   ] },
   { group: 'Hiring', items: [
     { label: 'Job postings', href: '/hr/careers', icon: Briefcase },
