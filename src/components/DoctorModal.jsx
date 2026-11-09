@@ -1468,7 +1468,7 @@ export default function DoctorModal({
                 </div>
               ) : (
                 <div className="px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm text-gray-500">
-                  Password will be automatically set to MyKoott@#2026
+                  A one-time temporary password is shown when the login is created
                 </div>
               )}
               {errors.password && (

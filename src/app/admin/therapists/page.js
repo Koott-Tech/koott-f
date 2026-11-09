@@ -34,6 +34,14 @@ function nameMatchKey(value) {
   return s.toLowerCase().replace(/\s+/g, '');
 }
 
+/** The new login's one-time password: shown once, to pass on (they change it with "Forgot password"). */
+function showTempPassword(r, email) {
+  const pw = r?.data?.tempPassword || r?.tempPassword;
+  if (pw && typeof window !== 'undefined') {
+    window.prompt(`Temporary password for ${email || 'the new therapist'} — copy it now, it is shown only once. They change it with "Forgot password".`, pw);
+  }
+}
+
 function EditTherapistModal({ therapist, onClose, onSaved }) {
   const { showError, showSuccess } = useNotification();
   const [loading, setLoading] = useState(false);
@@ -90,6 +98,7 @@ function EditTherapistModal({ therapist, onClose, onSaved }) {
 
       if (!r?.success) throw new Error(r?.error || 'Failed to save profile');
       showSuccess(therapist.psychologist?.id ? 'Profile updated' : 'Profile created and linked');
+      showTempPassword(r, formData.email);
       onSaved();
     } catch (err) {
       showError(err.message || 'Failed to save', 'Save Error');
@@ -250,7 +259,7 @@ function EditTherapistModal({ therapist, onClose, onSaved }) {
               </div>
             ) : (
               <div className="px-3 py-2 border border-blue-100 rounded-lg bg-blue-50/50 text-xs text-blue-800">
-                Password will be automatically set to <span className="font-semibold">MyKoott@#2026</span> upon creation.
+                A one-time temporary password is shown when the login is created.
               </div>
             )}
           </div>
@@ -292,8 +301,9 @@ export default function TherapistsPage() {
 
   const handleDoctorModalSuccess = async (doctorData) => {
     try {
-      await adminApi.createPsychologist(doctorData);
+      const r = await adminApi.createPsychologist(doctorData);
       showSuccess('Doctor added successfully');
+      showTempPassword(r, doctorData?.email);
       setIsDoctorModalOpen(false);
       await load({ silent: true });
     } catch (error) {
