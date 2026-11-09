@@ -33,7 +33,7 @@ import ClientBookingsHistoryModal from '@/components/ClientBookingsHistoryModal'
 
 export default function UsersPage() {
   const { showError, showSuccess } = useNotification();
-  const { user, isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState([]);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -71,7 +71,7 @@ export default function UsersPage() {
         return;
       }
       
-      if (!hasRole('admin') && !hasRole('superadmin')) {
+      if (!hasAnyRole(['admin', 'operations'])) {
         console.log('User does not have admin privileges, redirecting to profile');
         router.push('/profile');
         return;
@@ -83,7 +83,7 @@ export default function UsersPage() {
   }, [authLoading, isAuthenticated, hasRole, router, currentPage]);
 
   useEffect(() => {
-    if (authLoading || !user || (!hasRole('admin') && !hasRole('superadmin'))) return;
+    if (authLoading || !user || !hasAnyRole(['admin', 'operations'])) return;
     if (currentPage !== 1) {
       setCurrentPage(1);
       return;
@@ -226,7 +226,7 @@ export default function UsersPage() {
   }
 
   // Show access denied if user is not authenticated or doesn't have admin role
-  if (!user || (!hasRole('admin') && !hasRole('superadmin'))) {
+  if (!user || !hasAnyRole(['admin', 'operations'])) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
