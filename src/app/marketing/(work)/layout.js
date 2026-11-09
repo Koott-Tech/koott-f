@@ -12,6 +12,7 @@ const NAV = [
   { group: 'Content', items: [
     { label: 'Blog', href: '/marketing/blogs', icon: FileText },
     { label: 'Events', href: '/marketing/events-cms', icon: Ticket },
+    { label: 'Event results', href: '/marketing/event-results', icon: BarChart3 },
     { label: 'Assessments', href: '/marketing/assessments', icon: ClipboardCheck },
   ] },
   { group: 'Work', items: [{ label: 'Tasks', href: '/marketing/tasks', icon: ClipboardList }] },

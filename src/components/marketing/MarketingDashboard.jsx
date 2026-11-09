@@ -519,6 +519,7 @@ export default function MarketingDashboard() {
         <nav aria-label="Content">
           <a className="wx-navlink" href="/marketing/blogs">Blog</a>
           <a className="wx-navlink" href="/marketing/events-cms">Events</a>
+          <a className="wx-navlink" href="/marketing/event-results">Event results</a>
           <a className="wx-navlink" href="/marketing/assessments">Assessments</a>
           <button type="button" aria-current={page === 'pages' ? 'page' : undefined} onClick={() => setPage('pages')}>Edit Pages</button>
         </nav>
