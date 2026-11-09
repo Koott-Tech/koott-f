@@ -119,6 +119,7 @@ export default function AdminLayout({ children }) {
     { name: 'Coupons', href: '/admin/coupons', icon: Ticket },
     { name: 'People (HR)', href: '/admin/people', icon: UsersRound },
     { name: 'Teams', href: '/admin/teams', icon: UsersRound },
+    { name: 'Therapist onboarding', href: '/admin/therapist-onboarding', icon: UserCheck },
     { name: 'Calendar sync', href: '/admin/calendar', icon: CalendarCheck },
     { name: 'Job applications', href: '/admin/applications', icon: Briefcase },
     { name: 'Lead sources', href: '/admin/lead-sources', icon: BarChart3 },
