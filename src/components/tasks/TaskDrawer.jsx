@@ -46,6 +46,8 @@ const HISTORY_TEXT = {
   link: () => 'changed what the task is linked to',
   claimed: () => 'picked up the task',
   comment: () => 'commented',
+  attachment: (e) => `attached ${e.to_value?.name || 'a file'}`,
+  attachment_removed: (e) => `removed ${e.to_value?.name || 'a file'}`,
 };
 
 export default function TaskDrawer({ taskId, me, role, onClose, onChanged }) {
@@ -58,11 +60,30 @@ export default function TaskDrawer({ taskId, me, role, onClose, onChanged }) {
   const [mentionPick, setMentionPick] = useState('');
   const [newItem, setNewItem] = useState('');
   const [tab, setTab] = useState('comments');
+  const [files, setFiles] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const load = useCallback(async () => {
     try { setData(await tasksApi.get(taskId)); setErr(''); } catch (e) { setErr(e.message); }
   }, [taskId]);
   useEffect(() => { load(); }, [load]);
+  const loadFiles = useCallback(async () => {
+    try { setFiles((await tasksApi.attachments(taskId)).attachments); } catch (_) { setFiles([]); }
+  }, [taskId]);
+  useEffect(() => { loadFiles(); }, [loadFiles]);
+  const uploadFile = async (file) => {
+    if (!file) return;
+    setUploading(true); setErr('');
+    try { setFiles((await tasksApi.uploadAttachment(taskId, file)).attachments); load(); } catch (e) { setErr(e.message); } finally { setUploading(false); }
+  };
+  const openFile = async (f) => {
+    const w = window.open('', '_blank');
+    try { const { url } = await tasksApi.openAttachment(taskId, f.id); if (w) w.location.href = url; else window.location.href = url; } catch (e) { if (w) w.close(); setErr(e.message); }
+  };
+  const removeFile = async (f) => {
+    if (!window.confirm(`Remove ${f.name}?`)) return;
+    try { setFiles((await tasksApi.removeAttachment(taskId, f.id)).attachments); load(); } catch (e) { setErr(e.message); }
+  };
   useEffect(() => {
     const esc = (e) => { if (e.key === 'Escape') onClose?.(); };
     document.addEventListener('keydown', esc);
@@ -233,6 +254,29 @@ export default function TaskDrawer({ taskId, me, role, onClose, onChanged }) {
                 <input value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder="Add a step" className={inputCls} />
                 <button type="submit" className="rounded-lg border border-slate-200 px-3 text-sm text-slate-700 hover:bg-slate-50">Add</button>
               </form>
+            </div>
+
+            <div className="mt-4">
+              <div className="mb-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                <span>Files</span>
+                <label className={`cursor-pointer normal-case tracking-normal font-semibold text-[#025545] hover:underline ${uploading ? 'pointer-events-none opacity-50' : ''}`}>
+                  {uploading ? 'Uploading…' : '+ Attach a file'}
+                  <input type="file" className="hidden" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt"
+                    onChange={(e) => { uploadFile(e.target.files?.[0]); e.target.value = ''; }} />
+                </label>
+              </div>
+              {files === null ? <div className="text-xs text-slate-400">Loading…</div> : files.length ? (
+                <ul className="space-y-1">
+                  {files.map((f) => (
+                    <li key={f.id} className="group flex items-center gap-2 rounded-lg px-1 py-1 hover:bg-slate-50">
+                      <span aria-hidden>📎</span>
+                      <button type="button" onClick={() => openFile(f)} className="min-w-0 flex-1 truncate text-left text-sm text-[#025545] hover:underline">{f.name}</button>
+                      {f.size ? <span className="shrink-0 text-[11px] text-slate-400">{Math.max(1, Math.round(f.size / 1024))} KB</span> : null}
+                      <button type="button" onClick={() => removeFile(f)} className="text-xs text-slate-300 opacity-0 hover:text-rose-600 group-hover:opacity-100" aria-label={`Remove ${f.name}`}>✕</button>
+                    </li>
+                  ))}
+                </ul>
+              ) : <div className="text-xs text-slate-400">No files. Up to 15 MB each — never clinical notes.</div>}
             </div>
 
             <div className="mt-6 border-t border-slate-100 pt-4">

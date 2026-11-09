@@ -40,6 +40,20 @@ export const tasksApi = {
   markRead: (ids) => staffFetch('/tasks/notifications/read', { method: 'POST', body: { ids } }),
   report: (body) => staffFetch('/tasks/report', { method: 'POST', body }),
   runAuto: () => staffFetch('/tasks/auto/run', { method: 'POST' }),
+  attachments: (id) => staffFetch(`/tasks/${id}/attachments`),
+  openAttachment: (id, file) => staffFetch(`/tasks/${id}/attachments/${encodeURIComponent(file)}`),
+  removeAttachment: (id, file) => staffFetch(`/tasks/${id}/attachments/${encodeURIComponent(file)}`, { method: 'DELETE' }),
+  /** Multipart upload (no JSON content type). */
+  async uploadAttachment(id, file) {
+    let token = null;
+    try { token = getStoredToken(); } catch (_) { /* storage blocked */ }
+    const body = new FormData();
+    body.append('file', file);
+    const res = await fetch(`${API}/tasks/${id}/attachments`, { method: 'POST', headers: token ? { Authorization: `Bearer ${token}` } : {}, body });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json.success === false) throw new Error(json.message || `Upload failed (${res.status})`);
+    return json.data;
+  },
 };
 
 export const leadsApi = {
@@ -48,6 +62,8 @@ export const leadsApi = {
   update: (id, body) => staffFetch(`/leads/${id}`, { method: 'PATCH', body }),
   convert: (id, body = {}) => staffFetch(`/leads/${id}/convert`, { method: 'POST', body }),
   sources: (query) => staffFetch('/leads/sources', { query }),
+  viewed: (id) => staffFetch(`/leads/${id}/viewed`, { method: 'POST' }),
+  accessLog: (query) => staffFetch('/leads/access-log', { query }),
 };
 
 export const peopleApi = {

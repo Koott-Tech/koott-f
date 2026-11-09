@@ -122,6 +122,7 @@ export default function AdminLayout({ children }) {
     { name: 'Calendar sync', href: '/admin/calendar', icon: CalendarCheck },
     { name: 'Job applications', href: '/admin/applications', icon: Briefcase },
     { name: 'Lead sources', href: '/admin/lead-sources', icon: BarChart3 },
+    { name: 'Access log', href: '/admin/access-log', icon: FileText },
     {
       name: 'CMS',
       icon: Layers,

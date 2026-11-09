@@ -58,6 +58,8 @@ function LeadPanel({ lead, onClose, onSaved, meKey }) {
   const [msg, setMsg] = useState('');
   const [tasking, setTasking] = useState(false);
   useEffect(() => { setForm({ ...lead }); setLostReason(lead.lost_reason || ''); }, [lead]);
+  // Record of access: opening a lead is logged (Admin → Access log).
+  useEffect(() => { leadsApi.viewed(lead.id).catch(() => {}); }, [lead.id]);
 
   const save = async (patch) => {
     setBusy(true); setErr(''); setMsg('');
