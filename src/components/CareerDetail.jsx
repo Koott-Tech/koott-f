@@ -55,9 +55,58 @@ function renderBody(text) {
   return blocks;
 }
 
+/**
+ * Apply form: lands in HR → Applications (backend POST /careers/slug/:slug/apply) and
+ * creates a "Review the application" task for the HR team. Sample roles (no CMS row)
+ * keep the contact page.
+ */
+function ApplyForm({ slug, title, onClose }) {
+  const [f, setF] = useState({ name: '', email: '', phone: '', resume_url: '', linkedin_url: '', cover_note: '' });
+  const [state, setState] = useState('');
+  const submit = async (e) => {
+    e.preventDefault();
+    setState('sending');
+    try {
+      const base = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api').replace(/\/+$/, '');
+      const res = await fetch(`${base}/careers/slug/${encodeURIComponent(slug)}/apply`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(f),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json.success === false) throw new Error(json.message || 'Could not send your application.');
+      setState('sent');
+    } catch (err) { setState(err.message); }
+  };
+  return (
+    <div className="kcd-modal" role="dialog" aria-modal="true" aria-labelledby="kcd-apply-h">
+      <div className="kcd-scrim" onClick={onClose} aria-hidden />
+      <form className="kcd-form" onSubmit={submit}>
+        <div className="kcd-form-top"><span id="kcd-apply-h" className="kcd-form-h">Apply — {title}</span><button type="button" className="kcd-x" onClick={onClose} aria-label="Close">✕</button></div>
+        {state === 'sent' ? (
+          <div className="kcd-sent">Thank you — we have your application. Our team will get back to you by email.</div>
+        ) : (
+          <>
+            <input required placeholder="Full name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+            <input required type="email" placeholder="Email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+            <input placeholder="Phone" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
+            <input type="url" placeholder="Link to your résumé (Google Drive, Dropbox…)" value={f.resume_url} onChange={(e) => setF({ ...f, resume_url: e.target.value })} />
+            <input type="url" placeholder="LinkedIn profile (optional)" value={f.linkedin_url} onChange={(e) => setF({ ...f, linkedin_url: e.target.value })} />
+            <textarea rows={4} placeholder="A few lines about you (optional)" value={f.cover_note} onChange={(e) => setF({ ...f, cover_note: e.target.value })} />
+            {state && state !== 'sending' && <div className="kcd-err">{state}</div>}
+            <button type="submit" className="kcd-apply" disabled={state === 'sending'}>{state === 'sending' ? 'Sending…' : 'Send application'}</button>
+          </>
+        )}
+      </form>
+    </div>
+  );
+}
+
 export default function CareerDetail({ slug }) {
   const [job, setJob] = useState(undefined); // undefined = loading, null = missing
   const [usingSample, setUsingSample] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const applyBtn = usingSample
+    ? <a href="/get-in-touch" className="kcd-apply">Apply Now</a>
+    : <button type="button" className="kcd-apply" onClick={() => setApplying(true)}>Apply Now</button>;
 
   useEffect(() => {
     let off = false;
@@ -92,7 +141,7 @@ export default function CareerDetail({ slug }) {
           <>
             <div className="kcd-head">
               <h1 className="kcd-title">{job.title}</h1>
-              <a href="/get-in-touch" className="kcd-apply">Apply Now</a>
+              {applyBtn}
             </div>
 
             <section className="kcd-type">
@@ -118,9 +167,8 @@ export default function CareerDetail({ slug }) {
               </p>
             )}
 
-            <p className="kcd-applyrow">
-              <a href="/get-in-touch" className="kcd-apply">Apply Now</a>
-            </p>
+            <div className="kcd-applyrow">{applyBtn}</div>
+            {applying && <ApplyForm slug={slug} title={job.title} onClose={() => setApplying(false)} />}
           </>
         )}
       </div>
@@ -200,6 +248,17 @@ const CSS = `
 }
 
 .kcd-applyrow{margin:38px 0 0;}
+button.kcd-apply{border:0;cursor:pointer;font-family:inherit;}
+.kcd-modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+.kcd-scrim{position:absolute;inset:0;background:rgba(16,14,14,.45);}
+.kcd-form{position:relative;width:100%;max-width:480px;max-height:92vh;overflow:auto;background:#fff;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:10px;}
+.kcd-form-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:4px;}
+.kcd-form-h{font-family:'Poppins',sans-serif;font-size:18px;font-weight:600;color:var(--k-ink);}
+.kcd-x{background:none;border:0;font-size:18px;color:#666;cursor:pointer;}
+.kcd-form input,.kcd-form textarea{border:1px solid var(--k-line);border-radius:10px;padding:11px 12px;font-size:16px;font-family:'Inter',sans-serif;}
+.kcd-form .kcd-apply{margin-top:6px;}
+.kcd-err{color:#B42318;font-size:14px;}
+.kcd-sent{font-family:'Inter',sans-serif;font-size:16px;color:var(--k-ink);padding:8px 0 4px;}
 .kcd-state{
   font-family:var(--k-body)!important;font-size:16px!important;letter-spacing:0!important;
   color:#5B5757!important;text-align:center;margin:70px 0;

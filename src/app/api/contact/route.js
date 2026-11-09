@@ -45,8 +45,25 @@ export async function POST(request) {
     return NextResponse.json({ message: 'That email address looks incomplete.' }, { status: 400 });
   }
 
+  // Every enquiry is also a lead in the Operations dashboard (backend /api/leads/inbound),
+  // so it is followed up even when no mail transport is configured.
+  let savedAsLead = false;
+  try {
+    const backend = String(process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api').replace(/\/+$/, '');
+    const leadRes = await fetch(`${backend}/leads/inbound`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, topic: [reason, position].filter(Boolean).join(' · ') || 'Contact form', message }),
+      signal: AbortSignal.timeout(5000),
+    });
+    savedAsLead = leadRes.ok;
+  } catch (e) {
+    console.warn('[api/contact] could not save the enquiry as a lead:', e?.message);
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey || !FROM) {
+    if (savedAsLead) return NextResponse.json({ message: 'Thanks — we have your message and will get back to you soon.' });
     console.warn('[api/contact] enquiry received but no mail transport is configured:', { name, email, reason });
     return NextResponse.json(
       { message: 'Contact delivery is not configured yet. Please email admin@koott.in directly.' },

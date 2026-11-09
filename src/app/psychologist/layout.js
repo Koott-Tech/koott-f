@@ -10,7 +10,9 @@ import {
   LogOut,
   Menu,
   X,
+  ClipboardList,
 } from 'lucide-react';
+import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function PsychologistLayout({ children }) {
@@ -47,6 +49,7 @@ export default function PsychologistLayout({ children }) {
   const navigation = [
     { name: 'Dashboard', href: '/psychologist', icon: BarChart3 },
     { name: 'Sessions', href: '/psychologist/sessions', icon: Calendar },
+    { name: 'Tasks', href: '/psychologist/tasks', icon: ClipboardList },
     { name: 'Settings', href: '/psychologist/settings', icon: Settings }
   ];
 
@@ -249,6 +252,7 @@ export default function PsychologistLayout({ children }) {
         <main className="pt-24 lg:pt-24">
           {children}
         </main>
+        <TaskDock />
       </div>
     </div>
   );

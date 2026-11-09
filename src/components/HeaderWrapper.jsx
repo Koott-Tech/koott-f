@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { isDashboardPath } from '@/lib/staffRoles';
 // KoottHeader is the cloned koott.in header. The previous Koott header is kept
 // in Header.jsx, unused, so the swap is easy to reverse.
 import Header from './KoottHeader';
@@ -10,12 +11,7 @@ export default function HeaderWrapper() {
   
   // Hide global site header on admin, superadmin, psychologist, finance dashboards
   // Note: /online-child-psychologist (listing page) should show header, only /psychologist (dashboard) should hide it
-  const shouldHideCompletely = pathname.startsWith('/admin') || 
-                                pathname.startsWith('/superadmin') || 
-                                pathname.startsWith('/finance') ||
-                                pathname.startsWith('/marketing') ||
-                                pathname.startsWith('/event-organizer') ||
-                                (pathname.startsWith('/psychologist') && !pathname.startsWith('/online-child-psychologist'));
+  const shouldHideCompletely = isDashboardPath(pathname);
   
   if (shouldHideCompletely) return null;
   

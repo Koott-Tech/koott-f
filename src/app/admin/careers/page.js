@@ -1,4 +1,5 @@
 'use client';
+import { useDashBase } from '@/lib/dashBase';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -16,7 +17,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function CareersAdminPage() {
-  const { isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
+  const dashBase = useDashBase();
+  const { isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading } = useAuth();
   const { showError, showSuccess } = useNotification();
   const router = useRouter();
 
@@ -30,7 +32,7 @@ export default function CareersAdminPage() {
 
   useEffect(() => {
     if (!authLoading) {
-      if (!isAuthenticated() || (!hasRole('admin') && !hasRole('superadmin'))) {
+      if (!isAuthenticated() || !hasAnyRole(['admin', 'hr'])) {
         router.push('/');
         return;
       }
@@ -40,7 +42,7 @@ export default function CareersAdminPage() {
   }, [authLoading]);
 
   useEffect(() => {
-    if (isAuthenticated() && hasRole('admin')) {
+    if (isAuthenticated() && hasAnyRole(['admin', 'hr'])) {
       loadCareers();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -125,7 +127,7 @@ export default function CareersAdminPage() {
             </p>
           </div>
           <Link
-            href="/admin/careers/new"
+            href={`${dashBase}/careers/new`}
             className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-[#025545] text-white rounded-lg hover:bg-[#012f23] transition-colors"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -206,7 +208,7 @@ export default function CareersAdminPage() {
                         <h6>No jobs yet</h6>
                         <p className="text-gray-500 mb-4">Create your first job to show on the careers page</p>
                         <Link
-                          href="/admin/careers/new"
+                          href={`${dashBase}/careers/new`}
                           className="bg-[#025545] text-white px-4 py-2 rounded-lg hover:bg-[#012f23] inline-flex items-center space-x-2"
                         >
                           <Plus className="h-4 w-4" />
@@ -257,7 +259,7 @@ export default function CareersAdminPage() {
                               View
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => router.push(`/admin/careers/${job.id}/edit`)} className="cursor-pointer">
+                            <DropdownMenuItem onClick={() => router.push(`${dashBase}/careers/${job.id}/edit`)} className="cursor-pointer">
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { adminApi, dashboardApi } from '@/lib/backendApi';
 import { useAuth } from '@/contexts/AuthContext';
+import { dashboardFor } from '@/lib/staffRoles';
 import { cache, withCache } from '@/lib/cache';
 import DateRangePicker from '@/components/ui/date-range-picker';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
@@ -56,8 +57,8 @@ export default function AdminDashboard() {
       }
       
       if (!hasRole('admin') && !hasRole('superadmin')) {
-        console.log('User does not have admin privileges, redirecting to profile');
-        router.push('/profile');
+        // Staff with another role go to their own dashboard; clients to their sessions.
+        router.push(dashboardFor(user?.role) || '/profile');
         return;
       }
       

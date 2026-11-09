@@ -17,8 +17,10 @@ import {
   CreditCard,
   ChevronDown,
   ChevronRight,
-  Users
+  Users,
+  ClipboardList,
 } from 'lucide-react';
+import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
 import { financeApi } from '@/lib/backendApi';
 import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/istCalendarDates';
@@ -114,6 +116,8 @@ export default function FinanceLayout({ children }) {
     { name: 'Income', href: '/finance/income', icon: DollarSign },
     { name: 'Payouts', href: '/finance/payouts', icon: CreditCard },
     { name: 'Receipts', href: '/finance/receipts', icon: FileText },
+    { name: 'Salaries', href: '/finance/salaries', icon: Users },
+    { name: 'Tasks', href: '/finance/tasks', icon: ClipboardList },
   ];
 
   if (authLoading) {
@@ -293,6 +297,7 @@ export default function FinanceLayout({ children }) {
         <main className="pt-20 lg:pt-24">
           {children}
         </main>
+        <TaskDock />
       </div>
 
     </div>

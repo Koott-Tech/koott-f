@@ -10,8 +10,10 @@ import {
   PanelLeftClose,
   PanelLeft,
   Ticket,
-  Globe
+  Globe,
+  ClipboardList,
 } from 'lucide-react';
+import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function EventOrganizerLayout({ children }) {
@@ -48,6 +50,7 @@ export default function EventOrganizerLayout({ children }) {
     { name: 'Dashboard', href: '/event-organizer', icon: Globe },
     { name: 'Events Registrations', href: '/event-organizer/events', icon: Ticket },
     { name: 'Event Pages (CMS)', href: '/event-organizer/events-cms', icon: Globe },
+    { name: 'Tasks', href: '/event-organizer/tasks', icon: ClipboardList },
   ];
 
   if (authLoading) {
@@ -209,6 +212,7 @@ export default function EventOrganizerLayout({ children }) {
         <main className="lg:pt-16">
           {children}
         </main>
+        <TaskDock />
       </div>
 
     </div>

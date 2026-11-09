@@ -10,6 +10,7 @@
  * sessions; visits and clicks from visitors who accepted analytics cookies.
  */
 
+import TaskDock from '@/components/tasks/TaskDock';
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getStoredToken } from '@/lib/authStorage';
@@ -494,6 +495,7 @@ export default function MarketingDashboard() {
   const rangeSelect = <DateRange sel={sel} dates={dates} today={today} onChange={setSel} />;
 
   return (
+    <>
     <div className="wx">
       <style dangerouslySetInnerHTML={{ __html: MARKETING_CSS + REPORT_CSS + CONTENT_CSS + OPERATIONS_CSS }} />
       <aside className="wx-side">
@@ -510,9 +512,19 @@ export default function MarketingDashboard() {
         <nav aria-label="Operations">
           <button type="button" aria-current={page === 'ops' ? 'page' : undefined} onClick={() => setPage('ops')}>Bookings &amp; slots</button>
         </nav>
+        <nav aria-label="Leads">
+          <a className="wx-navlink" href="/marketing/lead-sources">Lead sources</a>
+        </nav>
         <div className="wx-navgrp">Content</div>
         <nav aria-label="Content">
+          <a className="wx-navlink" href="/marketing/blogs">Blog</a>
+          <a className="wx-navlink" href="/marketing/events-cms">Events</a>
+          <a className="wx-navlink" href="/marketing/assessments">Assessments</a>
           <button type="button" aria-current={page === 'pages' ? 'page' : undefined} onClick={() => setPage('pages')}>Edit Pages</button>
+        </nav>
+        <div className="wx-navgrp">Work</div>
+        <nav aria-label="Work">
+          <a className="wx-navlink" href="/marketing/tasks">Tasks</a>
         </nav>
         <div className="wx-who"><b>{user?.name || user?.email}</b><small>{user?.role}</small><button type="button" onClick={() => { logout(); window.location.href = '/marketing/login'; }}>Sign out</button></div>
       </aside>
@@ -523,6 +535,12 @@ export default function MarketingDashboard() {
           <button type="button" aria-pressed={page === 'traffic'} onClick={() => setPage('traffic')}>Traffic</button>
           <button type="button" aria-pressed={isReports} onClick={() => setPage('reports')}>Reports</button>
           <button type="button" aria-pressed={page === 'ops'} onClick={() => setPage('ops')}>Bookings</button>
+        </div>
+        <div className="wx-mobnav wx-mobnav-links">
+          <a href="/marketing/lead-sources">Lead sources</a>
+          <a href="/marketing/blogs">Blog</a>
+          <a href="/marketing/events-cms">Events</a>
+          <a href="/marketing/tasks">Tasks</a>
         </div>
         {!reportName && <div className="wx-head">
           <div><h1>{title}</h1><p>{sub}</p></div>
@@ -557,6 +575,9 @@ export default function MarketingDashboard() {
       </main>
       {meta && !notReady && <LiveCorner live={live} open={liveOpen} setOpen={setLiveOpen} />}
     </div>
+    {/* outside .wx so its styles do not reach the dock; raised above the live-visitors pill */}
+    <TaskDock bottom={64} />
+    </>
   );
 }
 
@@ -577,6 +598,8 @@ export const MARKETING_CSS = `
 .wx-side nav button{display:block;width:100%;text-align:left;background:none;border:0;color:#CFE3D6;padding:6px 10px 6px 26px;border-radius:6px;cursor:pointer;font-size:13px}
 .wx-side nav button:hover{background:#063B2D}
 .wx-side nav button[aria-current="page"]{background:#0A4A38;color:#fff}
+.wx-side nav a.wx-navlink{display:block;width:100%;text-align:left;color:#CFE3D6;padding:6px 10px 6px 26px;border-radius:6px;font-size:13px;text-decoration:none}
+.wx-side nav a.wx-navlink:hover{background:#063B2D;color:#fff}
 .wx-who{margin-top:auto;border-top:1px solid #0A4A38;padding:12px 10px 4px;display:grid;gap:2px;font-size:12.5px}
 .wx-who b{color:#fff;overflow:hidden;text-overflow:ellipsis}
 .wx-who small{color:#8C97A3}
@@ -746,6 +769,8 @@ export const MARKETING_CSS = `
   .wx-mobnav{display:flex;gap:6px;margin-bottom:12px}
   .wx-mobnav button{flex:1;border:1px solid #D3DCE6;background:#fff;border-radius:6px;padding:8px;cursor:pointer}
   .wx-mobnav button[aria-pressed="true"]{background:#1B6930;color:#fff;border-color:#1B6930}
+  .wx-mobnav-links{overflow-x:auto}
+  .wx-mobnav-links a{flex:1;white-space:nowrap;text-align:center;border:1px solid #D3DCE6;background:#fff;border-radius:6px;padding:8px;color:#1F2A37;text-decoration:none;font-size:13px}
   .wx-toprow,.wx-cols,.wx-cols-blog,.wx-duo-cards,.wx-country{grid-template-columns:1fr}
   .wx-col{padding:14px 0!important;border-left:0!important;border-top:1px solid #EEF1F5}
   .wx-col:first-child{border-top:0}

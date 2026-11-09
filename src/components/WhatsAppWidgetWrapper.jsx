@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { isDashboardPath } from '@/lib/staffRoles';
 import WhatsAppWidget from './WhatsAppWidget';
 
 export default function WhatsAppWidgetWrapper() {
@@ -8,12 +9,7 @@ export default function WhatsAppWidgetWrapper() {
   
   // Hide WhatsApp widget on admin, superadmin, finance, and psychologist dashboard pages
   // Keep it on user dashboard pages (profile) and all public pages
-  const shouldHide = 
-    pathname.startsWith('/admin') ||
-    pathname.startsWith('/superadmin') ||
-    pathname.startsWith('/finance') ||
-    pathname.startsWith('/marketing') ||
-    pathname.startsWith('/psychologist');
+  const shouldHide = isDashboardPath(pathname);
   
   if (shouldHide) {
     return null;

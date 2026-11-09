@@ -1,4 +1,5 @@
 'use client';
+import { useDashBase } from '@/lib/dashBase';
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -31,7 +32,8 @@ const initialBlogState = (userName = '') => ({
 });
 
 export default function NewBlogPage() {
-  const { user, isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
+  const dashBase = useDashBase();
+  const { user, isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading } = useAuth();
   const { showError, showSuccess } = useNotification();
   const { setSidebarOpen } = useAdminSidebar() || {};
   const router = useRouter();
@@ -49,7 +51,7 @@ export default function NewBlogPage() {
     }
   }, [setSidebarOpen]);
 
-  if (!authLoading && (!isAuthenticated() || (!hasRole('admin') && !hasRole('superadmin')))) {
+  if (!authLoading && (!isAuthenticated() || !hasAnyRole(['admin', 'marketing']))) {
     router.push('/');
     return null;
   }
@@ -141,7 +143,7 @@ export default function NewBlogPage() {
         return;
       }
       showSuccess('Blog created successfully');
-      router.push('/admin/blogs');
+      router.push(`${dashBase}/blogs`);
     } catch (err) {
       showError(err?.message || 'Failed to save blog');
     } finally {
@@ -177,7 +179,7 @@ export default function NewBlogPage() {
           headerLeft={
             <>
               <Link
-                href="/admin/blogs"
+                href={`${dashBase}/blogs`}
                 className="flex items-center justify-center w-8 h-8 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Back to blogs"
               >
@@ -200,7 +202,7 @@ export default function NewBlogPage() {
           headerRight={
             <>
               <Link
-                href="/admin/blogs"
+                href={`${dashBase}/blogs`}
                 className="hidden sm:flex items-center px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Cancel

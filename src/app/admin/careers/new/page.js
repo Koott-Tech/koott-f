@@ -1,4 +1,5 @@
 'use client';
+import { useDashBase } from '@/lib/dashBase';
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,13 +33,14 @@ const EMPTY = {
 };
 
 export default function NewCareerPage() {
-  const { isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
+  const dashBase = useDashBase();
+  const { isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading } = useAuth();
   const { showError, showSuccess } = useNotification();
   const router = useRouter();
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
 
-  if (!authLoading && (!isAuthenticated() || (!hasRole('admin') && !hasRole('superadmin')))) {
+  if (!authLoading && (!isAuthenticated() || !hasAnyRole(['admin', 'hr']))) {
     router.push('/');
     return null;
   }
@@ -78,7 +80,7 @@ export default function NewCareerPage() {
       const resp = await careersApi.createCareer(payload);
       if (resp?.success) {
         showSuccess('Job created successfully');
-        router.push('/admin/careers');
+        router.push(`${dashBase}/careers`);
       } else {
         showError(resp?.message || 'Failed to create job');
       }
@@ -101,7 +103,7 @@ export default function NewCareerPage() {
     <div className="px-4 sm:px-6 lg:px-8 py-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/admin/careers" className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
+          <Link href={`${dashBase}/careers`} className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
@@ -302,7 +304,7 @@ export default function NewCareerPage() {
 
           {/* Buttons */}
           <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-            <Link href="/admin/careers" className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</Link>
+            <Link href={`${dashBase}/careers`} className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</Link>
             <button type="submit" disabled={saving} className="px-5 py-2 bg-[#025545] text-white rounded-lg hover:bg-[#012f23] disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-2">
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               {saving ? 'Creating...' : 'Create Job'}

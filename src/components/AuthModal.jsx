@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackPopup } from "@/analytics";
+import { dashboardFor } from '@/lib/staffRoles';
 import { useAuth } from "@/contexts/AuthContext";
 import { authApi } from "@/lib/backendApi";
 import { validatePassword } from "@/utils/passwordValidation";
@@ -188,21 +189,10 @@ export default function AuthModal({
       closeAndReset();
       // Reload the page to refresh auth state
         if (!preventReload) {
-          if (loggedInUser?.role === 'admin') {
-            window.location.href = '/admin';
-          } else if (loggedInUser?.role === 'psychologist') {
-            window.location.href = '/psychologist';
-          } else if (loggedInUser?.role === 'finance') {
-            window.location.href = '/finance';
-          } else if (loggedInUser?.role === 'superadmin') {
-            window.location.href = '/superadmin';
-          } else if (loggedInUser?.role === 'event_organizer') {
-            window.location.href = '/event-organizer';
-          } else if (loggedInUser?.role === 'marketing') {
-            window.location.href = '/marketing';
-          } else {
-            window.location.reload();
-          }
+          // Every staff role has its own dashboard (lib/staffRoles); clients stay on the page.
+          const dashboard = dashboardFor(loggedInUser?.role);
+          if (dashboard) window.location.href = dashboard;
+          else window.location.reload();
         }
       }
     } catch (err) {

@@ -32,6 +32,7 @@ import {
   Ticket,
   PhoneCall
 } from 'lucide-react';
+import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function SuperAdminLayout({ children }) {
@@ -104,6 +105,7 @@ export default function SuperAdminLayout({ children }) {
 
   const navigation = [
     { name: 'Dashboard', href: '/superadmin', icon: BarChart3 },
+    { name: 'Tasks', href: '/superadmin/tasks', icon: ClipboardList },
     {
       name: 'Admin',
       icon: Shield,
@@ -444,6 +446,7 @@ export default function SuperAdminLayout({ children }) {
         <main className="min-h-screen">
           {children}
         </main>
+        <TaskDock />
       </div>
     </div>
   );

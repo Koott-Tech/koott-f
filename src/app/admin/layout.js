@@ -24,9 +24,14 @@ import {
   RefreshCw,
   Briefcase,
   Ticket,
-  PhoneCall
+  PhoneCall,
+  ClipboardList,
+  UsersRound,
+  CalendarCheck
 } from 'lucide-react';
+import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
+import { dashboardFor } from '@/lib/staffRoles';
 
 export default function AdminLayout({ children }) {
   // Desktop (>= 1024px): open by default, Mobile: closed by default
@@ -74,7 +79,7 @@ export default function AdminLayout({ children }) {
       }
       
       if (!hasRole('admin') && !hasRole('superadmin')) {
-        router.push('/');
+        router.push(dashboardFor(user?.role) || '/');
         return;
       }
     }
@@ -99,6 +104,8 @@ export default function AdminLayout({ children }) {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: BarChart3 },
+    { name: 'Today', href: '/admin/today', icon: Clock },
+    { name: 'Tasks', href: '/admin/tasks', icon: ClipboardList },
     // Temporarily hidden from menu (pages still exist & accessible by URL):
     // { name: 'Doctors', href: '/admin/doctors', icon: UserCheck },
     { name: 'Users', href: '/admin/users', icon: Users },
@@ -110,6 +117,11 @@ export default function AdminLayout({ children }) {
     { name: 'Assessment Sessions', href: '/admin/assessment-sessions', icon: Package },
     { name: 'Rescheduling', href: '/admin/rescheduling', icon: RefreshCw },
     { name: 'Coupons', href: '/admin/coupons', icon: Ticket },
+    { name: 'People (HR)', href: '/admin/people', icon: UsersRound },
+    { name: 'Teams', href: '/admin/teams', icon: UsersRound },
+    { name: 'Calendar sync', href: '/admin/calendar', icon: CalendarCheck },
+    { name: 'Job applications', href: '/admin/applications', icon: Briefcase },
+    { name: 'Lead sources', href: '/admin/lead-sources', icon: BarChart3 },
     {
       name: 'CMS',
       icon: Layers,
@@ -426,6 +438,7 @@ export default function AdminLayout({ children }) {
           {children}
         </main>
       </div>
+      <TaskDock />
 
     </div>
     </AdminSidebarContext.Provider>

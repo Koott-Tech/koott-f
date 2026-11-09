@@ -1,4 +1,5 @@
 'use client';
+import { useDashBase } from '@/lib/dashBase';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -27,7 +28,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function BlogsPage() {
-  const { user, isAuthenticated, hasRole, isLoading: authLoading, logout } = useAuth();
+  const dashBase = useDashBase();
+  const { user, isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading, logout } = useAuth();
   const { showError, showSuccess, showWarning } = useNotification();
   const router = useRouter();
   const [blogs, setBlogs] = useState([]);
@@ -45,7 +47,7 @@ export default function BlogsPage() {
         return;
       }
       
-      if (!hasRole('admin') && !hasRole('superadmin')) {
+      if (!hasAnyRole(['admin', 'marketing'])) {
         router.push('/');
         return;
       }
@@ -103,7 +105,7 @@ export default function BlogsPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated() && hasRole('admin')) {
+    if (isAuthenticated() && hasAnyRole(['admin', 'marketing'])) {
       loadBlogs();
     }
   }, [searchTerm, statusFilter]);
@@ -139,7 +141,7 @@ export default function BlogsPage() {
   };
 
   const handleEdit = (blog) => {
-    router.push(`/admin/blogs/${blog.id}/edit`);
+    router.push(`${dashBase}/blogs/${blog.id}/edit`);
   };
 
   const handleDeleteClick = (blog) => {
@@ -183,7 +185,7 @@ export default function BlogsPage() {
               <p className="text-gray-600 mt-1">Manage blog posts and content</p>
             </div>
             <Link
-              href="/admin/blogs/new"
+              href={`${dashBase}/blogs/new`}
               className="bg-[#025545] text-white px-4 py-2 rounded-lg hover:bg-[#012f23] flex items-center space-x-2"
             >
               <Plus className="h-5 w-5" />
@@ -318,7 +320,7 @@ export default function BlogsPage() {
                         <h6>No blog posts yet</h6>
                         <p className="text-gray-500 mb-4">Create your first blog post to get started</p>
                         <Link
-                          href="/admin/blogs/new"
+                          href={`${dashBase}/blogs/new`}
                           className="bg-[#025545] text-white px-4 py-2 rounded-lg hover:bg-[#012f23] inline-flex items-center space-x-2"
                         >
                           <Plus className="h-4 w-4" />

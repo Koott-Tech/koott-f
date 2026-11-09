@@ -11,11 +11,11 @@ import WorkshopEventPageClient from "@/components/events/WorkshopEventPageClient
 import { Loader2 } from "lucide-react";
 
 export default function EditEventPageCmsPage() {
-  const { isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname() || "";
   const base =
-    pathname.startsWith("/superadmin/admin/events-cms") ? "/superadmin/admin/events-cms" : "/admin/events-cms";
+    pathname.startsWith("/superadmin/admin/events-cms") ? "/superadmin/admin/events-cms" : pathname.startsWith("/marketing/events-cms") ? "/marketing/events-cms" : "/admin/events-cms";
   const params = useParams();
   const id = params?.id;
 
@@ -77,7 +77,7 @@ export default function EditEventPageCmsPage() {
 
   useEffect(() => {
     if (!authLoading) {
-      if (!isAuthenticated() || (!hasRole("admin") && !hasRole("superadmin"))) {
+      if (!isAuthenticated() || !hasAnyRole(['admin', 'marketing'])) {
         router.push("/");
         return;
       }

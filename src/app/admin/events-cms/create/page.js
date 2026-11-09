@@ -6,11 +6,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { adminApi } from "@/lib/backendApi";
 
 export default function CreateEventPageCmsPage() {
-  const { isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname() || "";
   const base =
-    pathname.startsWith("/superadmin/admin/events-cms") ? "/superadmin/admin/events-cms" : "/admin/events-cms";
+    pathname.startsWith("/superadmin/admin/events-cms") ? "/superadmin/admin/events-cms" : pathname.startsWith("/marketing/events-cms") ? "/marketing/events-cms" : "/admin/events-cms";
   const [eventTitle, setEventTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [status, setStatus] = useState("draft");
@@ -32,7 +32,7 @@ export default function CreateEventPageCmsPage() {
 
   useEffect(() => {
     if (!authLoading) {
-      if (!isAuthenticated() || (!hasRole("admin") && !hasRole("superadmin"))) router.push("/");
+      if (!isAuthenticated() || !hasAnyRole(['admin', 'marketing'])) router.push("/");
     }
   }, [authLoading, isAuthenticated, hasRole, router]);
 

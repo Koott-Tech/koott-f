@@ -1,4 +1,5 @@
 'use client';
+import { useDashBase } from '@/lib/dashBase';
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -11,9 +12,10 @@ import BlogEditor from '@/components/BlogEditor';
 import { getStoredToken } from '@/lib/authStorage';
 
 export default function EditBlogPage() {
+  const dashBase = useDashBase();
   const params = useParams();
   const id = params?.id;
-  const { user, isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading } = useAuth();
   const { showError, showSuccess } = useNotification();
   const { setSidebarOpen } = useAdminSidebar() || {};
   const router = useRouter();
@@ -34,7 +36,7 @@ export default function EditBlogPage() {
 
   useEffect(() => {
     if (!id || authLoading) return;
-    if (!isAuthenticated() || (!hasRole('admin') && !hasRole('superadmin'))) {
+    if (!isAuthenticated() || !hasAnyRole(['admin', 'marketing'])) {
       router.push('/');
       return;
     }
@@ -51,13 +53,13 @@ export default function EditBlogPage() {
             return;
           }
           showError('Blog not found');
-          router.push('/admin/blogs');
+          router.push(`${dashBase}/blogs`);
           return;
         }
         const result = await response.json();
         if (!result?.success || !result?.data) {
           showError('Blog not found');
-          router.push('/admin/blogs');
+          router.push(`${dashBase}/blogs`);
           return;
         }
         const b = result.data;
@@ -83,7 +85,7 @@ export default function EditBlogPage() {
         if (b.featured_image_url) setImagePreview(b.featured_image_url);
       } catch (err) {
         showError('Failed to load blog');
-        router.push('/admin/blogs');
+        router.push(`${dashBase}/blogs`);
       } finally {
         setLoading(false);
       }
@@ -178,7 +180,7 @@ export default function EditBlogPage() {
         return;
       }
       showSuccess('Blog updated successfully');
-      router.push('/admin/blogs');
+      router.push(`${dashBase}/blogs`);
     } catch (err) {
       showError(err?.message || 'Failed to save blog');
     } finally {
@@ -213,7 +215,7 @@ export default function EditBlogPage() {
           headerLeft={
             <>
               <Link
-                href="/admin/blogs"
+                href={`${dashBase}/blogs`}
                 className="flex items-center justify-center w-8 h-8 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Back to blogs"
               >

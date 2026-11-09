@@ -14,11 +14,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function AdminEventPagesCmsListPage() {
-  const { isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, hasRole, hasAnyRole, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname() || "";
   const base =
-    pathname.startsWith("/superadmin/admin/events-cms") ? "/superadmin/admin/events-cms" : "/admin/events-cms";
+    pathname.startsWith("/superadmin/admin/events-cms") ? "/superadmin/admin/events-cms" : pathname.startsWith("/marketing/events-cms") ? "/marketing/events-cms" : "/admin/events-cms";
 
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,7 @@ export default function AdminEventPagesCmsListPage() {
 
   useEffect(() => {
     if (!authLoading) {
-      if (!isAuthenticated() || (!hasRole("admin") && !hasRole("superadmin"))) {
+      if (!isAuthenticated() || !hasAnyRole(['admin', 'marketing'])) {
         router.push("/");
         return;
       }
@@ -46,7 +46,7 @@ export default function AdminEventPagesCmsListPage() {
   }, [searchTerm]);
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated() && (hasRole("admin") || hasRole("superadmin"))) {
+    if (!authLoading && isAuthenticated() && (hasAnyRole(['admin', 'marketing']) || hasRole("superadmin"))) {
       fetchPages();
     }
   }, [debouncedSearchTerm]);

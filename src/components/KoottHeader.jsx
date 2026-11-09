@@ -27,6 +27,7 @@
  * control and its menu are kept, drawn to match the header rather than dropped.
  */
 
+import { dashboardFor } from '@/lib/staffRoles';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -141,10 +142,7 @@ export default function KoottHeader() {
     || user?.email?.split('@')[0]
     || 'Account';
   const initial = (displayName.trim()[0] || 'A').toUpperCase();
-  const dashboardPath = ({
-    admin: '/admin', superadmin: '/superadmin', psychologist: '/psychologist', finance: '/finance',
-    event_organizer: '/event-organizer', marketing: '/marketing',
-  })[user?.role] || '/profile/sessions';
+  const dashboardPath = dashboardFor(user?.role) || '/profile/sessions';
 
   const onLogout = async () => {
     setUserMenuOpen(false);
