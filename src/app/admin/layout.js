@@ -123,6 +123,7 @@ export default function AdminLayout({ children }) {
     { name: 'Job applications', href: '/admin/applications', icon: Briefcase },
     { name: 'Lead sources', href: '/admin/lead-sources', icon: BarChart3 },
     { name: 'Access log', href: '/admin/access-log', icon: FileText },
+    { name: 'Client timeline', href: '/admin/timeline', icon: Clock },
     {
       name: 'CMS',
       icon: Layers,

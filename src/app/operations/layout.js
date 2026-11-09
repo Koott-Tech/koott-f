@@ -1,7 +1,7 @@
 'use client';
 
 /** /operations - leads, lead to client, clients, bookings, sessions, rescheduling, tasks. */
-import { CalendarDays, ClipboardList, Home, PhoneCall, RefreshCw, Users } from 'lucide-react';
+import { CalendarDays, ClipboardList, History, Home, PhoneCall, RefreshCw, Users } from 'lucide-react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 
 const NAV = [
@@ -9,6 +9,7 @@ const NAV = [
   { group: 'Leads', items: [{ label: 'Leads', href: '/operations/leads', icon: PhoneCall }] },
   { group: 'Clients & sessions', items: [
     { label: 'Clients', href: '/operations/clients', icon: Users },
+    { label: 'Client timeline', href: '/operations/timeline', icon: History },
     { label: 'Bookings & sessions', href: '/operations/bookings', icon: CalendarDays },
     { label: 'Rescheduling', href: '/operations/rescheduling', icon: RefreshCw },
   ] },

@@ -141,7 +141,9 @@ function LeadPanel({ lead, onClose, onSaved, meKey }) {
         </div>
         {msg && <div className="mt-2 text-sm text-emerald-700">{msg}</div>}
         {err && <div className="mt-2 text-sm text-rose-600">{err}</div>}
-        {lead.client_id && <div className="mt-3 text-xs text-slate-500">Client record linked. Open it from Clients.</div>}
+        {lead.client_id && (
+          <a href={`${window.location.pathname.startsWith('/admin') ? '/admin' : '/operations'}/timeline?client=${lead.client_id}`} className="mt-3 inline-block text-sm font-semibold text-[#025545] hover:underline">Open the client timeline →</a>
+        )}
       </aside>
       <Modal open={tasking} onClose={() => setTasking(false)} title="Task about this lead">
         <TaskForm meKey={meKey} preset={{ title: `Call back ${lead.name || 'lead'}`, link_type: 'lead', link_id: lead.id, link_label: lead.name || 'Lead' }}
