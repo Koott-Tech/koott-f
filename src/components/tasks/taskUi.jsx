@@ -5,6 +5,7 @@
  * the new-task form (used by quick add, the Tasks page and "Report a problem").
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { tasksApi } from '@/lib/staffApi';
 
 export const STATUSES = [
@@ -240,8 +241,10 @@ export function Modal({ open, onClose, title, children, wide = false }) {
     document.addEventListener('keydown', esc);
     return () => document.removeEventListener('keydown', esc);
   }, [open, onClose]);
-  if (!open) return null;
-  return (
+  if (!open || typeof document === 'undefined') return null;
+  // Rendered into <body>: a modal opened from a slid-in sidebar (CSS transform) would
+  // otherwise be positioned inside that sidebar instead of over the screen.
+  return createPortal(
     <div className="fixed inset-0 z-[110] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} aria-hidden />
       <div className={`relative max-h-[92vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 shadow-2xl sm:rounded-2xl ${wide ? 'sm:max-w-3xl' : 'sm:max-w-lg'}`}>
@@ -251,6 +254,7 @@ export function Modal({ open, onClose, title, children, wide = false }) {
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

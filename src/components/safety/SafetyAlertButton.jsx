@@ -36,9 +36,9 @@ export default function SafetyAlertButton({ compact = false }) {
         {state === 'sent' ? (
           <div className="space-y-3 text-sm">
             <div className="rounded-xl bg-emerald-50 p-3 text-emerald-800">
-              Sent to the clinical lead{result?.emailed ? ' by email' : ''}. You&apos;ll see a notification when they acknowledge it.
+              {result?.leadSet ? 'Sent to the clinical lead' : 'Alert saved'}{result?.emailed ? ' and emailed' : ''}. You&apos;ll see a notification when they acknowledge it.
             </div>
-            {!result?.leadSet && <div className="rounded-xl bg-amber-50 p-3 text-amber-900">No clinical lead is set yet, so it went to the Koott admin address. Please also call your supervisor now.</div>}
+            {(!result?.leadSet || !result?.emailed) && <div className="rounded-xl bg-amber-50 p-3 text-amber-900">{!result?.leadSet ? 'No clinical lead is set yet' : 'No email could be sent'}{result?.emailed ? ', so it went to the Koott admin address' : ', so nobody has been emailed — Admin sees it on the Safety alerts page'}. Please also call your supervisor now.</div>}
             <div className="text-slate-600">If someone is in immediate danger, call 112, or Tele-MANAS 14416 (24x7).</div>
             <div className="flex justify-end"><button type="button" onClick={() => setOpen(false)} className="rounded-lg bg-[#025545] px-4 py-2 font-semibold text-white">Close</button></div>
           </div>
