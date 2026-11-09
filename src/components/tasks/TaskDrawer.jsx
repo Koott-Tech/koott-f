@@ -25,7 +25,9 @@ export function linkHref(task, role) {
       if (role === 'psychologist') return '/psychologist/sessions';
       return ['operations', 'admin', 'superadmin'].includes(role) ? `${base}/bookings` : null;
     case 'client': return ['operations', 'admin', 'superadmin'].includes(role) ? `${base === '/operations' ? '/operations/clients' : '/admin/users'}` : null;
-    case 'blog': return ['marketing', 'admin', 'superadmin'].includes(role) ? `${role === 'marketing' ? '/marketing/blogs' : '/admin/blogs'}/${task.link_id}/edit` : null;
+    case 'blog':
+      if (role === 'psychologist' && task.template_key === 'blog_review') return `/psychologist/blog-review?task=${task.id}`;
+      return ['marketing', 'admin', 'superadmin'].includes(role) ? `${role === 'marketing' ? '/marketing/blogs' : '/admin/blogs'}/${task.link_id}/edit` : null;
     case 'application': return ['hr', 'admin', 'superadmin'].includes(role) ? `${role === 'hr' ? '/hr' : '/admin'}/applications` : null;
     case 'person': return ['hr', 'admin', 'superadmin'].includes(role) ? `${role === 'hr' ? '/hr' : '/admin'}/people` : null;
     case 'payout': return ['finance', 'admin', 'superadmin'].includes(role) ? '/finance/payouts' : null;

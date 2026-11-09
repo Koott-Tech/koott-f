@@ -87,3 +87,34 @@ export const applicationsApi = {
   list: (query) => staffFetch('/careers/admin/applications', { query }),
   update: (id, body) => staffFetch(`/careers/admin/applications/${id}`, { method: 'PATCH', body }),
 };
+
+async function upload(path, form) {
+  let token = null;
+  try { token = getStoredToken(); } catch (_) { /* storage blocked */ }
+  const res = await fetch(`${API}${path}`, { method: 'POST', headers: token ? { Authorization: `Bearer ${token}` } : {}, body: form });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json.success === false) { const e = new Error(json.message || `Upload failed (${res.status})`); e.status = res.status; throw e; }
+  return json.data;
+}
+
+export const documentsApi = {
+  list: (query) => staffFetch('/documents', { query }),
+  /** fields: { title, kind, expires_on, person } + optional file */
+  create: (fields, file) => {
+    const f = new FormData();
+    Object.entries(fields).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== '') f.append(k, v); });
+    if (file) f.append('file', file);
+    return upload('/documents', f);
+  },
+  open: (id) => staffFetch(`/documents/${id}/file`),
+  update: (id, body) => staffFetch(`/documents/${id}`, { method: 'PATCH', body }),
+  remove: (id) => staffFetch(`/documents/${id}`, { method: 'DELETE' }),
+};
+
+export const safetyApi = {
+  lead: () => staffFetch('/safety/lead'),
+  setLead: (body) => staffFetch('/safety/lead', { method: 'PUT', body }),
+  raise: (body) => staffFetch('/safety/alerts', { method: 'POST', body }),
+  list: () => staffFetch('/safety/alerts'),
+  update: (id, body) => staffFetch(`/safety/alerts/${id}`, { method: 'PATCH', body }),
+};

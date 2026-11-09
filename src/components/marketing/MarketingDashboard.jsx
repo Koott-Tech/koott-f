@@ -518,6 +518,7 @@ export default function MarketingDashboard() {
         <div className="wx-navgrp">Content</div>
         <nav aria-label="Content">
           <a className="wx-navlink" href="/marketing/blogs">Blog</a>
+          <a className="wx-navlink" href="/marketing/blog-calendar">Blog calendar</a>
           <a className="wx-navlink" href="/marketing/events-cms">Events</a>
           <a className="wx-navlink" href="/marketing/event-results">Event results</a>
           <a className="wx-navlink" href="/marketing/assessments">Assessments</a>

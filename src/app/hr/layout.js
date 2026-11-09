@@ -8,6 +8,7 @@ const NAV = [
   { group: 'People', items: [
     { label: 'People', href: '/hr', icon: Users, exact: true },
     { label: 'Teams', href: '/hr/teams', icon: UsersRound },
+    { label: 'Documents', href: '/hr/documents', icon: FileText },
   ] },
   { group: 'Therapists', items: [
     { label: 'Onboarding progress', href: '/hr/onboarding', icon: ListChecks },

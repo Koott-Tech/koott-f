@@ -13,6 +13,7 @@ import {
   ClipboardList,
 } from 'lucide-react';
 import TaskDock from '@/components/tasks/TaskDock';
+import SafetyAlertButton from '@/components/safety/SafetyAlertButton';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function PsychologistLayout({ children }) {
@@ -51,6 +52,7 @@ export default function PsychologistLayout({ children }) {
     { name: 'Sessions', href: '/psychologist/sessions', icon: Calendar },
     { name: 'Tasks', href: '/psychologist/tasks', icon: ClipboardList },
     { name: 'My numbers', href: '/psychologist/numbers', icon: BarChart3 },
+    { name: 'My documents', href: '/psychologist/documents', icon: Settings },
     { name: 'Settings', href: '/psychologist/settings', icon: Settings }
   ];
 
@@ -163,6 +165,9 @@ export default function PsychologistLayout({ children }) {
             })}
           </nav>
 
+          {/* Urgent safety path: straight to the clinical lead, never the task queue */}
+          <div className="px-4 pb-2"><SafetyAlertButton /></div>
+
           {/* Logout */}
           <div className="p-4 border-t border-gray-200">
             <button
@@ -218,6 +223,9 @@ export default function PsychologistLayout({ children }) {
               );
             })}
           </nav>
+
+          {/* Urgent safety path: straight to the clinical lead, never the task queue */}
+          <div className="px-4 pb-2"><SafetyAlertButton /></div>
 
           {/* Logout */}
           <div className="p-4 border-t border-gray-200">
