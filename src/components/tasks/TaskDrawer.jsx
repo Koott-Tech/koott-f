@@ -15,19 +15,20 @@ import {
 /** Where a linked record opens, from this dashboard. */
 export function linkHref(task, role) {
   if (!task?.link_type) return null;
-  if (task.link_type === 'url') return task.link_url || null;
+  // Only https:// links or paths on this site (an old row could hold javascript:…).
+  if (task.link_type === 'url') return /^(https?:\/\/|\/(?!\/))/i.test(String(task.link_url || '')) ? task.link_url : null;
   const base = ['operations'].includes(role) ? '/operations'
     : role === 'hr' ? '/hr' : role === 'marketing' ? '/marketing' : role === 'finance' ? '/finance'
       : role === 'psychologist' ? '/psychologist' : role === 'superadmin' ? '/admin' : '/admin';
   switch (task.link_type) {
-    case 'lead': return ['operations', 'admin', 'superadmin'].includes(role) ? `${base}/leads?lead=${task.link_id}` : null;
+    case 'lead': return ['operations', 'admin', 'superadmin'].includes(role) ? `${base}/leads?lead=${encodeURIComponent(task.link_id)}` : null;
     case 'session': case 'booking':
       if (role === 'psychologist') return '/psychologist/sessions';
       return ['operations', 'admin', 'superadmin'].includes(role) ? `${base}/bookings` : null;
     case 'client': return ['operations', 'admin', 'superadmin'].includes(role) ? `${base === '/operations' ? '/operations/clients' : '/admin/users'}` : null;
     case 'blog':
       if (role === 'psychologist' && task.template_key === 'blog_review') return `/psychologist/blog-review?task=${task.id}`;
-      return ['marketing', 'admin', 'superadmin'].includes(role) ? `${role === 'marketing' ? '/marketing/blogs' : '/admin/blogs'}/${task.link_id}/edit` : null;
+      return ['marketing', 'admin', 'superadmin'].includes(role) ? `${role === 'marketing' ? '/marketing/blogs' : '/admin/blogs'}/${encodeURIComponent(task.link_id)}/edit` : null;
     case 'application': return ['hr', 'admin', 'superadmin'].includes(role) ? `${role === 'hr' ? '/hr' : '/admin'}/applications` : null;
     case 'person': return ['hr', 'admin', 'superadmin'].includes(role) ? `${role === 'hr' ? '/hr' : '/admin'}/people` : null;
     case 'payout': return ['finance', 'admin', 'superadmin'].includes(role) ? '/finance/payouts' : null;
