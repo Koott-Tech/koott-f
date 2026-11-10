@@ -67,6 +67,15 @@ export const tasksApi = {
   },
 };
 
+/** Operations' refund requests (header icon): Refund sends the money back through Razorpay. */
+export const refundsApi = {
+  count: () => staffFetch('/refunds/count'),
+  list: (status = 'open') => staffFetch('/refunds', { query: { status } }),
+  refund: (id, body) => staffFetch(`/refunds/${id}/refund`, { method: 'POST', body }),
+  reject: (id, note) => staffFetch(`/refunds/${id}/reject`, { method: 'POST', body: { note } }),
+  manual: (id, body) => staffFetch(`/refunds/${id}/manual`, { method: 'POST', body }),
+};
+
 export const leadsApi = {
   list: (query) => staffFetch('/leads', { query }),
   create: (body) => staffFetch('/leads', { method: 'POST', body }),

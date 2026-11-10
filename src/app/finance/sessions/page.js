@@ -511,7 +511,7 @@ export default function FinanceSessionsPage() {
     try {
       const res = await financeApi.cancelRefundSession(cancelTarget.id);
       if (!res?.success) throw new Error(res?.error || 'Failed');
-      showSuccess(`Cancelled & refunded${res.data?.calendarEventRemoved ? '. Calendar event removed.' : '.'}`, 'Cancelled');
+      showSuccess(res.message || 'Session cancelled. The refund is waiting for Operations to approve.', 'Cancelled');
       setCancelTarget(null);
       loadSessions();
     } catch (e) { showError(e.message || 'Failed to cancel', 'Error'); }
@@ -1330,7 +1330,7 @@ export default function FinanceSessionsPage() {
                 <h3 className="text-base font-semibold text-gray-900">Cancel &amp; Refund?</h3>
               </div>
               <p className="text-sm text-gray-500 mb-5">
-                This will mark the session as <strong>refunded</strong> and remove the Google Calendar event. Refund the client via your payment gateway separately.
+                This cancels the session, removes the Google Calendar event and sends a <strong>refund request to Operations</strong>, who refund it through Razorpay.
               </p>
               <div className="flex justify-end gap-2">
                 <button onClick={() => setCancelTarget(null)} disabled={isCancelling} className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">Back</button>

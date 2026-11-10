@@ -3,6 +3,7 @@
 /** /operations - leads, lead to client, clients, bookings, sessions, rescheduling, tasks. */
 import { CalendarDays, ClipboardList, History, Home, PhoneCall, RefreshCw, Users } from 'lucide-react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
+import RefundRequestsButton from '@/components/ops/RefundRequestsButton';
 
 const NAV = [
   { items: [{ label: 'Today', href: '/operations', icon: Home, exact: true }] },
@@ -17,5 +18,9 @@ const NAV = [
 ];
 
 export default function OperationsLayout({ children }) {
-  return <DashboardShell title="Operations" roles={['operations']} nav={NAV}>{children}</DashboardShell>;
+  return (
+    <DashboardShell title="Operations" roles={['operations']} nav={NAV} headerActions={(dark) => <RefundRequestsButton dark={dark} />}>
+      {children}
+    </DashboardShell>
+  );
 }

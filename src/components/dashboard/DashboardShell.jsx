@@ -40,7 +40,11 @@ function NavList({ nav, pathname, onNavigate }) {
   );
 }
 
-export default function DashboardShell({ title, roles, nav, children }) {
+/**
+ * headerActions(dark) → small header icons (e.g. Operations' refund requests): shown in the
+ * phone top bar (dark) and in a slim bar above the page on laptops.
+ */
+export default function DashboardShell({ title, roles, nav, children, headerActions = null }) {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname() || '';
@@ -97,9 +101,12 @@ export default function DashboardShell({ title, roles, nav, children }) {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sm font-bold text-[#025545]">K</span>
           <span className="text-sm font-semibold text-white">Koott · {title}</span>
         </a>
-        <button type="button" onClick={() => setMenu(true)} className="rounded-lg p-2 text-white hover:bg-white/10" aria-label="Open menu">
-          <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
-        </button>
+        <div className="flex items-center gap-1">
+          {headerActions && headerActions(true)}
+          <button type="button" onClick={() => setMenu(true)} className="rounded-lg p-2 text-white hover:bg-white/10" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+        </div>
       </header>
       {menu && (
         <div className="fixed inset-0 z-[96] lg:hidden" role="dialog" aria-modal="true">
@@ -115,7 +122,14 @@ export default function DashboardShell({ title, roles, nav, children }) {
         </div>
       )}
 
-      <main className="min-w-0 pb-24 lg:ml-60">{children}</main>
+      <main className="min-w-0 pb-24 lg:ml-60">
+        {headerActions && (
+          <div className="sticky top-0 z-30 hidden h-12 items-center justify-end gap-1 border-b border-slate-200 bg-white/90 px-6 backdrop-blur lg:flex">
+            {headerActions(false)}
+          </div>
+        )}
+        {children}
+      </main>
       <TaskDock />
     </div>
   );

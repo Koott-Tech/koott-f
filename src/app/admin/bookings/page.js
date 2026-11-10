@@ -474,7 +474,7 @@ export default function BookingsPage() {
     try {
       const res = await adminApi.cancelRefundSession(cancelRefundTarget.id);
       if (!res?.success) throw new Error(res?.error || 'Failed');
-      showSuccess(`Session cancelled & refunded${res.data?.calendarEventRemoved ? '. Calendar event removed.' : '.'}`, 'Cancelled');
+      showSuccess(res.message || 'Session cancelled. The refund is waiting for Operations to approve.', 'Cancelled');
       setCancelRefundTarget(null);
       loadBookings();
     } catch (e) { showError(e?.message || 'Failed to cancel', 'Error'); }
@@ -1781,11 +1781,11 @@ export default function BookingsPage() {
             </div>
             <p className="text-sm text-gray-600 mb-1">This will:</p>
             <ul className="text-sm text-gray-500 list-disc ml-4 mb-4 space-y-1">
-              <li>Mark the session as <strong>refunded</strong> in our system</li>
+              <li>Cancel the session</li>
               <li>Remove the therapist&apos;s <strong>Google Calendar event</strong> so the slot reopens</li>
-              <li>Keep finance reporting under <strong>Refunds</strong></li>
+              <li>Send a <strong>refund request to Operations</strong>; it is refunded through Razorpay when they approve it</li>
             </ul>
-            <p className="text-xs text-gray-400 mb-5">Refund the client directly via your payment gateway if needed.</p>
+            <p className="text-xs text-gray-400 mb-5">The session shows as refunded once the money has gone back.</p>
             <div className="flex justify-end gap-2">
               <button onClick={() => setCancelRefundTarget(null)} disabled={isCancelRefunding} className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40">
                 Back
