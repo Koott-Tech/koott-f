@@ -16,9 +16,13 @@ function destination(role) {
   const home = dashboardFor(role);
   if (!home) return null;
   try {
-    const next = new URLSearchParams(window.location.search).get('next');
+    const raw = new URLSearchParams(window.location.search).get('next');
     const adminish = role === 'admin' || role === 'superadmin';
-    if (next && next.startsWith('/') && !next.startsWith('//') && (next === home || next.startsWith(`${home}/`) || next.startsWith('/tasks/open') || adminish)) return next;
+    // Same site only: "/\evil.com" and "/%5Cevil.com" start with "/" but browsers open
+    // another site, so resolve the URL and compare the origin.
+    const url = raw && raw.startsWith('/') ? new URL(raw, window.location.origin) : null;
+    const next = url && url.origin === window.location.origin && !/[\\\t\n\r]/.test(raw) ? `${url.pathname}${url.search}${url.hash}` : null;
+    if (next && (next === home || next.startsWith(`${home}/`) || next.startsWith('/tasks/open') || adminish)) return next;
   } catch (_) { /* no window */ }
   return home;
 }

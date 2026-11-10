@@ -13,14 +13,25 @@ export async function staffFetch(path, { method = 'GET', body, query } = {}) {
   const qs = query
     ? `?${new URLSearchParams(Object.entries(query).filter(([, v]) => v !== undefined && v !== null && v !== '')).toString()}`
     : '';
-  const res = await fetch(`${API}${path}${qs}`, {
-    method,
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let res;
+  try {
+    res = await fetch(`${API}${path}${qs}`, {
+      method,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (_) {
+    // Network down / server unreachable: say so in plain words (was "Failed to fetch").
+    const err = new Error("Can't reach Koott right now. Check your connection — this page will try again.");
+    err.status = 0;
+    throw err;
+  }
   const json = await res.json().catch(() => ({}));
   if (!res.ok || json.success === false) {
-    const err = new Error(json.message || json.error || `Request failed (${res.status})`);
+    const fallback = res.status === 429 ? 'Too many requests just now. Wait a minute and try again.'
+      : res.status >= 500 ? 'Something went wrong on our side. Please try again in a moment.'
+        : `Request failed (${res.status})`;
+    const err = new Error(json.message || json.error || fallback);
     err.status = res.status;
     throw err;
   }
