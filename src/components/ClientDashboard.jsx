@@ -363,7 +363,7 @@ function UpdateSheet({ session, onClose, onDone }) {
 }
 
 /** "multi" / the rest of a package: everything after the next session. */
-function ComingUp({ sessions }) {
+function ComingUp({ sessions, onUpdate }) {
   if (!sessions.length) return null;
   return (
     <div className="cdb-later">
@@ -384,7 +384,16 @@ function ComingUp({ sessions }) {
                 </small>
                 <small>{DURATION(s)} min · Google Meet</small>
               </div>
-              <span className="cdb-chip cdb-ok">Confirmed</span>
+              <div className="cdb-uc-side">
+                {s.cancel_request
+                  ? <span className="cdb-chip cdb-warn">Cancellation requested</span>
+                  : <span className="cdb-chip cdb-ok">Confirmed</span>}
+                {onUpdate && (
+                  <button type="button" className="cdb-uc-link" onClick={() => onUpdate(s)}>
+                    {s.cancel_request ? 'View request' : 'Cancel'}
+                  </button>
+                )}
+              </div>
             </li>
           );
         })}
@@ -697,7 +706,7 @@ export default function ClientDashboard({ client, fixture = null, previewState =
           client={client}
           onUpdate={(s) => (fixture ? setToast('To change a session, message your therapist or our care team.') : setUpdating(s))}
         />
-        <ComingUp sessions={later} />
+        <ComingUp sessions={later} onUpdate={fixture ? null : (s) => setUpdating(s)} />
         {packages.map((p) => <PackagePanel key={p.id} pack={p} sessions={sorted} />)}
         {next && <PaidPanels therapistName={nameOf(next.psychologist)} />}
       </>
@@ -954,6 +963,8 @@ const CSS = `
   .cdb-uc{grid-template-columns:auto minmax(0,1fr);padding:14px 16px}
   .cdb-dtile{grid-row:1/span 2;align-self:start}
   .cdb-uc .cdb-chip{grid-column:2;grid-row:2;justify-self:start;margin-top:4px}
+  .cdb-uc-side{grid-column:2;grid-row:2;flex-direction:row;align-items:center;justify-self:start;gap:14px;margin-top:4px}
+  .cdb-uc-side .cdb-chip{grid-column:auto;grid-row:auto;margin-top:0}
   .cdb-ses.cdb-done{flex-wrap:wrap}
   .cdb-ses-r{width:100%;margin-left:0}
   .cdb-preview button{display:none}
@@ -985,4 +996,7 @@ const CSS = `
 .cdb-confirm p{margin:0 0 12px;font-size:14px;color:#334155;line-height:1.5}
 .cdb-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cdb-row2 .cdb-btn{justify-content:center}
+.cdb-uc-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.cdb-uc-link{border:0;background:none;padding:2px 0;font-size:13px;font-weight:600;color:#b91c1c;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.cdb-uc-link:hover{color:#7f1d1d}
 `;
