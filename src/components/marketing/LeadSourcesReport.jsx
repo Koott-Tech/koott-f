@@ -12,6 +12,71 @@ import { SOURCE_LABEL } from '@/components/ops/LeadsPipeline';
 const pct = (a, b) => (b ? `${Math.round((a / b) * 100)}%` : '—');
 const ymd = (d) => d.toISOString().slice(0, 10);
 
+const inr = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
+const NOTE = 'Where they first found us: Koott\'s own tracking (utm tags, Facebook / Google click ids, the site they came from). "Not tracked": before tracking, by phone, or with tracking blocked.';
+
+/** Paid bookings and leads per channel (Instagram ads, Google Ads, direct…) — totals only. */
+function ChannelTables({ data }) {
+  const bookings = data.bookingChannels || [];
+  const leads = data.channels || [];
+  const maxRevenue = Math.max(1, ...bookings.map((b) => b.revenue));
+  const totals = bookings.reduce((a, b) => ({ bookings: a.bookings + b.bookings, revenue: a.revenue + b.revenue }), { bookings: 0, revenue: 0 });
+  return (
+    <>
+      <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-slate-200 lg:col-span-3">
+        <div className="px-4 pt-4">
+          <div className="text-sm font-semibold text-slate-900" role="heading" aria-level={2}>Paid bookings by channel</div>
+          <div className="mt-0.5 text-xs text-slate-500">Every paid booking in this period — leads or not — by where the client first found us. {bookings.length ? `${totals.bookings} bookings · ${inr(totals.revenue)}` : ''}</div>
+        </div>
+        <table className="mt-2 min-w-full text-sm">
+          <thead className="bg-slate-50 text-left text-[11px] uppercase tracking-wide text-slate-500">
+            <tr><th className="px-4 py-2">Channel</th><th className="px-3 py-2 text-right">Bookings</th><th className="px-3 py-2 text-right">Clients</th><th className="px-3 py-2 text-right">Revenue</th><th className="px-3 py-2 text-right">Share</th></tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {bookings.map((b) => (
+              <tr key={b.label}>
+                <td className="px-4 py-2.5">
+                  <div className={`font-medium ${b.channel ? 'text-slate-900' : 'text-slate-500'}`}>{b.label}</div>
+                  <div className="mt-1 h-1.5 w-full max-w-[220px] overflow-hidden rounded-full bg-slate-100"><div className="h-full bg-[#025545]" style={{ width: `${(b.revenue / maxRevenue) * 100}%` }} /></div>
+                </td>
+                <td className="px-3 py-2.5 text-right">{b.bookings}</td>
+                <td className="px-3 py-2.5 text-right">{b.clients}</td>
+                <td className="px-3 py-2.5 text-right font-semibold text-slate-900">{inr(b.revenue)}</td>
+                <td className="px-3 py-2.5 text-right">{pct(b.revenue, totals.revenue)}</td>
+              </tr>
+            ))}
+            {!bookings.length && <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-500">No paid bookings in this period.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+      <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-slate-200 lg:col-span-3">
+        <div className="px-4 pt-4">
+          <div className="text-sm font-semibold text-slate-900" role="heading" aria-level={2}>Leads by channel</div>
+          <div className="mt-0.5 text-xs text-slate-500">{NOTE}</div>
+        </div>
+        <table className="mt-2 min-w-full text-sm">
+          <thead className="bg-slate-50 text-left text-[11px] uppercase tracking-wide text-slate-500">
+            <tr><th className="px-4 py-2">Channel</th><th className="px-3 py-2 text-right">Leads</th><th className="px-3 py-2 text-right">Contacted</th><th className="px-3 py-2 text-right">Converted</th><th className="px-3 py-2 text-right">Paying</th><th className="px-3 py-2 text-right">Lead → paying</th></tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {leads.map((c) => (
+              <tr key={c.label}>
+                <td className={`px-4 py-2.5 font-medium ${c.channel ? 'text-slate-900' : 'text-slate-500'}`}>{c.label}</td>
+                <td className="px-3 py-2.5 text-right">{c.leads}</td>
+                <td className="px-3 py-2.5 text-right">{c.contacted}</td>
+                <td className="px-3 py-2.5 text-right">{c.converted}</td>
+                <td className="px-3 py-2.5 text-right font-semibold text-slate-900">{c.paying}</td>
+                <td className="px-3 py-2.5 text-right">{pct(c.paying, c.leads)}</td>
+              </tr>
+            ))}
+            {!leads.length && <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-500">No leads in this period.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
 export default function LeadSourcesReport() {
   const [range, setRange] = useState(90);
   const [data, setData] = useState(null);
@@ -66,6 +131,7 @@ export default function LeadSourcesReport() {
             ))}
             {!data.lostReasons.length && <div className="text-sm text-slate-500">No lost leads in this period.</div>}
           </div>
+          <ChannelTables data={data} />
         </div>
       )}
     </div>
