@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react';
 import { staffFetch } from '@/lib/staffApi';
 import { fmtWhen } from '@/components/tasks/taskUi';
+import { CameFromBox } from './CameFrom';
 
 const ICON = { lead: '🧲', session: '🗓️', payment: '₹', task: '☑', account: '👤' };
 const TONE = { lead: 'bg-sky-50 text-sky-700', session: 'bg-indigo-50 text-indigo-700', payment: 'bg-emerald-50 text-emerald-700', task: 'bg-amber-50 text-amber-800', account: 'bg-slate-100 text-slate-600' };
@@ -75,6 +76,7 @@ export default function ClientTimeline({ base = '/operations' }) {
               {data.client.phone && <a href={`https://wa.me/${String(data.client.phone).replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="rounded-full bg-emerald-600 px-2.5 py-1 font-semibold text-white">WhatsApp</a>}
               {data.client.phone && <a href={`tel:${data.client.phone}`} className="rounded-full bg-[#025545] px-2.5 py-1 font-semibold text-white">Call</a>}
             </div>
+            <div className="mt-3"><CameFromBox a={data.attribution} /></div>
           </div>
           <ol className="relative space-y-3 border-l border-slate-200 pl-5">
             {data.events.map((e, i) => (

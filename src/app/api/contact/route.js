@@ -81,7 +81,7 @@ export async function POST(request) {
           'x-client-ip': clientIp(request),
         } : {}),
       },
-      body: JSON.stringify({ name, email, phone, topic: [reason, position].filter(Boolean).join(' · ') || 'Contact form', message }),
+      body: JSON.stringify({ analytics: body.analytics && typeof body.analytics === 'object' && JSON.stringify(body.analytics).length < 8000 ? body.analytics : undefined, name, email, phone, topic: [reason, position].filter(Boolean).join(' · ') || 'Contact form', message }),
       signal: AbortSignal.timeout(5000),
     });
     savedAsLead = leadRes.ok;

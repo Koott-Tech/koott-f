@@ -21,6 +21,7 @@
 
 import { useState } from 'react';
 import CustomSelect from '@/components/CustomSelect';
+import { analyticsContext } from '@/analytics';
 
 const BANNER = 'https://static.wixstatic.com/media/11062b_4d7e8926f2754d96b1473dda3a8f8171~mv2.jpg';
 
@@ -56,7 +57,8 @@ export default function ContactPage() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, fileName: file?.name || null }),
+        // analytics: where this visitor came from (first-party touch), saved on the lead
+        body: JSON.stringify({ ...form, fileName: file?.name || null, analytics: (() => { try { return analyticsContext(); } catch (_) { return null; } })() }),
       });
       const json = await res.json().catch(() => ({}));
       if (res.ok) {

@@ -30,6 +30,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import WheelPagination from '@/components/ui/wheel-pagination';
 import ClientBookingsHistoryModal from '@/components/ClientBookingsHistoryModal';
+import { ClientCameFrom } from '@/components/ops/CameFrom';
 
 export default function UsersPage() {
   const { showError, showSuccess } = useNotification();
@@ -575,6 +576,9 @@ export default function UsersPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Where the client came from (Instagram, Google Ads, direct…) */}
+              {(selectedUser.role || 'client') === 'client' && <ClientCameFrom clientId={selectedUser.profile?.id || selectedUser.id} />}
 
               {/* Child Information (for clients) */}
               {selectedUser.role === 'client' && (selectedUser.profile?.child_name || selectedUser.profile?.child_age) && (

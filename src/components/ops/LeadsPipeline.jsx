@@ -11,6 +11,7 @@ import { leadsApi } from '@/lib/staffApi';
 import { AssigneePicker, Modal, TaskForm, fmtWhen, toInputValue, fromInputValue, usePeople } from '@/components/tasks/taskUi';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVisiblePoll } from '@/lib/useVisiblePoll';
+import { CameFromBox, CameFromChip } from './CameFrom';
 
 export const STAGES = [
   { value: 'new', label: 'New', tone: 'bg-sky-500' },
@@ -42,6 +43,7 @@ function LeadCard({ lead, onOpen, draggable }) {
       </div>
       <div className="mt-1 text-[11px] text-slate-500">{SOURCE_LABEL[lead.source] || lead.source}{lead.source_detail ? ` · ${lead.source_detail}` : ''}</div>
       <div className="mt-1.5 flex flex-wrap gap-1">
+        <CameFromChip a={lead.attribution} />
         {lead.waitingTooLong && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700">Not contacted 2h+</span>}
         {lead.followUpDue && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-800">Follow-up due</span>}
         {lead.ownerName && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600">{lead.ownerName}</span>}
@@ -98,6 +100,8 @@ function LeadPanel({ lead, onClose, onSaved, meKey }) {
           {lead.email && <a href={`mailto:${lead.email}`} onClick={() => logContact('email')} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700">Email</a>}
           <button type="button" onClick={() => setTasking(true)} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700">+ Task</button>
         </div>
+
+        <div className="mb-4"><CameFromBox a={lead.attribution} /></div>
 
         <div className="mb-4">
           <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Stage</div>
