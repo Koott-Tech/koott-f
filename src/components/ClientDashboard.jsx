@@ -183,7 +183,9 @@ function Ticket({ session, draft, client, onUpdate }) {
           <div className="cdb-t-top">
             <span className="cdb-t-brand">Koott · Session ticket</span>
             {paid
-              ? <span className="cdb-chip cdb-ok">Confirmed</span>
+              ? (session.cancel_request
+                ? <span className="cdb-chip cdb-warn">Cancellation requested</span>
+                : <span className="cdb-chip cdb-ok">Confirmed</span>)
               : <span className="cdb-chip cdb-warn">Awaiting payment</span>}
           </div>
           <div className="cdb-who">
@@ -274,6 +276,89 @@ function Ticket({ session, draft, client, onUpdate }) {
         </>
       )}
     </section>
+  );
+}
+
+/**
+ * "Update your session": cancel with the 48-hour rule.
+ *   48 h or more before -> cancelled and refunded automatically.
+ *   Less than 48 h      -> a request goes to our team; the session stays booked until they reply.
+ */
+const CANCEL_HOURS = 48;
+function UpdateSheet({ session, onClose, onDone }) {
+  const [step, setStep] = useState('view'); // view | confirm | busy | done
+  const [msg, setMsg] = useState('');
+  const [err, setErr] = useState('');
+  const start = startOf(session);
+  const hours = start ? (start.getTime() - Date.now()) / 3600000 : 0;
+  const early = hours >= CANCEL_HOURS;
+  const requested = Boolean(session.cancel_request);
+  useEffect(() => {
+    const esc = (e) => { if (e.key === 'Escape' && step !== 'busy') onClose(); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, [onClose, step]);
+
+  const cancel = async () => {
+    setStep('busy'); setErr('');
+    try {
+      const res = await clientApi.cancelSession(session.id);
+      if (res && res.success === false) throw new Error(res.message || res.error || 'Could not cancel.');
+      setMsg(res?.message || 'Done.');
+      setStep('done');
+      onDone();
+    } catch (e) { setErr(e?.message || 'Could not cancel. Please try again or message us.'); setStep('view'); }
+  };
+
+  return (
+    <div className="cdb-sheet-bg" role="dialog" aria-modal="true" aria-label="Update your session" onClick={() => step !== 'busy' && onClose()}>
+      <div className="cdb-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="cdb-sheet-head">
+          <h3>Update your session</h3>
+          <button type="button" className="cdb-x" onClick={onClose} aria-label="Close" disabled={step === 'busy'}>✕</button>
+        </div>
+        <p className="cdb-sheet-when">{dayLabel(start, true)} · {timeLabel(start)}</p>
+
+        {step === 'done' ? (
+          <>
+            <p className="cdb-sheet-ok">{msg}</p>
+            <button type="button" className="cdb-btn cdb-primary cdb-full" onClick={onClose}>Close</button>
+          </>
+        ) : requested ? (
+          <>
+            <p className="cdb-sheet-note">You asked to cancel this session. Our team will reply soon; until then it stays booked.</p>
+            <button type="button" className="cdb-btn cdb-full" onClick={onClose}>Close</button>
+          </>
+        ) : (
+          <>
+            <p className="cdb-sheet-note">To move it to another time, message your therapist or our care team.</p>
+            <div className="cdb-policy">
+              <b>Cancelling</b>
+              <span>{CANCEL_HOURS} hours or more before the session: cancelled at once and refunded automatically.</span>
+              <span>Less than {CANCEL_HOURS} hours before: your request goes to our team, and the session stays booked until they reply.</span>
+            </div>
+            {err && <p className="cdb-sheet-err">{err}</p>}
+            {step === 'view' ? (
+              <button type="button" className="cdb-btn cdb-danger cdb-full" onClick={() => setStep('confirm')}>
+                {early ? 'Cancel this session' : 'Ask to cancel this session'}
+              </button>
+            ) : (
+              <div className="cdb-confirm">
+                <p>{early
+                  ? 'Cancel this session? It is cancelled now and your payment is refunded to the same account in 5–7 working days.'
+                  : `Your session is in less than ${CANCEL_HOURS} hours. Send a cancellation request to our team?`}</p>
+                <div className="cdb-row2">
+                  <button type="button" className="cdb-btn" onClick={() => setStep('view')} disabled={step === 'busy'}>Back</button>
+                  <button type="button" className="cdb-btn cdb-danger" onClick={cancel} disabled={step === 'busy'}>
+                    {step === 'busy' ? 'Please wait…' : early ? 'Yes, cancel' : 'Yes, send request'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -513,6 +598,8 @@ export default function ClientDashboard({ client, fixture = null, previewState =
   const [status, setStatus] = useState('loading');
   const [open, setOpen] = useState([0]);
   const [toast, setToast] = useState('');
+  const [updating, setUpdating] = useState(null);
+  const [reload, setReload] = useState(0);
   const { draft, slotState } = useBookingDraft();
 
   useEffect(() => {
@@ -541,7 +628,7 @@ export default function ClientDashboard({ client, fixture = null, previewState =
       }
     })();
     return () => { off = true; };
-  }, [fixture]);
+  }, [fixture, reload]);
 
   const sorted = useMemo(
     () => [...upcoming].sort((a, b) => (startOf(a)?.getTime() || 0) - (startOf(b)?.getTime() || 0)),
@@ -608,7 +695,7 @@ export default function ClientDashboard({ client, fixture = null, previewState =
           session={next}
           draft={pending}
           client={client}
-          onUpdate={() => setToast('To change a session, message your therapist or our care team.')}
+          onUpdate={(s) => (fixture ? setToast('To change a session, message your therapist or our care team.') : setUpdating(s))}
         />
         <ComingUp sessions={later} />
         {packages.map((p) => <PackagePanel key={p.id} pack={p} sessions={sorted} />)}
@@ -636,6 +723,7 @@ export default function ClientDashboard({ client, fixture = null, previewState =
       </main>
       {onPreviewChange && <PreviewSwitch state={previewState} onChange={onPreviewChange} />}
       <div className={`cdb-toast${toast ? ' cdb-on' : ''}`} role="status">{toast}</div>
+      {updating && <UpdateSheet session={updating} onClose={() => setUpdating(null)} onDone={() => setReload((n) => n + 1)} />}
     </div>
   );
 }
@@ -880,4 +968,21 @@ const CSS = `
   .cdb-grid{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){.cdb-toast{transition:none}}
+.cdb-sheet-bg{position:fixed;inset:0;z-index:120;background:rgba(15,23,42,.45);display:flex;align-items:flex-end;justify-content:center}
+.cdb-sheet{background:#fff;width:100%;max-width:480px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.18)}
+@media (min-width:640px){.cdb-sheet-bg{align-items:center;padding:16px}.cdb-sheet{border-radius:18px}}
+.cdb-sheet-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.cdb-sheet-head h3{margin:0;font-size:18px;font-weight:700;color:#0f172a}
+.cdb-x{border:0;background:none;font-size:18px;color:#64748b;cursor:pointer;padding:4px}
+.cdb-sheet-when{margin:4px 0 14px;color:#475569;font-size:14px}
+.cdb-sheet-note{margin:0 0 12px;color:#334155;font-size:14px;line-height:1.5}
+.cdb-sheet-ok{margin:0 0 14px;padding:12px;border-radius:12px;background:#ecfdf5;color:#065f46;font-size:14px;line-height:1.5}
+.cdb-sheet-err{margin:0 0 10px;padding:10px;border-radius:10px;background:#fef2f2;color:#b91c1c;font-size:13px}
+.cdb-policy{display:grid;gap:6px;margin:0 0 14px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;font-size:13px;color:#475569;line-height:1.45}
+.cdb-policy b{color:#0f172a}
+.cdb-full{width:100%;justify-content:center}
+.cdb-danger{background:#b91c1c !important;color:#fff !important;border-color:#b91c1c !important}
+.cdb-confirm p{margin:0 0 12px;font-size:14px;color:#334155;line-height:1.5}
+.cdb-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cdb-row2 .cdb-btn{justify-content:center}
 `;

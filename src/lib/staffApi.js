@@ -73,6 +73,7 @@ export const refundsApi = {
   list: (status = 'open') => staffFetch('/refunds', { query: { status } }),
   refund: (id, body) => staffFetch(`/refunds/${id}/refund`, { method: 'POST', body }),
   reject: (id, note) => staffFetch(`/refunds/${id}/reject`, { method: 'POST', body: { note } }),
+  cancelOnly: (id, note) => staffFetch(`/refunds/${id}/cancel-only`, { method: 'POST', body: { note } }),
   manual: (id, body) => staffFetch(`/refunds/${id}/manual`, { method: 'POST', body }),
 };
 

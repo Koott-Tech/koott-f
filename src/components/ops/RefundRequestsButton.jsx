@@ -43,6 +43,11 @@ function Details({ r, onDone, onBack }) {
   const [err, setErr] = useState('');
   const [mode, setMode] = useState('refund'); // refund | reject | manual
   const open = ['pending', 'failed'].includes(r.status);
+  // A client's cancellation request within 48 h: the session is still booked until decided.
+  const asking = r.kind === 'cancel_request' && r.sessionLive;
+  const MODES = asking
+    ? [['refund', 'Cancel & refund'], ['cancel_only', 'Cancel, no refund'], ['reject', 'Keep the session']]
+    : [['refund', 'Refund'], ['reject', "Don't refund"], ['manual', 'Refunded by hand']];
   const amt = Number(amount);
   const amountOk = amt > 0 && amt <= Number(r.amount_paid);
 
@@ -51,6 +56,7 @@ function Details({ r, onDone, onBack }) {
     try {
       if (mode === 'refund') await refundsApi.refund(r.id, { amount: amt, note: note || undefined });
       else if (mode === 'reject') await refundsApi.reject(r.id, note);
+      else if (mode === 'cancel_only') await refundsApi.cancelOnly(r.id, note);
       else await refundsApi.manual(r.id, { amount: amt, note });
       onDone();
     } catch (e) { setErr(e.message); setStep('view'); }
@@ -62,13 +68,19 @@ function Details({ r, onDone, onBack }) {
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <div className="text-lg font-semibold text-slate-900">{r.clientName || r.clientRef || 'Client'}</div>
         <Badge status={r.status} />
+        {r.kind === 'cancel_request' && <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-semibold text-violet-800">Cancel request</span>}
       </div>
+      {asking && r.status === 'pending' && (
+        <p className="mb-3 rounded-lg bg-violet-50 p-2 text-sm text-violet-900">
+          The client asked to cancel within 48 hours of the session. The session is <strong>still booked</strong> until you decide.
+        </p>
+      )}
       <div className="rounded-xl border border-slate-200 p-3">
         <Row label="Client">{r.clientRef}{r.clientPhone ? ` · ${r.clientPhone}` : ''}</Row>
         {r.clientEmail && <Row label="Email">{r.clientEmail}</Row>}
         <Row label="Session">{r.session ? `${r.session.date} ${r.session.time} IST` : '—'}{r.session?.type ? ` · ${r.session.type}` : ''}</Row>
         <Row label="Therapist">{r.therapistName || '—'}</Row>
-        <Row label="Cancelled by">{r.requestedBy} · {when(r.created_at)}</Row>
+        <Row label={r.kind === 'cancel_request' ? 'Asked by' : 'Cancelled by'}>{r.requestedBy} · {when(r.created_at)}</Row>
         {r.reason && <Row label="Reason">{r.reason}</Row>}
         <Row label="Paid">{inr(r.amount_paid)}{r.payment?.method ? ` · ${r.payment.method}` : ''}{r.payment?.paidAt ? ` · ${when(r.payment.paidAt)}` : ''}</Row>
         <Row label="Razorpay payment">{r.razorpay_payment_id || 'Not paid through Razorpay'}</Row>
@@ -82,12 +94,12 @@ function Details({ r, onDone, onBack }) {
       {open && (
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap gap-2 text-sm">
-            {[['refund', 'Refund'], ['reject', "Don't refund"], ['manual', 'Refunded by hand']].map(([k, label]) => (
+            {MODES.map(([k, label]) => (
               <button key={k} type="button" onClick={() => { setMode(k); setStep('view'); setErr(''); }}
                 className={`rounded-full px-3 py-1 ring-1 ${mode === k ? 'bg-[#025545] text-white ring-[#025545]' : 'text-slate-700 ring-slate-300 hover:bg-slate-50'}`}>{label}</button>
             ))}
           </div>
-          {mode !== 'reject' && (
+          {!['reject', 'cancel_only'].includes(mode) && (
             <label className="block text-sm">
               <span className="text-slate-600">Amount (₹) — up to {inr(r.amount_paid)}</span>
               <input type="number" inputMode="decimal" min="1" step="0.01" max={r.amount_paid} value={amount} onChange={(e) => { setAmount(e.target.value); setStep('view'); }}
@@ -95,21 +107,26 @@ function Details({ r, onDone, onBack }) {
             </label>
           )}
           <label className="block text-sm">
-            <span className="text-slate-600">{mode === 'refund' ? 'Note (optional)' : mode === 'reject' ? 'Why no refund? (the client may ask)' : 'How was it refunded? (e.g. bank transfer, ref no.)'}</span>
+            <span className="text-slate-600">{mode === 'refund' ? 'Note (optional)'
+              : mode === 'reject' ? (asking ? 'Why the session stays (the client is emailed)' : 'Why no refund? (the client may ask)')
+                : mode === 'cancel_only' ? 'Why no refund (the client is emailed)' : 'How was it refunded? (e.g. bank transfer, ref no.)'}</span>
             <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" />
           </label>
           {err && <p className="rounded-lg bg-red-50 p-2 text-sm text-red-700">{err}</p>}
           {mode === 'refund' && !r.canRefund && <p className="text-sm text-amber-700">This booking was not paid through Razorpay. Refund it by hand, then use "Refunded by hand".</p>}
           {step !== 'confirm' ? (
             <button type="button"
-              disabled={step === 'busy' || (mode === 'refund' && (!r.canRefund || !amountOk)) || (mode === 'manual' && (!amountOk || !note.trim())) || (mode === 'reject' && !note.trim())}
+              disabled={step === 'busy' || (mode === 'refund' && (!r.canRefund || !amountOk)) || (mode === 'manual' && (!amountOk || !note.trim())) || (['reject', 'cancel_only'].includes(mode) && !note.trim())}
               onClick={() => (mode === 'refund' ? setStep('confirm') : go())}
               className="w-full rounded-xl bg-[#025545] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40">
-              {step === 'busy' ? 'Working…' : mode === 'refund' ? `Refund ${amountOk ? inr(amt) : ''}` : mode === 'reject' ? "Don't refund" : 'Save as refunded by hand'}
+              {step === 'busy' ? 'Working…'
+                : mode === 'refund' ? `${asking ? 'Cancel the session and refund' : 'Refund'} ${amountOk ? inr(amt) : ''}`
+                  : mode === 'reject' ? (asking ? 'Keep the session' : "Don't refund")
+                    : mode === 'cancel_only' ? 'Cancel the session, no refund' : 'Save as refunded by hand'}
             </button>
           ) : (
             <div className="rounded-xl border border-red-200 bg-red-50 p-3">
-              <p className="text-sm text-red-800">Send <strong>{inr(amt)}</strong> back to {r.clientName || r.clientRef} through Razorpay? This cannot be undone.</p>
+              <p className="text-sm text-red-800">{asking ? 'Cancel the session and send ' : 'Send '}<strong>{inr(amt)}</strong> back to {r.clientName || r.clientRef} through Razorpay? This cannot be undone.</p>
               <div className="mt-3 flex gap-2">
                 <button type="button" onClick={() => setStep('view')} className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">Back</button>
                 <button type="button" onClick={go} className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white">Yes, refund {inr(amt)}</button>
@@ -173,7 +190,9 @@ export default function RefundRequestsButton({ dark = false }) {
                       <li key={r.id}>
                         <button type="button" onClick={() => setPicked(r)} className="flex w-full items-center justify-between gap-3 py-3 text-left hover:bg-slate-50">
                           <span className="min-w-0">
-                            <span className="block truncate text-sm font-semibold text-slate-900">{r.clientName || r.clientRef} · {inr(r.amount_suggested)}</span>
+                            <span className="block truncate text-sm font-semibold text-slate-900">
+                              {r.kind === 'cancel_request' && r.sessionLive ? 'Wants to cancel · ' : ''}{r.clientName || r.clientRef} · {inr(r.amount_suggested)}
+                            </span>
                             <span className="block truncate text-xs text-slate-500">
                               {r.session ? `Session ${r.session.date} ${r.session.time}` : 'Session'}{r.therapistName ? ` · ${r.therapistName}` : ''} · {r.requestedBy} · {when(r.created_at)}
                             </span>
