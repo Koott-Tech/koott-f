@@ -157,6 +157,8 @@ export default function BookingFlow({ slug }) {
     name: '', email: '', age: '', dial: '+91', phone: '', emergency: '',
   });
   const [authOpen, setAuthOpen] = useState(false);
+  const [needLogin, setNeedLogin] = useState(false); // testing-phase code on a number with an account
+  const [reverify, setReverify] = useState(false); // after that log-in: verify again, signed in
   const [pendingPay, setPendingPay] = useState(false);
   const [paying, setPaying] = useState(false);
   const [payErr, setPayErr] = useState('');
@@ -246,9 +248,15 @@ export default function BookingFlow({ slug }) {
 
   const verifyOtp = async (code = otpCode) => {
     if (code.length !== otpLen) return;
-    setOtpBusy(true); setOtpErr('');
+    setOtpBusy(true); setOtpErr(''); setNeedLogin(false);
     try {
       const d = await postOtp('verify', { phone: otpPhone, code, psychologistId: therapist?.id, analytics: analyticsContext() });
+      // Testing-phase code on a number that already has an account: log in with the password.
+      if (d.signInRequired) {
+        setOtpErr('This number already has a Koott account. Please log in to continue.');
+        setNeedLogin(true);
+        return;
+      }
       track('phone_verified', {}, { psychologistId: therapist?.id });
       // The number already belongs to a Koott client: sign them in and say so.
       if (d.found && d.auth?.token) {
@@ -265,6 +273,11 @@ export default function BookingFlow({ slug }) {
       setOtpBusy(false);
     }
   };
+
+  // Runs on the render after log-in, so the request carries the new sign-in.
+  useEffect(() => {
+    if (reverify && token) { setReverify(false); verifyOtp(); }
+  }, [reverify, token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const changeNumber = () => {
     setOtpSent(false); setOtpCode(''); setOtpErr(''); setOtpNote(''); setResendIn(0);
@@ -310,7 +323,7 @@ export default function BookingFlow({ slug }) {
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || json.success === false) {
-        if (json.code === 'EMAIL_EXISTS') setEmailTaken(true);
+        if (json.code === 'EMAIL_EXISTS' || json.code === 'SIGN_IN_REQUIRED') setEmailTaken(true);
         if (json.code === 'PHONE_NOT_VERIFIED') forgetVerified();
         throw new Error(json.message || 'We could not save your details. Please try again.');
       }
@@ -916,7 +929,14 @@ export default function BookingFlow({ slug }) {
                 </>
               )}
               {otpNote && <p className="bf-otp-note">{otpNote}</p>}
-              {otpErr && <p className="bf-err">{otpErr}</p>}
+              {otpErr && (
+                <p className="bf-err">
+                  {otpErr}
+                  {needLogin && (
+                    <button type="button" className="bf-link" onClick={() => { setAuthFor('phone'); setAuthOpen(true); }}>Log in</button>
+                  )}
+                </p>
+              )}
             </div>
           </>
         ) : (
@@ -1246,6 +1266,8 @@ export default function BookingFlow({ slug }) {
           setAuthOpen(false);
           // Logged in from "email already has an account" → on to review; else straight to payment.
           if (authFor === 'about') setStep(4);
+          // Logged in from "this number has an account": verify again, now attached to them.
+          else if (authFor === 'phone') { setNeedLogin(false); setOtpErr(''); setReverify(true); }
           else if (authFor === 'pay') setPendingPay(true);
           // 'package': the package loads by itself once signed in
         }}
