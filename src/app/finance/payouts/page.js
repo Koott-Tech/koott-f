@@ -829,7 +829,6 @@ export default function FinancePayouts() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-2 sm:mb-3">
           <div role="heading" aria-level="2" className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-1">Payouts & Payments</div>
-          <p className="text-xs sm:text-sm text-gray-600">Manage doctor payouts and commission payments</p>
         </div>
 
         {/* Date Range Filter */}

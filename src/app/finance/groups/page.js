@@ -15,9 +15,6 @@ export default function FinanceGroupsPage() {
         <Users className="h-5 w-5 text-[#025545]" />
         <div>
           <div className="text-xl font-semibold text-gray-900">Therapist groups</div>
-          <p className="mt-0.5 max-w-2xl text-xs text-slate-500">
-            Sales, sessions and slots per group. Groups are set up by admins under Admin → Therapist groups.
-          </p>
         </div>
       </div>
       <TherapistGroupsReport />

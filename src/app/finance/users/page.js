@@ -220,9 +220,6 @@ export default function FinanceUsersPage() {
                 </span>
               )}
             </div>
-            <p className="mt-1 text-sm text-gray-600">
-              View and manage client accounts
-            </p>
           </div>
           <button
             onClick={handleAddUser}

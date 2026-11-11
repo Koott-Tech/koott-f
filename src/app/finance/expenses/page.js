@@ -247,7 +247,6 @@ export default function FinanceExpenses() {
         <div className="mb-2 sm:mb-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <div role="heading" aria-level="2" className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-1">Expense Management</div>
-            <p className="text-xs sm:text-sm text-gray-600">Track and manage company expenses</p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}

@@ -679,9 +679,8 @@ export default function FinanceSessionsPage() {
                     : paymentLabel === 'Free'
                       ? 'bg-sky-50 text-sky-700'
                       : 'bg-emerald-50 text-emerald-700';
-                  const _wpContact = _wp.client || _wp.formInfo?.contactDetails || _wp.contactDetails || {};
-                  const clientEmail = booking.client?.user?.email || booking.client?.email || booking.client_email || _wpContact.email || null;
-                  const clientPhone = booking.client?.phone_number || booking.client_phone || _wpContact.phone || _wpContact.phoneNumber || null;
+                  const clientEmail = booking.client?.user?.email || booking.client?.email || booking.client_email || null;
+                  const clientPhone = booking.client?.phone_number || booking.client_phone || null;
 
                   const isManual = isManualSession(booking);
                   const isVerified = booking.payment_verified === true;

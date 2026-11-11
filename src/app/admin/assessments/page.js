@@ -85,7 +85,6 @@ export default function AssessmentsAdminPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h5 className="font-bold text-gray-900">Assessments</h5>
-          <p className="text-gray-600 mt-2">Manage assessment pages and content</p>
         </div>
         <button onClick={() => router.push(`${dashBase}/assessments/create`)} className="bg-[#189e4f] text-white px-6 py-3 rounded-lg hover:bg-[#189e4f]">Create New</button>
       </div>

@@ -488,9 +488,7 @@ export default function FinanceDoctors() {
                         {doctor.psychologist?.first_name} {doctor.psychologist?.last_name}
                       </div>
                       {doctor.is_fast_list ? (
-                        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-                          Fast list mode. Open <span className="font-semibold text-slate-800">Profile</span> or <span className="font-semibold text-slate-800">View Details</span> to calculate finance totals for this therapist.
-                        </div>
+                        <div className="text-xs text-slate-400">—</div>
                       ) : (
                         <div className="flex flex-wrap items-stretch gap-y-3 text-sm min-w-0">
                           {[

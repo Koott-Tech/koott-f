@@ -18,7 +18,6 @@ export default function EventResults() {
     <div className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 lg:py-8">
       <div className="mb-4">
         <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Event results</div>
-        <div className="mt-0.5 text-sm text-slate-500">Registrations, attendance, and how many registrants became paying clients.</div>
       </div>
       {err && <div className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{err}</div>}
       {!rows ? <div className="text-sm text-slate-500">Loading…</div> : rows.length ? (
@@ -51,7 +50,7 @@ export default function EventResults() {
             </table>
           </div>
         </>
-      ) : <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">No event registrations yet. They appear here as people register on the event pages.</div>}
+      ) : <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">No event registrations yet.</div>}
     </div>
   );
 }

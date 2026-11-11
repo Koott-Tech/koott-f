@@ -485,11 +485,6 @@ export default function MarketingDashboard() {
     : page === 'pages' ? 'Edit Pages'
     : page === 'ops' ? 'Bookings & Slots'
     : 'Traffic Overview';
-  const sub = page === 'highlights' ? 'Get a complete overview of your site’s activity across all areas.'
-    : page === 'reports' ? 'Dig into the details of your site’s traffic, visitors and content.'
-    : page === 'pages' ? 'Edit the text and search settings for each page of the website.'
-    : page === 'ops' ? 'When clients book, when they meet, and the slots behind it — across Koott, a team, or one therapist.'
-    : 'Track your site’s traffic trends and get to know your visitors.';
   const show = data && data.page === page;
   const isReports = page === 'reports' || !!reportName;
   const rangeSelect = <DateRange sel={sel} dates={dates} today={today} onChange={setSel} />;
@@ -547,7 +542,7 @@ export default function MarketingDashboard() {
           <a href="/marketing/tasks">Tasks</a>
         </div>
         {!reportName && <div className="wx-head">
-          <div><h1>{title}</h1><p>{sub}</p></div>
+          <div><h1>{title}</h1></div>
           {envOptions.length > 1 && (
             <label className="wx-env">Data
               <select value={env} onChange={(e) => setEnv(e.target.value)}>{envOptions.map((e) => <option key={e} value={e}>{e[0].toUpperCase() + e.slice(1)}</option>)}</select>

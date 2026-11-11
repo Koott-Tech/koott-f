@@ -46,7 +46,7 @@ export default function SalariesPage() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Salaries</div>
-          <div className="mt-0.5 text-sm text-slate-500">From HR&apos;s list of people. Monthly total: <strong className="text-slate-800">{inr(total)}</strong></div>
+          <div className="mt-0.5 text-sm text-slate-500">Monthly total: <strong className="text-slate-800">{inr(total)}</strong></div>
         </div>
         <button type="button" onClick={exportCsv} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Download CSV</button>
       </div>

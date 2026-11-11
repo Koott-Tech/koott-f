@@ -73,7 +73,6 @@ export default function BlogCalendar() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Blog calendar</div>
-          <div className="mt-0.5 text-sm text-slate-500">Planned → drafted → checked by a therapist → published.</div>
         </div>
         <div className="flex gap-2">
           <div className="flex rounded-lg bg-slate-100 p-0.5">
