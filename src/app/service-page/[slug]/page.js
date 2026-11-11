@@ -8,6 +8,10 @@ import { notFound } from 'next/navigation';
 import ServicePageClient from '@/components/ServicePageClient';
 import { therapistSlugExists } from '@/lib/therapistLookup';
 
+// Built once per therapist and kept for 5 minutes (it was rebuilt on every visit).
+export const revalidate = 300;
+export async function generateStaticParams() { return []; }
+
 export default async function ServicePage({ params }) {
   // null = list unavailable → render and let the client show its own message
   if ((await therapistSlugExists(params.slug, { loose: true })) === false) notFound();
