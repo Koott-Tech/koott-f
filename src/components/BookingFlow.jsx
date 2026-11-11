@@ -656,6 +656,8 @@ export default function BookingFlow({ slug }) {
         image: `${window.location.origin}/favicon-512.png`,
         description: `${plan.name || TYPE_LABEL[kind]} with ${name}`,
         prefill: { name: about.name, email: about.email, contact: verified?.phone || accountPhone || '' },
+        // No Razorpay saved-card sign-in (its extra SMS OTP); the bank's OTP still applies.
+        remember_customer: false,
         notes: o.notes || {},
         theme: { color: '#189E4F' },
         handler: (resp) => { clearDraft(); setPayStage('confirming'); finishPayment(resp); },

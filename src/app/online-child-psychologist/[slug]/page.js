@@ -1421,6 +1421,8 @@ const TherapistProfileContent = ({ slug, packageId }) => {
             description: paymentData.description,
             order_id: paymentData.orderId,
             prefill: paymentData.prefill || {},
+            // No Razorpay saved-card sign-in (its extra SMS OTP); the bank's OTP still applies.
+            remember_customer: false,
             notes: paymentData.notes || {},
             theme: paymentData.theme || { color: '#3b82f6' },
             handler: async function (response) {
