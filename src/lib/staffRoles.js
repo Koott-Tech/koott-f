@@ -9,20 +9,19 @@ export const DASHBOARD_BY_ROLE = {
   hr: '/hr',
   marketing: '/marketing',
   finance: '/finance',
-  event_organizer: '/event-organizer',
   staff: '/staff',
   psychologist: '/psychologist',
 };
 
 export const ROLE_LABEL = {
   superadmin: 'Superadmin', admin: 'Admin', operations: 'Operations', hr: 'HR', marketing: 'Marketing',
-  finance: 'Finance', event_organizer: 'Event organizer', staff: 'Staff', psychologist: 'Therapist', client: 'Client',
+  finance: 'Finance', staff: 'Staff', psychologist: 'Therapist', client: 'Client',
 };
 
 /** Where each dashboard keeps its Tasks page. */
 export const TASKS_PATH_BY_ROLE = {
   superadmin: '/superadmin/tasks', admin: '/admin/tasks', operations: '/operations/tasks', hr: '/hr/tasks',
-  marketing: '/marketing/tasks', finance: '/finance/tasks', event_organizer: '/event-organizer/tasks',
+  marketing: '/marketing/tasks', finance: '/finance/tasks',
   staff: '/staff', psychologist: '/psychologist/tasks',
 };
 
@@ -57,7 +56,7 @@ export function staffDestination(role) {
 }
 
 /** Staff dashboards that should not show the public site header/footer. */
-export const DASHBOARD_PREFIXES = ['/admin', '/superadmin', '/finance', '/psychologist', '/event-organizer', '/marketing', '/operations', '/hr', '/staff'];
+export const DASHBOARD_PREFIXES = ['/admin', '/superadmin', '/finance', '/psychologist', '/marketing', '/operations', '/hr', '/staff'];
 
 /** Is this a staff dashboard page (or the staff login)? Then the public header, footer and WhatsApp button stay away. */
 export function isDashboardPath(pathname) {

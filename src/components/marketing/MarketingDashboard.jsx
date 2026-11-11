@@ -528,7 +528,7 @@ export default function MarketingDashboard() {
         <nav aria-label="Work">
           <a className="wx-navlink" href="/marketing/tasks">Tasks</a>
         </nav>
-        <div className="wx-who"><b>{user?.name || user?.email}</b><small>{user?.role}</small><button type="button" onClick={() => { logout(); window.location.href = '/marketing/login'; }}>Sign out</button></div>
+        <div className="wx-who"><b>{user?.name || user?.email}</b><small>{user?.role}</small><button type="button" onClick={() => { logout(); window.location.href = '/'; }}>Sign out</button></div>
       </aside>
 
       <main className="wx-main">
