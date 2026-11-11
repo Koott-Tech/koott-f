@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   Calendar,
   BarChart3,
@@ -118,7 +119,7 @@ export default function PsychologistLayout({ children }) {
         <div className="flex flex-col h-full">
           {/* Logo/Brand - Mobile only */}
           <div className="lg:hidden p-4 border-b border-gray-200">
-            <a 
+            <Link
               href="/psychologist"
               className="hover:opacity-80 transition-opacity cursor-pointer"
               aria-label="Koott - Go to psychologist dashboard"
@@ -135,7 +136,7 @@ export default function PsychologistLayout({ children }) {
                 height={40}
                 className="object-contain"
               />
-            </a>
+            </Link>
           </div>
 
           {/* Navigation */}
@@ -144,8 +145,9 @@ export default function PsychologistLayout({ children }) {
               const Icon = item.icon;
               const isActive = pathname === item.href || (item.href !== '/psychologist' && pathname?.startsWith(item.href));
               return (
-                <a
+                <Link
                   key={item.name}
+                  prefetch
                   href={item.href}
                   className={`flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors ${
                     isActive 
@@ -161,7 +163,7 @@ export default function PsychologistLayout({ children }) {
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   {item.name}
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -188,7 +190,7 @@ export default function PsychologistLayout({ children }) {
         <div className="flex flex-col h-full w-full">
           {/* Logo/Brand */}
           <div className="p-6 border-b border-gray-200">
-            <a 
+            <Link
               href="/psychologist"
               className="hover:opacity-80 transition-opacity cursor-pointer"
               aria-label="Koott - Go to psychologist dashboard"
@@ -200,7 +202,7 @@ export default function PsychologistLayout({ children }) {
                 height={40}
                 className="object-contain"
               />
-            </a>
+            </Link>
           </div>
 
           {/* Navigation */}
@@ -209,8 +211,9 @@ export default function PsychologistLayout({ children }) {
               const Icon = item.icon;
               const isActive = pathname === item.href || (item.href !== '/psychologist' && pathname?.startsWith(item.href));
               return (
-                <a
+                <Link
                   key={item.name}
+                  prefetch
                   href={item.href}
                   className={`flex items-center px-4 py-3 text-gray-700 rounded-lg transition-colors ${
                     isActive 
@@ -220,7 +223,7 @@ export default function PsychologistLayout({ children }) {
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   {item.name}
-                </a>
+                </Link>
               );
             })}
           </nav>

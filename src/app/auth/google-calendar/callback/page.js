@@ -78,7 +78,7 @@ function GoogleCalendarCallbackContent() {
         {status === 'processing' && (
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Connecting Google Calendar...</h2>
+            <div role="heading" aria-level={2} className="text-lg font-semibold text-gray-900 mb-2" style={{ fontSize: 18, lineHeight: 1.4 }}>Connecting Google Calendar...</div>
             <p className="text-sm text-gray-600">Please wait while we complete the setup</p>
           </div>
         )}
@@ -90,7 +90,7 @@ function GoogleCalendarCallbackContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Successfully Connected!</h2>
+            <div role="heading" aria-level={2} className="text-lg font-semibold text-gray-900 mb-2" style={{ fontSize: 18, lineHeight: 1.4 }}>Successfully Connected!</div>
             <p className="text-sm text-gray-600">Your Google Calendar is now synced with Koott</p>
             <p className="text-xs text-gray-500 mt-2">Redirecting to settings...</p>
           </div>
@@ -103,7 +103,7 @@ function GoogleCalendarCallbackContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Connection Failed</h2>
+            <div role="heading" aria-level={2} className="text-lg font-semibold text-gray-900 mb-2" style={{ fontSize: 18, lineHeight: 1.4 }}>Connection Failed</div>
             <p className="text-sm text-red-600 mb-4">{error}</p>
             <p className="text-xs text-gray-500">Redirecting to settings...</p>
           </div>
@@ -120,7 +120,7 @@ export default function GoogleCalendarCallback() {
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading...</h2>
+            <div role="heading" aria-level={2} className="text-lg font-semibold text-gray-900 mb-2" style={{ fontSize: 18, lineHeight: 1.4 }}>Loading...</div>
           </div>
         </div>
       </div>
