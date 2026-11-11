@@ -160,7 +160,10 @@ export default function KoottHeader() {
     return () => mq.removeEventListener?.('change', onChange);
   }, [mobileOpen]);
 
-  const displayName = user?.name
+  // Sign-up and sign-in keep the client's name on user.profile (first_name / last_name).
+  const p = user?.profile || {};
+  const displayName = [p.first_name, p.last_name].filter(Boolean).join(' ').trim()
+    || p.full_name || p.name || user?.name
     || [user?.first_name, user?.last_name].filter(Boolean).join(' ')
     || user?.email?.split('@')[0]
     || 'Account';
