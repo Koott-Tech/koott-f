@@ -156,6 +156,14 @@ async function confirmPayment(resp) {
   return null;
 }
 
+/** Country picker of the WhatsApp number field (Figma: flag, ISO code, chevron). */
+const DIAL_COUNTRIES = [
+  ['IN', '+91', '🇮🇳'], ['AE', '+971', '🇦🇪'], ['SA', '+966', '🇸🇦'], ['QA', '+974', '🇶🇦'],
+  ['KW', '+965', '🇰🇼'], ['OM', '+968', '🇴🇲'], ['BH', '+973', '🇧🇭'], ['US', '+1', '🇺🇸'],
+  ['GB', '+44', '🇬🇧'], ['CA', '+1', '🇨🇦'], ['AU', '+61', '🇦🇺'], ['SG', '+65', '🇸🇬'],
+  ['MY', '+60', '🇲🇾'], ['NZ', '+64', '🇳🇿'], ['DE', '+49', '🇩🇪'], ['IE', '+353', '🇮🇪'],
+];
+
 const Arrow = ({ dir = 'left' }) => (
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
     strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -210,6 +218,7 @@ export default function BookingFlow({ slug }) {
 
   const [verified, setVerified] = useState(null);         // { phone, token } once the code checks out
   const [otpDial, setOtpDial] = useState('+91');
+  const [otpCountry, setOtpCountry] = useState('IN');
   const [otpNumber, setOtpNumber] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('');
@@ -882,8 +891,12 @@ export default function BookingFlow({ slug }) {
     <div className="bf">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <div className="bf-in">
-        <button type="button" className="bf-back" onClick={back} aria-label="Back"><Arrow /></button>
+      <div className={`bf-in${needsPhone && !paidDone && !booked && !authLoading ? ' is-signin' : ''}`}>
+        <button type="button" className="bf-back" onClick={back} aria-label="Back">
+          {needsPhone && !paidDone && !booked && !authLoading
+            ? <img src="/design/booking/arrow-left.svg" alt="" width={24} height={24} />
+            : <Arrow />}
+        </button>
 
         {authLoading ? (
           <p className="bf-note">Loading…</p>
@@ -929,36 +942,57 @@ export default function BookingFlow({ slug }) {
           </div>
         ) : needsPhone ? (
           <>
-            <h1 className="bf-h">{otpSent ? 'Enter the code we sent you' : "Let's start with your mobile number"}</h1>
-            <p className="bf-sub">
-              {otpSent
-                ? 'We sent a 6-digit code on WhatsApp. It is valid for 5 minutes.'
-                : "We'll send a 6-digit code on WhatsApp to confirm it's you. Your booking details and Meet link come to this number."}
-            </p>
+            <div className="bf-si-head">
+              <div className="bf-si-title" role="heading" aria-level={1}>{otpSent ? 'Enter the code we sent you' : 'Let’s get you signed in'}</div>
+              <p className="bf-si-sub">
+                {otpSent
+                  ? 'We sent a code on WhatsApp. It is valid for 5 minutes.'
+                  : 'Enter your WhatsApp number to receive an OTP'}
+              </p>
+            </div>
 
-            <div className="bf-otp">
+            <div className={`bf-otp${otpSent ? ' is-code' : ''}`}>
               {!otpSent ? (
                 <>
-                  <label className="bf-otp-label">Mobile number (on WhatsApp)
-                    <span className="bf-phone">
+                  <div className="bf-si-field">
+                    <label className="bf-si-label" htmlFor="bf-wa-number">WhatsApp number</label>
+                    <div className="bf-si-input">
+                      <span className="bf-si-country">
+                        {otpCountry === 'IN'
+                          ? <img src="/design/booking/flag-india.svg" alt="" width={24} height={24} />
+                          : <span className="bf-si-flag" aria-hidden>{(DIAL_COUNTRIES.find((c) => c[0] === otpCountry) || [])[2]}</span>}
+                        <span className="bf-si-iso">{otpCountry}</span>
+                        <img src="/design/booking/chevron-down.svg" alt="" width={20} height={20} />
+                        <select
+                          aria-label="Country" value={otpCountry}
+                          onChange={(e) => {
+                            const c = DIAL_COUNTRIES.find((x) => x[0] === e.target.value);
+                            if (c) { setOtpCountry(c[0]); setOtpDial(c[1]); }
+                          }}
+                        >
+                          {DIAL_COUNTRIES.map(([iso, dial]) => <option key={iso} value={iso}>{iso} {dial}</option>)}
+                        </select>
+                      </span>
                       <input
-                        className="bf-dial" value={otpDial} aria-label="Country code"
-                        onChange={(e) => setOtpDial(e.target.value.replace(/[^\d+]/g, ''))}
-                      />
-                      <input
-                        value={otpNumber} inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210"
+                        id="bf-wa-number" value={otpNumber} inputMode="numeric" autoComplete="tel-national"
+                        aria-label={`WhatsApp number (${otpDial})`}
                         onChange={(e) => setOtpNumber(e.target.value.replace(/[^\d\s]/g, ''))}
                         onKeyDown={(e) => { if (e.key === 'Enter' && otpNumber.replace(/\D/g, '').length >= 6) sendOtp(); }}
                       />
-                    </span>
-                  </label>
-                  <button
-                    type="button" className="bf-next"
-                    disabled={otpBusy || resendIn > 0 || otpNumber.replace(/\D/g, '').length < 6}
-                    onClick={sendOtp}
-                  >
-                    {otpBusy ? 'Sending…' : resendIn > 0 ? `Send code (${resendIn}s)` : 'Send code'}
-                  </button>
+                    </div>
+                  </div>
+                  <div className="bf-si-actions">
+                    <button
+                      type="button" className="bf-si-btn"
+                      disabled={otpBusy || resendIn > 0 || otpNumber.replace(/\D/g, '').length < 6}
+                      onClick={sendOtp}
+                    >
+                      {otpBusy ? 'Sending…' : resendIn > 0 ? `Get OTP (${resendIn}s)` : 'Get OTP'}
+                    </button>
+                    <button type="button" className="bf-si-alt" onClick={() => { setAuthFor('phone'); setAuthOpen(true); }}>
+                      Try another way
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>
@@ -975,7 +1009,7 @@ export default function BookingFlow({ slug }) {
                       if (code.length === otpLen) verifyOtp(code);
                     }}
                   />
-                  <button type="button" className="bf-next" disabled={otpBusy || otpCode.length !== otpLen} onClick={() => verifyOtp()}>
+                  <button type="button" className="bf-si-btn" disabled={otpBusy || otpCode.length !== otpLen} onClick={() => verifyOtp()}>
                     {otpBusy ? 'Checking…' : 'Verify and continue'}
                   </button>
                   <p className="bf-otp-resend">
@@ -1612,6 +1646,51 @@ const CSS = `
 .bf-dots span{width:18px;height:3px;border-radius:2px;background:#E3E6EA;}
 .bf-dots span.is-on{background:#111;}
 
+/* Sign-in step (Figma "OTP"): 1180 wide, title Poppins 24, field 372, Get OTP + Try another way */
+.bf-in.is-signin{max-width:1228px;padding-top:56px;}
+.bf-in.is-signin .bf-back{margin:0 0 16px;width:24px;height:24px;}
+.bf-in.is-signin .bf-back img{display:block;width:24px;height:24px;}
+.bf-si-head{display:flex;flex-direction:column;gap:4px;margin:0 0 24px;}
+.bf-si-title{
+  font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:24px!important;font-weight:500!important;
+  line-height:1.66!important;color:#0F0F0F!important;letter-spacing:0!important;margin:0;
+}
+.bf-si-sub{
+  font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;
+  line-height:22px!important;color:#373737!important;margin:0;
+}
+.is-signin .bf-otp{gap:48px;max-width:none;}
+.bf-si-field{display:flex;flex-direction:column;gap:8px;width:372px;max-width:100%;}
+.bf-si-label{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#373737!important;}
+.bf-si-input{
+  display:flex;align-items:center;gap:12px;height:40px;padding:0 16px;background:#fff;
+  border:1px solid #E3E2E2;border-radius:8px;box-sizing:border-box;
+}
+.bf-si-input:focus-within{border-color:#189E4F;}
+.bf-si-country{position:relative;display:flex;align-items:center;gap:4px;flex:none;}
+.bf-si-country > img:first-child,.bf-si-flag{margin-right:4px;}
+.bf-si-flag{font-size:20px;line-height:24px;width:24px;text-align:center;}
+.bf-si-iso{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:22px!important;color:#373737!important;}
+.bf-si-country select{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;font-size:16px;}
+.is-signin .bf-si-input input{
+  flex:1;min-width:0;border:0!important;padding:0!important;border-radius:0;background:transparent;height:38px;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:500!important;color:#373737!important;
+}
+.is-signin .bf-si-input input:focus{outline:none;}
+.bf-si-actions{display:flex;flex-direction:column;align-items:flex-start;gap:16px;}
+.bf-si-btn{
+  height:40px;padding:8px 22px;border:0;border-radius:8px;background:#189E4F;color:#fff!important;cursor:pointer;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;
+}
+.bf-si-btn:disabled{background:#9CA3AF;cursor:default;}
+.bf-si-alt{
+  height:40px;padding:7px 0;border:0;background:none;cursor:pointer;color:#189E4F!important;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;
+}
+.is-signin .bf-otp:not(.is-code) > .bf-otp-note,.is-signin .bf-otp:not(.is-code) > .bf-err{margin-top:-32px;}
+.is-signin .bf-otp.is-code{gap:16px;}
+.is-signin .bf-otp.is-code .bf-otp-to{margin-bottom:8px;}
+
 @media (max-width:900px){
   .bf-when{grid-template-columns:1fr;}
   .bf-cal{padding-right:0;border-right:0;padding-bottom:26px;border-bottom:1px solid rgba(17,17,17,.1);}
@@ -1619,6 +1698,19 @@ const CSS = `
   .bf-plans,.bf-form{grid-template-columns:1fr;}
 }
 @media (max-width:720px){
+  /* Sign-in step, phone (Figma 1123:12462): 16px sides, 16px subtitle, taller field,
+     buttons side by side, the faint Koott mark at the bottom right */
+  .bf-in.is-signin{padding:16px 16px 90px;position:relative;}
+  .bf-in.is-signin::after{
+    content:'';position:fixed;right:-80px;bottom:-60px;width:308px;height:214px;z-index:0;pointer-events:none;
+    background:url(/design/booking/mark-watermark.svg) no-repeat center/contain;transform:rotate(-18.64deg);
+  }
+  .bf-in.is-signin > *{position:relative;z-index:1;}
+  .bf-si-sub{font-size:16px!important;line-height:24px!important;}
+  .bf-si-field{width:100%;}
+  .bf-si-input{height:46px;}
+  .bf-si-actions{flex-direction:row;align-items:center;width:100%;}
+  .bf-si-btn,.bf-si-alt{flex:1;min-width:0;}
   .bf-ticket{grid-template-columns:1fr;}
   .bf-tk-main{padding:22px 20px 24px;}
   .bf-tk-stub{border-left:0;border-top:2px dashed rgba(24,158,79,.35);border-radius:0 0 20px 20px;padding:24px 20px;}
