@@ -14,7 +14,7 @@ export default function OpenTask() {
     if (isLoading) return;
     const id = new URLSearchParams(window.location.search).get('id') || '';
     if (!isAuthenticated()) {
-      window.location.replace(`/staff-login?next=${encodeURIComponent(`/tasks/open?id=${id}`)}`);
+      window.location.replace(`/?login=1&next=${encodeURIComponent(`/tasks/open?id=${id}`)}`);
       return;
     }
     const path = TASKS_PATH_BY_ROLE[user?.role];

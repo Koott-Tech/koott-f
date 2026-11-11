@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { trackPopup } from "@/analytics";
-import { dashboardFor } from '@/lib/staffRoles';
+import { staffDestination } from '@/lib/staffRoles';
 import { useAuth } from "@/contexts/AuthContext";
 import { authApi } from "@/lib/backendApi";
 import { validatePassword } from "@/utils/passwordValidation";
@@ -190,7 +190,7 @@ export default function AuthModal({
       // Reload the page to refresh auth state
         if (!preventReload) {
           // Every staff role has its own dashboard (lib/staffRoles); clients stay on the page.
-          const dashboard = dashboardFor(loggedInUser?.role);
+          const dashboard = staffDestination(loggedInUser?.role);
           if (dashboard) window.location.href = dashboard;
           else window.location.reload();
         }

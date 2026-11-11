@@ -16,6 +16,7 @@ import {
 import TaskDock from '@/components/tasks/TaskDock';
 import SafetyAlertButton from '@/components/safety/SafetyAlertButton';
 import { useAuth } from '@/contexts/AuthContext';
+import { signInUrl } from '@/lib/staffRoles';
 
 export default function PsychologistLayout({ children }) {
   // Desktop (>= 1024px): open by default, Mobile: closed by default
@@ -33,7 +34,7 @@ export default function PsychologistLayout({ children }) {
   useEffect(() => {
     if (!authLoading) {
       if (!isAuthenticated()) {
-        router.push('/');
+        router.replace(signInUrl(pathname));
         return;
       }
       if (!hasRole('psychologist')) {
@@ -41,7 +42,7 @@ export default function PsychologistLayout({ children }) {
         return;
       }
     }
-  }, [authLoading, isAuthenticated, hasRole, router]);
+  }, [authLoading, isAuthenticated, hasRole, router, pathname]);
 
   const handleLogout = () => {
     logout();

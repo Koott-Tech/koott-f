@@ -131,7 +131,7 @@ export default function PeoplePage({ therapistOnboardingHref = '/hr/therapists' 
       <Modal open={onboarding} onClose={() => setOnboarding(false)} title={created ? 'Login created' : 'Onboard a team member'}>
         {created ? (
           <div className="space-y-3 text-sm">
-            <div><strong>{created.name}</strong> can now sign in at <strong>/staff-login</strong> and lands on <strong>{created.dashboard}</strong>.</div>
+            <div><strong>{created.name}</strong> can now sign in with the <strong>Log In</strong> button on the website and lands on <strong>{created.dashboard}</strong>.</div>
             <div className="rounded-xl bg-amber-50 p-3 text-amber-900">
               <div className="text-xs font-semibold uppercase tracking-wide">Temporary password — shown once</div>
               <div className="mt-1 select-all font-mono text-base">{created.tempPassword}</div>

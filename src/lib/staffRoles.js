@@ -30,6 +30,27 @@ export const ADMIN_ROLES = ['admin', 'superadmin'];
 export const isAdminRole = (role) => ADMIN_ROLES.includes(role);
 export const dashboardFor = (role) => DASHBOARD_BY_ROLE[role] || null;
 
+/** The site's sign-in (the Log In popup on the home page); ?next= returns there afterwards. */
+export const signInUrl = (next) => `/?login=1${next ? `&next=${encodeURIComponent(next)}` : ''}`;
+
+/**
+ * Where a staff member / therapist goes after signing in: their dashboard, or the page in
+ * ?next= when it belongs to their role (admins: any page). Same site only — "/\evil.com"
+ * starts with "/" but browsers open another site, so the URL is resolved and compared.
+ */
+export function staffDestination(role) {
+  const home = dashboardFor(role);
+  if (!home) return null;
+  try {
+    const raw = new URLSearchParams(window.location.search).get('next');
+    const adminish = role === 'admin' || role === 'superadmin';
+    const url = raw && raw.startsWith('/') ? new URL(raw, window.location.origin) : null;
+    const next = url && url.origin === window.location.origin && !/[\\\t\n\r]/.test(raw) ? `${url.pathname}${url.search}${url.hash}` : null;
+    if (next && (next === home || next.startsWith(`${home}/`) || next.startsWith('/tasks/open') || adminish)) return next;
+  } catch (_) { /* no window */ }
+  return home;
+}
+
 /** Staff dashboards that should not show the public site header/footer. */
 export const DASHBOARD_PREFIXES = ['/admin', '/superadmin', '/finance', '/psychologist', '/event-organizer', '/marketing', '/operations', '/hr', '/staff'];
 

@@ -27,7 +27,7 @@
  * control and its menu are kept, drawn to match the header rather than dropped.
  */
 
-import { dashboardFor } from '@/lib/staffRoles';
+import { dashboardFor, staffDestination } from '@/lib/staffRoles';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -60,7 +60,7 @@ const PillCaret = ({ open }) => (
 export default function KoottHeader() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isLoading: authLoading } = useAuth();
 
   const [openCat, setOpenCat] = useState(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -95,6 +95,20 @@ export default function KoottHeader() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(frame); };
   }, [openCat, userMenuOpen, mobileOpen]);
+
+  // /?login=1 (old /staff-login links, signed-out dashboards): open the Log In popup.
+  // Someone already signed in goes on: staff and therapists to their dashboard.
+  useEffect(() => {
+    if (authLoading) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('login') !== '1') return;
+    if (user && isAuthenticated()) {
+      const dest = staffDestination(user.role);
+      if (dest) window.location.replace(dest);
+      return;
+    }
+    setShowAuth(true);
+  }, [authLoading, user, isAuthenticated]);
 
   // Close everything on navigation.
   useEffect(() => {

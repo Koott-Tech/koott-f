@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { ROLE_LABEL, dashboardFor } from '@/lib/staffRoles';
+import { ROLE_LABEL, dashboardFor, signInUrl } from '@/lib/staffRoles';
 import TaskDock from '@/components/tasks/TaskDock';
 
 function NavList({ nav, pathname, onNavigate }) {
@@ -54,7 +54,7 @@ export default function DashboardShell({ title, roles, nav, children, headerActi
 
   useEffect(() => {
     if (isLoading) return;
-    if (!signedIn) { router.replace(`/staff-login?next=${encodeURIComponent(pathname)}`); return; }
+    if (!signedIn) { router.replace(signInUrl(pathname)); return; }
     if (!allowed) router.replace(dashboardFor(user?.role) || '/');
   }, [isLoading, signedIn, allowed, user, router, pathname]);
   useEffect(() => { setMenu(false); }, [pathname]);
@@ -75,7 +75,7 @@ export default function DashboardShell({ title, roles, nav, children, headerActi
       <div className="text-xs text-emerald-100/60">{ROLE_LABEL[user?.role] || user?.role}</div>
       <div className="mt-2 flex gap-3 text-xs">
         {['admin', 'superadmin'].includes(user?.role) && <a href={dashboardFor(user.role)} className="text-emerald-100/80 hover:text-white">Admin panel</a>}
-        <button type="button" onClick={() => { logout(); window.location.href = '/staff-login'; }} className="text-emerald-100/80 hover:text-white">Sign out</button>
+        <button type="button" onClick={() => { logout(); window.location.href = '/'; }} className="text-emerald-100/80 hover:text-white">Sign out</button>
       </div>
     </div>
   );
