@@ -52,9 +52,7 @@ export default function PsychologistLayout({ children }) {
     { name: 'Dashboard', href: '/psychologist', icon: BarChart3 },
     { name: 'Sessions', href: '/psychologist/sessions', icon: Calendar },
     { name: 'Tasks', href: '/psychologist/tasks', icon: ClipboardList },
-    { name: 'My numbers', href: '/psychologist/numbers', icon: BarChart3 },
     { name: 'Training', href: '/psychologist/training', icon: ClipboardList },
-    { name: 'My documents', href: '/psychologist/documents', icon: Settings },
     { name: 'Settings', href: '/psychologist/settings', icon: Settings }
   ];
 
