@@ -1765,7 +1765,8 @@ function PaymentSuccessContent() {
 
 export default function PaymentSuccess() {
   return (
-    <Suspense fallback={null}>
+    // A full-height placeholder: an empty fallback let the footer jump up and back.
+    <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
       <PaymentSuccessContent />
     </Suspense>
   );

@@ -122,6 +122,40 @@ async function finishPayment(resp) {
     + `&razorpay_signature=${encodeURIComponent(ids.razorpay_signature)}`;
 }
 
+/**
+ * After Razorpay says paid: confirm with the server here (the booking is saved in a
+ * second or two; Meet link, emails and WhatsApp follow in the background) and show
+ * "Session booked" without leaving the page. If that does not answer in time, hand
+ * over to the success page as before, which keeps checking (the webhook is the backstop).
+ * Returns { ok, sessionId } | { taken, message } | null (handed over).
+ */
+async function confirmPayment(resp) {
+  const ids = {
+    razorpay_order_id: resp.razorpay_order_id,
+    razorpay_payment_id: resp.razorpay_payment_id,
+    razorpay_signature: resp.razorpay_signature,
+  };
+  try {
+    sessionStorage.setItem('razorpay_payment', JSON.stringify({ ...ids, timestamp: Date.now() }));
+  } catch (_) { /* private mode */ }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
+  try {
+    const res = await fetch(`${BACKEND}/payment/success`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ids), signal: ctrl.signal,
+    });
+    const json = await res.json().catch(() => ({}));
+    if (res.ok && json.success !== false && json.data?.sessionId) return { ok: true, sessionId: json.data.sessionId };
+    if (res.status === 409 && json.code === 'SLOT_ALREADY_BOOKED') {
+      return { taken: true, message: json.message || 'That time was just booked by someone else. Your payment is being refunded.' };
+    }
+  } catch (_) { /* slow or offline: the success page takes over */ } finally {
+    clearTimeout(timer);
+  }
+  finishPayment(resp);
+  return null;
+}
+
 const Arrow = ({ dir = 'left' }) => (
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
     strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -169,7 +203,8 @@ export default function BookingFlow({ slug }) {
   const [pkgMode, setPkgMode] = useState(null);           // that client_packages row, once loaded
   const [pkgErr, setPkgErr] = useState('');
   const [confirming, setConfirming] = useState(false);
-  const [booked, setBooked] = useState(null);             // { startsAt, left } after Confirm booking
+  const [booked, setBooked] = useState(null);
+  const [paidDone, setPaidDone] = useState(null);         // { startsAt, sessionId } after a paid booking             // { startsAt, left } after Confirm booking
 
   /* ------------------------- mobile number + code ------------------------ */
 
@@ -673,7 +708,15 @@ export default function BookingFlow({ slug }) {
         remember_customer: false,
         notes: o.notes || {},
         theme: { color: '#189E4F' },
-        handler: (resp) => { clearDraft(); setPayStage('confirming'); finishPayment(resp); },
+        handler: async (resp) => {
+          clearDraft(); setPayStage('confirming');
+          const done = await confirmPayment(resp);
+          if (!done) return; // handed over to the success page
+          setPaying(false); setPayStage(null);
+          if (done.taken) { setPayErr(done.message); return; }
+          setPaidDone({ startsAt: slot.startsAt, sessionId: done.sessionId });
+          try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (_) { /* old browsers */ }
+        },
         modal: { ondismiss: () => { setPaying(false); track('payment_dismissed'); } },
       });
       rz.on('payment.failed', (resp) => {
@@ -850,6 +893,20 @@ export default function BookingFlow({ slug }) {
             {pkgErr && !isAuthenticated() && (
               <button type="button" className="bf-next" onClick={() => { setAuthFor('package'); setAuthOpen(true); }}>Log in</button>
             )}
+          </div>
+        ) : paidDone ? (
+          <div className="bf-done">
+            <span className="bf-done-icon" aria-hidden>✓</span>
+            <div className="bf-done-h">Session booked</div>
+            <div className="bf-done-p">
+              Your session with {name} on{' '}
+              <strong>{dateLabel(paidDone.startsAt, tz, { weekday: 'long', day: 'numeric', month: 'long' })}</strong> at{' '}
+              <strong>{timeLabel(paidDone.startsAt, tz)}</strong> ({zone}) is confirmed.
+              We&apos;ll email and WhatsApp you the Google Meet link in a minute.
+            </div>
+            <div className="bf-done-actions">
+              <button type="button" className="bf-next" onClick={() => router.push('/profile/sessions')}>View my sessions</button>
+            </div>
           </div>
         ) : booked ? (
           <div className="bf-done">
