@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
@@ -144,7 +145,7 @@ export default function FinanceLayout({ children }) {
               {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
             <h6 className="text-sm font-semibold text-gray-800">Finance</h6>
-            <div className="w-9"></div> {/* Spacer for centering */}
+            <TaskDock inline only="phone" />
           </div>
         </div>
       </div>
@@ -188,7 +189,7 @@ export default function FinanceLayout({ children }) {
               const isActive = pathname === item.href;
               
               return (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
@@ -204,7 +205,7 @@ export default function FinanceLayout({ children }) {
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   {item.name}
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -235,7 +236,7 @@ export default function FinanceLayout({ children }) {
               const isActive = pathname === item.href;
               
               return (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
@@ -246,7 +247,7 @@ export default function FinanceLayout({ children }) {
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   {item.name}
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -283,12 +284,15 @@ export default function FinanceLayout({ children }) {
                 </button>
                 <h6 className="text-lg font-semibold text-gray-800">Finance Dashboard</h6>
               </div>
-              {user && (
-                <div className="text-sm text-gray-600">
-                  <span className="font-medium">{user.email}</span>
-                  <span className="ml-2 text-gray-400 capitalize">({user.role})</span>
-                </div>
-              )}
+              <div className="flex items-center gap-3">
+                {user && (
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium">{user.email}</span>
+                    <span className="ml-2 text-gray-400 capitalize">({user.role})</span>
+                  </div>
+                )}
+                <TaskDock inline only="laptop" />
+              </div>
             </div>
           </div>
         </div>
@@ -297,7 +301,6 @@ export default function FinanceLayout({ children }) {
         <main className="pt-20 lg:pt-24">
           {children}
         </main>
-        <TaskDock />
       </div>
 
     </div>

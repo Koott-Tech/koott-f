@@ -4,6 +4,12 @@
  * On every dashboard page: the task notifications bell, quick add ("+ Task", one line
  * from anywhere) and "Report a problem" (a task for the developers with this page's
  * link filled in). Opening a notification goes to this dashboard's Tasks page.
+ *
+ * inline: three small icons for a dashboard's top bar (the notifications drop down under
+ * the bell), so nothing floats over tables. dark: white icons for a dark green bar.
+ * Without inline it floats bottom-right (kept for any page that has no top bar).
+ * only='phone' | 'laptop': this copy is active only below / from 1024px wide, so a layout
+ * with a phone bar and a laptop bar polls once and opens one quick-add window.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -15,7 +21,7 @@ import { Modal, TaskForm, fmtWhen } from './taskUi';
 
 const KIND_ICON = { assigned: '📌', comment: '💬', mention: '@', status: '↻', due_today: '⏰', due_tomorrow: '🗓️', overdue: '⚠️' };
 
-export default function TaskDock({ bottom = 16 }) {
+export default function TaskDock({ bottom = 16, inline = false, dark = false, only = null }) {
   const { user, isAuthenticated } = useAuth();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -27,7 +33,16 @@ export default function TaskDock({ bottom = 16 }) {
   const [reportState, setReportState] = useState('');
   const [toast, setToast] = useState('');
   const box = useRef(null);
-  const signedIn = typeof isAuthenticated === 'function' ? isAuthenticated() : Boolean(user);
+  const [fits, setFits] = useState(!only);
+  useEffect(() => {
+    if (!only) return undefined;
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setFits(only === 'laptop' ? mq.matches : !mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, [only]);
+  const signedIn = (typeof isAuthenticated === 'function' ? isAuthenticated() : Boolean(user)) && fits;
   const tasksPath = TASKS_PATH_BY_ROLE[user?.role] || null;
   const meKey = user ? `${user.role === 'psychologist' ? 'psychologist' : 'user'}:${user.id}` : null;
 
@@ -48,6 +63,7 @@ export default function TaskDock({ bottom = 16 }) {
   }, []);
   // Quick add from the keyboard: press "t" outside a field (like Notion's shortcuts).
   useEffect(() => {
+    if (!signedIn || !tasksPath) return undefined;
     const onKey = (e) => {
       if (e.key !== 't' || e.metaKey || e.ctrlKey || e.altKey) return;
       const el = e.target;
@@ -56,7 +72,7 @@ export default function TaskDock({ bottom = 16 }) {
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, []);
+  }, [signedIn, tasksPath]);
 
   if (!signedIn || !tasksPath) return null;
 
@@ -75,12 +91,16 @@ export default function TaskDock({ bottom = 16 }) {
     } catch (err) { setReportState(err.message); }
   };
 
-  const btn = 'flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg ring-1 ring-slate-200 hover:text-[#025545]';
+  const btn = inline
+    ? `flex h-9 w-9 items-center justify-center rounded-lg ${dark ? 'text-white hover:bg-white/10' : 'text-slate-600 hover:bg-slate-100 hover:text-[#025545]'}`
+    : 'flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg ring-1 ring-slate-200 hover:text-[#025545]';
   return (
     <>
-      <div ref={box} className="fixed right-4 z-[90] flex flex-col items-end gap-2 print:hidden" style={{ bottom }}>
+      <div ref={box} className={inline ? 'relative flex items-center print:hidden' : 'fixed right-4 z-[90] flex flex-col items-end gap-2 print:hidden'} style={inline ? undefined : { bottom }}>
         {open && (
-          <div className="mb-1 w-[min(92vw,360px)] overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
+          <div className={inline
+            ? 'fixed right-2 top-14 z-[95] w-[min(94vw,360px)] overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200 sm:absolute sm:right-0 sm:top-full sm:mt-2'
+            : 'mb-1 w-[min(92vw,360px)] overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200'}>
             <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2.5">
               <span className="text-sm font-semibold text-slate-900">Notifications</span>
               <span className="flex gap-3 text-xs">
@@ -104,7 +124,7 @@ export default function TaskDock({ bottom = 16 }) {
             </div>
           </div>
         )}
-        <div className="flex gap-2">
+        <div className={inline ? 'flex gap-0.5' : 'flex gap-2'}>
           <button type="button" onClick={() => setReporting(true)} className={btn} title="Report a problem" aria-label="Report a problem">
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /></svg>
           </button>
@@ -118,7 +138,7 @@ export default function TaskDock({ bottom = 16 }) {
         </div>
       </div>
 
-      {toast && <div className="fixed right-4 z-[95] rounded-xl bg-slate-900 px-4 py-2.5 text-sm text-white shadow-lg" style={{ bottom: bottom + 60 }}>{toast}</div>}
+      {toast && <div className="fixed right-4 z-[95] rounded-xl bg-slate-900 px-4 py-2.5 text-sm text-white shadow-lg" style={{ bottom: inline ? 16 : bottom + 60 }}>{toast}</div>}
 
       <Modal open={adding} onClose={() => setAdding(false)} title="Quick add a task">
         <TaskForm

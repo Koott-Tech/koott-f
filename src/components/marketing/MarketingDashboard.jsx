@@ -519,7 +519,8 @@ export default function MarketingDashboard() {
         <nav aria-label="Content">
           <a className="wx-navlink" href="/marketing/blogs">Blog</a>
           <a className="wx-navlink" href="/marketing/blog-calendar">Blog calendar</a>
-          <a className="wx-navlink" href="/marketing/events-cms">Events</a>
+          <a className="wx-navlink" href="/marketing/events-cms">Event pages</a>
+          <a className="wx-navlink" href="/marketing/event-registrations">Event registrations</a>
           <a className="wx-navlink" href="/marketing/event-results">Event results</a>
           <a className="wx-navlink" href="/marketing/assessments">Assessments</a>
           <button type="button" aria-current={page === 'pages' ? 'page' : undefined} onClick={() => setPage('pages')}>Edit Pages</button>
@@ -532,6 +533,7 @@ export default function MarketingDashboard() {
       </aside>
 
       <main className="wx-main">
+        <div className="wx-dock"><TaskDock inline /></div>
         <div className="wx-mobnav">
           <button type="button" aria-pressed={page === 'highlights'} onClick={() => setPage('highlights')}>Highlights</button>
           <button type="button" aria-pressed={page === 'traffic'} onClick={() => setPage('traffic')}>Traffic</button>
@@ -577,8 +579,6 @@ export default function MarketingDashboard() {
       </main>
       {meta && !notReady && <LiveCorner live={live} open={liveOpen} setOpen={setLiveOpen} />}
     </div>
-    {/* outside .wx so its styles do not reach the dock; raised above the live-visitors pill */}
-    <TaskDock bottom={64} />
     </>
   );
 }
@@ -607,6 +607,7 @@ export const MARKETING_CSS = `
 .wx-who small{color:#8C97A3}
 .wx-who button{justify-self:start;margin-top:6px;background:#063B2D;border:0;border-radius:6px;padding:4px 10px;color:#CFE3D6;cursor:pointer}
 .wx-main{min-width:0;padding:24px 28px 80px;max-width:1600px}
+.wx-dock{display:flex;justify-content:flex-end;margin:-12px -8px 4px}
 .wx-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .wx-head h1{font-size:28px!important;font-weight:700!important;line-height:1.2!important}
 .wx-head p{margin:2px 0 0;color:#3B4F63}

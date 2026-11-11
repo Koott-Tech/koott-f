@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { AdminSidebarContext } from '@/contexts/AdminSidebarContext';
@@ -165,9 +166,10 @@ export default function AdminLayout({ children }) {
     <div className="min-h-screen bg-white">
       {/* Mobile header with menu button */}
       <div 
-        className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white flex items-center justify-end px-4 z-50"
+        className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white flex items-center justify-end gap-1 px-4 z-50"
         style={!isSidebarOpen ? { boxShadow: '0 2px 8px rgba(63, 46, 115, 0.15)' } : {}}
       >
+        <TaskDock inline only="phone" />
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="p-2 rounded-md bg-white shadow-lg"
@@ -239,7 +241,7 @@ export default function AdminLayout({ children }) {
                           const SubIcon = subItem.icon;
                           const isSubActive = pathname === subItem.href || pathname.startsWith(subItem.href + '/');
                           return (
-                            <a
+                            <Link
                               key={subItem.name}
                               href={subItem.href}
                               className={`flex items-center px-4 py-2 text-sm rounded-lg transition-colors ${
@@ -256,7 +258,7 @@ export default function AdminLayout({ children }) {
                             >
                               <SubIcon className="h-4 w-4 mr-3" />
                               {subItem.name}
-                            </a>
+                            </Link>
                           );
                         })}
                       </div>
@@ -268,7 +270,7 @@ export default function AdminLayout({ children }) {
               // Regular menu item
               const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
               return (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
@@ -285,7 +287,7 @@ export default function AdminLayout({ children }) {
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   {item.name}
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -311,7 +313,7 @@ export default function AdminLayout({ children }) {
         <div className="flex flex-col h-full w-full">
           {/* Logo/Brand */}
           <div className="h-[4.5rem] px-6 flex items-center border-b border-gray-200">
-            <a 
+            <Link 
               href="/admin"
               className="hover:opacity-80 transition-opacity cursor-pointer"
               aria-label="Koott - Go to admin dashboard"
@@ -323,7 +325,7 @@ export default function AdminLayout({ children }) {
                 height={36}
                 className="object-contain" style={{ height: 36, width: 'auto' }}
               />
-            </a>
+            </Link>
           </div>
 
           {/* Navigation */}
@@ -357,7 +359,7 @@ export default function AdminLayout({ children }) {
                           const SubIcon = subItem.icon;
                           const isSubActive = pathname === subItem.href || pathname.startsWith(subItem.href + '/');
                           return (
-                            <a
+                            <Link
                               key={subItem.name}
                               href={subItem.href}
                               className={`flex items-center px-4 py-2 text-sm rounded-lg transition-colors ${
@@ -368,7 +370,7 @@ export default function AdminLayout({ children }) {
                             >
                               <SubIcon className="h-4 w-4 mr-3" />
                               {subItem.name}
-                            </a>
+                            </Link>
                           );
                         })}
                       </div>
@@ -380,7 +382,7 @@ export default function AdminLayout({ children }) {
               // Regular menu item
               const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
               return (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
@@ -391,7 +393,7 @@ export default function AdminLayout({ children }) {
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   {item.name}
-                </a>
+                </Link>
               );
             })}
           </nav>
@@ -435,6 +437,7 @@ export default function AdminLayout({ children }) {
                   <span className="ml-2 text-gray-400 capitalize">({user.role})</span>
                 </div>
               )}
+              <TaskDock inline only="laptop" />
             </div>
           </div>
         </div>
@@ -444,7 +447,6 @@ export default function AdminLayout({ children }) {
           {children}
         </main>
       </div>
-      <TaskDock />
 
     </div>
     </AdminSidebarContext.Provider>

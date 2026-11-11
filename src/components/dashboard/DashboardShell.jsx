@@ -10,6 +10,7 @@
  */
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_LABEL, dashboardFor, signInUrl } from '@/lib/staffRoles';
 import TaskDock from '@/components/tasks/TaskDock';
@@ -25,12 +26,12 @@ function NavList({ nav, pathname, onNavigate }) {
               const Icon = it.icon;
               const active = it.exact ? pathname === it.href : pathname === it.href || pathname.startsWith(`${it.href}/`);
               return (
-                <a key={it.href} href={it.href} onClick={onNavigate} aria-current={active ? 'page' : undefined}
+                <Link key={it.href} href={it.href} onClick={onNavigate} aria-current={active ? 'page' : undefined}
                   className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${active ? 'font-medium text-white' : 'text-emerald-50/80 hover:bg-white/10 hover:text-white'}`}
                   style={active ? { background: 'rgba(255,255,255,.12)' } : undefined}>
                   {Icon && <Icon className="h-4 w-4 shrink-0" />}
                   <span className="truncate">{it.label}</span>
-                </a>
+                </Link>
               );
             })}
           </div>
@@ -65,9 +66,8 @@ export default function DashboardShell({ title, roles, nav, children, headerActi
     return () => { document.body.style.overflow = ''; document.removeEventListener('keydown', esc); };
   }, [menu]);
 
-  if (isLoading || !allowed) {
-    return <div className="grid min-h-screen place-items-center bg-slate-50 text-sm text-slate-500">Checking access…</div>;
-  }
+  // Only on a fresh page load (links inside the dashboard no longer reload the app).
+  if (isLoading || !allowed) return <div className="min-h-screen bg-slate-50" />;
 
   const who = (
     <div className="border-t border-white/10 px-4 py-4">
@@ -80,10 +80,10 @@ export default function DashboardShell({ title, roles, nav, children, headerActi
     </div>
   );
   const brand = (
-    <a href={nav[0]?.items[0]?.href || '/'} className="flex items-center gap-2.5 px-4 py-4">
+    <Link href={nav[0]?.items[0]?.href || '/'} className="flex items-center gap-2.5 px-4 py-4">
       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sm font-bold text-[#025545]">K</span>
       <span className="leading-tight"><span className="block text-sm font-semibold text-white">Koott</span><span className="block text-[11px] text-emerald-100/60">{title}</span></span>
-    </a>
+    </Link>
   );
 
   return (
@@ -97,12 +97,13 @@ export default function DashboardShell({ title, roles, nav, children, headerActi
 
       {/* Phone / tablet: top bar + slide-in menu */}
       <header className="sticky top-0 z-40 flex h-14 items-center justify-between bg-[#033D30] px-3 lg:hidden">
-        <a href={nav[0]?.items[0]?.href || '/'} className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-sm font-bold text-[#025545]">K</span>
-          <span className="text-sm font-semibold text-white">Koott · {title}</span>
-        </a>
-        <div className="flex items-center gap-1">
+        <Link href={nav[0]?.items[0]?.href || '/'} className="flex min-w-0 items-center gap-2">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-sm font-bold text-[#025545]">K</span>
+          <span className="truncate text-sm font-semibold text-white">{title}</span>
+        </Link>
+        <div className="flex shrink-0 items-center gap-0.5">
           {headerActions && headerActions(true)}
+          <TaskDock inline dark only="phone" />
           <button type="button" onClick={() => setMenu(true)} className="rounded-lg p-2 text-white hover:bg-white/10" aria-label="Open menu">
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
@@ -122,15 +123,14 @@ export default function DashboardShell({ title, roles, nav, children, headerActi
         </div>
       )}
 
-      <main className="min-w-0 pb-24 lg:ml-60">
-        {headerActions && (
-          <div className="sticky top-0 z-30 hidden h-12 items-center justify-end gap-1 border-b border-slate-200 bg-white/90 px-6 backdrop-blur lg:flex">
-            {headerActions(false)}
-          </div>
-        )}
+      <main className="min-w-0 pb-10 lg:ml-60">
+        {/* Laptop: slim top bar with the header icons and the task icons */}
+        <div className="sticky top-0 z-30 hidden h-12 items-center justify-end gap-1 border-b border-slate-200 bg-white/90 px-6 backdrop-blur lg:flex">
+          {headerActions && headerActions(false)}
+          <TaskDock inline only="laptop" />
+        </div>
         {children}
       </main>
-      <TaskDock />
     </div>
   );
 }

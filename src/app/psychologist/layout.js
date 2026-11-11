@@ -80,7 +80,7 @@ export default function PsychologistLayout({ children }) {
             {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
           <h6 className="text-sm font-semibold text-gray-800">Psychologist Dashboard</h6>
-          <div className="w-10"></div> {/* Spacer for centering */}
+          <TaskDock inline only="phone" />
         </div>
       </div>
 
@@ -247,14 +247,17 @@ export default function PsychologistLayout({ children }) {
       <div className={`lg:ml-64 transition-all duration-300 ease-in-out`}>
         {/* Top bar - Fixed header */}
         <div className="hidden lg:block bg-white shadow-sm border-b border-gray-200 fixed top-0 right-0 left-64 z-30 min-h-[4.5rem]">
-          <div className="px-6 py-6">
-            <div className="flex items-center justify-between">
+          <div className="flex min-h-[4.5rem] items-center px-6">
+            <div className="flex w-full items-center justify-between">
               <h6 className="text-lg font-semibold text-gray-800">Psychologist Dashboard</h6>
-              {user && (
-                <div className="text-sm font-medium text-gray-700">
-                  {[user.profile?.first_name, user.profile?.last_name].filter(Boolean).join(' ') || user.profile?.name || user.email}
-                </div>
-              )}
+              <div className="flex items-center gap-3">
+                {user && (
+                  <div className="text-sm font-medium text-gray-700">
+                    {[user.profile?.first_name, user.profile?.last_name].filter(Boolean).join(' ') || user.profile?.name || user.email}
+                  </div>
+                )}
+                <TaskDock inline only="laptop" />
+              </div>
             </div>
           </div>
         </div>
@@ -263,7 +266,6 @@ export default function PsychologistLayout({ children }) {
         <main className="pt-24 lg:pt-24">
           {children}
         </main>
-        <TaskDock />
       </div>
     </div>
   );
