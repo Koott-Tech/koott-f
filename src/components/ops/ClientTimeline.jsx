@@ -45,7 +45,6 @@ export default function ClientTimeline({ base = '/operations' }) {
     <div className="mx-auto w-full max-w-4xl px-4 py-5 sm:px-6 lg:py-8">
       <div className="mb-4">
         <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Client timeline</div>
-        <div className="mt-0.5 text-sm text-slate-500">Lead source, bookings, payments and tasks for one client, in date order.</div>
       </div>
       <div className="relative mb-5">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search a client by name, email or phone"

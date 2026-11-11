@@ -92,7 +92,6 @@ export default function LeadSourcesReport() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Lead sources</div>
-          <div className="mt-0.5 text-sm text-slate-500">Which sources bring leads — and which bring paying clients.</div>
         </div>
         <select value={range} onChange={(e) => setRange(Number(e.target.value))} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
           <option value={30}>Last 30 days</option><option value={90}>Last 90 days</option><option value={365}>Last 12 months</option>

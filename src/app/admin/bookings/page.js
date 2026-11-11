@@ -974,9 +974,6 @@ export default function BookingsPage() {
               </span>
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-1 max-w-xl">
-            Koott sessions and packages. Manage your internal therapy sessions here.
-          </p>
         </div>
         <div className="mt-2 sm:mt-0 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
           

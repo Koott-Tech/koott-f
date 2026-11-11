@@ -120,7 +120,6 @@ export default function AdminEventPagesCmsListPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h5 className="font-bold text-gray-900">Event pages</h5>
-          <p className="text-gray-600 mt-2">Manage workshop landing pages at /events/[slug]</p>
         </div>
         <button
           type="button"

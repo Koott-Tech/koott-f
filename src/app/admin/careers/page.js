@@ -122,9 +122,6 @@ export default function CareersAdminPage() {
                 </span>
               )}
             </div>
-            <p className="mt-1 text-sm text-gray-600">
-              Manage open roles that appear on the careers page.
-            </p>
           </div>
           <Link
             href={`${dashBase}/careers/new`}

@@ -211,9 +211,6 @@ export default function AssessmentSessionsPage() {
     <div className="px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Assessment Sessions</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          View and manage all assessment package sessions. Each package includes 3 sessions.
-        </p>
       </div>
 
       {/* Stats */}

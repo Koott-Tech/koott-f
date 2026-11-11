@@ -86,7 +86,6 @@ export default function TherapistGroupsManager({ onChanged }) {
       {/* Groups */}
       <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
         <div className="text-base font-semibold text-gray-900">Groups</div>
-        <p className="mt-0.5 text-xs text-slate-500">Each therapist can be in one group. Groups are only visible to admin and finance.</p>
 
         {!state.ready && (
           <div className="mt-3 flex gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
@@ -181,7 +180,6 @@ export default function TherapistGroupsManager({ onChanged }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div className="text-base font-semibold text-gray-900">Therapists</div>
-            <p className="mt-0.5 text-xs text-slate-500">Pick a group for each therapist — it saves straight away.</p>
           </div>
           <input
             value={search}

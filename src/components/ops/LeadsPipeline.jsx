@@ -214,7 +214,6 @@ export default function LeadsPipeline() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Leads</div>
-          <div className="mt-0.5 text-sm text-slate-500">Every lead from the booking form, contact form, events and ads — call, follow up, convert.</div>
         </div>
         <button type="button" onClick={() => setAdding(true)} className="rounded-lg bg-[#025545] px-4 py-2 text-sm font-semibold text-white hover:bg-[#013d31]">+ Add lead</button>
       </div>

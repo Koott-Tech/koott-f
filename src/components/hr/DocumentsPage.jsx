@@ -53,7 +53,6 @@ export default function DocumentsPage() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>{manage ? 'Documents' : 'My documents'}</div>
-          <div className="mt-0.5 text-sm text-slate-500">Licences, ID, contracts and agreements. A renewal task appears 30 days before a document expires.</div>
         </div>
         <button type="button" onClick={() => setAdding(true)} className="rounded-lg bg-[#025545] px-4 py-2 text-sm font-semibold text-white">+ Add a document</button>
       </div>

@@ -43,7 +43,6 @@ export default function SafetyAdminPage() {
     <div className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 lg:py-8">
       <div className="mb-4">
         <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Safety alerts</div>
-        <div className="mt-0.5 text-sm text-slate-500">Urgent safety concerns from therapists go straight to the clinical lead — never into the task queue.</div>
       </div>
       {err && <div className="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{err}</div>}
 

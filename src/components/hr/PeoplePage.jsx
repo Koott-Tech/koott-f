@@ -73,7 +73,6 @@ export default function PeoplePage({ therapistOnboardingHref = '/hr/therapists' 
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>People</div>
-          <div className="mt-0.5 text-sm text-slate-500">Everyone who works at Koott. One email, one role, one dashboard.</div>
         </div>
         <div className="flex gap-2">
           <a href={therapistOnboardingHref} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Onboard a therapist</a>

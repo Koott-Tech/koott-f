@@ -480,9 +480,6 @@ export default function DoctorsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h6>Doctors Management</h6>
-          <p className="mt-1 text-sm text-gray-600">
-            Manage psychologist profiles.
-          </p>
           <p className="mt-2 text-xs text-gray-500">{doctors.length} profile(s) total.</p>
         </div>
         <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row gap-2">

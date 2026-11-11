@@ -71,10 +71,6 @@ export default function TherapistGroupsReport({ refreshKey = 0 }) {
       <div className="flex flex-col gap-3 border-b border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="text-base font-semibold text-gray-900">Group performance</div>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Internal only. Sales = successful payments in the range; sessions = scheduled in the range;
-            open slots and utilisation count from today{data?.slotWindow ? ` (${niceDate(data.slotWindow.from)} – ${niceDate(data.slotWindow.to)})` : ' — none for a past range'}.
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Filter className="h-4 w-4 text-gray-400" />

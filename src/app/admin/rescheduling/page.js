@@ -270,9 +270,6 @@ export default function AdminReschedulingPage() {
             >
               Rescheduling Requests
             </div>
-            <p className="text-xs text-gray-600 mt-1">
-              Review and act on client reschedule requests.
-            </p>
           </div>
         </div>
 

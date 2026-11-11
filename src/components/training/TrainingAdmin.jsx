@@ -55,7 +55,6 @@ export default function TrainingAdmin() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Training</div>
-          <div className="mt-0.5 text-sm text-slate-500">Courses for therapists and staff, and who has finished them.</div>
         </div>
         <div className="flex gap-2">
           <div className="flex rounded-lg bg-slate-100 p-0.5">
@@ -93,7 +92,7 @@ export default function TrainingAdmin() {
               <button type="button" onClick={() => setLessonFor(c)} className="mt-2 text-xs font-semibold text-[#025545] hover:underline">+ Add a lesson</button>
             </div>
           ))}
-          {!courses.length && <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">No courses yet. Start with your therapist induction.</div>}
+          {!courses.length && <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">No courses yet.</div>}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-slate-200">

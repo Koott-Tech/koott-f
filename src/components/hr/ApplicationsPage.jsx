@@ -37,7 +37,6 @@ export default function ApplicationsPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 lg:py-8">
       <div className="mb-4">
         <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Applications</div>
-        <div className="mt-0.5 text-sm text-slate-500">From the careers pages. Move each one along; notes stay with it.</div>
       </div>
       <div className="-mx-4 mb-4 flex gap-1 overflow-x-auto px-4 sm:mx-0 sm:px-0">
         {[{ value: '', label: 'All' }, ...STAGES].map((s) => (
@@ -72,7 +71,7 @@ export default function ApplicationsPage() {
               </button>
             );
           })}
-          {!apps.length && <div className="p-8 text-center text-sm text-slate-500">No applications yet. They arrive from the job pages on the careers section.</div>}
+          {!apps.length && <div className="p-8 text-center text-sm text-slate-500">No applications yet.</div>}
         </div>
       )}
       <Modal open={Boolean(open)} onClose={() => setOpen(null)} title={open ? `${open.name} — ${open.career_title || 'Application'}` : ''}>

@@ -88,11 +88,7 @@ export default function ListingPatternEditor({ refreshKey = 0 }) {
         <LayoutList className="mt-0.5 h-5 w-5 text-[#025545]" />
         <div>
           <div className="text-base font-semibold text-gray-900">Booking-page order</div>
-          <p className="mt-0.5 max-w-3xl text-xs text-slate-500">
-            For <span className="font-medium">/book-malayali-psychologists</span> only. Each card is reserved for a group and
-            shows that group&apos;s therapist with the soonest free slot. Groups can repeat (A, B, B, C). The home page and
-            condition pages always show the soonest-available therapists first.
-          </p>
+          <p className="mt-0.5 text-xs text-slate-500">Card order by group on /book-malayali-psychologists.</p>
         </div>
       </div>
 
@@ -183,7 +179,6 @@ export default function ListingPatternEditor({ refreshKey = 0 }) {
               ))}
               {!preview?.cards?.length && <li className="px-2 py-4 text-center text-sm text-slate-400">No active therapists.</li>}
             </ol>
-            <p className="mt-1.5 text-[11px] text-slate-400">Next free times in IST; refreshed every couple of minutes.</p>
           </div>
         </div>
       )}

@@ -40,7 +40,6 @@ export default function TeamsPage() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Teams</div>
-          <div className="mt-0.5 text-sm text-slate-500">Members and a team lead. Give tasks to a whole team; when someone leaves, their tasks go to the lead.</div>
         </div>
         <button type="button" onClick={() => setEditing({ name: '', description: '', lead: '' })} className="rounded-lg bg-[#025545] px-4 py-2 text-sm font-semibold text-white">+ New team</button>
       </div>

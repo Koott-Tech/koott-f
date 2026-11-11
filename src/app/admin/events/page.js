@@ -201,9 +201,6 @@ export default function AdminEventsPage() {
                 </span>
               )}
             </div>
-            <p className="mt-1 text-sm text-gray-600">
-              Manage workshop/event signups.
-            </p>
           </div>
           <button
             type="button"
@@ -247,7 +244,7 @@ export default function AdminEventsPage() {
       ) : allRows.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <p className="text-center text-gray-500 py-16 px-4">
-            No registrations yet. When visitors submit the workshop form, entries appear here.
+            No registrations yet.
           </p>
         </div>
       ) : filteredRows.length === 0 ? (

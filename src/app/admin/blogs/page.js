@@ -182,7 +182,6 @@ export default function BlogsPage() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h6>Blog Management</h6>
-              <p className="text-gray-600 mt-1">Manage blog posts and content</p>
             </div>
             <Link
               href={`${dashBase}/blogs/new`}

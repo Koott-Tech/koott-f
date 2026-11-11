@@ -167,10 +167,6 @@ export default function AdminCouponsPage() {
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Discount coupons</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Codes clients can apply at checkout. Every rule here is re-checked on the server
-          when the payment order is created.
-        </p>
       </div>
 
       {msg.text && (

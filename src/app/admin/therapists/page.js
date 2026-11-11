@@ -378,9 +378,6 @@ export default function TherapistsPage() {
           <UserCheck className="h-5 w-5 text-[#025545]" />
           <div>
             <div className="text-xl font-semibold text-gray-900">Therapists</div>
-            <p className="text-xs text-slate-500 mt-0.5 max-w-xl">
-              Every therapist on the platform, with their booking activity in the selected range.
-            </p>
           </div>
         </div>
         <div className="mt-2 sm:mt-0 flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
@@ -468,14 +465,6 @@ export default function TherapistsPage() {
         />
         <div className="text-sm text-gray-500 flex flex-col sm:flex-row sm:items-center sm:gap-3">
           <span>{filtered.length} from bookings</span>
-          {typeof statsMeta?.bookingsScanned === 'number' && (
-            <span className="text-slate-400">· {statsMeta.bookingsScanned} booking rows scanned</span>
-          )}
-          {typeof statsMeta?.psychologistsTableCount === 'number' && (
-            <span className="text-slate-400">
-              · {statsMeta.psychologistsTableCount} profile(s) on Doctors page (psychologists table)
-            </span>
-          )}
         </div>
       </div>
 

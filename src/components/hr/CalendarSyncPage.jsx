@@ -38,7 +38,6 @@ export default function CalendarSyncPage() {
     <div className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 lg:py-8">
       <div className="mb-4">
         <div className="text-2xl font-semibold text-slate-900" role="heading" aria-level={1}>Calendar sync</div>
-        <div className="mt-0.5 text-sm text-slate-500">Therapists whose Google Calendar is connected get every session (with its Meet link) in their own calendar.</div>
       </div>
       <div className="mb-4 flex flex-wrap gap-2">
         {Object.entries(STATE).map(([k, s]) => <span key={k} className={`rounded-full px-3 py-1 text-xs font-medium ${s.cls}`}>{s.label}: {counts[k] || 0}</span>)}

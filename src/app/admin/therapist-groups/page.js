@@ -20,9 +20,6 @@ export default function TherapistGroupsPage() {
         <Users className="h-5 w-5 text-[#025545]" />
         <div>
           <div className="text-xl font-semibold text-gray-900">Therapist groups</div>
-          <p className="mt-0.5 max-w-2xl text-xs text-slate-500">
-            Group therapists (A, B, C …) to follow sales, sessions and slots per group. Only admin and finance see groups.
-          </p>
         </div>
       </div>
       <TherapistGroupsManager onChanged={() => setRefreshKey((k) => k + 1)} />

@@ -264,9 +264,6 @@ export default function UsersPage() {
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-gray-600">
-            Manage client users and their accounts on the platform
-          </p>
         </div>
         <button
           onClick={handleAddUser}
