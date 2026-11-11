@@ -323,11 +323,6 @@ export default function TherapistTimeBlocking({ calendarConnected = false, psych
 
   return (
     <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-6">
-      <p className="text-sm text-gray-700">
-        Block time you are not available. Blocked hours disappear from your booking
-        page{calendarConnected ? ' and are marked in your Google Calendar' : ''}.
-      </p>
-
       <div className="flex flex-wrap gap-2">
         {tab('date', CalendarDays, 'A specific date')}
         {tab('weekly', Repeat, 'Every week')}
@@ -353,7 +348,7 @@ export default function TherapistTimeBlocking({ calendarConnected = false, psych
         ) : (
           <div>
             <p className="block text-sm font-medium text-gray-700 mb-2">
-              Days of the week <span className="font-normal text-gray-500">— repeats for the next six months</span>
+              Days <span className="font-normal text-gray-500">(next 6 months)</span>
             </p>
             <div className="flex flex-wrap gap-2">
               {DAYS_SHORT.map((label, d) => {
@@ -380,7 +375,7 @@ export default function TherapistTimeBlocking({ calendarConnected = false, psych
 
         {/* How much of it */}
         <div>
-          <p className="block text-sm font-medium text-gray-700 mb-2">How much of it</p>
+          <p className="block text-sm font-medium text-gray-700 mb-2">Block</p>
           <div className="flex flex-wrap gap-2">
             {coverageOption('whole', 'The whole day')}
             {coverageOption('range', 'A time range')}
@@ -392,8 +387,8 @@ export default function TherapistTimeBlocking({ calendarConnected = false, psych
           <p className="flex items-start gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
             <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
             {activeDays.length > 1
-              ? 'These days have no working hours in common. Block them separately, or block the whole day.'
-              : 'You have no working hours on that day, so there is nothing to block.'}
+              ? 'No working hours in common. Block these days separately or block the whole day.'
+              : 'No working hours on this day.'}
           </p>
         )}
 
@@ -451,11 +446,9 @@ export default function TherapistTimeBlocking({ calendarConnected = false, psych
                 </button>
               ))}
             </div>
-            <p className="mt-2 text-xs text-gray-500">
-              {pickedSlots.length
-                ? `${pickedSlots.length} hour${pickedSlots.length === 1 ? '' : 's'} selected`
-                : 'Pick one or more hours. They need not be next to each other.'}
-            </p>
+            {pickedSlots.length > 0 && (
+              <p className="mt-2 text-xs text-gray-500">{pickedSlots.length} hour{pickedSlots.length === 1 ? '' : 's'} selected</p>
+            )}
           </div>
         )}
 

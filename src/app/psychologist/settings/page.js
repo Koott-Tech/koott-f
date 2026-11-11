@@ -332,10 +332,6 @@ export default function PsychologistSettings() {
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h6 className="font-semibold text-gray-900">Calendar &amp; Availability</h6>
-          <p className="mt-1 text-sm text-gray-600">
-            Connect your Google Calendar, see what is on it, and block the time you
-            are not available.
-          </p>
         </div>
       </div>
 
@@ -347,15 +343,15 @@ export default function PsychologistSettings() {
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
               <p className="font-medium text-gray-900 text-sm sm:text-base flex items-center">
                 <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                Google Calendar Integration
+                Google Calendar
               </p>
             </div>
             <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-4">
               <div className="flex items-start">
                 <div className="flex-1">
-                  <p className="text-sm text-gray-700 mb-4">
-                    Connect your Google Calendar to automatically prevent double bookings. When you have sessions booked on other platforms (BetterHelp, Talkspace, etc.), those time slots will be automatically blocked on Koott.
-                  </p>
+                  {!isCalendarConnected && (
+                    <p className="text-sm text-gray-600 mb-4">Busy times in your Google Calendar are blocked on Koott.</p>
+                  )}
                   
                   {isCalendarConnected ? (
                     <div className="space-y-4">
@@ -419,23 +415,13 @@ export default function PsychologistSettings() {
                 </div>
               </div>
               
-              <div className="mt-4 bg-[#025545]/10 border border-[#025545]/20 rounded-md p-4">
-                <p className="text-sm font-medium text-[#012f23] mb-2">How it works:</p>
-                <ul className="text-xs text-[#025545] space-y-1 list-disc list-inside">
-                  <li>System syncs your calendar every 30 minutes automatically</li>
-                  <li>Bookings from other platforms are detected and blocked here</li>
-                  <li>Prevents double bookings across all your therapy platforms</li>
-                  <li>Read-only access - we never modify your calendar</li>
-                </ul>
-              </div>
-              
               {/* Calendar Events Display */}
               {isCalendarConnected && (
                 <div className="mt-6">
                   {/* Month Calendar View */}
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-4">
-                      <p className="text-sm font-semibold text-gray-900">Calendar View - Bookings from Other Platforms</p>
+                      <p className="text-sm font-semibold text-gray-900">Your calendar</p>
                       <button
                         onClick={fetchCalendarEvents}
                         disabled={isLoadingEvents}
@@ -561,9 +547,6 @@ export default function PsychologistSettings() {
                                   </p>
                                   {event.location && (
                                     <p className="text-xs mt-1 opacity-70">📍 {event.location}</p>
-                                  )}
-                                  {event.description && (
-                                    <p className="text-xs mt-2 opacity-60">{event.description}</p>
                                   )}
                                 </div>
                                 <div className="ml-3">
