@@ -251,9 +251,8 @@ export default function PsychologistLayout({ children }) {
             <div className="flex items-center justify-between">
               <h6 className="text-lg font-semibold text-gray-800">Psychologist Dashboard</h6>
               {user && (
-                <div className="text-xs text-gray-500">
-                  <span className="font-medium text-gray-600">{user.email}</span>
-                  <span className="ml-2 text-gray-400 capitalize">({user.role})</span>
+                <div className="text-sm font-medium text-gray-700">
+                  {[user.profile?.first_name, user.profile?.last_name].filter(Boolean).join(' ') || user.profile?.name || user.email}
                 </div>
               )}
             </div>

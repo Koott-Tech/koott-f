@@ -198,9 +198,9 @@ export default function PsychologistDashboard() {
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           {(() => {
-            const first = user?.first_name || user?.firstName || '';
-            const last = user?.last_name || user?.lastName || '';
-            const fallback = user?.name || user?.email || 'Psychologist';
+            const first = user?.profile?.first_name || user?.first_name || user?.firstName || '';
+            const last = user?.profile?.last_name || user?.last_name || user?.lastName || '';
+            const fallback = user?.profile?.name || user?.name || user?.email || 'Psychologist';
             const display = (first || last) ? `${first} ${last}`.trim() : fallback;
             return (
               <h6 className="font-semibold text-gray-900">{display}</h6>
