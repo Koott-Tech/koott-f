@@ -144,9 +144,9 @@ export default function EventOrganizerLayout({ children }) {
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex flex-col h-full w-full">
-          <div className="p-6 border-b border-gray-200">
+          <div className="h-[4.5rem] px-6 flex items-center border-b border-gray-200">
             <a href="/event-organizer" className="hover:opacity-80 transition-opacity">
-              <img src="/logo.png" alt="Koott" width={120} height={40} className="object-contain" />
+              <img src="/logo-sidebar.png" alt="Koott" width={110} height={36} className="object-contain" style={{ height: 36, width: 'auto' }} />
             </a>
           </div>
 

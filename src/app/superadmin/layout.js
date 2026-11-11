@@ -327,18 +327,18 @@ export default function SuperAdminLayout({ children }) {
       }`}>
         <div className="flex flex-col h-full w-full">
           {/* Logo/Brand */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="h-[4.5rem] px-6 flex items-center border-b border-gray-200">
             <a 
               href="/superadmin"
               className="hover:opacity-80 transition-opacity cursor-pointer"
               aria-label="Koott - Go to super admin dashboard"
             >
               <img 
-                src="/logo.png"
+                src="/logo-sidebar.png"
                 alt="Koott"
-                width={120}
-                height={40}
-                className="object-contain"
+                width={110}
+                height={36}
+                className="object-contain" style={{ height: 36, width: 'auto' }}
               />
             </a>
           </div>

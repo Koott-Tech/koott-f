@@ -117,7 +117,7 @@ export default function PsychologistLayout({ children }) {
         >
         <div className="flex flex-col h-full">
           {/* Logo/Brand - Mobile only */}
-          <div className="lg:hidden p-4 border-b border-gray-200">
+          <div className="lg:hidden h-[4.5rem] px-6 flex items-center border-b border-gray-200">
             <Link
               href="/psychologist"
               className="hover:opacity-80 transition-opacity cursor-pointer"
@@ -129,11 +129,11 @@ export default function PsychologistLayout({ children }) {
               }}
             >
               <img 
-                src="/logo.png"
+                src="/logo-sidebar.png"
                 alt="Koott"
-                width={120}
-                height={40}
-                className="object-contain"
+                width={110}
+                height={36}
+                className="object-contain" style={{ height: 36, width: 'auto' }}
               />
             </Link>
           </div>
@@ -188,18 +188,18 @@ export default function PsychologistLayout({ children }) {
       <div className="hidden lg:flex fixed inset-y-0 left-0 w-64 bg-white shadow-lg border-r border-[#025545]/20 z-40">
         <div className="flex flex-col h-full w-full">
           {/* Logo/Brand */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="h-[4.5rem] px-6 flex items-center border-b border-gray-200">
             <Link
               href="/psychologist"
               className="hover:opacity-80 transition-opacity cursor-pointer"
               aria-label="Koott - Go to psychologist dashboard"
             >
               <img 
-                src="/logo.png"
+                src="/logo-sidebar.png"
                 alt="Koott"
-                width={120}
-                height={40}
-                className="object-contain"
+                width={110}
+                height={36}
+                className="object-contain" style={{ height: 36, width: 'auto' }}
               />
             </Link>
           </div>
