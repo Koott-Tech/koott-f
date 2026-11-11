@@ -42,7 +42,12 @@ export function staffDestination(role) {
   const home = dashboardFor(role);
   if (!home) return null;
   try {
-    const raw = new URLSearchParams(window.location.search).get('next');
+    // ?next= on the address, or kept by the header when it opened the sign-in popup
+    let raw = new URLSearchParams(window.location.search).get('next');
+    try {
+      if (!raw) raw = sessionStorage.getItem('koott_signin_next');
+      sessionStorage.removeItem('koott_signin_next');
+    } catch (_) { /* storage blocked */ }
     const adminish = role === 'admin' || role === 'superadmin';
     const url = raw && raw.startsWith('/') ? new URL(raw, window.location.origin) : null;
     const next = url && url.origin === window.location.origin && !/[\\\t\n\r]/.test(raw) ? `${url.pathname}${url.search}${url.hash}` : null;

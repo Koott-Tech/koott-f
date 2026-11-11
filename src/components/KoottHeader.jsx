@@ -102,6 +102,15 @@ export default function KoottHeader() {
     if (authLoading) return;
     const params = new URLSearchParams(window.location.search);
     if (params.get('login') !== '1') return;
+    // Keep ?next= for after sign-in, then tidy the address bar back to the plain page.
+    try {
+      const next = params.get('next');
+      if (next) sessionStorage.setItem('koott_signin_next', next);
+      else sessionStorage.removeItem('koott_signin_next');
+    } catch (_) { /* storage blocked */ }
+    params.delete('login'); params.delete('next');
+    const rest = params.toString();
+    window.history.replaceState(window.history.state, '', `${window.location.pathname}${rest ? `?${rest}` : ''}${window.location.hash}`);
     if (user && isAuthenticated()) {
       const dest = staffDestination(user.role);
       if (dest) window.location.replace(dest);
