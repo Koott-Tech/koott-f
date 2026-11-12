@@ -32,6 +32,7 @@ import SlotUnavailablePopup from '@/components/SlotUnavailablePopup';
 import { analyticsContext, track, trackPopup } from '@/analytics';
 import { therapistSlug } from '@/components/TherapistProfile';
 import {
+  SESSION_MINUTES,
   IST, SESSION_LENGTH_LABEL, clientTimeZone, dateLabel, dayKey, fetchSlots, fromYmd,
   isPsychiatristRecord, istToInstant, packageKind, sameAsIst, timeLabel, toTimeOfDay, ymd, zoneLabel,
 } from '@/lib/sessionSlots';
@@ -88,6 +89,25 @@ function loadRazorpay() {
   }
   return razorpayScript;
 }
+
+/* Figma "Stepper/ Booking" (1123:9829) and "Post payment screens" (1123:17819). */
+const FX_TYPE_LABEL = {
+  individual: 'Individual Therapy', couple: 'Couple Therapy',
+  psychiatry_15: '15-min consultation', psychiatry_30: '30-min consultation',
+};
+const FX_TYPE_SHORT = { individual: 'Individual', couple: 'Couple', psychiatry_15: 'Psychiatry', psychiatry_30: 'Psychiatry' };
+const FX_TYPE_ICON = { individual: 'user-03', couple: 'users-02', psychiatry_15: 'user-03', psychiatry_30: 'user-03' };
+const FX_DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const FX_PERIODS = [['morning', 'slot-morning', 'Morning'], ['afternoon', 'slot-afternoon', 'Afternoon'], ['evening', 'slot-evening', 'Evening']];
+const inr2 = (n) => `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const pairsOf = (list) => list.reduce((acc, x, i) => { if (i % 2 === 0) acc.push([x]); else acc[acc.length - 1].push(x); return acc; }, []);
+
+/** The five step dots: the current one is a pill (Figma Frame 5058). */
+const StepDots = ({ at }) => (
+  <span className="bfx-dots" aria-hidden>
+    {[0, 1, 2, 3, 4].map((i) => <i key={i} className={i === at ? 'is-on' : i < at ? 'is-done' : ''} />)}
+  </span>
+);
 
 const PAY_STAGE_TEXT = {
   order: 'Holding your slot…',
@@ -212,7 +232,8 @@ export default function BookingFlow({ slug }) {
   const [pkgErr, setPkgErr] = useState('');
   const [confirming, setConfirming] = useState(false);
   const [booked, setBooked] = useState(null);
-  const [paidDone, setPaidDone] = useState(null);         // { startsAt, sessionId } after a paid booking             // { startsAt, left } after Confirm booking
+  const [paidDone, setPaidDone] = useState(null);         // { startsAt, sessionId } after a paid booking
+            // { startsAt, left } after Confirm booking
 
   /* ------------------------- mobile number + code ------------------------ */
 
@@ -723,7 +744,7 @@ export default function BookingFlow({ slug }) {
           if (!done) return; // handed over to the success page
           setPaying(false); setPayStage(null);
           if (done.taken) { setPayErr(done.message); return; }
-          setPaidDone({ startsAt: slot.startsAt, sessionId: done.sessionId });
+          setPaidDone({ startsAt: slot.startsAt, sessionId: done.sessionId, orderId: resp.razorpay_order_id, amount: plan?.price, kind });
           try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (_) { /* old browsers */ }
         },
         modal: { ondismiss: () => { setPaying(false); track('payment_dismissed'); } },
@@ -891,12 +912,20 @@ export default function BookingFlow({ slug }) {
     <div className="bf">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <div className={`bf-in${needsPhone && !paidDone && !booked && !authLoading ? ' is-signin' : ''}`}>
-        <button type="button" className="bf-back" onClick={back} aria-label="Back">
-          {needsPhone && !paidDone && !booked && !authLoading
-            ? <img src="/design/booking/arrow-left.svg" alt="" width={24} height={24} />
-            : <Arrow />}
-        </button>
+      <div className={`bf-in${needsPhone && !paidDone && !booked && !authLoading ? ' is-signin'
+        : (paidDone || (!booked && !needsPhone && step === 4)) ? ' is-wide' : ' is-fx'}`}>
+        {needsPhone && !paidDone && !booked && !authLoading ? (
+          <button type="button" className="bf-back" onClick={back} aria-label="Back">
+            <img src="/design/booking/arrow-left.svg" alt="" width={24} height={24} />
+          </button>
+        ) : (!paidDone && !booked && !authLoading && step < 4) ? (
+          <div className="bfx-top">
+            <button type="button" className="bfx-back" onClick={back} aria-label="Back">
+              <img src="/design/booking/arrow-left.svg" alt="" width={24} height={24} />
+            </button>
+            <StepDots at={step} />
+          </div>
+        ) : null}
 
         {authLoading ? (
           <p className="bf-note">Loading…</p>
@@ -908,18 +937,32 @@ export default function BookingFlow({ slug }) {
             )}
           </div>
         ) : paidDone ? (
-          <div className="bf-done">
-            <span className="bf-done-icon" aria-hidden>✓</span>
-            <div className="bf-done-h">Session booked</div>
-            <div className="bf-done-p">
-              Your session with {name} on{' '}
-              <strong>{dateLabel(paidDone.startsAt, tz, { weekday: 'long', day: 'numeric', month: 'long' })}</strong> at{' '}
-              <strong>{timeLabel(paidDone.startsAt, tz)}</strong> ({zone}) is confirmed.
-              We&apos;ll email and WhatsApp you the Google Meet link in a minute.
+          <div className="bfx-done">
+            <div className="bfx-done-head">
+              <img src="/design/booking/check-verified.svg" alt="" width={64} height={64} />
+              <div className="bfx-title" role="heading" aria-level={1}>Session Confirmed</div>
             </div>
-            <div className="bf-done-actions">
-              <button type="button" className="bf-next" onClick={() => router.push('/profile/sessions')}>View my sessions</button>
+            <div className="bfx-ticket is-done">
+              <div className="bfx-tk-band" aria-hidden />
+              <div className="bfx-done-who">
+                {photo
+                  ? <img className="bfx-tk-photo" src={photo} alt={name} width={64} height={64} />
+                  : <span className="bfx-tk-photo is-empty" aria-hidden>{initials}</span>}
+                <span className="bfx-tk-name">{name}</span>
+                {role && <span className="bfx-tk-role">{role}</span>}
+              </div>
+              <div className="bfx-tear" aria-hidden><i /><b /><i /></div>
+              <div className="bfx-tiles is-small">
+                <div className="bfx-tile"><span className="bfx-tl">Amount paid</span><strong>{inr2(paidDone.amount)}</strong></div>
+                <div className="bfx-tile"><span className="bfx-tl">Session type</span><strong>{FX_TYPE_SHORT[paidDone.kind || kind]}</strong></div>
+                <div className="bfx-tile"><span className="bfx-tl">Date</span><strong>{dateLabel(paidDone.startsAt, tz, { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}</strong></div>
+                <div className="bfx-tile"><span className="bfx-tl">Time &amp; Duration</span><strong>{timeLabel(paidDone.startsAt, tz)}, {SESSION_MINUTES[paidDone.kind || kind]} Minutes</strong></div>
+              </div>
+              {paidDone.orderId && (
+                <div className="bfx-order"><span>Order ID</span><strong>{paidDone.orderId}</strong></div>
+              )}
             </div>
+            <button type="button" className="bfx-btn" onClick={() => router.push('/profile/sessions')}>View my booking</button>
           </div>
         ) : booked ? (
           <div className="bf-done">
@@ -1034,12 +1077,12 @@ export default function BookingFlow({ slug }) {
         <>
         {step === 0 && (
           <>
-            <h1 className="bf-h">What kind of session are you looking for?</h1>
-            <div className="bf-choices">
+            <div className="bfx-title" role="heading" aria-level={1}>What kind of session are you looking for?</div>
+            <div className="bfx-types">
               {typeChoices.map(([k, label]) => (
-                <button key={k} type="button" className="bf-choice" onClick={() => chooseType(k)}>
-                  {label}
-                  <span className="bf-choice-len">{SESSION_LENGTH_LABEL[k]}</span>
+                <button key={k} type="button" className={`bfx-type ${kind === k ? 'is-on' : ''}`} onClick={() => chooseType(k)}>
+                  <span className="bfx-ic" style={{ '--ic': `url(/design/booking/${FX_TYPE_ICON[k] || 'user-03'}.svg)` }} aria-hidden />
+                  <span className="bfx-type-l">{FX_TYPE_LABEL[k] || label}</span>
                 </button>
               ))}
             </div>
@@ -1048,7 +1091,13 @@ export default function BookingFlow({ slug }) {
 
         {step === 1 && (
           <>
-            <h1 className="bf-h">When would you like to meet {name}?</h1>
+            <div className="bfx-title bfx-title-who" role="heading" aria-level={1}>
+              <span>When would you like to meet</span>
+              {photo
+                ? <img className="bfx-who-photo" src={photo} alt="" width={32} height={32} />
+                : <span className="bfx-who-photo is-empty" aria-hidden>{initials}</span>}
+              <span>{name}?</span>
+            </div>
             {slotNotice && (
               <SlotUnavailablePopup
                 reason={slotNotice}
@@ -1063,15 +1112,19 @@ export default function BookingFlow({ slug }) {
                 onClose={() => { trackPopup('slot_unavailable', 'dismissed'); setSlotNotice(''); }}
               />
             )}
-            <div className="bf-when">
-              <div className="bf-cal">
-                <div className="bf-cal-top">
-                  <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month">‹</button>
+            <div className="bfx-sched">
+              <div className="bfx-cal">
+                <div className="bfx-cal-top">
+                  <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month">
+                    <img src="/design/booking/chevron-left.svg" alt="" width={20} height={20} />
+                  </button>
                   <span>{MONTHS[month.getMonth()]} {month.getFullYear()}</span>
-                  <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month">›</button>
+                  <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month">
+                    <img src="/design/booking/chevron-right.svg" alt="" width={20} height={20} />
+                  </button>
                 </div>
-                <div className={`bf-cal-grid ${daysBusy ? 'is-busy' : ''}`}>
-                  {DAYS.map((d) => <span key={d} className="bf-dow">{d}</span>)}
+                <div className="bfx-cal-dow">{FX_DOW.map((d) => <span key={d}>{d}</span>)}</div>
+                <div className={`bfx-cal-days ${daysBusy ? 'is-busy' : ''}`}>
                   {grid.map((d, i) => {
                     if (!d) return <span key={`x${i}`} />;
                     const key = ymd(d);
@@ -1082,7 +1135,7 @@ export default function BookingFlow({ slug }) {
                     return (
                       <button
                         key={key} type="button" disabled={off}
-                        className={`bf-day ${day === key ? 'is-on' : ''} ${!off ? 'has-slots' : ''}`}
+                        className={`bfx-day ${day === key ? 'is-on' : ''} ${!off ? 'has-slots' : ''}`}
                         onClick={() => setDay(key)}
                       >
                         {d.getDate()}
@@ -1096,32 +1149,65 @@ export default function BookingFlow({ slug }) {
                 )}
               </div>
 
-              <div className="bf-slots">
-                {day ? (
-                  <>
-                    <p className="bf-slots-h">
-                      {fromYmd(day).getDate()} {MONTHS[fromYmd(day).getMonth()]},{' '}
-                      {fromYmd(day).toLocaleDateString('en-GB', { weekday: 'long' })}
-                    </p>
-                    <p className="bf-slots-n">
-                      {daysBusy ? 'checking…' : `${slots.length} ${slots.length === 1 ? 'time' : 'times'} available · ${SESSION_LENGTH_LABEL[kind]} each`}
-                    </p>
-                    <div className="bf-slot-grid">
-                      {slots.map((s) => (
-                        <button
-                          key={s.startsAt} type="button"
-                          className={`bf-slot ${slot?.startsAt === s.startsAt ? 'is-on' : ''}`}
-                          // Picking a time is the answer to this step.
-                          onClick={() => { setSlot(s); setSlotNotice(''); setSlotSuggestion(null); track('slot_selected', {}, { psychologistId: therapist?.id }); setStep(pkgMode ? 4 : 2); }}
-                        >
-                          {s.label}
-                        </button>
-                      ))}
-                      {!daysBusy && slots.length === 0 && <p className="bf-note">No free times that day.</p>}
-                    </div>
-                  </>
-                ) : <p className="bf-note">Pick a date to see the times.</p>}
-                <p className="bf-tz">Times shown in your time zone · {zone}</p>
+              <div className="bfx-slots">
+                {day ? (() => {
+                  const dd = fromYmd(day);
+                  const picked = slot && slots.some((x) => x.startsAt === slot.startsAt) ? slot : null;
+                  const hourOf = (x) => Number(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hourCycle: 'h23', timeZone: tz }).format(new Date(x.startsAt)));
+                  const byPeriod = {
+                    morning: slots.filter((x) => hourOf(x) < 12),
+                    afternoon: slots.filter((x) => hourOf(x) >= 12 && hourOf(x) < 17),
+                    evening: slots.filter((x) => hourOf(x) >= 17),
+                  };
+                  const mins = SESSION_MINUTES[kind] || 50;
+                  return (
+                    <>
+                      <div className="bfx-sum">
+                        <div className="bfx-sum-h">
+                          {dd.getDate()} {MONTHS[dd.getMonth()]}, {dd.toLocaleDateString('en-GB', { weekday: 'long' })}
+                          {picked ? `, ${timeLabel(picked.startsAt, tz)}` : ''}
+                        </div>
+                        {picked ? (
+                          <div className="bfx-sum-s">
+                            <img src="/design/booking/clock.svg" alt="" width={20} height={20} />
+                            {timeLabel(picked.startsAt, tz)} - {timeLabel(new Date(new Date(picked.startsAt).getTime() + mins * 60000).toISOString(), tz)}
+                          </div>
+                        ) : (
+                          <div className="bfx-sum-s">
+                            {daysBusy ? 'checking…' : `${slots.length} ${slots.length === 1 ? 'time' : 'times'} available`}
+                            <i aria-hidden />
+                            {mins} minutes each
+                          </div>
+                        )}
+                      </div>
+                      <div className="bfx-periods">
+                        {FX_PERIODS.map(([p, icon, label]) => (byPeriod[p].length ? (
+                          <div key={p} className="bfx-period">
+                            <img src={`/design/booking/${icon}.svg`} alt={label} width={20} height={20} />
+                            <div className="bfx-period-row">
+                              {pairsOf(byPeriod[p]).map((pair) => (
+                                <div key={pair[0].startsAt} className="bfx-pair">
+                                  {pair.map((x) => (
+                                    <button
+                                      key={x.startsAt} type="button"
+                                      className={`bfx-slot ${slot?.startsAt === x.startsAt ? 'is-on' : ''}`}
+                                      // Picking a time is the answer to this step.
+                                      onClick={() => { setSlot(x); setSlotNotice(''); setSlotSuggestion(null); track('slot_selected', {}, { psychologistId: therapist?.id }); setStep(pkgMode ? 4 : 2); }}
+                                    >
+                                      {x.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null))}
+                        {!daysBusy && slots.length === 0 && <p className="bf-note">No free times that day.</p>}
+                      </div>
+                    </>
+                  );
+                })() : <p className="bf-note">Pick a date to see the times.</p>}
+                <div className="bfx-tz">Times shown in your time zone<i aria-hidden />{zone}</div>
               </div>
             </div>
           </>
@@ -1129,77 +1215,81 @@ export default function BookingFlow({ slug }) {
 
         {step === 2 && (
           <>
-            <h1 className="bf-h">Select a session plan</h1>
-            <p className="bf-eyebrow">{EYEBROW[kind]}</p>
+            <div className="bfx-head">
+              <div className="bfx-title" role="heading" aria-level={1}>Select a session plan</div>
+              <p className="bfx-sub">{FX_TYPE_SHORT[kind]} {SESSION_LENGTH_LABEL[kind]}</p>
+            </div>
 
-            {singles.length > 0 && bundles.length > 0 && (
-              <div className="bf-tabs">
-                {['packages', 'single'].map((m) => (
-                  <button
-                    key={m} type="button"
-                    className={`bf-tab ${effectiveMode === m ? 'is-on' : ''}`}
-                    onClick={() => { setMode(m); setPlan(null); }}
-                  >
-                    {m === 'packages' ? 'Packages' : 'Single'}
-                  </button>
-                ))}
+            <div className="bfx-plan-wrap">
+              {singles.length > 0 && bundles.length > 0 && (
+                <div className="bfx-tabs">
+                  {['packages', 'single'].map((m) => (
+                    <button
+                      key={m} type="button"
+                      className={`bfx-tab ${effectiveMode === m ? 'is-on' : ''}`}
+                      onClick={() => { setMode(m); setPlan(null); }}
+                    >
+                      {m === 'packages' ? 'Packages' : 'Single'}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="bfx-plans">
+                {shown.map((p, i) => {
+                  const { sessions } = readType(p);
+                  const full = unit * sessions;
+                  return (
+                    <button
+                      key={p.id} type="button"
+                      className={`bfx-plan ${(plan ? plan.id === p.id : i === 0) ? 'is-on' : ''}`}
+                      // Picking a plan is the answer to this step — no Continue.
+                      onClick={() => { setPlan(p); track('plan_selected', { item_kind: itemKindOf(p) }, { psychologistId: therapist?.id, value: Number(p.price) || 0 }); setStep(3); }}
+                    >
+                      <span className="bfx-plan-chip">
+                        {isPsychiatrist
+                          ? (sessions === 1 ? '1 consultation' : `${sessions} consultations`)
+                          : (sessions === 1 ? '1 session' : `${sessions} sessions`)}
+                      </span>
+                      <span className="bfx-plan-p">
+                        {inr(p.price)}
+                        {full > p.price && <s>{inr(full)}</s>}
+                      </span>
+                      <span className="bfx-plan-u">Per session {inr(Math.round(p.price / sessions))}</span>
+                    </button>
+                  );
+                })}
+                {shown.length === 0 && <p className="bf-note">No plans published for this option yet.</p>}
               </div>
-            )}
-
-            <div className="bf-plans">
-              {shown.map((p) => {
-                const { sessions } = readType(p);
-                const full = unit * sessions;
-                return (
-                  <button
-                    key={p.id} type="button"
-                    className={`bf-plan ${plan?.id === p.id ? 'is-on' : ''}`}
-                    // Picking a plan is the answer to this step — no Continue.
-                    onClick={() => { setPlan(p); track('plan_selected', { item_kind: itemKindOf(p) }, { psychologistId: therapist?.id, value: Number(p.price) || 0 }); setStep(3); }}
-                  >
-                    <span className="bf-plan-n">
-                      {isPsychiatrist
-                        ? (sessions === 1 ? 'Single consultation' : `${sessions} consultations`)
-                        : (sessions === 1 ? 'Single session' : `${sessions} sessions`)}
-                    </span>
-                    <span className="bf-plan-p">
-                      {inr(p.price)}
-                      {full > p.price && <s>{inr(full)}</s>}
-                    </span>
-                    <span className="bf-plan-u">
-                      Per session<br />{inr(Math.round(p.price / sessions))}
-                    </span>
-                  </button>
-                );
-              })}
-              {shown.length === 0 && <p className="bf-note">No plans published for this option yet.</p>}
             </div>
           </>
         )}
 
         {step === 3 && (
           <>
-            <h1 className="bf-h">About yourself</h1>
-            <div className="bf-form">
-              <label>Full name
-                <input value={about.name} onChange={(e) => setAbout({ ...about, name: e.target.value })} autoComplete="name" />
+            <div className="bfx-title" role="heading" aria-level={1}>About yourself</div>
+            <div className="bfx-form">
+              <label className="bfx-field">
+                <span className="bfx-label">Full name</span>
+                <input value={about.name} placeholder="full name" onChange={(e) => setAbout({ ...about, name: e.target.value })} autoComplete="name" />
               </label>
-              <label>Email
+              <label className="bfx-field">
+                <span className="bfx-label">Age</span>
+                <input type="number" min="16" max="120" placeholder="age" value={about.age} onChange={(e) => setAbout({ ...about, age: e.target.value })} />
+              </label>
+              <label className="bfx-field">
+                <span className="bfx-label">Contact number</span>
+                <input className="is-fixed" value={verified?.phone || accountPhone || ''} readOnly tabIndex={-1} />
+              </label>
+              <label className="bfx-field">
+                <span className="bfx-label">Email address</span>
                 <input
-                  type="email" value={about.email} autoComplete="email" readOnly={isAuthenticated()}
+                  type="email" value={about.email} placeholder="enter your email" autoComplete="email" readOnly={isAuthenticated()}
+                  className={isAuthenticated() ? 'is-fixed' : ''}
                   onChange={(e) => setAbout({ ...about, email: e.target.value })}
                 />
               </label>
-              <label>Age
-                <input type="number" min="16" max="120" value={about.age} onChange={(e) => setAbout({ ...about, age: e.target.value })} />
-              </label>
-              <label>Emergency contact number
-                <input value={about.emergency} onChange={(e) => setAbout({ ...about, emergency: e.target.value })} />
-              </label>
             </div>
-            {!isAuthenticated() && (
-              <p className="bf-hint">We&apos;ll set up your Koott account with these details, so you can see and manage your sessions.</p>
-            )}
             {aboutErr && (
               <p className="bf-err">
                 {aboutErr}
@@ -1208,122 +1298,125 @@ export default function BookingFlow({ slug }) {
                 )}
               </p>
             )}
+            <button type="button" className="bfx-btn bfx-next" disabled={!canContinue || aboutBusy} onClick={continueAbout}>
+              {aboutBusy ? 'Saving…' : 'Next'}
+            </button>
           </>
         )}
 
-        {step === 4 && (
-          <>
-            <h1 className="bf-h">Review your booking</h1>
-            {/* A session ticket: who and when on the left, the guest stub and
-                total on the right, split by a perforated tear line. */}
-            <div className="bf-ticket">
-              <div className="bf-tk-main">
-                <div className="bf-tk-top">
-                  <span className="bf-tk-brand">Koott · Session ticket</span>
-                  <span className="bf-tk-status">{pkgMode ? 'From your package' : 'Awaiting payment'}</span>
-                </div>
-
-                <div className="bf-tk-who">
-                  {photo
-                    ? <img className="bf-tk-photo" src={photo} alt={name} />
-                    : <span className="bf-tk-photo is-empty" aria-hidden>{initials}</span>}
-                  <div>
-                    <p className="bf-tk-label">Your {isPsychiatrist ? 'psychiatrist' : 'therapist'}</p>
-                    <p className="bf-tk-name">{name}</p>
-                    {role && <p className="bf-tk-role">{role}</p>}
+        {step === 4 && (() => {
+          const sessions = pkgMode ? 1 : planSessions;
+          const total = pkgMode ? 0 : Number(plan?.price || 0);
+          const saving = !pkgMode && sessions > 1 ? Math.max(Math.round(unit * sessions - total), 0) : 0;
+          const planName = pkgMode
+            ? `Session ${pkgSessionNo} of ${pkgTotal}`
+            : sessions === 1 ? (isPsychiatrist ? 'Single consultation' : 'Single session') : `Package Sessions(${sessions})`;
+          return (
+            <div className="bfx-review">
+              <div className="bfx-rv-left">
+                <div className="bfx-rv-inner">
+                  <StepDots at={4} />
+                  <div className="bfx-title" role="heading" aria-level={1}>Almost there, Review &amp; confirm</div>
+                  <div className="bfx-bill">
+                    <div className="bfx-bill-h">Bill summary</div>
+                    <div className="bfx-bill-row"><span>{pkgMode ? 'From your package' : sessions === 1 ? 'Single session' : `${sessions} sessions package`}</span><strong>{inr2(total)}</strong></div>
                   </div>
-                </div>
-
-                <div className="bf-tk-grid">
-                  <div>
-                    <span>Date</span>
-                    <strong>{slot && dateLabel(slot.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</strong>
+                  <div className="bfx-total">
+                    <div className="bfx-total-row"><span>Total</span><strong>{inr2(total)}</strong></div>
+                    {saving > 0 && <p>You’re saving {inr(saving)} with this package.</p>}
+                    {pkgMode && <p>Included in your package.</p>}
                   </div>
-                  <div>
-                    <span>Time</span>
-                    <strong>{slot && timeLabel(slot.startsAt, tz)}</strong>
-                    <em>{zone}</em>
-                  </div>
-                  <div>
-                    <span>Session</span>
-                    <strong>{TYPE_LABEL[kind]}</strong>
-                    <em>{SESSION_LENGTH_LABEL[kind]} · Google Meet</em>
-                  </div>
-                  <div>
-                    <span>Plan</span>
-                    {pkgMode ? (
-                      <>
-                        <strong>Session {pkgSessionNo} of {pkgTotal}</strong>
-                        <em>From your package</em>
-                      </>
-                    ) : (
-                      <>
-                        <strong>{planSessions === 1 ? (isPsychiatrist ? 'Single consultation' : 'Single session') : `${planSessions} sessions`}</strong>
-                        {planSessions > 1 && <em>{inr(Math.round((plan?.price || 0) / planSessions))} per session</em>}
-                      </>
+                  <div className="bfx-terms">
+                    <span>
+                      I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer">Terms&amp; Conditions</a>,
+                      {' '}<a href="/terms-and-conditions" target="_blank" rel="noreferrer">Consent to Therapy</a> and
+                      {' '}<a href="/refund-policy" target="_blank" rel="noreferrer">Refund Policy</a>.
+                    </span>
+                    {!pkgMode && (
+                      <span className="bfx-secure">Secure payment via <img src="/design/booking/razorpay.svg" alt="Razorpay" width={76} height={21} /></span>
                     )}
                   </div>
-                  {showIst && (
-                    <div className="is-wide">
-                      <span>India time</span>
-                      <strong>{dateLabel(slot.startsAt, IST, { day: 'numeric', month: 'short' })}, {timeLabel(slot.startsAt, IST)} IST</strong>
-                    </div>
+                  {payErr && <p className="bf-err">{payErr}</p>}
+                  {pkgMode ? (
+                    <button type="button" className="bfx-btn" disabled={confirming || !slot} onClick={confirmPackageSession}>
+                      {confirming ? 'Booking…' : 'Confirm booking'}
+                    </button>
+                  ) : (
+                    <button type="button" className="bfx-btn" disabled={paying || !slot || !plan} onClick={pay}>
+                      {paying ? 'Starting payment…' : 'Agree & Pay'}
+                    </button>
                   )}
                 </div>
               </div>
-
-              <div className="bf-tk-stub">
-                <div className="bf-tk-guest">
-                  <span>Booked for</span>
-                  <strong>{about.name}</strong>
-                  <em>{about.email}</em>
-                  <em>{verified?.phone || accountPhone}</em>
-                  {about.emergency && <em>Emergency · {about.emergency}</em>}
+              <div className="bfx-rv-right">
+                <div className="bfx-ticket">
+                  <div className="bfx-tk-band" aria-hidden />
+                  <div className="bfx-tk-who">
+                    {photo
+                      ? <img className="bfx-tk-photo" src={photo} alt={name} width={72} height={72} />
+                      : <span className="bfx-tk-photo is-empty" aria-hidden>{initials}</span>}
+                    <div className="bfx-tk-whotxt">
+                      <span className="bfx-tk-lbl">
+                        Your {isPsychiatrist ? 'Psychiatrist' : 'Therapist'}
+                        <button type="button" className="bfx-edit" aria-label="Change therapist" onClick={() => router.push('/book-malayali-psychologists')}>
+                          <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
+                        </button>
+                      </span>
+                      <span className="bfx-tk-name">{name}</span>
+                      {role && <span className="bfx-tk-role">{role}</span>}
+                    </div>
+                  </div>
+                  <div className="bfx-tear" aria-hidden><i /><b /><i /></div>
+                  <div className="bfx-tiles">
+                    <div className="bfx-tile">
+                      <span className="bfx-tl">Date</span>
+                      <strong>{slot && dateLabel(slot.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</strong>
+                      <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change date and time" onClick={() => setStep(1)}>
+                        <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
+                      </button>
+                    </div>
+                    <div className="bfx-tile">
+                      <span className="bfx-tl">Time</span>
+                      <strong>{slot && timeLabel(slot.startsAt, tz)}</strong>
+                      <em>{zone}</em>
+                      <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change time" onClick={() => setStep(1)}>
+                        <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
+                      </button>
+                    </div>
+                    <div className="bfx-tile">
+                      <span className="bfx-tl">Session</span>
+                      <strong>{FX_TYPE_LABEL[kind]}</strong>
+                      <em>{SESSION_MINUTES[kind]} min<i aria-hidden />Google Meet</em>
+                      <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change session type" onClick={() => setStep(0)}>
+                        <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
+                      </button>
+                    </div>
+                    <div className="bfx-tile">
+                      <span className="bfx-tl">Plan</span>
+                      <strong>{planName}</strong>
+                      <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change plan" onClick={() => setStep(pkgMode ? 1 : 2)}>
+                        <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="bf-tk-total">
-                  <span>Total</span>
-                  <strong>{pkgMode ? inr(0) : inr(plan?.price)}</strong>
-                  <em>{pkgMode ? 'Included in your package' : 'Secure payment via Razorpay'}</em>
-                </div>
+                <img className="bfx-rv-mark" src="/design/booking/review-mark.svg" alt="" aria-hidden />
               </div>
             </div>
-            {payErr && <p className="bf-err">{payErr}</p>}
-          </>
-        )}
-
-        {/* step 1 advances on the slot you click and step 2 on the plan card,
-            so neither needs the shared action row */}
-        {step > 2 && (
-          <div className="bf-actions">
-            {step < STEPS.length - 1 ? (
-              <button
-                type="button" className="bf-next" disabled={!canContinue || aboutBusy}
-                onClick={step === 3 ? continueAbout : () => setStep((s) => s + 1)}
-              >
-                {aboutBusy ? 'Saving…' : 'Continue'}
-              </button>
-            ) : (
-              pkgMode ? (
-                <button type="button" className="bf-next" disabled={confirming || !slot} onClick={confirmPackageSession}>
-                  {confirming ? 'Booking…' : 'Confirm booking'}
-                </button>
-              ) : (
-                <button type="button" className="bf-next" disabled={paying || !slot || !plan} onClick={pay}>
-                  {paying ? 'Starting payment…' : 'Proceed to pay'}
-                </button>
-              )
-            )}
-          </div>
-        )}
-
-        <div className="bf-dots" aria-hidden>
-          {STEPS.map((s, i) => <span key={s} className={i === step ? 'is-on' : ''} />)}
-        </div>
+          );
+        })()}
         </>
         )}
       </div>
 
-      {payStage && (
+      {payStage === 'confirming' && (
+        <div className="bfx-verify" role="status" aria-live="polite">
+          <img className="bfx-verify-ic" src="/design/booking/loading.svg" alt="" width={48} height={48} />
+          <div className="bfx-verify-h">Verifying your payment and booking...</div>
+          <p className="bfx-verify-s">Please wait, do not close this. We confirm with the payment provider before showing success.</p>
+        </div>
+      )}
+      {payStage && payStage !== 'confirming' && (
         <div className="bf-paying" role="status" aria-live="polite">
           <div className="bf-paying-card">
             <span className="bf-spinner" aria-hidden />
@@ -1645,6 +1738,239 @@ const CSS = `
 .bf-dots{display:flex;gap:6px;margin-top:46px;}
 .bf-dots span{width:18px;height:3px;border-radius:2px;background:#E3E6EA;}
 .bf-dots span.is-on{background:#111;}
+
+/* ------------------------------------------------------------------ Figma booking flow
+   Steps 0-3 (1123:9830 / 9987 / 10711 / 10081 / 10264 / 10805), review (10386),
+   verifying (10687), success (17820). Phone frames 1123:12508… at max-width 720px. */
+.bf-in.is-fx{max-width:1228px;padding:56px 24px 120px;}
+.bf-in.is-wide{max-width:none;padding:0;}
+.bfx-top{display:flex;align-items:center;gap:16px;margin:0 0 32px;}
+.bfx-back{background:none;border:0;padding:0;cursor:pointer;width:24px;height:24px;display:block;}
+.bfx-back img{display:block;}
+.bfx-dots{display:flex;align-items:center;gap:8px;}
+.bfx-dots i{display:block;width:10px;height:10px;border-radius:50%;background:#E8EFE5;}
+.bfx-dots i.is-on{width:22px;border-radius:100px;background:#1B6930;}
+.bfx-dots i.is-done{background:#1B6930;}
+.bfx-title{
+  font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:24px!important;font-weight:500!important;
+  line-height:1.66!important;color:#0F0F0F!important;letter-spacing:0!important;margin:0 0 24px;
+}
+.bfx-head{margin:0 0 24px;display:flex;flex-direction:column;gap:4px;}
+.bfx-head .bfx-title{margin:0;}
+.bfx-sub{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#373737!important;margin:0;}
+.bfx-btn{
+  height:40px;padding:8px 22px;border:0;border-radius:8px;background:#189E4F;color:#fff!important;cursor:pointer;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;
+}
+.bfx-btn:disabled{background:#9CA3AF;cursor:default;}
+.bfx-ic{display:block;width:32px;height:32px;flex:none;background:#373737;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat;}
+
+/* step 0: session type */
+.bfx-types{display:flex;flex-direction:column;gap:16px;width:338px;max-width:100%;}
+.bfx-type{
+  display:flex;align-items:center;gap:12px;height:64px;padding:16px;background:#fff;border:1px solid #E3E2E2;border-radius:12px;
+  cursor:pointer;text-align:left;box-sizing:border-box;
+}
+.bfx-type-l{font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:20px!important;font-weight:400!important;line-height:30px!important;color:#373737!important;}
+.bfx-type.is-on,.bfx-type:hover{border-color:#189E4F;box-shadow:0 8px 12px #EBF3EE;}
+.bfx-type.is-on .bfx-type-l,.bfx-type:hover .bfx-type-l{font-weight:500!important;color:#0F0F0F!important;}
+.bfx-type.is-on .bfx-ic,.bfx-type:hover .bfx-ic{background:#189E4F;}
+
+/* step 1: schedule */
+.bfx-title-who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.bfx-who-photo{width:32px;height:32px;border-radius:40px;object-fit:cover;flex:none;}
+.bfx-who-photo.is-empty{display:inline-flex;align-items:center;justify-content:center;background:#E9F1E4;color:#1B6930;font:600 12px/1 'Inter',sans-serif;}
+.bfx-sched{display:flex;gap:32px;align-items:flex-start;}
+.bfx-cal{width:380px;flex:none;box-sizing:border-box;padding:24px;border:1px solid #E3E2E2;border-radius:16px;background:#fff;display:flex;flex-direction:column;gap:16px;}
+.bfx-cal-top{display:flex;align-items:center;justify-content:space-between;height:22px;}
+.bfx-cal-top button{background:none;border:0;padding:0;cursor:pointer;width:20px;height:20px;}
+.bfx-cal-top button img{display:block;}
+.bfx-cal-top span{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:22px!important;color:#0F0F0F!important;}
+.bfx-cal-dow,.bfx-cal-days{display:grid;grid-template-columns:repeat(7,30px);justify-content:space-between;}
+.bfx-cal-dow{margin-bottom:-8px;}
+.bfx-cal-dow span{height:20px;text-align:center;font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;padding-top:1px;color:#9CA3AF!important;}
+.bfx-cal-days{row-gap:8px;}
+.bfx-cal-days.is-busy{opacity:.55;}
+.bfx-day{
+  width:30px;height:30px;padding:0;border:1px solid transparent;border-radius:40px;background:none;cursor:pointer;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#9CA3AF!important;
+}
+.bfx-day:disabled{cursor:default;}
+.bfx-day.has-slots{border-color:#DDEED8;color:#0F0F0F!important;}
+.bfx-day.is-on{background:#189E4F;border-color:#189E4F;color:#fff!important;}
+.bfx-slots{width:500px;max-width:100%;display:flex;flex-direction:column;gap:16px;}
+.bfx-sum{display:flex;flex-direction:column;gap:8px;padding:16px;background:#F0F5ED;border:1px solid #DDEED8;border-radius:12px;}
+.bfx-sum-h{font-family:'Inter',system-ui,sans-serif!important;font-size:18px!important;font-weight:500!important;line-height:26px!important;color:#0F0F0F!important;}
+.bfx-sum-s{display:flex;align-items:center;gap:12px;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#373737!important;}
+.bfx-sum-s img{margin-right:-6px;}
+.bfx-sum-s i{display:block;width:6px;height:6px;border-radius:50%;background:#D6DCD8;}
+.bfx-periods{display:flex;flex-direction:column;gap:16px;}
+.bfx-period{display:flex;flex-direction:column;gap:8px;}
+.bfx-period > img{display:block;}
+.bfx-period-row{display:flex;flex-wrap:wrap;gap:8px;}
+.bfx-pair{display:flex;gap:12px;}
+.bfx-slot{
+  width:117px;height:58px;padding:16px;background:#fff;border:1px solid #E8EFE5;border-radius:8px;cursor:pointer;box-sizing:border-box;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#0F0F0F!important;
+}
+.bfx-slot:hover,.bfx-slot.is-on{border-color:#189E4F;}
+.bfx-tz{
+  align-self:flex-start;display:flex;align-items:center;gap:6px;padding:5px 12px;background:#F9F9F9;border-radius:6px;margin-top:0;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#373737!important;
+}
+.bfx-tz i{display:block;width:4px;height:4px;border-radius:50%;background:#D6DCD8;margin:0 2px;}
+
+/* step 2: plans */
+.bfx-plan-wrap{display:flex;flex-direction:column;gap:32px;}
+.bfx-tabs{display:flex;gap:12px;}
+.bfx-tab{
+  height:32px;padding:5px 16px;border:1px solid #E3E2E2;border-radius:56px;background:none;cursor:pointer;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#0F0F0F!important;
+}
+.bfx-tab.is-on{background:#EFFFEA;border-color:#BFE3CB;font-weight:500!important;color:#1B6930!important;}
+.bfx-plans{display:flex;flex-wrap:wrap;gap:16px;}
+.bfx-plan{
+  width:278px;height:192px;padding:20px 22px;box-sizing:border-box;background:#fff;border:1px solid #E3E2E2;border-radius:16px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+}
+.bfx-plan.is-on,.bfx-plan:hover{border-color:#189E4F;box-shadow:0 8px 12px #EBF3EE;}
+.bfx-plan-chip{padding:3px 12px;border-radius:13px;background:#FAFCF9;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#373737!important;}
+.bfx-plan-p{display:flex;align-items:center;gap:8px;font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:24px!important;font-weight:500!important;line-height:1.66!important;color:#0F0F0F!important;}
+.bfx-plan-p s{font-family:'Inter',system-ui,sans-serif!important;font-size:18px!important;font-weight:400!important;line-height:26px!important;color:#9CA3AF!important;}
+.bfx-plan-u{font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#7C7C7C!important;}
+
+/* step 3: about yourself */
+.bfx-form{display:flex;flex-direction:column;gap:24px;width:520px;max-width:100%;}
+.bfx-field{display:flex;flex-direction:column;gap:8px;}
+.bfx-label{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#373737!important;}
+.bfx-field input{
+  height:40px;box-sizing:border-box;padding:0 16px;border:1px solid #E3E2E2;border-radius:8px;background:#fff;width:100%;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;color:#373737!important;
+}
+.bfx-field input::placeholder{color:#BCBCBC;}
+.bfx-field input:focus{outline:none;border-color:#189E4F;}
+.bfx-field input.is-fixed{background:#F9F9F9;border-color:#E5E5EA;color:#5C5C5C!important;}
+.bfx-field input::-webkit-outer-spin-button,.bfx-field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.bfx-next{margin-top:48px;width:100px;}
+
+/* step 4: review & pay (full width, two halves) */
+.bfx-review{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 63px);background:#E9F1E4;}
+.bfx-rv-left{padding:56px 120px 48px;border-radius:16px;}
+.bfx-rv-inner{max-width:720px;display:flex;flex-direction:column;gap:0;}
+.bfx-rv-inner .bfx-dots{margin:0 0 32px;}
+.bfx-rv-inner .bfx-title{margin:0 0 24px;}
+.bfx-bill{display:flex;flex-direction:column;gap:16px;margin:0 0 24px;}
+.bfx-bill-h{font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;line-height:24px!important;color:#5C5C5C!important;}
+.bfx-bill-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:'Inter',system-ui,sans-serif!important;font-size:18px!important;line-height:26px!important;color:#0F0F0F!important;}
+.bfx-bill-row strong{font-weight:600!important;}
+.bfx-total{display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding:8px 12px;border-radius:8px;background:#F9FFF8;margin:0 0 16px;}
+.bfx-total-row{display:flex;justify-content:space-between;align-items:center;width:100%;gap:2px;}
+.bfx-total-row span{font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;line-height:24px!important;color:#5C5C5C!important;}
+.bfx-total-row strong{font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:24px!important;font-weight:600!important;line-height:36px!important;color:#189E4F!important;}
+.bfx-total p{margin:0;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#373737!important;}
+.bfx-terms{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 40px;}
+.bfx-terms > span:first-child{font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#5C5C5C!important;}
+.bfx-terms a{color:inherit!important;text-decoration:underline;}
+.bfx-secure{display:flex;align-items:flex-end;gap:6px;flex:none;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#5C5C5C!important;}
+.bfx-rv-inner .bfx-btn{align-self:flex-start;}
+.bfx-rv-inner .bf-err{margin:-24px 0 16px;}
+.bfx-rv-right{position:relative;padding:98px 120px 24px;overflow:hidden;}
+.bfx-rv-mark{position:absolute;left:452px;top:539px;width:702px;height:587px;pointer-events:none;}
+.bfx-ticket{position:relative;z-index:1;max-width:720px;box-sizing:border-box;padding:40px;border-radius:24px;background:#fff;display:flex;flex-direction:column;gap:72px;}
+.bfx-ticket::before{content:'';position:absolute;left:40px;right:40px;top:23px;height:400px;max-height:calc(100% - 23px);background:#BDBDBD;filter:blur(64px);z-index:-2;border-radius:24px;}
+.bfx-ticket::after{content:'';position:absolute;inset:0;background:#fff;border-radius:24px;z-index:-1;}
+.bfx-tk-band{position:absolute;left:0;right:0;top:0;height:148px;background:#FAFCF9;border-radius:24px 24px 0 0;z-index:0;}
+.bfx-tk-who{position:relative;display:flex;align-items:center;gap:8px;}
+.bfx-tk-photo{width:72px;height:72px;border-radius:40px;object-fit:cover;flex:none;}
+.bfx-tk-photo.is-empty{display:flex;align-items:center;justify-content:center;background:#E9F1E4;color:#1B6930;font:600 20px/1 'Inter',sans-serif;}
+.bfx-tk-whotxt{display:flex;flex-direction:column;gap:2px;}
+.bfx-tk-lbl{display:flex;align-items:center;gap:6px;font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#5C5C5C!important;}
+.bfx-tk-name{font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:20px!important;font-weight:500!important;line-height:30px!important;color:#0F0F0F!important;}
+.bfx-tk-role{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#373737!important;}
+.bfx-edit{background:none;border:0;padding:0;cursor:pointer;width:16px;height:16px;display:inline-flex;}
+.bfx-edit img{display:block;}
+.bfx-tear{position:absolute;left:-24px;right:-24px;top:124px;height:48px;display:flex;align-items:center;pointer-events:none;}
+.bfx-tear i{display:block;width:48px;height:48px;border-radius:50%;background:#E9F1E4;flex:none;}
+.bfx-tear b{display:block;flex:1;height:0;border-top:1px dashed #DDEED8;margin:0 -2px;}
+.bfx-tiles{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.bfx-tile{position:relative;display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:102px;box-sizing:border-box;padding:16px;border-radius:8px;background:#F9F9F9;}
+.bfx-tl{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#5C5C5C!important;}
+.bfx-tile strong{font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#0F0F0F!important;}
+.bfx-tile em{display:flex;align-items:center;gap:4px;margin-top:2px;font-style:normal;font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#5C5C5C!important;}
+.bfx-tile em i{display:block;width:4px;height:4px;border-radius:50%;background:#D6DCD8;margin:0 4px;}
+.bfx-tile-edit{position:absolute;right:16px;top:43px;}
+
+/* verifying payment */
+.bfx-verify{position:fixed;left:0;right:0;bottom:0;top:63px;z-index:60;background:#fff;display:flex;flex-direction:column;align-items:center;padding:136px 16px 0;gap:8px;}
+.bfx-verify-ic{animation:bfxSpin 1s linear infinite;}
+@keyframes bfxSpin{to{transform:rotate(360deg);}}
+.bfx-verify-h{margin-top:0;font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:20px!important;font-weight:500!important;line-height:30px!important;color:#0F0F0F!important;text-align:center;}
+.bfx-verify-s{margin:0;max-width:384px;text-align:center;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#373737!important;}
+
+/* payment success */
+.bfx-done{min-height:calc(100vh - 63px);background:#E9F1E4;display:flex;flex-direction:column;align-items:center;padding:56px 16px 120px;box-sizing:border-box;}
+.bfx-done-head{display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px 0;}
+.bfx-done-head img{display:block;}
+.bfx-done-head .bfx-title{margin:0;}
+.bfx-ticket.is-done{width:720px;max-width:100%;gap:80px;margin-top:8px;}
+.bfx-ticket.is-done .bfx-tk-band{height:204px;}
+.bfx-ticket.is-done .bfx-tear{top:180px;}
+.bfx-done-who{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.bfx-done-who .bfx-tk-photo{width:64px;height:64px;}
+.bfx-tiles.is-small .bfx-tile{min-height:74px;}
+.bfx-tiles.is-small .bfx-tl{font-size:12px!important;line-height:18px!important;color:#7C7C7C!important;}
+.bfx-tiles.is-small .bfx-tile strong{font-size:14px!important;line-height:22px!important;}
+.bfx-order{position:relative;display:flex;justify-content:center;gap:8px;margin-top:-64px;font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;}
+.bfx-order span{color:#7C7C7C!important;}
+.bfx-order strong{font-weight:500!important;color:#0F0F0F!important;word-break:break-all;}
+.bfx-done > .bfx-btn{margin-top:48px;}
+
+@media (max-width:1100px){
+  .bfx-review{grid-template-columns:1fr;}
+  .bfx-rv-left{padding:56px 24px 32px;}
+  .bfx-rv-right{padding:24px 24px 120px;}
+  .bfx-rv-mark{left:auto;right:-200px;top:auto;bottom:-200px;}
+  .bfx-sched{flex-wrap:wrap;}
+}
+@media (max-width:720px){
+  .bf-in.is-fx{padding:16px 16px 90px;}
+  .bfx-top{margin:0 0 16px;}
+  .bfx-types{width:100%;}
+  .bfx-sched{flex-direction:column;gap:24px;}
+  .bfx-cal{width:100%;}
+  .bfx-slots{width:100%;}
+  .bfx-period-row{flex-direction:column;gap:8px;}
+  .bfx-pair{gap:12px;}
+  .bfx-slot{width:173px;flex:1 1 0;min-width:0;}
+  .bfx-plans{flex-direction:column;}
+  .bfx-plan{width:100%;}
+  .bfx-form{width:100%;}
+  .bfx-next{width:100%;}
+  /* Review & Pay, phone (1123:12984): dots, title, ticket, then bill + Agree & Pay */
+  .bfx-review{display:flex;flex-direction:column;padding:16px 16px 90px;min-height:0;}
+  .bfx-rv-left,.bfx-rv-inner{display:contents;}
+  .bfx-rv-inner .bfx-dots{order:1;margin:0 0 16px;}
+  .bfx-rv-inner .bfx-title{order:2;margin:0 0 24px;}
+  .bfx-rv-right{order:3;padding:0;overflow:visible;margin:0 0 40px;}
+  .bfx-rv-mark{display:none;}
+  .bfx-bill{order:4;}
+  .bfx-total{order:5;}
+  .bfx-terms{order:6;flex-direction:column;align-items:flex-start;}
+  .bfx-rv-inner .bf-err{order:7;margin:0 0 16px;}
+  .bfx-rv-inner .bfx-btn{order:8;width:100%;}
+  .bfx-ticket{padding:40px;gap:72px;}
+  .bfx-tear{left:-20px;right:-20px;top:128px;height:40px;}
+  .bfx-tear i{width:40px;height:40px;}
+  .bfx-tiles{grid-template-columns:1fr;gap:12px;}
+  .bfx-done{padding:16px 16px 90px;}
+  .bfx-done > .bfx-btn{width:100%;}
+  .bfx-ticket.is-done{gap:72px;}
+  .bfx-ticket.is-done .bfx-tk-band{height:200px;}
+  .bfx-ticket.is-done .bfx-tear{top:180px;}
+  .bfx-tiles.is-small .bfx-tile{min-height:80px;}
+  .bfx-tiles.is-small .bfx-tl{font-size:14px!important;line-height:22px!important;color:#5C5C5C!important;}
+  .bfx-order{margin-top:-56px;flex-wrap:wrap;}
+}
 
 /* Sign-in step (Figma "OTP"): 1180 wide, title Poppins 24, field 372, Get OTP + Try another way */
 .bf-in.is-signin{max-width:1228px;padding-top:56px;}
