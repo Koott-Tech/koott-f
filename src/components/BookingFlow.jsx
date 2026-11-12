@@ -900,6 +900,12 @@ export default function BookingFlow({ slug }) {
   }
 
   const zone = zoneLabel(tz);
+  // Figma writes the zone as "Asia/Calcutta (GMT+5:30)" (schedule) and "Asia/Calcutta GMT+5:30" (review)
+  const zoneParts = String(zone).split(' · ');
+  const zoneParen = zoneParts.length === 2 ? `${zoneParts[0]} (${zoneParts[1]})` : zone;
+  const zoneSpace = zoneParts.length === 2 ? `${zoneParts[0]} ${zoneParts[1]}` : zone;
+  // "+91 994 578 5625", as in the design
+  const phoneShown = ((p) => { const m = String(p || '').match(/^\+91(\d{3})(\d{3})(\d{4})$/); return m ? `+91 ${m[1]} ${m[2]} ${m[3]}` : (p || ''); })(verified?.phone || accountPhone);
   const showIst = slot && !sameAsIst(tz);
 
   // Review ticket
@@ -1207,7 +1213,7 @@ export default function BookingFlow({ slug }) {
                     </>
                   );
                 })() : <p className="bf-note">Pick a date to see the times.</p>}
-                <div className="bfx-tz">Times shown in your time zone<i aria-hidden />{zone}</div>
+                <div className="bfx-tz">Times shown in your time zone<i aria-hidden />{zoneParen}</div>
               </div>
             </div>
           </>
@@ -1279,7 +1285,7 @@ export default function BookingFlow({ slug }) {
               </label>
               <label className="bfx-field">
                 <span className="bfx-label">Contact number</span>
-                <input className="is-fixed" value={verified?.phone || accountPhone || ''} readOnly tabIndex={-1} />
+                <input className="is-fixed" value={phoneShown} readOnly tabIndex={-1} />
               </label>
               <label className="bfx-field">
                 <span className="bfx-label">Email address</span>
@@ -1378,7 +1384,7 @@ export default function BookingFlow({ slug }) {
                     <div className="bfx-tile">
                       <span className="bfx-tl">Time</span>
                       <strong>{slot && timeLabel(slot.startsAt, tz)}</strong>
-                      <em>{zone}</em>
+                      <em>{zoneSpace}</em>
                       <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change time" onClick={() => setStep(1)}>
                         <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
                       </button>
@@ -1883,7 +1889,8 @@ const CSS = `
 .bfx-tk-who{position:relative;display:flex;align-items:center;gap:8px;}
 .bfx-tk-photo{width:72px;height:72px;border-radius:40px;object-fit:cover;flex:none;}
 .bfx-tk-photo.is-empty{display:flex;align-items:center;justify-content:center;background:#E9F1E4;color:#1B6930;font:600 20px/1 'Inter',sans-serif;}
-.bfx-tk-whotxt{display:flex;flex-direction:column;gap:2px;}
+.bfx-tk-whotxt{display:flex;flex-direction:column;gap:0;}
+.bfx-tk-lbl{margin-bottom:2px;}
 .bfx-tk-lbl{display:flex;align-items:center;gap:6px;font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#5C5C5C!important;}
 .bfx-tk-name{font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:20px!important;font-weight:500!important;line-height:30px!important;color:#0F0F0F!important;}
 .bfx-tk-role{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#373737!important;}
@@ -1917,6 +1924,7 @@ const CSS = `
 .bfx-ticket.is-done .bfx-tear{top:180px;}
 .bfx-done-who{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
 .bfx-done-who .bfx-tk-photo{width:64px;height:64px;}
+.bfx-done-who .bfx-tk-role{margin-top:-8px;}
 .bfx-tiles.is-small .bfx-tile{min-height:74px;}
 .bfx-tiles.is-small .bfx-tl{font-size:12px!important;line-height:18px!important;color:#7C7C7C!important;}
 .bfx-tiles.is-small .bfx-tile strong{font-size:14px!important;line-height:22px!important;}
@@ -1941,9 +1949,11 @@ const CSS = `
   .bfx-slots{width:100%;}
   .bfx-period-row{flex-direction:column;gap:8px;}
   .bfx-pair{gap:12px;}
-  .bfx-slot{width:173px;flex:1 1 0;min-width:0;}
+  .bfx-slot{width:calc(50% - 6px);flex:0 0 calc(50% - 6px);min-width:0;}
+  .bfx-pair{width:100%;}
+  .bfx-tz{align-self:stretch;justify-content:center;white-space:nowrap;padding:5px 9px;}
   .bfx-plans{flex-direction:column;}
-  .bfx-plan{width:100%;}
+  .bfx-plan{width:100%;height:138px;}
   .bfx-form{width:100%;}
   .bfx-next{width:100%;}
   /* Review & Pay, phone (1123:12984): dots, title, ticket, then bill + Agree & Pay */
@@ -1955,7 +1965,7 @@ const CSS = `
   .bfx-rv-mark{display:none;}
   .bfx-bill{order:4;}
   .bfx-total{order:5;}
-  .bfx-terms{order:6;flex-direction:column;align-items:flex-start;}
+  .bfx-terms{order:6;flex-direction:column;align-items:flex-start;margin:0 0 24px;}
   .bfx-rv-inner .bf-err{order:7;margin:0 0 16px;}
   .bfx-rv-inner .bfx-btn{order:8;width:100%;}
   .bfx-ticket{padding:40px;gap:72px;}
@@ -1970,6 +1980,10 @@ const CSS = `
   .bfx-tiles.is-small .bfx-tile{min-height:80px;}
   .bfx-tiles.is-small .bfx-tl{font-size:14px!important;line-height:22px!important;color:#5C5C5C!important;}
   .bfx-order{margin-top:-56px;flex-wrap:wrap;}
+  .bfx-ticket.is-done{margin-top:16px;}
+  .bfx-done > .bfx-btn{margin-top:40px;}
+  .bfx-tiles.is-small .bfx-tile strong{font-size:16px!important;line-height:24px!important;}
+  .bfx-verify{padding-top:48px;}
 }
 
 /* Sign-in step (Figma "OTP"): 1180 wide, title Poppins 24, field 372, Get OTP + Try another way */
@@ -2036,7 +2050,7 @@ const CSS = `
   .bf-si-field{width:100%;}
   .bf-si-input{height:46px;}
   .bf-si-actions{flex-direction:row;align-items:center;width:100%;}
-  .bf-si-btn,.bf-si-alt{flex:1;min-width:0;}
+  .bf-si-btn,.bf-si-alt{flex:0 0 calc(50% - 8px);min-width:0;box-sizing:border-box;}
   .bf-ticket{grid-template-columns:1fr;}
   .bf-tk-main{padding:22px 20px 24px;}
   .bf-tk-stub{border-left:0;border-top:2px dashed rgba(24,158,79,.35);border-radius:0 0 20px 20px;padding:24px 20px;}
