@@ -1,12 +1,11 @@
 'use client';
 
 /**
- * Therapist listing — the native replacement for the Wix page
- * koott.in/book-malayali-psychologists.
- *
- * Layout measured off that page: H1 "Find your Malayali Psychologist", two
- * 233x41 filter selects, and a 2-up grid of 482px therapist cards. Cards link
- * to /therapist-profile?doctor=<id>, which is our booking flow.
+ * Therapist listing (/book-malayali-psychologists), built to Figma "Therapists page"
+ * (1123:10853 laptop, 1123:13465 phone) with its filter popup (1123:11584 / 1123:13939,
+ * the same popup as the home page's, Figma 680:3664): a name search with the language
+ * pill, four quick filters, the count, then "Resume your booking" and the therapist
+ * cards in the design's card (TherapistCard design mode), three across.
  *
  * Data comes from /api/public/psychologists; the ORDER comes from
  * /api/public/psychologists/order?list=booking — the admin's group pattern
@@ -15,17 +14,17 @@
  * Filters keep that order.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { track } from '@/analytics';
 import { publicApi } from '@/lib/backendApi';
 import { applyTherapistOrder, fetchTherapistOrder } from '@/lib/therapistOrder';
-import TherapistCard, { THERAPIST_CARD_CSS, introOf } from '@/components/TherapistCard';
+import TherapistCard, { THERAPIST_CARD_CSS, cardFields, designCardCss, introOf } from '@/components/TherapistCard';
 import { therapistSlug } from '@/components/TherapistProfile';
 import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
-import CustomSelect from '@/components/CustomSelect';
+import { Chevron, FilterPopup, FINDER_CSS, FINDER_VARS, SearchIcon } from '@/components/TherapistFinderParts';
+import { THERAPISTS_SECTION } from '@/data/koottHomeContent';
 import { whenLabel } from '@/lib/nextAvailable';
 
-const ALL = 'All';
 
 /**
  * Map an API psychologist onto the card's shape.
@@ -61,10 +60,8 @@ export function toCard(p) {
 }
 
 export default function BookMalayaliPsychologists() {
-  const [therapists, setTherapists] = useState([]);
+  const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading');
-  const [specialist, setSpecialist] = useState(ALL);
-  const [concern, setConcern] = useState(ALL);
   // This browser's unfinished booking (localStorage), shown as the first card.
   const { draft, slotState, suggestion, dismiss: dismissDraft, takeSuggestion, seeOtherTimes } = useBookingDraft();
 
@@ -78,18 +75,18 @@ export default function BookMalayaliPsychologists() {
         ]);
         /* The backend wraps this as {data:{psychologists:[…]}}; reading res.data
            straight through yields an object and silently breaks .map. */
-        const rows = res?.data?.psychologists || res?.psychologists
+        const list = res?.data?.psychologists || res?.psychologists
           || (Array.isArray(res?.data) ? res.data : null)
           || (Array.isArray(res) ? res : []);
         if (cancelled) return;
         // The order endpoint already carries each therapist's next free start,
         // so the cards need no slot requests of their own.
-        setTherapists(applyTherapistOrder(rows.map(toCard), order).map((t) => ({
-          ...t,
-          availability: whenLabel(order?.nextAt?.get(String(t.id))),
+        setRows(applyTherapistOrder(list, order).map((p) => ({
+          ...p,
+          nextAvailable: whenLabel(order?.nextAt?.get(String(p.id))),
         })));
         setStatus('ready');
-        track('counsellor_list_view', { count: rows.length });
+        track('counsellor_list_view', { count: list.length });
       } catch (err) {
         console.error('[book-malayali-psychologists] load failed:', err);
         if (!cancelled) setStatus('error');
@@ -98,168 +95,175 @@ export default function BookMalayaliPsychologists() {
     return () => { cancelled = true; };
   }, []);
 
-  const specialists = useMemo(
-    () => [ALL, ...[...new Set(therapists.map((t) => t.specialist).filter(Boolean))].sort()],
-    [therapists]
-  );
-  const concerns = useMemo(
-    () => [ALL, ...[...new Set(therapists.flatMap((t) => t.concerns).filter(Boolean))].sort()],
-    [therapists]
-  );
-
-  const visible = useMemo(
-    () => therapists.filter(
-      (t) => (specialist === ALL || t.specialist === specialist)
-        && (concern === ALL || t.concerns.includes(concern))
-    ),
-    [therapists, specialist, concern]
-  );
+  /* A name search, a language, how they attend, and one quick filter at a time —
+     the same filter as the home page. */
+  const [query, setQuery] = useState('');
+  const [language, setLanguage] = useState(THERAPISTS_SECTION.languages[0]);
+  const [attend, setAttend] = useState(THERAPISTS_SECTION.filterPopup.attend[0].key);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const closeFilter = useCallback(() => setFilterOpen(false), []);
+  const attendOn = THERAPISTS_SECTION.filterPopup.attend.find((m) => m.key === attend);
+  const [quick, setQuick] = useState('');
+  const quickOn = THERAPISTS_SECTION.quickFilters.find((f) => f.label === quick);
+  const visible = useMemo(() => rows.filter((t) => {
+    const q = query.trim().toLowerCase();
+    const nm = String(t.name || `${t.first_name || ''} ${t.last_name || ''}`).toLowerCase();
+    if (q && !nm.includes(q)) return false;
+    const langs = cardFields(t).languages.map((l) => String(l).toLowerCase());
+    if (language && !langs.includes(language.toLowerCase())) return false;
+    if (!(t.session_modes?.length ? t.session_modes : ['online']).includes(attend)) return false;
+    if (quickOn) {
+      const role = `${t.designation || ''} ${t.specialization || ''}`;
+      const hay = (quickOn.kind === 'need' ? `${role} ${(t.area_of_expertise || []).join(' ')}` : role).toLowerCase();
+      if (![].concat(quickOn.match).some((w) => hay.includes(w))) return false;
+    }
+    return true;
+  }), [rows, query, language, attend, quickOn]);
+  const linkFor = (t, kind) => {
+    const slug = therapistSlug(t);
+    if (kind === 'book') return slug ? `/book/${slug}` : `/therapist-profile?doctor=${encodeURIComponent(t.id)}`;
+    return slug ? `/service-page/${slug}` : `/therapist-profile?doctor=${encodeURIComponent(t.id)}`;
+  };
+  const showDraft = draft && rows.some((t) => therapistSlug(t) === draft.slug);
 
   return (
-    <div className="ktl">
-      <style dangerouslySetInnerHTML={{ __html: THERAPIST_CARD_CSS + RESUME_CARD_CSS + LISTING_CSS }} />
+    <div className="ktf">
+      <style dangerouslySetInnerHTML={{ __html: THERAPIST_CARD_CSS + RESUME_CARD_CSS + designCardCss('.ktf') + FINDER_CSS + LISTING_CSS }} />
 
-      <section className="ktl-head">
-        <h1 className="ktl-h1">Find your Malayali Psychologist</h1>
-        <p className="ktl-sub">
-          Talk to a licensed therapist who understands your language, culture and experiences.
-        </p>
+      <section className="ktf-in">
+        <div className="ktf-head">
+          <h1 className="ktf-h1">Find your malayali psychologist</h1>
+          <p className="ktf-sub">Talk to a licensed therapist who understands your language, culture and experiences.</p>
+        </div>
 
-        <div className="ktl-filters">
-          <label className="ktl-field">
-            <span className="ktl-label">Specialist</span>
-            <CustomSelect className="ktl-select" aria-label="Specialist" value={specialist} onChange={(e) => { setSpecialist(e.target.value); if (e.target.value !== ALL) track('filter_applied', { filter: 'specialist', value: String(e.target.value) }); }}
-              options={specialists} />
-          </label>
+        <div className="kh2-filters ktf-filters">
+          <div className="kh2-fsearch">
+            <label className="kh2-fsearch-q">
+              <SearchIcon />
+              <input
+                type="search" className="ph-no-capture" value={query} placeholder="Search"
+                aria-label="Search therapists by name" onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+            <button type="button" className="kh2-flang" aria-haspopup="dialog" aria-expanded={filterOpen} onClick={() => setFilterOpen(true)}>
+              <span className="kh2-flang-v">{language}<small>{attendOn.label}</small></span>
+              <Chevron />
+            </button>
+          </div>
+          <div className="kh2-quicks">
+            {THERAPISTS_SECTION.quickFilters.map((f) => {
+              const on = quick === f.label;
+              return (
+                <button
+                  key={f.label} type="button" className={`kh2-quick${on ? ' is-on' : ''}`} aria-pressed={on}
+                  onClick={() => { setQuick(on ? '' : f.label); if (!on) track('filter_applied', { filter: f.kind, value: f.label }); }}
+                >
+                  <img src={`/design/home/${f.icon}.png`} alt="" width={32} height={32} />
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-          <label className="ktl-field">
-            <span className="ktl-label">Concern</span>
-            <CustomSelect className="ktl-select" aria-label="Concern" value={concern} onChange={(e) => { setConcern(e.target.value); if (e.target.value !== ALL) track('filter_applied', { filter: 'concern', value: String(e.target.value) }); }}
-              options={concerns} />
-          </label>
+        {status === 'loading' && <p className="ktf-count">Loading therapists…</p>}
+        {status === 'error' && <p className="ktf-count">We couldn’t load the therapist list just now. Please refresh to try again.</p>}
+        {status === 'ready' && (
+          <p className="ktf-count">
+            {visible.length
+              ? `${visible.length} therapist${visible.length === 1 ? '' : 's'} available`
+              : 'No therapist matches that combination yet. Clear a filter to see everyone.'}
+          </p>
+        )}
+
+        <div className="kh2-tgrid ktf-grid">
+          {showDraft && (
+            <ResumeBookingCard
+              draft={draft} slotState={slotState} suggestion={suggestion}
+              onDismiss={dismissDraft} onTakeSuggestion={takeSuggestion} onSeeOtherTimes={seeOtherTimes}
+            />
+          )}
+          {visible.map((t, i) => (
+            <TherapistCard
+              key={t.id || i}
+              design
+              t={{ ...cardFields(t), availability: t.nextAvailable }}
+              profileHref={linkFor(t, 'profile')}
+              bookHref={linkFor(t, 'book')}
+            />
+          ))}
         </div>
       </section>
 
-      <section className={`ktl-body${status === 'loading' ? ' is-loading' : ''}`}>
-        {status === 'loading' && <p className="ktl-state">Loading therapists…</p>}
-
-        {status === 'error' && (
-          <p className="ktl-state">
-            We couldn’t load the therapist list just now. Please refresh to try again.
-          </p>
-        )}
-
-        {status === 'ready' && visible.length === 0 && (
-          <p className="ktl-state">
-            No therapists match those filters yet. Try widening your selection.
-          </p>
-        )}
-
-        {status === 'ready' && visible.length > 0 && (
-          <>
-            <p className="ktl-count">
-              {visible.length} therapist{visible.length === 1 ? '' : 's'} available
-            </p>
-            <div className="ktl-grid">
-              {draft && therapists.some((t) => t.slug === draft.slug) && (
-                <ResumeBookingCard
-                  draft={draft} slotState={slotState} suggestion={suggestion}
-                  onDismiss={dismissDraft} onTakeSuggestion={takeSuggestion} onSeeOtherTimes={seeOtherTimes}
-                />
-              )}
-              {visible.map((t) => (
-                <TherapistCard
-                  key={t.id}
-                  t={t}
-                  // The cloned koott.in profile; booking stays on the old flow.
-                  profileHref={t.slug ? `/service-page/${t.slug}` : `/therapist-profile?doctor=${encodeURIComponent(t.id)}`}
-                  bookHref={t.slug ? `/book/${t.slug}` : `/therapist-profile?doctor=${encodeURIComponent(t.id)}`}
-                />
-              ))}
-            </div>
-          </>
-        )}
-      </section>
+      {filterOpen && (
+        <FilterPopup
+          copy={THERAPISTS_SECTION.filterPopup}
+          language={language}
+          attend={attend}
+          onLanguage={(l) => { setLanguage(l); track('filter_applied', { filter: 'language', value: l }); }}
+          onAttend={(m) => { setAttend(m); track('filter_applied', { filter: 'attend', value: m }); }}
+          onClose={closeFilter}
+        />
+      )}
     </div>
   );
 }
 
-/* Scoped to .ktl and marked !important for the same reason the condition
-   template is: globals.css forces Poppins / 48px on headings and Inter /
-   16px on p, with letter-spacing on span, li, a and button. */
+/* Figma "Therapists page": content 112px under the header (63px, fixed, so 175 from the top), 1180 wide; heading Poppins
+   600 32/48, subtitle Inter 16/24 #373737, 40 to the filters, 24 to the count (Inter 500
+   16/24 #373737), 24 to the cards (377 × 360, 24 apart), 124 to the footer. Marked
+   !important where globals.css forces its own heading and paragraph styles. */
 const LISTING_CSS = `
-.ktl{
-  --ktl-ink:#100E0E;
-  --ktl-deep:#012F23;
-  --ktl-accent:#3D985C;
-  --ktl-sans:'Inter',ui-sans-serif,system-ui,sans-serif;
-  --ktl-body:'Inter','Avenir Light','Avenir Next','Avenir',ui-sans-serif,system-ui,sans-serif;
-  /* Header.jsx is position:fixed and h-16, so it reserves no space in flow. */
-  padding-top:64px;
-  /* Always at least one full screen (header space included), so the footer never
-     peeks in while the list loads or is short, then jumps down when cards arrive. */
-  box-sizing:border-box;min-height:100vh;min-height:100dvh;
-  display:block;background:#fff;color:var(--ktl-ink);
-  font-family:var(--ktl-body)!important;
+.ktf{${FINDER_VARS}background:#fff;color:var(--ink);min-height:100vh;}
+.ktf *{box-sizing:border-box;}
+.ktf-in{max-width:1228px;margin:0 auto;padding:175px 24px 124px;}
+.ktf-head{display:flex;flex-direction:column;gap:8px;text-align:center;}
+.ktf-h1{
+  font-family:var(--sans)!important;font-size:32px!important;font-weight:600!important;line-height:48px!important;
+  letter-spacing:0!important;color:var(--ink)!important;margin:0!important;
 }
-.ktl *{box-sizing:border-box;}
-.ktl-head{max-width:1180px;margin:0 auto;padding:44px 20px 0;text-align:center;}
-.ktl-h1{
-  /* size from the global --h1-size scale */
-  font-family:var(--ktl-sans)!important;font-weight:500!important;
-  line-height:1.3em!important;letter-spacing:-.05em!important;color:var(--ktl-ink)!important;margin:0;
+.ktf-sub{font-family:var(--text)!important;font-size:16px!important;font-weight:400!important;line-height:24px!important;letter-spacing:0!important;color:var(--body)!important;margin:0!important;}
+.ktf .ktf-filters{margin-top:40px;}
+.ktf-count{
+  margin:24px 0 0!important;text-align:center;font-family:var(--text)!important;font-size:16px!important;
+  font-weight:500!important;line-height:24px!important;letter-spacing:0!important;color:var(--body)!important;
 }
-.ktl-sub{
-  font-family:var(--ktl-body)!important;font-size:15px!important;font-weight:400!important;
-  line-height:1.6em!important;letter-spacing:0!important;color:var(--ktl-ink)!important;
-  margin:12px auto 0;max-width:520px;
-}
-.ktl-filters{display:flex;gap:13px;justify-content:center;flex-wrap:wrap;margin:26px 0 0;}
-.ktl-field{display:flex;flex-direction:column;gap:6px;text-align:left;}
-.ktl-label{
-  font-family:var(--ktl-body)!important;font-size:12px!important;font-weight:400!important;
-  letter-spacing:0!important;color:#5B5757!important;padding-left:4px;
-}
-.ktl-select{
-  width:233px;height:41px;padding:0 16px;
-  background:#fff;border:1px solid rgba(61,152,92,.35);border-radius:15px;
-  font-family:var(--ktl-body)!important;font-size:14px;font-weight:400;
-  color:var(--ktl-deep);cursor:pointer;appearance:none;
-  background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%233D985C' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 16px center;background-size:11px;
-  transition:border-color .2s ease,box-shadow .2s ease;
-}
-.ktl-select:hover{border-color:var(--ktl-accent);}
-.ktl-select:focus-visible{outline:none;border-color:var(--ktl-accent);box-shadow:0 0 0 3px rgba(61,152,92,.18);}
+.ktf .ktf-grid{margin-top:24px;}
+/* This frame's card chips are Inter 500 (the home page's are 400). */
+.ktf .ktc-chip{font-weight:500!important;}
+/* Figma draws the 1px stroke inside the 20 padding. */
+.ktf .ktf-grid .ktc{padding:19px;}
+/* Filter popup, Figma 1123:11584 (laptop) and 1123:13939 (phone): the dim starts under
+   the header, #151515 at 45% with a 4px blur; on a laptop the 477 card sits 143 below
+   the header, on a phone it is a sheet on the bottom edge with 24px top corners. */
+.ktf .kh2-pop-wrap{top:63px;align-items:flex-start;padding:143px 16px 16px;}
+.ktf .kh2-pop-dim{background:rgba(21,21,21,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
 
-.ktl-body{max-width:1180px;margin:0 auto;padding:32px 20px 72px;}
-/* While the list loads, keep a full screen under the heading for the cards, so the
-   footer sits well below the fold instead of right at its edge. */
-.ktl-body.is-loading{min-height:100vh;min-height:100dvh;}
-.ktl-count{
-  font-family:var(--ktl-body)!important;font-size:14px!important;font-weight:400!important;
-  letter-spacing:0!important;color:#5B5757!important;text-align:center;margin:0 0 22px;
-}
-.ktl-state{
-  font-family:var(--ktl-body)!important;font-size:15px!important;font-weight:400!important;
-  letter-spacing:0!important;color:var(--ktl-ink)!important;text-align:center;margin:48px 0;
-}
-/* Three across on a laptop — the cards sit at ~366px, the same width they take
-   on the home page's grid, so a therapist looks identical on both. */
-.ktl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-@media (max-width:1100px){
-  .ktl-grid{grid-template-columns:repeat(2,1fr);}
-}
-
-@media (max-width:900px){
-  .ktl-grid{grid-template-columns:1fr;}
-}
-/* phones: the two filters share one row, each half of a narrower strip */
+/* Phone frame 1123:13465: 56 under the header, heading 32/38.4 then 12 to the
+   subtitle, 32 to the search; cards 358 wide, 16 apart, and this frame keeps the
+   laptop card inside (20 padding, three-line bio, 54 tiles 23 apart, a bordered
+   66 foot, a 120 "Book now"), not the home page's phone card. */
 @media (max-width:640px){
-  .ktl-filters{flex-wrap:nowrap;gap:10px;max-width:340px;margin-left:auto;margin-right:auto;}
-  .ktl-field{flex:1 1 0;min-width:0;}
-  /* cards run 12px from the screen edge rather than the page's 20px gutter */
-  .ktl-grid{margin-left:-8px;margin-right:-8px;gap:16px;}
-  .ktl-select{width:100%;height:38px;padding:0 30px 0 12px;font-size:13px;border-radius:12px;background-position:right 12px center;}
+  .ktf-in{padding:119px 16px 80px;}
+  .ktf-head{gap:12px;}
+  .ktf-h1{font-size:32px!important;line-height:38.4px!important;}
+  .ktf .ktf-filters{margin-top:32px;}
+  .ktf .ktf-grid{gap:16px;}
+  .ktf .ktf-grid .ktc{min-height:360px;padding:19px;--ktc-ink-soft:#5C5C5C;}
+  .ktf .ktf-grid .ktc-wave{margin-top:0;}
+  .ktf .ktf-grid .ktc-wave-btn{width:25.2px;height:25.2px;margin:0 -1.3px;}
+  .ktf .ktf-grid .ktc-panel{margin-bottom:16px;}
+  .ktf .ktf-grid .ktc-bio{max-height:54px;}
+  .ktf .ktf-grid .ktc-tags-wrap{margin-bottom:16px;}
+  .ktf .ktf-grid .ktc-chip{height:24px;border-color:#E3E2E2;border-radius:12px;}
+  .ktf .ktf-grid .ktc-stats:not(#_){gap:23px;margin-bottom:20px;}
+  .ktf .ktf-grid .ktc-stat{min-height:54px;border-radius:12px;}
+  .ktf .ktf-grid .ktc-foot{min-height:66px;padding:0 12px;border:1px solid #DDEED8;}
+  .ktf .ktf-grid .ktc-book{width:120px;text-transform:none;}
+  .ktf .kh2-pop-wrap{align-items:flex-end;padding:0;}
+  .ktf .kh2-pop{width:100%;max-height:calc(100% - 24px);padding:32px 24px 24px;gap:24px;border-radius:24px 24px 0 0;animation-name:ktf-sheet-in;}
+  .ktf .kh2-pop-langs,.ktf .kh2-pop-modes{gap:16px;}
+  .ktf .kh2-pop-h{font-size:18px!important;line-height:26px!important;margin-bottom:16px;}
 }
+@keyframes ktf-sheet-in{from{transform:translateY(100%);}to{transform:none;}}
 `;
