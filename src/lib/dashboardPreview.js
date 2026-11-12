@@ -18,7 +18,7 @@ const session = (id, day, hh, extra = {}) => {
   return {
     id, scheduled_date: date, scheduled_time: time, status: 'booked', price: 1350,
     session_type: 'individual', duration_minutes: 50, psychologist: SHOW,
-    google_meet_link: 'https://meet.google.com/abc-defg-hij', ...extra,
+    google_meet_link: 'https://meet.google.com/abc-defg-hij', created_at: new Date(Date.now() - 2 * 86400000).toISOString(), ...extra,
   };
 };
 const doneSession = (id, day, extra = {}) => {

@@ -18,7 +18,7 @@
  */
 
 import { Suspense, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import LogoLoader from '@/components/LogoLoader';
 import { previewFromParams } from '@/lib/dashboardPreview';
@@ -30,13 +30,17 @@ import { previewFromParams } from '@/lib/dashboardPreview';
  * The width matches the dashboard's own 960px column plus its gutters, so the
  * pages beside it do not run the full width of a large screen.
  */
-const Shell = ({ children }) => (
-  <div style={{ paddingTop: 63, minHeight: 'calc(100vh - 63px)', background: '#fff' }}>
-    <div style={{ position: 'relative', maxWidth: 1024, margin: '0 auto', minHeight: 'calc(100vh - 63px)' }}>
-      {children}
+const Shell = ({ children }) => {
+  // The sessions page is drawn to Figma's 1180 column (plus gutters); the rest stay at 1024.
+  const wide = (usePathname() || '').startsWith('/profile/sessions');
+  return (
+    <div style={{ paddingTop: 63, minHeight: 'calc(100vh - 63px)', background: '#fff' }}>
+      <div style={{ position: 'relative', maxWidth: wide ? 1228 : 1024, margin: '0 auto', minHeight: 'calc(100vh - 63px)' }}>
+        {children}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 function ProfileGuard({ children }) {
   const { user, isLoading: authLoading } = useAuth();

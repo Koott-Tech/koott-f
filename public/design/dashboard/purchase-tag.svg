@@ -1,0 +1,4 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="l" x1="0" y1="0" x2="0" y2="16" gradientUnits="userSpaceOnUse"><stop stop-color="#2A8A4B"/><stop offset="1" stop-color="#3C9A5F"/></linearGradient><linearGradient id="r" x1="0" y1="0" x2="0" y2="16" gradientUnits="userSpaceOnUse"><stop stop-color="#4FBA76"/><stop offset="1" stop-color="#5AC083"/></linearGradient><clipPath id="a"><rect width="8" height="16"/></clipPath><clipPath id="b"><rect x="8" width="8" height="16"/></clipPath><path id="s" fill-rule="evenodd" clip-rule="evenodd" d="M1.5 2.7A1.2 1.2 0 0 1 2.7 1.5h4.8c.32 0 .62.13.85.35l6 6a1.2 1.2 0 0 1 0 1.7l-4.8 4.8a1.2 1.2 0 0 1-1.7 0l-6-6A1.2 1.2 0 0 1 1.5 7.5zM5 3.6a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z"/></defs>
+<g clip-path="url(#a)"><use href="#s" fill="url(#l)"/></g><g clip-path="url(#b)"><use href="#s" fill="url(#r)"/></g>
+</svg>

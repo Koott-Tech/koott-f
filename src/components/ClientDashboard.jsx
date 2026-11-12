@@ -3,6 +3,12 @@
 /**
  * The client dashboard — "Your sessions".
  *
+ * Booked sessions follow Figma "Post payment screens" (Booking/ Dashboard 1123:17876,
+ * more options 1123:17936, Session details 1123:18093 / 18161 / 18311; phone 1123:18598,
+ * 19037, 18663, 18731): a card per session with Date / Time / Session tiles, a "Manage
+ * your session" menu behind the ⋮, and a details view (?session=<id>) with the payment
+ * summary, the invoice and the session's activity.
+ *
  * Built to the prototype in "koott-client-dashboard (2).html" (repo root). That
  * file has a preview switch with six states; here the state is whatever the
  * client's data says it is:
@@ -23,8 +29,10 @@
  * keeps (lib/bookingDraft), the same one the Resume card on the listing uses.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { clientApi } from '@/lib/backendApi';
+import RescheduleModal from '@/components/RescheduleModal';
 import { useBookingDraft } from '@/components/ResumeBookingCard';
 import { therapistSlug } from '@/components/TherapistProfile';
 
@@ -362,46 +370,6 @@ function UpdateSheet({ session, onClose, onDone }) {
   );
 }
 
-/** "multi" / the rest of a package: everything after the next session. */
-function ComingUp({ sessions, onUpdate }) {
-  if (!sessions.length) return null;
-  return (
-    <div className="cdb-later">
-      <div className="cdb-sec-h">
-        <h2>Coming up</h2>
-        <span className="cdb-hint">{sessions.length} more session{sessions.length > 1 ? 's' : ''}</span>
-      </div>
-      <ul className="cdb-ulist">
-        {sessions.map((s) => {
-          const d = startOf(s);
-          return (
-            <li key={s.id} className="cdb-uc">
-              <div className="cdb-dtile"><b>{d ? d.getDate() : '—'}</b><span>{d ? MON[d.getMonth()] : ''}</span></div>
-              <div className="cdb-uc-main">
-                <b>{dayLabel(d)} · {timeLabel(d)}</b>
-                <small>
-                  {s.package_id ? 'Package session' : 'Follow-up session'} · {nameOf(s.psychologist)}
-                </small>
-                <small>{DURATION(s)} min · Google Meet</small>
-              </div>
-              <div className="cdb-uc-side">
-                {s.cancel_request
-                  ? <span className="cdb-chip cdb-warn">Cancellation requested</span>
-                  : <span className="cdb-chip cdb-ok">Confirmed</span>}
-                {onUpdate && (
-                  <button type="button" className="cdb-uc-link" onClick={() => onUpdate(s)}>
-                    {s.cancel_request ? 'View request' : 'Cancel'}
-                  </button>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
-
 /** "package": an active package, its booked sessions and what is left to book. */
 function PackagePanel({ pack, sessions }) {
   const total = Number(pack.total_sessions) || 0;
@@ -478,32 +446,6 @@ function PackagePanel({ pack, sessions }) {
   );
 }
 
-/** The note and receipts panels under a confirmed session. */
-const PaidPanels = ({ therapistName }) => (
-  <div className="cdb-two">
-    <div className="cdb-panel">
-      <h3>Receipt and invoice</h3>
-      <p className="cdb-hint">Download them for your records or for reimbursement.</p>
-      <div className="cdb-docs">
-        <a className="cdb-doc" href="/profile/receipts">
-          <span><b>Receipts</b><small>Every session you have paid for</small></span>
-          {Icon.download}
-        </a>
-      </div>
-    </div>
-    <div className="cdb-panel">
-      <h3>Message {therapistName.split(' ')[0]}</h3>
-      <p className="cdb-hint">Share anything you would like them to know before the session.</p>
-      <div className="cdb-docs">
-        <a className="cdb-doc" href="/profile/messages">
-          <span><b>Open messages</b><small>Your conversation with your therapist</small></span>
-          {Icon.chevron}
-        </a>
-      </div>
-    </div>
-  </div>
-);
-
 /** One row of the Completed tab, with its notes, feedback and receipt. */
 function HistoryRow({ session, open, onToggle, onRate }) {
   const d = startOf(session);
@@ -572,6 +514,266 @@ function HistoryRow({ session, open, onToggle, onRate }) {
   );
 }
 
+
+/* ── booked sessions, to the Figma post-payment screens ─────────────────── */
+
+const ART = '/design/dashboard';
+const CARE_WHATSAPP = '919539007766';
+const endOf = (s) => { const d = startOf(s); return d ? new Date(d.getTime() + DURATION(s) * 60000) : null; };
+const typeOf = (s) => (s?.session_type === 'couple' ? 'Couple Therapy' : 'Individual Therapy');
+const inr2 = (n) => `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const hm = (d) => timeLabel(d).toUpperCase();
+const careLink = (text) => `https://wa.me/${CARE_WHATSAPP}?text=${encodeURIComponent(text)}`;
+
+/** The therapist's photo, or the line-art face when there is none. */
+function Photo({ person, id, size = 72 }) {
+  const src = person?.profile_picture_url || person?.photo;
+  return (
+    <span className="cdx-photo" style={{ width: size, height: size }}>
+      {src ? <img src={src} alt="" width={size} height={size} /> : <LineAvatar id={id} />}
+    </span>
+  );
+}
+
+/** The ⋮ button in a card's corner. */
+const MoreButton = ({ open, onClick, label }) => (
+  <button type="button" className="cdx-more" aria-label={label} aria-haspopup="menu" aria-expanded={open} onClick={onClick}>
+    <img src={`${ART}/dots-vertical.svg`} alt="" width={24} height={24} />
+  </button>
+);
+
+/** Name, status and title beside the photo. */
+const Who = ({ session, status, id }) => (
+  <div className="cdx-who">
+    <Photo person={session.psychologist} id={id} />
+    <div className="cdx-who-t">
+      <span className="cdx-status">{status}</span>
+      <span className="cdx-name">{nameOf(session.psychologist)}</span>
+      <span className="cdx-role">{roleOf(session.psychologist)}</span>
+    </div>
+  </div>
+);
+
+const SessionTile = ({ session }) => (
+  <div className="cdx-tile">
+    <span className="cdx-tl">Session</span>
+    <span className="cdx-tv">{typeOf(session)}</span>
+    <span className="cdx-ts">
+      {DURATION(session)} min
+      <span className="cdx-meet"><img src={`${ART}/google-meet.svg`} alt="" width={16} height={16} />Google Meet</span>
+    </span>
+  </div>
+);
+
+/**
+ * "Manage your session": a menu under the ⋮ on a laptop, a sheet on a phone.
+ * Moving the time uses the reschedule flow; a new therapist or a new way to attend
+ * goes to our care team on WhatsApp, as the booking system cannot change either
+ * on its own (every session is a Google Meet video call today).
+ */
+function ManageMenu({ session, onClose, onReschedule, onCancel }) {
+  const ref = useRef(null);
+  const start = startOf(session);
+  const who = nameOf(session.psychologist);
+  const when = `${dayLabel(start, true)} at ${hm(start)}`;
+  useEffect(() => {
+    const esc = (e) => { if (e.key === 'Escape') onClose(); };
+    const away = (e) => { if (ref.current && !ref.current.contains(e.target) && !e.target.closest?.('.cdx-more')) onClose(); };
+    document.addEventListener('keydown', esc);
+    document.addEventListener('mousedown', away);
+    return () => { document.removeEventListener('keydown', esc); document.removeEventListener('mousedown', away); };
+  }, [onClose]);
+  const rows = [
+    {
+      key: 'time', icon: 'calendar', title: 'Change Date & Time',
+      sub: <>{dayLabel(start, true)}<i className="cdx-dot" />{hm(start)}</>,
+      onClick: () => { onClose(); onReschedule(session); },
+    },
+    {
+      key: 'therapist', icon: 'user', title: 'Change therapist', sub: who,
+      href: careLink(`Hi Koott, I'd like to change the therapist for my session with ${who} on ${when}.`),
+    },
+    {
+      key: 'attend', icon: 'video-camera', title: 'Change how to attend', sub: 'Video',
+      href: careLink(`Hi Koott, I'd like to change how I attend my session with ${who} on ${when}.`),
+    },
+  ];
+  return (
+    <>
+      <div className="cdx-menu-dim" aria-hidden onClick={onClose} />
+      <div className="cdx-menu" role="menu" aria-label="Manage your session" ref={ref}>
+        <div className="cdx-menu-h">Manage your session</div>
+        <button type="button" className="cdx-menu-x" aria-label="Close" onClick={onClose}>
+          <img src="/design/booking/x-close.svg" alt="" width={24} height={24} />
+        </button>
+        <div className="cdx-menu-rows">
+          {rows.map((row) => {
+            const inner = (
+              <>
+                <img className="cdx-menu-i" src={`${ART}/${row.icon}.svg`} alt="" width={24} height={24} />
+                <span className="cdx-menu-t">
+                  <span className="cdx-menu-tt">{row.title}</span>
+                  <span className="cdx-menu-ts">{row.sub}</span>
+                </span>
+                <img className="cdx-menu-c" src={`${ART}/chevron-right.svg`} alt="" width={20} height={20} />
+              </>
+            );
+            return row.href
+              ? <a key={row.key} role="menuitem" className="cdx-menu-row" href={row.href} target="_blank" rel="noreferrer" onClick={onClose}>{inner}</a>
+              : <button key={row.key} type="button" role="menuitem" className="cdx-menu-row" onClick={row.onClick}>{inner}</button>;
+          })}
+        </div>
+        {onCancel && (
+          <button type="button" className="cdx-menu-cancel" onClick={() => { onClose(); onCancel(session); }}>
+            {session.cancel_request ? 'View cancellation request' : 'Cancel this session'}
+          </button>
+        )}
+      </div>
+    </>
+  );
+}
+
+/** One booked session (Figma "Booking/ Dashboard"). */
+function SessionCard({ session, menuOpen, onMenu, onOpen, children }) {
+  const start = startOf(session);
+  return (
+    <article className="cdx-card">
+      <button type="button" className="cdx-open" aria-label={`Session details: ${nameOf(session.psychologist)}, ${dayLabel(start, true)}`} onClick={onOpen} />
+      <div className="cdx-card-top">
+        <Who session={session} status={session.cancel_request ? 'Cancellation requested' : 'Upcoming'} id={`c-${session.id}`} />
+        <MoreButton open={menuOpen} onClick={onMenu} label="Manage your session" />
+      </div>
+      <div className="cdx-tiles">
+        <div className="cdx-tile">
+          <span className="cdx-tl">Date</span>
+          <span className="cdx-tv">{dayLabel(start, true)}</span>
+        </div>
+        <div className="cdx-tile">
+          <span className="cdx-tl">Time</span>
+          <span className="cdx-tv">{hm(start)} - {hm(endOf(session))}</span>
+          <span className="cdx-ts">Asia/Calcutta GMT+5:30</span>
+        </div>
+        <SessionTile session={session} />
+      </div>
+      {children}
+    </article>
+  );
+}
+
+/** Saves a session's receipt (the same download the Receipts page uses). */
+async function downloadInvoice(session) {
+  const res = await clientApi.getReceipts();
+  const receipt = (res?.data || []).find((x) => String(x.session_id) === String(session.id));
+  if (!receipt) throw new Error('The invoice for this session is not ready yet.');
+  if (receipt.file_url) { window.open(receipt.file_url, '_blank'); return; }
+  const out = await clientApi.downloadReceipt(receipt.id || receipt.receipt_id);
+  if (out?.success && out.blob) {
+    const url = window.URL.createObjectURL(out.blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Receipt-${receipt.receipt_number || receipt.id}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+    return;
+  }
+  const link = out?.data?.downloadUrl || out?.downloadUrl;
+  if (link) { window.open(link, '_blank'); return; }
+  throw new Error(out?.message || 'Could not download the invoice.');
+}
+
+/** "Session details" (Figma 1123:18093, expanded 1123:18161 / 18311). */
+function SessionDetails({ session, onBack, menu, onMenu, onToast, preview }) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const start = startOf(session);
+  const bought = session.created_at ? new Date(session.created_at) : null;
+  const price = Number(session.price) || 0;
+  const invoice = async () => {
+    if (preview) { onToast('The invoice downloads here on a real booking.'); return; }
+    setBusy(true);
+    try { await downloadInvoice(session); } catch (e) { onToast(e?.message || 'Could not download the invoice.'); }
+    setBusy(false);
+  };
+  return (
+    <div className="cdx-detail">
+      <div className="cdx-dh">
+        <button type="button" className="cdx-back" aria-label="Back to your sessions" onClick={onBack}>
+          <img src={`${ART}/arrow-left.svg`} alt="" width={24} height={24} />
+        </button>
+        <h1 className="cdx-dh-t">Session details</h1>
+      </div>
+      <div className="cdx-dcol">
+        <section className="cdx-card is-detail">
+          <div className="cdx-card-top">
+            <Who session={session} status={session.cancel_request ? 'Cancellation requested' : 'Scheduled'} id={`d-${session.id}`} />
+            <MoreButton open={!!menu} onClick={onMenu} label="Manage your session" />
+          </div>
+          {menu}
+          <div className="cdx-tiles is-two">
+            <SessionTile session={session} />
+            <div className="cdx-tile">
+              <span className="cdx-tl">Price</span>
+              <span className="cdx-tv">{inr2(price)}</span>
+            </div>
+          </div>
+          <div className={`cdx-pay${open ? ' is-open' : ''}`}>
+            <button type="button" className="cdx-pay-row" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+              <img className="cdx-pay-ok" src={`${ART}/check-circle.svg`} alt="" width={20} height={20} />
+              <span className="cdx-pay-h">Payment summary</span>
+              <span className="cdx-pay-r">
+                <span className="cdx-pay-l">Session purchased</span>
+                <span className="cdx-pay-v">{inr2(price)}<span className="cdx-paid">Paid</span></span>
+              </span>
+              <img className="cdx-pay-c" src={`${ART}/chevron-down.svg`} alt="" width={24} height={24} />
+            </button>
+            {open && (
+              <div className="cdx-bill">
+                <div className="cdx-bill-rows">
+                  <div className="cdx-bill-row"><span>Session sub total</span><b>{inr2(price)}</b></div>
+                  <div className="cdx-bill-row is-total"><span>Paid amount</span><b>{inr2(price)}</b></div>
+                </div>
+                <button type="button" className="cdx-invoice" onClick={invoice} disabled={busy}>
+                  {busy ? 'Preparing…' : 'Download Invoice'}
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="cdx-log" aria-label="Activity">
+          <ol>
+            <li>
+              <span className="cdx-log-i"><img src={`${ART}/user.svg`} alt="" width={16} height={16} /></span>
+              <div className="cdx-log-l">
+                <b>{nameOf(session.psychologist)}</b>
+                <span className="cdx-log-s">
+                  {typeOf(session)}<i className="cdx-dot" />
+                  <span className="cdx-log-on"><img src={`${ART}/video-recorder.svg`} alt="" width={16} height={16} />Online</span>
+                </span>
+              </div>
+              <div className="cdx-log-r">
+                <span className="cdx-paid">{session.cancel_request ? 'Cancellation requested' : 'Scheduled'}</span>
+                <span className="cdx-log-d">{dayLabel(start, true)}<i className="cdx-dot" />{hm(start)}</span>
+              </div>
+            </li>
+            {bought && (
+              <li>
+                <span className="cdx-log-i"><img src={`${ART}/purchase-tag.svg`} alt="" width={16} height={16} /></span>
+                <div className="cdx-log-l"><b>Session purchased</b></div>
+                <div className="cdx-log-r">
+                  <span className="cdx-log-d">{dayLabel(bought, true)}<i className="cdx-dot" />{hm(bought)}</span>
+                </div>
+              </li>
+            )}
+          </ol>
+        </section>
+      </div>
+    </div>
+  );
+}
+
 /* ── the page ───────────────────────────────────────────────────────────── */
 
 /**
@@ -609,7 +811,21 @@ export default function ClientDashboard({ client, fixture = null, previewState =
   const [toast, setToast] = useState('');
   const [updating, setUpdating] = useState(null);
   const [reload, setReload] = useState(0);
+  const [menuFor, setMenuFor] = useState(null); // session id whose "Manage your session" is open
+  const [moving, setMoving] = useState(null); // session being rescheduled
   const { draft, slotState } = useBookingDraft();
+  const router = useRouter();
+  const params = useSearchParams();
+  const detailId = params.get('session') || '';
+  // ?session=<id> opens "Session details"; the other params (?preview) are kept.
+  const goDetail = useCallback((id) => {
+    const q = new URLSearchParams(params.toString());
+    if (id) q.set('session', id); else q.delete('session');
+    const qs = q.toString();
+    setMenuFor(null);
+    router.push(qs ? `?${qs}` : window.location.pathname, { scroll: true });
+  }, [params, router]);
+  const closeMenu = useCallback(() => setMenuFor(null), []);
 
   useEffect(() => {
     if (fixture) {
@@ -644,7 +860,6 @@ export default function ClientDashboard({ client, fixture = null, previewState =
     [upcoming]
   );
   const next = sorted[0] || null;
-  const later = sorted.slice(1);
   // A draft only stands in for a session while nothing is booked and its time still holds.
   const pending = fixture
     ? fixture.draft || null
@@ -698,41 +913,73 @@ export default function ClientDashboard({ client, fixture = null, previewState =
 
     if (!next && !pending) return <FindSpecialist />;
 
+    // An unpaid booking (only this browser knows of it) keeps the ticket with "Proceed to pay".
+    if (!next) return <Ticket session={null} draft={pending} client={client} onUpdate={() => {}} />;
+
     return (
       <>
-        <Ticket
-          session={next}
-          draft={pending}
-          client={client}
-          onUpdate={(s) => (fixture ? setToast('To change a session, message your therapist or our care team.') : setUpdating(s))}
-        />
-        <ComingUp sessions={later} onUpdate={fixture ? null : (s) => setUpdating(s)} />
+        <div className="cdx-list">
+          {sorted.map((s) => (
+            <SessionCard
+              key={s.id}
+              session={s}
+              menuOpen={menuFor === s.id}
+              onMenu={() => setMenuFor((m) => (m === s.id ? null : s.id))}
+              onOpen={() => goDetail(s.id)}
+            >
+              {menuFor === s.id && menuOf(s)}
+            </SessionCard>
+          ))}
+        </div>
         {packages.map((p) => <PackagePanel key={p.id} pack={p} sessions={sorted} />)}
-        {next && <PaidPanels therapistName={nameOf(next.psychologist)} />}
       </>
     );
   };
 
-  const count = (next ? 1 : 0) + later.length;
+  const menuOf = (s) => (
+    <ManageMenu
+      session={s}
+      onClose={closeMenu}
+      onReschedule={(x) => (fixture ? say('Changing the time opens here on a real booking.') : setMoving(x))}
+      onCancel={fixture ? null : (x) => setUpdating(x)}
+    />
+  );
+  const say = (text) => { setToast(text); setTimeout(() => setToast(''), 2400); };
+  const detail = detailId && status === 'ready' ? sorted.find((s) => String(s.id) === detailId) : null;
 
   return (
     <div className="cdb">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <main className="cdb-wrap">
-        <h1 className="cdb-sr">Your sessions</h1>
-        <div className="cdb-pills" role="tablist" aria-label="Session status">
-          <button type="button" role="tab" aria-selected={tab === 'upcoming'} onClick={() => setTab('upcoming')}>
-            Upcoming {count > 0 && <span className="cdb-count">{count}</span>}
-          </button>
-          <button type="button" role="tab" aria-selected={tab === 'completed'} onClick={() => setTab('completed')}>
-            Completed {past.length > 0 && <span className="cdb-count">{past.length}</span>}
-          </button>
-        </div>
-        <div role="tabpanel">{body()}</div>
+      <main className="cdb-wrap cdx-wrap">
+        {detail ? (
+          <SessionDetails
+            session={detail}
+            onBack={() => goDetail('')}
+            menu={menuFor === detail.id ? menuOf(detail) : null}
+            onMenu={() => setMenuFor((m) => (m === detail.id ? null : detail.id))}
+            onToast={say}
+            preview={!!fixture}
+          />
+        ) : (
+          <>
+            <h1 className="cdb-sr">Your sessions</h1>
+            <div className="cdx-tabs" role="tablist" aria-label="Sessions">
+              <button type="button" role="tab" aria-selected={tab === 'upcoming'} onClick={() => setTab('upcoming')}>Sessions</button>
+              <button type="button" role="tab" aria-selected={tab === 'completed'} onClick={() => setTab('completed')}>History</button>
+            </div>
+            <div role="tabpanel" className="cdx-panel">{body()}</div>
+          </>
+        )}
       </main>
       {onPreviewChange && <PreviewSwitch state={previewState} onChange={onPreviewChange} />}
       <div className={`cdb-toast${toast ? ' cdb-on' : ''}`} role="status">{toast}</div>
       {updating && <UpdateSheet session={updating} onClose={() => setUpdating(null)} onDone={() => setReload((n) => n + 1)} />}
+      <RescheduleModal
+        isOpen={!!moving}
+        session={moving}
+        onClose={() => setMoving(null)}
+        onRescheduleSuccess={() => { setMoving(null); setReload((n) => n + 1); }}
+      />
     </div>
   );
 }
@@ -740,6 +987,132 @@ export default function ClientDashboard({ client, fixture = null, previewState =
 /* ── styles, from the prototype ─────────────────────────────────────────── */
 
 const CSS = `
+/* ── Figma post-payment screens ── */
+.cdb-wrap.cdx-wrap{max-width:1228px;padding:56px 24px 120px}
+.cdx-tabs{display:flex;gap:12px}
+.cdx-tabs button{
+  height:32px;padding:0 15px;border:1px solid #E3E2E2;border-radius:56px;background:#fff;cursor:pointer;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#0F0F0F!important;
+  letter-spacing:0;text-transform:none;
+}
+.cdx-tabs button[aria-selected="true"]{background:#EFFFEA;border-color:#BFE3CB;font-weight:500!important;color:#1B6930!important}
+.cdx-panel{margin-top:24px}
+.cdx-list{display:flex;flex-direction:column;gap:16px}
+.cdx-card{position:relative;display:flex;flex-direction:column;gap:18px;padding:24px;border-radius:12px;background:#E9F1E4}
+.cdx-open{position:absolute;inset:0;z-index:0;width:100%;padding:0;border:0;border-radius:12px;background:none;cursor:pointer}
+.cdx-open:focus-visible{outline:2px solid #189E4F;outline-offset:2px}
+.cdx-card.is-detail{width:781px;max-width:100%}
+.cdx-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.cdx-who{display:flex;align-items:center;gap:8px;min-width:0}
+.cdx-card.is-detail .cdx-who{gap:12px}
+.cdx-photo{flex:none;display:block;overflow:hidden;border-radius:40px;background:#EFFFEA}
+.cdx-photo img,.cdx-photo svg{display:block;width:100%;height:100%;object-fit:cover}
+.cdx-who-t{display:flex;flex-direction:column;min-width:0}
+.cdx-status{font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#1E8631!important}
+.cdx-name{font-family:'Poppins',system-ui,sans-serif!important;font-size:20px!important;font-weight:500!important;line-height:30px!important;color:#0F0F0F!important}
+.cdx-role{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#373737!important}
+.cdx-more{position:relative;z-index:2;flex:none;width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer}
+.cdx-more img{display:block}
+.cdx-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.cdx-tiles.is-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cdx-tile{display:flex;flex-direction:column;justify-content:center;gap:2px;height:94px;padding:0 16px;border-radius:8px;background:#F9F9F9}
+.cdx-tl{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#7C7C7C!important}
+.cdx-tv{font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#0F0F0F!important}
+.cdx-ts{display:flex;align-items:center;gap:12px;font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#5C5C5C!important}
+.cdx-meet{display:inline-flex;align-items:center;gap:4px}
+.cdx-dot{display:inline-block;width:4px;height:4px;margin:0 8px;border-radius:50%;background:#E3E2E2;vertical-align:middle}
+/* "Manage your session" */
+.cdx-menu-dim{display:none}
+.cdx-menu{
+  position:absolute;z-index:5;right:24px;top:64px;display:flex;flex-direction:column;gap:24px;width:477px;max-width:calc(100vw - 32px);
+  padding:24px;border-radius:16px;background:#fff;box-shadow:0 6px 21px rgba(0,0,0,.07);
+}
+.cdx-card.is-detail .cdx-menu{top:64px}
+.cdx-menu-h{font-family:'Poppins',system-ui,sans-serif!important;font-size:20px!important;font-weight:500!important;line-height:30px!important;color:#0F0F0F!important}
+.cdx-menu-x{display:none;position:absolute;right:24px;top:27px;width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer}
+.cdx-menu-x img{display:block}
+.cdx-menu-rows{display:flex;flex-direction:column;gap:16px}
+.cdx-menu-row{
+  display:flex;align-items:center;gap:12px;height:72px;padding:0 12px;border:1px solid #E5E5EA;border-radius:8px;background:#fff;
+  text-align:left;text-decoration:none;cursor:pointer;
+}
+.cdx-menu-row:hover{border-color:#BFE3CB;background:#FAFCF9}
+.cdx-menu-row:focus-visible{outline:2px solid #189E4F;outline-offset:2px}
+.cdx-menu-i{flex:none}
+.cdx-menu-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cdx-menu-tt{font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#0F0F0F!important}
+.cdx-menu-ts{display:flex;align-items:center;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#5C5C5C!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdx-menu-c{flex:none;margin-left:8px}
+.cdx-menu-cancel{
+  align-self:center;margin-top:-8px;padding:0;border:0;background:none;cursor:pointer;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#5C5C5C!important;text-decoration:underline;
+}
+/* Session details */
+.cdx-dh{display:flex;align-items:center;gap:8px;height:40px}
+.cdx-back{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer}
+.cdx-back img{display:block}
+.cdx-dh-t{margin:0!important;font-family:'Poppins',system-ui,sans-serif!important;font-size:24px!important;font-weight:500!important;line-height:39.8px!important;color:#0F0F0F!important;letter-spacing:0!important}
+.cdx-dcol{display:flex;flex-direction:column;gap:24px;margin-top:24px}
+.cdx-pay{display:flex;flex-direction:column;gap:16px;padding:12px 16px;border-radius:8px;background:#FAFCF9}
+.cdx-pay.is-open{padding-bottom:16px}
+.cdx-pay-row{display:flex;align-items:flex-end;gap:16px;width:100%;padding:0;border:0;background:none;text-align:left;cursor:pointer}
+.cdx-pay-h{flex:1;font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#0F0F0F!important}
+.cdx-pay-r{display:flex;align-items:center;gap:8px}
+.cdx-pay-l,.cdx-pay-v{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#5C5C5C!important}
+.cdx-pay-v{display:inline-flex;align-items:center;gap:4px;margin-left:12px}
+.cdx-pay-c{flex:none;transition:transform .15s ease}
+.cdx-pay-ok{display:none;flex:none}
+.cdx-pay.is-open .cdx-pay-c{transform:rotate(180deg)}
+.cdx-paid{
+  display:inline-flex;align-items:center;height:24px;padding:0 11px;border:1px solid #51B763;border-radius:45px;white-space:nowrap;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#1E8631!important;
+}
+.cdx-bill{display:flex;flex-direction:column;align-items:flex-start;gap:24px;padding:12px;border:1px solid #E8EFE5;border-radius:8px;background:#fff}
+.cdx-bill-rows{display:flex;flex-direction:column;gap:16px;width:100%}
+.cdx-bill-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cdx-bill-row span{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#5C5C5C!important}
+.cdx-bill-row b{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:22px!important;color:#373737!important}
+.cdx-bill-row.is-total b{font-size:16px!important;line-height:24px!important;color:#189E4F!important}
+.cdx-invoice{
+  height:32px;padding:0 22px;border:0;border-radius:6px;background:#189E4F;cursor:pointer;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:22px!important;color:#fff!important;
+}
+.cdx-invoice:hover{background:#1B6930}
+.cdx-invoice:disabled{opacity:.7;cursor:default}
+.cdx-log{width:781px;max-width:100%;padding:16px;border:1px solid #E8EFE5;border-radius:12px;background:#fff}
+.cdx-log ol{position:relative;display:flex;flex-direction:column;gap:34px;margin:0;padding:0;list-style:none}
+.cdx-log li{position:relative;display:flex;align-items:center;gap:24px;padding-left:52px}
+.cdx-log li:first-child{align-items:flex-start}
+.cdx-log-i{position:absolute;left:8px;top:13px;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:52px;background:#F9F9F9}
+.cdx-log li:last-child .cdx-log-i{top:0}
+.cdx-log li:not(:last-child)::after{content:'';position:absolute;left:20px;top:43px;bottom:-34px;border-left:1px dashed #E3E2E2}
+.cdx-log-l{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cdx-log-l b{font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#0F0F0F!important}
+.cdx-log-s,.cdx-log-on{display:flex;align-items:center;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#5C5C5C!important}
+.cdx-log-on{gap:4px}
+.cdx-log-r{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.cdx-log-d{display:flex;align-items:center;font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#5C5C5C!important;white-space:nowrap}
+.cdx-log-d .cdx-dot{margin:0 6px 0 6px}
+/* Phone frames 1123:18598, 19037, 18663, 18731. */
+@media (max-width:720px){
+  .cdb-wrap.cdx-wrap{padding:16px 16px 80px}
+  .cdx-photo{width:64px!important;height:64px!important}
+  .cdx-tiles,.cdx-tiles.is-two{grid-template-columns:1fr;gap:16px}
+  .cdx-menu-dim{display:block;position:fixed;left:0;right:0;bottom:0;top:63px;z-index:60;background:rgba(21,21,21,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .cdx-menu{position:fixed;z-index:61;left:0;right:0;top:auto;bottom:0;width:100%;max-width:none;border-radius:16px 16px 0 0}
+  .cdx-card.is-detail .cdx-menu{top:auto}
+  .cdx-menu-x{display:block}
+  .cdx-pay-row{align-items:center;gap:6px}
+  .cdx-pay-ok{display:block}
+  .cdx-pay-r{display:none}
+  .cdx-log li,.cdx-log li:first-child{flex-direction:column;align-items:stretch;gap:8px;padding-left:27px}
+  .cdx-log-i{left:-3.5px;top:22px}
+  .cdx-log li:last-child .cdx-log-i{top:0}
+  .cdx-log li:not(:last-child)::after{left:8.5px;top:52px}
+  .cdx-log-r{flex-direction:row-reverse;align-items:center;justify-content:space-between}
+  .cdx-role{white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:214px}
+}
+
 .cdb{
   --bg:#fff;--surface:#fff;--ink:#111;--muted:#6d727f;--lbl:#9ba0a6;--line:#e7e7e7;
   --brand:#4a9c58;--brand-ink:#2f7a3f;--total:#316a3b;--on-brand:#fff;--mint:#e6f4ea;--mint-ink:#2f6b3c;
