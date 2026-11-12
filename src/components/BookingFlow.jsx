@@ -674,6 +674,31 @@ export default function BookingFlow({ slug }) {
 
   // Package mode has only the calendar and the review; otherwise one step back, leaving
   // the page from the first step (or the mobile-number step).
+  /* "Leaving already?" (Figma 1123:10602 steps, 1123:10485 review): a click on a link that
+     leaves an unfinished booking asks once; asking again would trap the client. */
+  const [leaveAsk, setLeaveAsk] = useState(null); // { href } while the popup is open
+  const [leaveAsked, setLeaveAsked] = useState(false);
+  const inBooking = !paidDone && !booked && !authLoading && !needsPhone && !pkgMode && (step >= 1 || !!slot);
+  useEffect(() => {
+    if (!inBooking || leaveAsked) return undefined;
+    const onClick = (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest && e.target.closest('a[href]');
+      if (!a || a.closest('.bf') || a.target === '_blank') return;
+      const url = new URL(a.href, window.location.href);
+      if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.koottHeld = true; // PageLoadingOverlay: no loader for a held click
+      setLeaveAsk({ href: url.pathname + url.search + url.hash });
+    };
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
+  }, [inBooking, leaveAsked]);
+  const stayHere = () => { setLeaveAsk(null); setLeaveAsked(true); };
+  // Review has its own question ("still reserved"), so it may ask once more there.
+  useEffect(() => { if (step === 4) setLeaveAsked(false); }, [step]);
+
   const back = () => {
     if (pkgMode) { if (step <= 1) router.back(); else setStep(1); return; }
     if (needsPhone || step === 0) router.back(); else setStep((s) => s - 1);
@@ -1415,6 +1440,38 @@ export default function BookingFlow({ slug }) {
         )}
       </div>
 
+      {leaveAsk && (
+        <div className="bfx-leave" role="dialog" aria-modal="true" aria-labelledby="bfx-leave-h">
+          <div className={`bfx-leave-card ${step === 4 ? 'is-review' : ''}`}>
+            <button type="button" className="bfx-leave-x" aria-label="Close" onClick={stayHere}>
+              <img src="/design/booking/x-close.svg" alt="" width={24} height={24} />
+            </button>
+            <div className="bfx-leave-top">
+              <span className="bfx-leave-ic"><img src="/design/booking/alert-hexagon.svg" alt="" width={32} height={32} /></span>
+              <div className="bfx-leave-txt">
+                <div id="bfx-leave-h" className="bfx-leave-h">Leaving already?</div>
+                <p className="bfx-leave-p">
+                  {step === 4 && slot
+                    ? <>Your booking with {name} for<br />{dateLabel(slot.startsAt, tz, { weekday: 'short' })}, {dateLabel(slot.startsAt, tz, { day: 'numeric', month: 'short' })} · {timeLabel(slot.startsAt, tz)} is still reserved.</>
+                    : 'Hey, it seems you haven\'t completed all the steps. Want to leave?'}
+                </p>
+              </div>
+            </div>
+            {step === 4 ? (
+              <div className="bfx-leave-btns">
+                <button type="button" className="bfx-btn-line" onClick={() => { const to = leaveAsk.href; clearDraft(); setLeaveAsk(null); setLeaveAsked(true); router.push(to); }}>Cancel booking</button>
+                <button type="button" className="bfx-btn" onClick={() => { stayHere(); pay(); }}>Continue to payment</button>
+              </div>
+            ) : (
+              <div className="bfx-leave-btns">
+                <a className="bfx-btn-line" href={`https://wa.me/919539007766?text=${encodeURIComponent(`Hi Koott, I need help booking a session with ${name}.`)}`} target="_blank" rel="noreferrer" onClick={stayHere}>WhatsApp Us</a>
+                <button type="button" className="bfx-btn" onClick={stayHere}>Continue</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {payStage === 'confirming' && (
         <div className="bfx-verify" role="status" aria-live="polite">
           <img className="bfx-verify-ic" src="/design/booking/loading.svg" alt="" width={48} height={48} />
@@ -1906,6 +1963,27 @@ const CSS = `
 .bfx-tile em{display:flex;align-items:center;gap:4px;margin-top:2px;font-style:normal;font-family:'Inter',system-ui,sans-serif!important;font-size:12px!important;line-height:18px!important;color:#5C5C5C!important;}
 .bfx-tile em i{display:block;width:4px;height:4px;border-radius:50%;background:#D6DCD8;margin:0 4px;}
 .bfx-tile-edit{position:absolute;right:16px;top:43px;}
+
+/* "Leaving already?" popups */
+.bfx-leave{position:fixed;left:0;right:0;bottom:0;top:63px;z-index:70;background:rgba(21,21,21,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:flex-start;padding:167px 16px 16px;box-sizing:border-box;}
+.bfx-leave-card{position:relative;width:331px;max-width:100%;box-sizing:border-box;padding:24px;border-radius:16px;background:#fff;display:flex;flex-direction:column;align-items:center;gap:24px;}
+.bfx-leave-card.is-review{width:426px;}
+.bfx-leave-x{position:absolute;right:16px;top:16px;width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;}
+.bfx-leave-x img{display:block;}
+.bfx-leave-top{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;}
+.bfx-leave-ic{display:flex;align-items:center;justify-content:center;width:48px;height:48px;box-sizing:border-box;padding:8px;border:1px solid #FFF4E8;border-radius:8px;}
+.bfx-leave-txt{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;}
+.bfx-leave-h{font-family:'Inter',system-ui,sans-serif!important;font-size:18px!important;font-weight:500!important;line-height:26px!important;color:#0F0F0F!important;}
+.bfx-leave-p{margin:0;text-align:center;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#373737!important;}
+.bfx-leave-btns{display:flex;gap:16px;justify-content:center;}
+.bfx-btn-line{
+  display:inline-flex;align-items:center;justify-content:center;height:40px;box-sizing:border-box;padding:7px 18px;border:1px solid #BFE3CB;border-radius:8px;background:#fff;cursor:pointer;text-decoration:none;
+  font-family:'Inter',system-ui,sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#0F0F0F!important;
+}
+.bfx-leave-btns .bfx-btn{display:inline-flex;align-items:center;justify-content:center;}
+.bfx-leave-card.is-review .bfx-leave-btns{width:100%;}
+.bfx-leave-card.is-review .bfx-btn-line{flex:0 0 157px;}
+.bfx-leave-card.is-review .bfx-btn{flex:1 1 auto;}
 
 /* verifying payment */
 .bfx-verify{position:fixed;left:0;right:0;bottom:0;top:63px;z-index:60;background:#fff;display:flex;flex-direction:column;align-items:center;padding:136px 16px 0;gap:8px;}

@@ -50,7 +50,11 @@ function PageLoadingOverlayContent() {
       try { url = new URL(a.href, window.location.href); } catch (_) { return; }
       if (url.origin !== window.location.origin) return;
       if (url.pathname === window.location.pathname && url.search === window.location.search) return;
-
+      // A page that holds the click back (the booking flow's "Leaving already?") marks the
+      // event later in this same click; check once every listener has run.
+      setTimeout(() => { if (!e.koottHeld) startLoader(); }, 0);
+    };
+    const startLoader = () => {
       clearTimeout(showTimer.current);
       clearTimeout(giveUpTimer.current);
       showTimer.current = setTimeout(() => {
