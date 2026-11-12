@@ -193,7 +193,7 @@ const Arrow = ({ dir = 'left' }) => (
 
 export default function BookingFlow({ slug }) {
   const router = useRouter();
-  const { user, token, isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const { user, token, isAuthenticated, isLoading: authLoading, login, logout } = useAuth();
   const tz = useMemo(() => clientTimeZone(), []);
 
   const [step, setStep] = useState(0);
@@ -261,6 +261,11 @@ export default function BookingFlow({ slug }) {
   const isClient = user?.role === 'client';
   const accountPhone = usablePhone(user?.profile?.phone_number || user?.phone_number);
   const needsPhone = !verified && !(isAuthenticated() && isClient && accountPhone);
+  // Staff, therapists and admins can't book (sessions belong to a client account): say so on
+  // "About yourself" rather than leaving them stuck. The email box is locked only when the
+  // signed-in client's account actually supplies it; otherwise it stays typeable.
+  const nonClientSignedIn = isAuthenticated() && Boolean(user?.role) && !isClient;
+  const emailLocked = isAuthenticated() && isClient && Boolean(user?.email);
 
   // A number verified in this tab stays verified for the token's life (2 h).
   useEffect(() => {
@@ -668,7 +673,7 @@ export default function BookingFlow({ slug }) {
     true,
     Boolean(slot),
     Boolean(plan),
-    Boolean(about.name.trim() && /.+@.+\..+/.test(about.email)),
+    Boolean(about.name.trim() && /.+@.+\..+/.test(about.email)) && !nonClientSignedIn,
     true,
   ][step];
 
@@ -1315,12 +1320,18 @@ export default function BookingFlow({ slug }) {
               <label className="bfx-field">
                 <span className="bfx-label">Email address</span>
                 <input
-                  type="email" value={about.email} placeholder="enter your email" autoComplete="email" readOnly={isAuthenticated()}
-                  className={isAuthenticated() ? 'is-fixed' : ''}
+                  type="email" value={about.email} placeholder="enter your email" autoComplete="email" readOnly={emailLocked}
+                  className={emailLocked ? 'is-fixed' : ''}
                   onChange={(e) => setAbout({ ...about, email: e.target.value })}
                 />
               </label>
             </div>
+            {nonClientSignedIn && (
+              <p className="bf-err">
+                You&apos;re signed in with a Koott staff account. Sessions are booked from a client account.{' '}
+                <button type="button" className="bf-link" onClick={() => logout()}>Log out</button> to book as a client.
+              </p>
+            )}
             {aboutErr && (
               <p className="bf-err">
                 {aboutErr}
