@@ -8,11 +8,22 @@ const nextConfig = {
   // While indexing is off, every response — pages, images, PDFs, API proxies — carries
   // a noindex header, so nothing gets indexed even if a crawler ignores robots.txt.
   async headers() {
-    if (allowIndexing) return [];
+    // Security headers on every response (Migration Checklist → Backend → Security).
+    // A Content-Security-Policy is not set yet: it needs testing against GTM, Razorpay,
+    // PostHog and the embedded videos first.
+    const security = [
+      { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
+    ];
     return [
       {
         source: '/:path*',
-        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' }],
+        headers: allowIndexing
+          ? security
+          : [...security, { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' }],
       },
     ];
   },
@@ -117,6 +128,8 @@ const nextConfig = {
       // All of these are live, indexed URLs on the Wix site. Keeping them alive
       // preserves inbound links and the SEO already earned against them.
       { source: '/agreement', destination: '/therapy-agreement', permanent: true },
+      // /contact-us was a duplicate of /get-in-touch (koott.in answers 404 for it).
+      { source: '/contact-us', destination: '/get-in-touch', permanent: true },
       { source: '/refundpolicy', destination: '/refund-policy', permanent: true },
       { source: '/koottaksharangal', destination: '/blog', permanent: true },
 

@@ -1,7 +1,16 @@
+import { CONDITION_SLUGS } from '@/data/conditions';
+import { KOOTT_STATIC_PAGES } from '@/data/koottStaticPages';
+
 function backendOrigin() {
   const raw = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || '';
   const withApi = raw || 'http://localhost:5001/api';
   return withApi.replace(/\/?api\/?$/, '') || 'http://localhost:5001';
+}
+
+// A real date for <lastmod>, or none (an always-"now" date tells Google nothing).
+function realDate(v) {
+  const d = v ? new Date(v) : null;
+  return d && !Number.isNaN(d.getTime()) ? d : undefined;
 }
 
 export default async function sitemap() {
@@ -34,7 +43,6 @@ export default async function sitemap() {
       url: `${baseUrl}${route}`,
       changeFrequency: "monthly",
       priority: route === "" ? 1.0 : route === "/blog" || route === "/online-child-psychologist" ? 0.9 : 0.7,
-      lastModified: new Date(),
     })
   );
 
@@ -61,9 +69,10 @@ export default async function sitemap() {
         data?.careers ||
         data?.data ||
         [];
+      // Each entry keeps its real last-edited date for <lastmod>.
       return (items || [])
         .filter((item) => item?.status === "published" && item?.slug)
-        .map((item) => item.slug);
+        .map((item) => ({ slug: item.slug, lastModified: realDate(item.updated_at || item.published_at) }));
     } catch {
       return [];
     }
@@ -98,8 +107,7 @@ export default async function sitemap() {
     }
   }
 
-  const [counsellingSlugs, assessmentSlugs, parentingSlugs, blogSlugs, careerSlugs, psychologistSlugs] = await Promise.all([
-    fetchSlugs("/api/counselling"),
+  const [assessmentSlugs, parentingSlugs, blogSlugs, careerSlugs, psychologistSlugs] = await Promise.all([
     fetchSlugs("/api/assessments"),
     fetchSlugs("/api/better-parenting"),
     fetchSlugs("/api/blogs"),
@@ -108,42 +116,42 @@ export default async function sitemap() {
   ]);
 
   const dynamicRoutes = [
-    ...counsellingSlugs.map((slug) => ({
-      url: `${baseUrl}/counselling/${slug}`,
-      changeFrequency: "weekly",
+    // Condition pages and the ported Wix landing/location pages live at /<slug>
+    // (app/[conditionSlug]). /counselling/<slug> only 301s here, so it is not listed.
+    ...[...new Set([...CONDITION_SLUGS, ...Object.keys(KOOTT_STATIC_PAGES || {})])].map((slug) => ({
+      url: `${baseUrl}/${slug}`,
+      changeFrequency: "monthly",
       priority: 0.8,
-      lastModified: new Date(),
     })),
-    ...assessmentSlugs.map((slug) => ({
+    ...assessmentSlugs.map(({ slug, lastModified }) => ({
       url: `${baseUrl}/assessments/${slug}`,
       changeFrequency: "weekly",
       priority: 0.8,
-      lastModified: new Date(),
+      lastModified,
     })),
-    ...parentingSlugs.map((slug) => ({
+    ...parentingSlugs.map(({ slug, lastModified }) => ({
       url: `${baseUrl}/better-parenting/${slug}`,
       changeFrequency: "weekly",
       priority: 0.8,
-      lastModified: new Date(),
+      lastModified,
     })),
-    ...blogSlugs.map((slug) => ({
+    ...blogSlugs.map(({ slug, lastModified }) => ({
       url: `${baseUrl}/blog/${slug}`,
       changeFrequency: "weekly",
       priority: 0.7,
-      lastModified: new Date(),
+      lastModified,
     })),
     // Job detail pages, submitted at their canonical /jobs/<slug> URL.
-    ...careerSlugs.map((slug) => ({
+    ...careerSlugs.map(({ slug, lastModified }) => ({
       url: `${baseUrl}/jobs/${slug}`,
       changeFrequency: "weekly",
       priority: 0.6,
-      lastModified: new Date(),
+      lastModified,
     })),
     ...psychologistSlugs.map((slug) => ({
       url: `${baseUrl}/online-child-psychologist/${slug}`,
       changeFrequency: "monthly",
       priority: 0.9,
-      lastModified: new Date(),
     })),
   ];
 

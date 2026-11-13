@@ -78,6 +78,8 @@ export const metadata = {
     type: "website",
     url: "https://www.koott.in/events",
     siteName: "Koott",
+    // Same share image as the other fixed pages (lib/seo.js OG_IMAGE); it had none.
+    images: [{ url: "https://www.koott.in/logo.png", alt: "Koott" }],
   },
   alternates: {
     canonical: "https://www.koott.in/events",
