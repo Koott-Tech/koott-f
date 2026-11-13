@@ -573,7 +573,7 @@ export default function Header() {
                 aria-label="MyKoott - Go to homepage"
               >
                 <img 
-                  src="/logo.png"
+                  src="/logo-384.webp"
                   alt="MyKoott"
                   width={120}
                   height={40}
@@ -935,7 +935,7 @@ export default function Header() {
                 >
                   <div className="w-7 h-7 rounded-full overflow-hidden bg-indigo-100 flex items-center justify-center flex-shrink-0">
                     <img 
-                      src="/logo.png"
+                      src="/logo-384.webp"
                       alt={getUserDisplayName()}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -1070,7 +1070,7 @@ export default function Header() {
                   aria-label="MyKoott - Go to homepage"
                 >
                   <img 
-                    src="/logo.png"
+                    src="/logo-384.webp"
                     alt="MyKoott"
                     width={120}
                     height={40}
@@ -1096,7 +1096,7 @@ export default function Header() {
                   <div className="flex flex-col items-center text-center py-2">
                     <div className="w-14 h-14 rounded-full overflow-hidden bg-indigo-100 flex items-center justify-center mb-3 flex-shrink-0">
                       <img 
-                        src="/logo.png"
+                        src="/logo-384.webp"
                         alt={getUserDisplayName()}
                         className="w-full h-full object-cover"
                         onError={(e) => {

@@ -118,7 +118,7 @@ export default async function RootLayout({ children }) {
             TT Interphases (licensed) on the nav, buttons and captions. */}
         <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         {/* Preload logo for instant loading screen display */}
-        <link rel="preload" as="image" href="/favicon-512.png" />
+        <link rel="preload" as="image" href="/loader-mark.webp" type="image/webp" />
         {/* CRITICAL: Script to manage loader - runs only on client side to prevent hydration mismatch */}
         <script
           dangerouslySetInnerHTML={{
@@ -274,7 +274,7 @@ export default async function RootLayout({ children }) {
               width: 180px;
               height: 180px;
               margin: 0 auto;
-              background-image: url('/favicon-512.png');
+              background-image: url('/loader-mark.webp'); /* 360 px copy of favicon-512.png (14 KB, was 57 KB) */
               background-size: contain;
               background-repeat: no-repeat;
               background-position: center;

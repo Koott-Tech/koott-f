@@ -9,6 +9,7 @@ import { blogApi } from '@/lib/blogApi';
 import { fetchTherapistOrder } from '@/lib/therapistOrder';
 import { whenLabel } from '@/lib/nextAvailable';
 import { screenerFor, scoreScreener, FREQUENCY, CRISIS_LINES } from '@/data/screeners';
+import { sizedImg } from '@/lib/imageSize';
 
 /**
  * ConditionPageTemplate — layout for condition / counselling landing pages.
@@ -177,7 +178,7 @@ function StepMedia({ step }) {
 
   return (
     <div className="kct-step-media kct-step-pair" aria-hidden>
-      <img className="kct-step-mark" src="/logo.png" alt="" loading="lazy" />
+      <img className="kct-step-mark" src="/logo-384.webp" alt="" loading="lazy" />
       <img src="/design/steps/pair-1.webp" alt="" loading="lazy" />
       <img src="/design/steps/pair-2.webp" alt="" loading="lazy" />
     </div>
@@ -891,7 +892,7 @@ export default function ConditionPageTemplate({ data }) {
             {posts.map((b) => (
               <a key={b.slug} className="kct-blog" href={`/blog/${b.slug}`}>
                 {b.featured_image_url
-                  ? <img className="kct-blog-img" src={b.featured_image_url} alt="" loading="lazy" />
+                  ? <img className="kct-blog-img" {...sizedImg(b.featured_image_url, [400, 640, 800], '(max-width: 768px) 100vw, 380px')} alt="" loading="lazy" decoding="async" />
                   : <span className="kct-blog-img kct-blog-img--ph" aria-hidden />}
                 <span className="kct-blog-t">{b.title}</span>
                 <span className="kct-blog-more">

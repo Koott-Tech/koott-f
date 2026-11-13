@@ -27,6 +27,7 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { sizedImg } from '@/lib/imageSize';
 import { track } from '@/analytics';
 import ResumeBookingCard, { RESUME_CARD_CSS, useBookingDraft } from '@/components/ResumeBookingCard';
 import TherapistCard, { THERAPIST_CARD_CSS, cardFields, designCardCss } from '@/components/TherapistCard';
@@ -1031,7 +1032,7 @@ export default function KoottHome({ content } = {}) {
                   {/* Sideways off-screen never counts as near, so lazy panels
                       would blink in; load this one and the next early. */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.image} alt={p.imageAlt || ''} width={445} height={301}
+                  <img {...sizedImg(p.image, [445, 668, 890], '(max-width: 768px) 92vw, 445px')} alt={p.imageAlt || ''} width={445} height={301}
                     loading={i <= serviceTab + 1 ? 'eager' : 'lazy'} />
                 </div>
                 <div className="kh2-slide-body">
@@ -1114,7 +1115,7 @@ export default function KoottHome({ content } = {}) {
                 <Link key={post.slug} href={`/blog/${post.slug}`} className="kh2-post">
                   {post.featured_image_url
                     // eslint-disable-next-line @next/next/no-img-element
-                    ? <img className="kh2-post-img" src={post.featured_image_url} alt="" loading="lazy" />
+                    ? <img className="kh2-post-img" {...sizedImg(post.featured_image_url, [400, 640, 800], '(max-width: 768px) 100vw, 380px')} alt="" loading="lazy" decoding="async" />
                     : <span className="kh2-post-img is-blank" aria-hidden />}
                   <span className="kh2-post-t">{post.title}</span>
                   <span className="kh2-post-more">

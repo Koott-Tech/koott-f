@@ -22,6 +22,7 @@
 import { useState } from 'react';
 import CustomSelect from '@/components/CustomSelect';
 import { analyticsContext } from '@/analytics';
+import { sizedImg } from '@/lib/imageSize';
 
 const BANNER = 'https://static.wixstatic.com/media/11062b_4d7e8926f2754d96b1473dda3a8f8171~mv2.jpg';
 
@@ -80,7 +81,8 @@ export default function ContactPage() {
     <main className="kct2">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <img className="kct2-banner" src={BANNER} alt="" aria-hidden />
+      {/* The first thing on the page: right-sized (it was a 976 KB JPG) and fetched first. */}
+      <img className="kct2-banner" {...sizedImg(BANNER, [800, 1200, 1600, 2000], '100vw')} alt="" aria-hidden fetchPriority="high" />
 
       <div className="kct2-bookbar">
         <div className="kct2-bookin">

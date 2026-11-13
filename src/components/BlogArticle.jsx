@@ -28,6 +28,7 @@
 
 import { useEffect, useState } from 'react';
 import { blogApi } from '@/lib/blogApi';
+import { sizedImg } from '@/lib/imageSize';
 import { looksLikeHtml, sanitizeHtml } from '@/lib/sanitizeHtml';
 import { formatPostDate } from './BlogListing';
 
@@ -231,7 +232,7 @@ export default function BlogArticle({ slug, post: givenPost, preview = false }) 
           <h1 className="kba-title">{post.title}</h1>
 
           {post.featured_image_url && (
-            <img className="kba-cover" src={post.featured_image_url} alt="" />
+            <img className="kba-cover" {...sizedImg(post.featured_image_url, [640, 960, 1280, 1600], '(max-width: 960px) 100vw, 900px')} alt="" fetchPriority="high" />
           )}
 
           <div className="kba-body">{renderBody(post)}</div>
@@ -262,7 +263,7 @@ export default function BlogArticle({ slug, post: givenPost, preview = false }) 
                   <li key={r.slug}>
                     <a href={`/blog/${r.slug}`}>
                       {r.featured_image_url
-                        ? <img src={r.featured_image_url} alt="" loading="lazy" />
+                        ? <img {...sizedImg(r.featured_image_url, [400, 640, 800], '(max-width: 768px) 100vw, 360px')} alt="" loading="lazy" decoding="async" />
                         : <span className="kba-recent-ph" aria-hidden />}
                       <b>{r.title}</b>
                       <small>

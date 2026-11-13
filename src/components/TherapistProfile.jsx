@@ -25,6 +25,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { track } from '@/analytics';
 import Link from 'next/link';
+import { sizedImg } from '@/lib/imageSize';
 import { DEFAULT_FAQS, extrasFor } from '@/data/therapistExtras';
 import {
   clientTimeZone, fetchSlots, fromYmd, isPsychiatristRecord, packageKind, zoneLabel,
@@ -356,7 +357,8 @@ export default function TherapistProfile({ therapist, bookHref }) {
         <Link key={p.slug || p.id} href={`/blog/${p.slug}`} className="lp-blog">
           {p.featured_image_url
             // eslint-disable-next-line @next/next/no-img-element
-            ? <img className="lp-blog-thumb" src={p.featured_image_url} alt="" />
+            // An 80 px thumbnail: ask for 80 / 160 / 240 px, not the multi-MB original.
+            ? <img className="lp-blog-thumb" {...sizedImg(p.featured_image_url, [80, 160, 240], '80px')} alt="" width={80} height={80} loading="lazy" decoding="async" />
             : <span className="lp-blog-thumb" aria-hidden />}
           <span>
             <span className="lp-blog-t">{p.title}</span>

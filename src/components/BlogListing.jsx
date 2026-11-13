@@ -22,6 +22,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { blogApi } from '@/lib/blogApi';
+import { sizedImg } from '@/lib/imageSize';
 import { BLOG_SAMPLE_POSTS, BLOG_CATEGORIES } from '@/data/blogSampleData';
 
 /** Two letters for the author chip, where koott.in shows the author's photo. */
@@ -144,11 +145,13 @@ export default function BlogListing({ initialCategory, extraSlugs, heading, init
 
         {visible.length > 0 && (
           <div className="kbl-grid">
-            {visible.slice(0, shown).map((p) => (
+            {visible.slice(0, shown).map((p, i) => (
               <article key={p.id || p.slug} className="kbl-card">
                 <a href={`/blog/${p.slug}`} className="kbl-cover-link">
                   {p.featured_image_url
-                    ? <img className="kbl-cover" src={p.featured_image_url} alt="" />
+                    // Card is 454 px wide (full width on phones); first row loads first.
+                    ? <img className="kbl-cover" {...sizedImg(p.featured_image_url, [480, 720, 960], '(max-width: 768px) 100vw, 454px')} alt=""
+                        loading={i < 3 ? 'eager' : 'lazy'} fetchPriority={i === 0 ? 'high' : undefined} decoding="async" />
                     : <span className="kbl-cover kbl-cover--ph" aria-hidden />}
                 </a>
 
