@@ -1402,10 +1402,12 @@ export const adminApi = {
   },
 
   // Book the next session of a client's package.
-  async bookPackageNextSession({ client_id, package_id, scheduled_date, scheduled_time, duration_minutes }) {
+  // package_group_id = the purchase the clicked session belongs to, so the new session
+  // joins THAT purchase (a client can have two purchases of the same plan).
+  async bookPackageNextSession({ client_id, package_id, package_group_id, scheduled_date, scheduled_time, duration_minutes }) {
     return apiRequest('/admin/bookings/book-package-next-session', {
       method: 'POST',
-      body: JSON.stringify({ client_id, package_id, scheduled_date, scheduled_time, duration_minutes }),
+      body: JSON.stringify({ client_id, package_id, package_group_id, scheduled_date, scheduled_time, duration_minutes }),
     });
   },
 

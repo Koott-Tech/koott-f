@@ -102,7 +102,7 @@ export default function AdminBookNextPackageSessionModal({ isOpen, onClose, sess
       const scheduled_date = `${selectedDateObj.getFullYear()}-${String(selectedDateObj.getMonth() + 1).padStart(2, '0')}-${String(selectedDateObj.getDate()).padStart(2, '0')}`;
       const scheduled_time = buildTime24(hour, minute, ampm);
 
-      await adminApi.bookPackageNextSession({ client_id: clientId, package_id: packageId, scheduled_date, scheduled_time, duration_minutes: duration });
+      await adminApi.bookPackageNextSession({ client_id: clientId, package_id: packageId, package_group_id: session?.package_group_id || null, scheduled_date, scheduled_time, duration_minutes: duration });
       showSuccess('Next session booked successfully.', 'Booked');
       onSuccess?.();
       onClose();
