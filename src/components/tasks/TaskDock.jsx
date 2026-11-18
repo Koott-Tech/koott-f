@@ -144,7 +144,7 @@ export default function TaskDock({ bottom = 16, inline = false, dark = false, on
         <TaskForm
           meKey={meKey}
           onCancel={() => setAdding(false)}
-          onCreated={() => { setAdding(false); setToast('Task created.'); setTimeout(() => setToast(''), 2500); if (pathname === tasksPath) window.location.reload(); }}
+          onCreated={() => { setAdding(false); setToast('Task created.'); setTimeout(() => setToast(''), 2500); if (pathname === tasksPath) window.dispatchEvent(new Event('koott:tasks-changed')); }}
         />
       </Modal>
 

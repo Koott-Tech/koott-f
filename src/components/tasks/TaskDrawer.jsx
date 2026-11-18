@@ -94,14 +94,21 @@ export default function TaskDrawer({ taskId, me, role, onClose, onChanged }) {
   }, [onClose]);
 
   const task = data?.task;
+  // Changes show at once; the save (about a second) runs behind and its answer replaces the
+  // shown task. A refused save puts the task back and says why. History reloads after.
   const save = async (patch) => {
     setSaving(true); setErr('');
+    const before = data?.task;
+    setData((d) => (d?.task ? { ...d, task: { ...d.task, ...patch } } : d));
     try {
       const { task: t } = await tasksApi.update(taskId, patch);
       setData((d) => ({ ...d, task: t }));
       onChanged?.(t);
       load();
-    } catch (e) { setErr(e.message); } finally { setSaving(false); }
+    } catch (e) {
+      setData((d) => (d && before ? { ...d, task: before } : d));
+      setErr(e.message);
+    } finally { setSaving(false); }
   };
 
   const claim = async () => {
@@ -110,14 +117,24 @@ export default function TaskDrawer({ taskId, me, role, onClose, onChanged }) {
 
   const sendComment = async () => {
     if (!comment.trim()) return;
+    const body = comment.trim();
+    const sentMentions = mentions;
+    // The comment appears straight away (marked "sending…") and the box clears; if the
+    // server refuses it, the text comes back into the box.
+    const tempId = `pending-${Date.now()}`;
+    setData((d) => (d ? { ...d, comments: [...(d.comments || []), { id: tempId, body, authorName: 'You', created_at: new Date().toISOString(), pending: true }] } : d));
+    setComment(''); setMentions([]);
     try {
-      const out = await tasksApi.comment(taskId, comment.trim(), mentions);
-      setComment(''); setMentions([]);
+      const out = await tasksApi.comment(taskId, body, sentMentions);
       load();
       // Need to know: only people who can see the task are told about a mention.
       const skipped = out?.skippedMentions || [];
       if (skipped.length) setErr(`${skipped.map((s) => s.name).join(', ')} can't see this task, so ${skipped.length > 1 ? 'they were' : 'it was'} not told. Give them the task or make a new one for them.`);
-    } catch (e) { setErr(e.message); }
+    } catch (e) {
+      setData((d) => (d ? { ...d, comments: (d.comments || []).filter((c) => c.id !== tempId) } : d));
+      setComment(body); setMentions(sentMentions);
+      setErr(e.message);
+    }
   };
 
   const addMention = (k) => {
@@ -297,7 +314,7 @@ export default function TaskDrawer({ taskId, me, role, onClose, onChanged }) {
                 <div className="space-y-3">
                   {data.comments.map((c) => (
                     <div key={c.id} className="rounded-xl bg-slate-50 px-3 py-2">
-                      <div className="text-xs text-slate-500"><strong className="text-slate-700">{c.authorName}</strong> · {fmtWhen(c.created_at)}</div>
+                      <div className="text-xs text-slate-500"><strong className="text-slate-700">{c.authorName}</strong> · {c.pending ? 'sending…' : fmtWhen(c.created_at)}</div>
                       <div className="mt-0.5 whitespace-pre-wrap text-sm text-slate-800">{c.body}</div>
                     </div>
                   ))}

@@ -255,6 +255,12 @@ export default function TasksPage({ title = 'Tasks' }) {
   useEffect(() => { const t = setTimeout(load, q ? 250 : 0); return () => clearTimeout(t); }, [load, q, tick]);
   // Others change tasks too: refresh every minute while the page is open.
   useVisiblePoll(() => setTick((n) => n + 1), 60000);
+  // A task added from the task bar on this page: refresh the list (it used to reload the page).
+  useEffect(() => {
+    const onChanged = () => setTick((n) => n + 1);
+    window.addEventListener('koott:tasks-changed', onChanged);
+    return () => window.removeEventListener('koott:tasks-changed', onChanged);
+  }, []);
 
   const moveTask = async (id, status) => {
     setTasks((ts) => ts.map((t) => (t.id === id ? { ...t, status } : t)));
