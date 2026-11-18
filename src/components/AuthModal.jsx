@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { trackPopup } from "@/analytics";
 import { staffDestination } from '@/lib/staffRoles';
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,6 +22,7 @@ export default function AuthModal({
   // onRequireContactInfo // Removed - contact details collected during signup
 }) {
   const { login, isRemembered } = useAuth();
+  const router = useRouter();
 
   const [activeTab, setActiveTab] = useState(defaultTab); // 'login' | 'signup'
   const [isLoading, setIsLoading] = useState(false);
@@ -190,8 +192,11 @@ export default function AuthModal({
       // Reload the page to refresh auth state
         if (!preventReload) {
           // Every staff role has its own dashboard (lib/staffRoles); clients stay on the page.
+          // Staff and therapists go to their dashboard inside the already-loaded app (the
+          // sign-in is already in AuthContext): a full page load re-downloaded and restarted
+          // the whole site first, which is most of the wait after "Log in".
           const dashboard = staffDestination(loggedInUser?.role);
-          if (dashboard) window.location.href = dashboard;
+          if (dashboard) router.push(dashboard);
           else window.location.reload();
         }
       }
