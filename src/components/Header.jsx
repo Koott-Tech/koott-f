@@ -399,8 +399,6 @@ export default function Header() {
       router.push('/psychologist');
     } else if (user?.role === 'finance') {
       router.push('/finance'); // Redirect finance role to finance dashboard
-    } else if (user?.role === 'event_organizer') {
-      router.push('/event-organizer');
     } else {
       router.push('/profile');
     }
