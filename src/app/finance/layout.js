@@ -23,8 +23,7 @@ import {
 } from 'lucide-react';
 import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
-import { financeApi } from '@/lib/backendApi';
-import { formatIstCalendarYmd, istCalendarMonthBounds } from '@/lib/istCalendarDates';
+
 
 // Cache removed - always fetch fresh data from API
 
@@ -40,16 +39,9 @@ export default function FinanceLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   
-  // Initialize header stats - no caching, always fetch fresh data
-  const [headerStats, setHeaderStats] = useState({
-    total_revenue: 0,
-    net_profit: 0,
-    total_expenses: 0,
-    pending_payouts: 0,
-    total_sessions: 0,
-    total_doctor_wallet: 0
-  });
-  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  // (The layout used to fetch the whole finance dashboard on every finance page, and again
+  // every 5 minutes, into header stats that nothing displays — the heaviest finance call,
+  // twice on /finance itself. Removed; each page loads its own data.)
 
   useEffect(() => {
     if (!authLoading) {
@@ -65,42 +57,7 @@ export default function FinanceLayout({ children }) {
     }
   }, [authLoading, isAuthenticated, hasRole, router]);
 
-  // Load header stats - always fetch fresh data (no caching)
-  useEffect(() => {
-    const loadHeaderStats = async () => {
-      try {
-        setIsLoadingStats(true);
-        
-        const b = istCalendarMonthBounds(new Date());
-        const dates = { from: formatIstCalendarYmd(b.from), to: formatIstCalendarYmd(b.to) };
-        const response = await financeApi.getDashboard({
-          dateFrom: dates.from,
-          dateTo: dates.to,
-          includeCharts: false,
-        });
-        if (response.success && response.data?.summary) {
-          const stats = response.data.summary;
-          setHeaderStats(stats);
-        }
-      } catch (err) {
-        console.error('Failed to load header stats:', err);
-      } finally {
-        setIsLoadingStats(false);
-      }
-    };
 
-    if (!authLoading && (hasRole('finance') || hasRole('admin') || hasRole('superadmin'))) {
-      // Always load fresh data (no cache)
-      loadHeaderStats();
-      
-      // Header numbers do not need heavy polling; detail pages refresh their own data.
-      const interval = setInterval(() => {
-        loadHeaderStats();
-      }, 5 * 60 * 1000);
-      
-      return () => clearInterval(interval);
-    }
-  }, [authLoading, hasRole]);
 
   const handleLogout = () => {
     logout();

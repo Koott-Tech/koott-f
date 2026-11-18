@@ -314,6 +314,10 @@ export default function HeroSection({ therapyType = "individual", cmsData = null
                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 50vw"
                      style={{ objectPosition: 'center center' }}
                      onError={(e) => {
+                       // Try the fallback once only: /kids.png is not in public/, so it fails
+                       // too, and re-setting it on every error looped thousands of requests.
+                       if (e.target.dataset.fallbackTried) return;
+                       e.target.dataset.fallbackTried = '1';
                        console.error('Image failed to load:', currentContent.image);
                        e.target.src = '/kids.png'; // Fallback image
                      }}
