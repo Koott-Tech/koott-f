@@ -32,7 +32,8 @@ import {
   ClipboardList,
   Ticket,
   PhoneCall,
-  Target
+  Target,
+  Scale
 } from 'lucide-react';
 import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
@@ -138,6 +139,9 @@ export default function SuperAdminLayout({ children }) {
         { name: 'Groups', href: '/superadmin/finance/groups', icon: Users },
         { name: 'Expenses', href: '/superadmin/finance/expenses', icon: Receipt },
         { name: 'Income', href: '/superadmin/finance/income', icon: TrendingUp },
+        { name: 'Profit & Loss', href: '/superadmin/finance/profit-loss', icon: TrendingUp },
+        { name: 'Balance Sheet', href: '/superadmin/finance/balance-sheet', icon: Scale },
+        { name: 'Fixed Assets', href: '/superadmin/finance/assets', icon: Package },
       ]
     },
     {

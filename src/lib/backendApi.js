@@ -2318,6 +2318,48 @@ export const financeApi = {
     return apiRequest('/finance/targets', { method: 'PUT', body: JSON.stringify(data) });
   },
 
+  // ---- Profit & Loss, Balance Sheet, Fixed Assets
+  async getProfitLoss({ from, to, compare } = {}) {
+    const q = new URLSearchParams();
+    if (from) q.set('from', from);
+    if (to) q.set('to', to);
+    if (compare) q.set('compare', 'previous');
+    return apiRequest(`/finance/reports/profit-loss?${q}`);
+  },
+  async getBalanceSheet(asOf) {
+    return apiRequest(`/finance/reports/balance-sheet${asOf ? `?as_of=${asOf}` : ''}`);
+  },
+  async getFixedAssets(asOf) {
+    return apiRequest(`/finance/assets${asOf ? `?as_of=${asOf}` : ''}`);
+  },
+  async createFixedAsset(data) {
+    return apiRequest('/finance/assets', { method: 'POST', body: JSON.stringify(data) });
+  },
+  async updateFixedAsset(id, data) {
+    return apiRequest(`/finance/assets/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+  },
+  async deleteFixedAsset(id) {
+    return apiRequest(`/finance/assets/${id}`, { method: 'DELETE' });
+  },
+  async fixedAssetFromExpense(expenseId, data = {}) {
+    return apiRequest(`/finance/assets/from-expense/${expenseId}`, { method: 'POST', body: JSON.stringify(data) });
+  },
+  async getBalanceItems(asOf) {
+    return apiRequest(`/finance/balance-items${asOf ? `?as_of=${asOf}` : ''}`);
+  },
+  async saveBalanceItem(data, id) {
+    return apiRequest(id ? `/finance/balance-items/${id}` : '/finance/balance-items', { method: id ? 'PUT' : 'POST', body: JSON.stringify(data) });
+  },
+  async deleteBalanceItem(id) {
+    return apiRequest(`/finance/balance-items/${id}`, { method: 'DELETE' });
+  },
+  async getExpenseGroups() {
+    return apiRequest('/finance/expense-groups');
+  },
+  async setExpenseGroup(name, plGroup) {
+    return apiRequest('/finance/expense-groups', { method: 'PUT', body: JSON.stringify({ name, pl_group: plGroup || null }) });
+  },
+
   async updateExpense(expenseId, data) {
     return apiRequest(`/finance/expenses/${expenseId}`, {
       method: 'PUT',

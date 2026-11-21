@@ -21,6 +21,8 @@ import {
   Users,
   ClipboardList,
   Target,
+  Scale,
+  Package,
 } from 'lucide-react';
 import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
@@ -73,6 +75,9 @@ export default function FinanceLayout({ children }) {
     { name: 'Groups', href: '/finance/groups', icon: Users },
     { name: 'Users', href: '/finance/users', icon: Users },
     { name: 'Expenses', href: '/finance/expenses', icon: Receipt },
+    { name: 'Profit & Loss', href: '/finance/profit-loss', icon: TrendingUp },
+    { name: 'Balance Sheet', href: '/finance/balance-sheet', icon: Scale },
+    { name: 'Fixed Assets', href: '/finance/assets', icon: Package },
     { name: 'Income', href: '/finance/income', icon: DollarSign },
     { name: 'Payouts', href: '/finance/payouts', icon: CreditCard },
     { name: 'Receipts', href: '/finance/receipts', icon: FileText },
