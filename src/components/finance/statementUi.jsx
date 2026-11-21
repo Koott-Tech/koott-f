@@ -56,3 +56,32 @@ export function Notice({ tone = 'amber', children }) {
   const c = tone === 'red' ? 'bg-red-50 border-red-200 text-red-800' : tone === 'green' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-900';
   return <div className={`rounded-lg border px-3 py-2 text-sm mb-4 ${c}`}>{children}</div>;
 }
+
+/**
+ * Period filter for finance lists (Expenses, Income…): nothing is ever removed when a new month
+ * starts; pick an earlier period to see it. value = { key, from, to } (from/to null = all time).
+ */
+export const PERIODS = [['this_month', 'This month'], ['last_month', 'Last month'], ['this_fy', 'This financial year'], ['last_fy', 'Last financial year'], ['all', 'All time'], ['custom', 'Custom']];
+export function periodValue(key, today = todayIST()) {
+  if (key === 'all') return { key, from: null, to: null };
+  const r = presetRange(key, today);
+  return { key, from: r.from, to: r.to };
+}
+export function PeriodFilter({ value, onChange }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <select aria-label="Period" value={value.key} onChange={(e) => onChange(e.target.value === 'custom' ? { key: 'custom', from: value.from || presetRange('this_month').from, to: value.to || todayIST() } : periodValue(e.target.value))}
+        className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white">
+        {PERIODS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+      </select>
+      {value.key === 'custom' && (
+        <>
+          <input type="date" aria-label="From" value={value.from || ''} onChange={(e) => e.target.value && onChange({ ...value, from: e.target.value })} className="px-2 py-1.5 border border-gray-300 rounded-lg text-sm bg-white" />
+          <span className="text-sm text-gray-500">to</span>
+          <input type="date" aria-label="To" value={value.to || ''} onChange={(e) => e.target.value && onChange({ ...value, to: e.target.value })} className="px-2 py-1.5 border border-gray-300 rounded-lg text-sm bg-white" />
+        </>
+      )}
+    </div>
+  );
+}
+export const periodLabel = (v) => (v.key === 'all' ? 'All time' : v.from && v.to ? `${fmtDate(v.from)} – ${fmtDate(v.to)}` : '');

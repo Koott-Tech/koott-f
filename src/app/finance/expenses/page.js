@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Receipt, Plus, Check, X, Edit, Trash2, MoreVertical, Eye } from 'lucide-react';
 import { financeApi } from '@/lib/backendApi';
 import RazorpaySettlementPanel from '@/components/finance/RazorpaySettlement';
+import { PeriodFilter, periodValue, periodLabel } from '@/components/finance/statementUi';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
@@ -30,6 +31,8 @@ export default function FinanceExpenses() {
   const [approvingExpenseId, setApprovingExpenseId] = useState(null);
   const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState('subscription'); // 'subscription' or 'additional'
+  // Old months stay in the database; pick an earlier period to see them.
+  const [period, setPeriod] = useState(() => periodValue('this_month'));
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     category: '',
@@ -65,7 +68,7 @@ export default function FinanceExpenses() {
       setIsLoading(true);
       setError(null);
 
-      const response = await financeApi.getExpenses({ expenseType: activeTab });
+      const response = await financeApi.getExpenses({ expenseType: activeTab, ...(period.from ? { dateFrom: period.from, dateTo: period.to } : {}), limit: 2000 });
       
       if (response.success) {
         setExpenses(response.data.expenses || []);
@@ -84,7 +87,7 @@ export default function FinanceExpenses() {
     if (!authLoading && (isAuthenticated() && (hasRole('finance') || hasRole('admin') || hasRole('superadmin')))) {
       loadExpenses();
     }
-  }, [activeTab]);
+  }, [activeTab, period]);
 
   const loadCategories = async () => {
     try {
@@ -267,6 +270,14 @@ export default function FinanceExpenses() {
           </div>
         ) : (
           <>
+            {/* Period: earlier months are kept, pick one to see them */}
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <PeriodFilter value={period} onChange={setPeriod} />
+              <p className="text-sm text-gray-600">
+                {periodLabel(period)} · {expenses.length} {activeTab === 'subscription' ? 'subscription' : 'additional'} expense{expenses.length === 1 ? '' : 's'} · ₹{Math.round(expenses.reduce((s, e) => s + (parseFloat(e.total_amount || e.amount) || 0), 0)).toLocaleString('en-IN')}
+              </p>
+            </div>
+
             {/* Tabs */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 sm:mb-6">
               <div className="flex border-b border-gray-200">

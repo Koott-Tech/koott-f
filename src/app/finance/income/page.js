@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { DollarSign, Plus, Edit, Trash2, MoreVertical, X, Loader2, AlertTriangle } from 'lucide-react';
 import { financeApi } from '@/lib/backendApi';
 import { useNotification } from '@/contexts/NotificationContext';
+import { PeriodFilter, periodValue, periodLabel } from '@/components/finance/statementUi';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,8 @@ import {
 export default function FinanceIncome() {
   const { showError, showSuccess } = useNotification();
   const [income, setIncome] = useState([]);
+  // Old months stay in the database; pick an earlier period to see them.
+  const [period, setPeriod] = useState(() => periodValue('this_month'));
   const [isLoading, setIsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -44,14 +47,16 @@ export default function FinanceIncome() {
   };
 
   useEffect(() => {
-    loadIncome();
     loadSources();
   }, []);
+  useEffect(() => {
+    loadIncome();
+  }, [period]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadIncome = async () => {
     try {
       setIsLoading(true);
-      const response = await financeApi.getIncome();
+      const response = await financeApi.getIncome({ ...(period.from ? { dateFrom: period.from, dateTo: period.to } : {}), limit: 2000 });
       if (response.success) {
         setIncome(response.data.income || []);
       } else {
@@ -170,6 +175,7 @@ export default function FinanceIncome() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="text-base font-semibold text-gray-900">Income</div>
+            <div className="mt-2"><PeriodFilter value={period} onChange={setPeriod} /></div>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
@@ -188,6 +194,7 @@ export default function FinanceIncome() {
             </div>
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Income</p>
           </div>
+          <p className="text-xs text-gray-500 -mt-2 mb-2">{periodLabel(period)} · {income.length} entr{income.length === 1 ? 'y' : 'ies'}</p>
           <div className="text-xl font-semibold text-gray-900">
             ₹{totalIncome.toLocaleString('en-IN')}
           </div>
