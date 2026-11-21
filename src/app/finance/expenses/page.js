@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Receipt, Plus, Check, X, Edit, Trash2, MoreVertical, Eye } from 'lucide-react';
 import { financeApi } from '@/lib/backendApi';
+import RazorpaySettlementPanel from '@/components/finance/RazorpaySettlement';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
@@ -257,6 +258,9 @@ export default function FinanceExpenses() {
           </button>
         </div>
 
+        {/* Razorpay payouts: collected − received = Razorpay fee, saved as an expense */}
+        <RazorpaySettlementPanel onSaved={() => { if (activeTab === 'additional') loadExpenses(); else setActiveTab('additional'); }} />
+
         {error ? (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
             <p className="text-red-700">{error}</p>
@@ -480,6 +484,7 @@ export default function FinanceExpenses() {
                     <option value="cheque">Cheque</option>
                     <option value="upi">UPI</option>
                     <option value="card">Card</option>
+                    <option value="razorpay">Razorpay (deducted from payout)</option>
                   </select>
                 </div>
                 <div>
@@ -637,6 +642,7 @@ export default function FinanceExpenses() {
                     <option value="cheque">Cheque</option>
                     <option value="upi">UPI</option>
                     <option value="card">Card</option>
+                    <option value="razorpay">Razorpay (deducted from payout)</option>
                   </select>
                 </div>
                 <div>

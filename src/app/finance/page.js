@@ -33,6 +33,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, Cart
 import DateRangePicker from '@/components/ui/date-range-picker';
 import { Filter } from 'lucide-react';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
+import RazorpaySettlementPanel from '@/components/finance/RazorpaySettlement';
 import {
   formatIstCalendarYmd,
   istCalendarMonthBounds,
@@ -957,11 +958,14 @@ export default function FinanceDashboard() {
           </div>
         </div>
 
+        {/* Razorpay payouts so far (fees are recorded as expenses when Razorpay settles) */}
+        <RazorpaySettlementPanel compact />
+
         {/* Row 4: how the money came in — Razorpay (fee kept, rest settled later) vs direct */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
           <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
             <div className="text-base font-semibold text-gray-900">How the money came in</div>
-            <p className="text-xs text-gray-500">Razorpay fees come off net profit. Therapist shares don&apos;t change.</p>
+            <p className="text-xs text-gray-500">Razorpay&apos;s fee reaches net profit as an expense when the payout is recorded. Therapist shares don&apos;t change.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="rounded-lg border border-gray-200 p-4">
@@ -975,16 +979,15 @@ export default function FinanceDashboard() {
               <p className="text-xs text-gray-500">Website checkout + payment links</p>
             </div>
             <div className="rounded-lg border border-gray-200 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Razorpay fees</p>
-              <p className="mt-1 text-lg sm:text-xl font-semibold text-amber-700">₹{Math.round(stats.razorpay_fees || 0).toLocaleString('en-IN')}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Razorpay fees (this period)</p>
+              <p className="mt-1 text-lg sm:text-xl font-semibold text-amber-700">₹{Math.round(stats.razorpay_fees_recorded || 0).toLocaleString('en-IN')}</p>
               <p className="text-xs text-gray-500">
-                {stats.razorpay_fees_estimated > 0
-                  ? `₹${Math.round(stats.razorpay_fees_estimated).toLocaleString('en-IN')} estimated at ${stats.razorpay_fee_percent ?? 2.36}%`
-                  : 'Fee + GST, as Razorpay charged'}
+                Recorded as expenses · expected ₹{Math.round(stats.razorpay_fees || 0).toLocaleString('en-IN')}
+                {stats.razorpay_fees_estimated > 0 ? ` (part estimated at ${stats.razorpay_fee_percent ?? 2.36}%)` : ''}
               </p>
             </div>
             <div className="rounded-lg border border-gray-200 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Razorpay pays out</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Expected from Razorpay</p>
               <p className="mt-1 text-lg sm:text-xl font-semibold text-gray-900">₹{Math.round(Math.max(0, (stats.revenue_razorpay || 0) - (stats.razorpay_fees || 0))).toLocaleString('en-IN')}</p>
               <p className="text-xs text-gray-500">After fees, settled in a few days</p>
             </div>

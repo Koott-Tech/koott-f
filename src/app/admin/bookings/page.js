@@ -1310,16 +1310,21 @@ export default function BookingsPage() {
                         }
                         return <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium capitalize ${colour}`}>{label}</span>;
                       })()}
-                      {/* Payment method badge */}
-                      {(() => {
-                        let pm = null;
-                        if (String(booking.source || '').toLowerCase() === 'admin_manual') pm = 'Manual';
-                        else if (parseFloat(booking.price || '0') === 0) pm = 'Free';
-                        else if (booking.payment_id) pm = 'Razorpay';
-                        if (!pm) return null;
-                        const isManual = pm === 'Manual';
-                        return <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${isManual ? 'bg-orange-50 text-orange-700' : 'bg-emerald-50 text-emerald-700'}`}>{pm}</span>;
-                      })()}
+                      {/* Booked by hand (Admin/Operations) */}
+                      {String(booking.source || '').toLowerCase() === 'admin_manual' && (
+                        <span className="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-orange-50 text-orange-700">Manual</span>
+                      )}
+                      {/* How the money came in: Razorpay (fee kept by Razorpay) or Bank (direct) */}
+                      {booking.payment_channel ? (
+                        <span
+                          className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${booking.payment_channel === 'razorpay' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}`}
+                          title={booking.payment_channel === 'razorpay' ? 'Paid through Razorpay (Razorpay keeps its fee)' : 'Paid straight to the company bank / UPI'}
+                        >
+                          {booking.payment_channel === 'razorpay' ? 'Razorpay' : 'Bank'}
+                        </span>
+                      ) : parseFloat(booking.price || '0') === 0 ? (
+                        <span className="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-600">Free</span>
+                      ) : null}
                       {booking.status === 'rescheduled' && booking.original_scheduled_date && (
                         <span className="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-amber-50 text-amber-700">
                           Was: {formatDate(booking.original_scheduled_date)}
@@ -1666,6 +1671,11 @@ export default function BookingsPage() {
                   ['Time', formatTime(selectedSession.scheduled_time)],
                   ...(selectedSession.status === 'rescheduled' && selectedSession.original_scheduled_date ? [['Original Date', formatDate(selectedSession.original_scheduled_date)]] : []),
                   ['Price', selectedSession.price != null ? `₹${selectedSession.price}` : '—'],
+                  ['Received Through', !selectedSession.payment_channel
+                    ? (parseFloat(selectedSession.price || '0') === 0 ? 'Free / part of a package' : '—')
+                    : selectedSession.payment_channel === 'razorpay'
+                      ? `Razorpay (fee ₹${Number(selectedSession.gateway_fee || 0).toLocaleString('en-IN')}${selectedSession.gateway_fee_estimated ? ', estimated' : ''})`
+                      : 'Bank / UPI (direct, no fee)'],
                   ['Session Type', selectedSession.package_id || selectedSession.package ? adminPackageDisplayLabel(selectedSession.package || {}) : 'Individual'],
                   ['Booked at', formatBookedAt(sessionBookedAtIso(selectedSession))],
                   ['Session ID', `#${selectedSession.id?.slice(0, 8)}`],

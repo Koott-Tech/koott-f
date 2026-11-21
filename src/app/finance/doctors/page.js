@@ -1059,6 +1059,7 @@ export default function FinanceDoctors() {
                         <th className="text-left px-3 py-2 font-medium">Email</th>
                         <th className="text-left px-3 py-2 font-medium">Booked At (IST)</th>
                         <th className="text-left px-3 py-2 font-medium">Session Date</th>
+                        <th className="text-left px-3 py-2 font-medium">Paid Via</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1084,6 +1085,9 @@ export default function FinanceDoctors() {
                             <td className="px-3 py-2 text-slate-700">{row?.client?.email || '—'}</td>
                             <td className="px-3 py-2 text-slate-700">{bookedDate}</td>
                             <td className="px-3 py-2 text-slate-700">{sessionDate}</td>
+                            <td className="px-3 py-2 text-slate-700">
+                              {row?.payment_channel === 'razorpay' ? 'Razorpay' : row?.payment_channel === 'direct' ? 'Bank / UPI' : '—'}
+                            </td>
                           </tr>
                         );
                       })}

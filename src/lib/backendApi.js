@@ -2286,6 +2286,20 @@ export const financeApi = {
     });
   },
 
+  // Razorpay payout reached the bank: { date, gross, received, reference_number?, notes? }.
+  // gross − received is saved as a "Razorpay fees" expense.
+  async createRazorpaySettlement(data) {
+    return apiRequest('/finance/razorpay-settlements', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Collected via Razorpay, settled so far, fees recorded, still with Razorpay.
+  async getRazorpaySettlementSummary() {
+    return apiRequest('/finance/razorpay-settlements/summary');
+  },
+
   async updateExpense(expenseId, data) {
     return apiRequest(`/finance/expenses/${expenseId}`, {
       method: 'PUT',
