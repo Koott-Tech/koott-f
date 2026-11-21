@@ -957,6 +957,43 @@ export default function FinanceDashboard() {
           </div>
         </div>
 
+        {/* Row 4: how the money came in — Razorpay (fee kept, rest settled later) vs direct */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
+            <div className="text-base font-semibold text-gray-900">How the money came in</div>
+            <p className="text-xs text-gray-500">Razorpay fees come off net profit. Therapist shares don&apos;t change.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-lg border border-gray-200 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Direct to bank / UPI</p>
+              <p className="mt-1 text-lg sm:text-xl font-semibold text-emerald-700">₹{Math.round(stats.revenue_direct || 0).toLocaleString('en-IN')}</p>
+              <p className="text-xs text-gray-500">No fee</p>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Through Razorpay</p>
+              <p className="mt-1 text-lg sm:text-xl font-semibold text-indigo-700">₹{Math.round(stats.revenue_razorpay || 0).toLocaleString('en-IN')}</p>
+              <p className="text-xs text-gray-500">Website checkout + payment links</p>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Razorpay fees</p>
+              <p className="mt-1 text-lg sm:text-xl font-semibold text-amber-700">₹{Math.round(stats.razorpay_fees || 0).toLocaleString('en-IN')}</p>
+              <p className="text-xs text-gray-500">
+                {stats.razorpay_fees_estimated > 0
+                  ? `₹${Math.round(stats.razorpay_fees_estimated).toLocaleString('en-IN')} estimated at ${stats.razorpay_fee_percent ?? 2.36}%`
+                  : 'Fee + GST, as Razorpay charged'}
+              </p>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Razorpay pays out</p>
+              <p className="mt-1 text-lg sm:text-xl font-semibold text-gray-900">₹{Math.round(Math.max(0, (stats.revenue_razorpay || 0) - (stats.razorpay_fees || 0))).toLocaleString('en-IN')}</p>
+              <p className="text-xs text-gray-500">After fees, settled in a few days</p>
+            </div>
+          </div>
+          {stats.revenue_no_payment > 0 && (
+            <p className="mt-3 text-xs text-gray-500">₹{Math.round(stats.revenue_no_payment).toLocaleString('en-IN')} of revenue has no payment record (for example older package sessions), so it isn&apos;t in either group.</p>
+          )}
+        </div>
+
         {/* Charts Section Toggle */}
         {!showCharts && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">

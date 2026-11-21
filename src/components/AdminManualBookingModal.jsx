@@ -236,7 +236,11 @@ export default function AdminManualBookingModal({
     const d = String(now.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   });
-  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [paymentMethod, setPaymentMethod] = useState('upi');
+  // Razorpay payment link: Razorpay keeps a fee and settles the rest later. Fee is optional
+  // (left blank, finance estimates it until the real fee is entered).
+  const [gatewayFee, setGatewayFee] = useState('');
+  const viaRazorpay = paymentMethod === 'razorpay_link';
   const [paymentScreenshotUrl, setPaymentScreenshotUrl] = useState('');
   const [paymentScreenshotName, setPaymentScreenshotName] = useState('');
   const [isUploadingPaymentScreenshot, setIsUploadingPaymentScreenshot] = useState(false);
@@ -387,7 +391,8 @@ export default function AdminManualBookingModal({
     const m = String(now.getMonth() + 1).padStart(2, '0');
     const d = String(now.getDate()).padStart(2, '0');
     setPaymentReceivedDate(`${y}-${m}-${d}`);
-    setPaymentMethod('cash');
+    setPaymentMethod('upi');
+    setGatewayFee('');
     setPaymentScreenshotUrl('');
     setPaymentScreenshotName('');
     setIsUploadingPaymentScreenshot(false);
@@ -814,6 +819,7 @@ export default function AdminManualBookingModal({
           total_sessions: total,
           total_amount: parseFloat(amount) || 0,
           payment_method: paymentMethod,
+          gateway_fee: viaRazorpay && gatewayFee !== '' ? parseFloat(gatewayFee) : undefined,
           receipt_url: paymentScreenshotUrl || null,
           payment_received_date: paymentReceivedDate,
           notes: notes || null,
@@ -989,6 +995,7 @@ export default function AdminManualBookingModal({
           amount: parseFloat(amount),
           payment_received_date: paymentReceivedDate,
           payment_method: paymentMethod,
+          gateway_fee: viaRazorpay && gatewayFee !== '' ? parseFloat(gatewayFee) : undefined,
           receipt_url: paymentScreenshotUrl || null,
           therapist_commission: therapistCommission ? parseFloat(therapistCommission) : 0,
           notes: notes || null,
@@ -1053,6 +1060,7 @@ export default function AdminManualBookingModal({
         amount: parseFloat(amount),
         payment_received_date: paymentReceivedDate,
         payment_method: paymentMethod,
+        gateway_fee: viaRazorpay && gatewayFee !== '' ? parseFloat(gatewayFee) : undefined,
         receipt_url: paymentScreenshotUrl || null,
         therapist_commission: therapistCommission ? parseFloat(therapistCommission) : 0,
         notes: notes || null,
@@ -1899,16 +1907,40 @@ export default function AdminManualBookingModal({
                 required
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm"
               >
-                <option value="cash">Cash</option>
-                <option value="card">Card (Debit/Credit)</option>
-                <option value="upi">UPI (GPay, PhonePe, etc.)</option>
-                <option value="netbanking">Net Banking</option>
-                <option value="wallet">Wallet (Paytm, etc.)</option>
-                <option value="bank_transfer">Bank Transfer</option>
-                <option value="cheque">Cheque</option>
-                <option value="other">Other</option>
+                <optgroup label="Direct to company account (no fee)">
+                  <option value="upi">UPI to company account</option>
+                  <option value="bank_transfer">Bank transfer</option>
+                  <option value="cash">Cash</option>
+                  <option value="cheque">Cheque</option>
+                  <option value="card">Card (company machine)</option>
+                  <option value="netbanking">Net Banking</option>
+                  <option value="wallet">Wallet (Paytm, etc.)</option>
+                  <option value="other">Other</option>
+                </optgroup>
+                <optgroup label="Through Razorpay (fee deducted)">
+                  <option value="razorpay_link">Razorpay payment link</option>
+                </optgroup>
               </select>
-              <p className="mt-1 text-xs text-slate-500">Method used for manual payment</p>
+              <p className={`mt-1 text-xs ${viaRazorpay ? 'text-amber-700' : 'text-slate-500'}`}>
+                {viaRazorpay
+                  ? 'Razorpay keeps its fee and pays the rest to our account in a few days.'
+                  : 'Lands straight in the company account. No gateway fee.'}
+              </p>
+              {viaRazorpay && (
+                <div className="mt-3">
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Razorpay fee (₹, optional)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={gatewayFee}
+                    onChange={(e) => setGatewayFee(e.target.value)}
+                    placeholder="From the Razorpay dashboard, incl. GST"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm"
+                  />
+                  <p className="mt-1 text-xs text-slate-500">Leave blank and finance uses an estimate until it&apos;s filled in.</p>
+                </div>
+              )}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">

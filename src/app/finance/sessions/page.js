@@ -724,7 +724,19 @@ export default function FinanceSessionsPage() {
                         </span>
                       </td>
                       {/* Price */}
-                      <td className="px-4 py-3 text-gray-700">₹{getPriceDisplayAmount(booking).toLocaleString('en-IN')}</td>
+                      <td className="px-4 py-3 text-gray-700">
+                        ₹{getPriceDisplayAmount(booking).toLocaleString('en-IN')}
+                        {booking.payment_channel && (
+                          <span
+                            className={`ml-1.5 inline-flex rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${booking.payment_channel === 'razorpay' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}`}
+                            title={booking.payment_channel === 'razorpay'
+                              ? `Razorpay: fee ₹${Number(booking.gateway_fee || 0).toLocaleString('en-IN')}${booking.gateway_fee_estimated ? ' (estimated)' : ''}`
+                              : 'Direct to company account, no fee'}
+                          >
+                            {booking.payment_channel === 'razorpay' ? 'Razorpay' : 'Bank'}
+                          </span>
+                        )}
+                      </td>
                       {/* Created at */}
                       <td className="px-4 py-3 text-xs text-gray-400">{formatBookedAt(sessionBookedAtIso(booking))}</td>
                       {/* Actions */}
@@ -1019,10 +1031,26 @@ export default function FinanceSessionsPage() {
                                   if (raw === 'upi') return 'UPI';
                                   if (raw === 'card' || raw === 'card payment') return 'Card';
                                   if (raw === 'netbanking' || raw === 'net banking') return 'Net Banking';
+                                  if (raw === 'razorpay_link' || raw === 'razorpay payment link') return 'Razorpay payment link';
+                                  if (raw === 'bank_transfer' || raw === 'bank transfer') return 'Bank Transfer';
                                   return paymentType || '—';
                                 })()}
                               </div>
                             </div>
+                            {selectedSession.payment?.payment_channel && (
+                              <div>
+                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Received Through</p>
+                                <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900">
+                                  {selectedSession.payment.payment_channel === 'razorpay' ? (
+                                    <>
+                                      Razorpay · fee ₹{Number(selectedSession.payment.gateway_fee || 0).toLocaleString('en-IN')}
+                                      {selectedSession.payment.gateway_fee_estimated ? ' (estimated)' : ''}
+                                      {' · '}we get ₹{Number(selectedSession.payment.net_received || 0).toLocaleString('en-IN')}
+                                    </>
+                                  ) : 'Direct to company account · no fee'}
+                                </div>
+                              </div>
+                            )}
                             {razorpayOrderId && (
                               <div className="md:col-span-2">
                                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Razorpay Order ID</p>
@@ -1065,6 +1093,8 @@ export default function FinanceSessionsPage() {
                                   if (raw === 'card' || raw === 'card payment') return 'Card';
                                   if (raw === 'netbanking' || raw === 'net banking') return 'Net Banking';
                                   if (raw === 'razorpay') return 'Razorpay';
+                                  if (raw === 'razorpay_link' || raw === 'razorpay payment link') return 'Razorpay payment link';
+                                  if (raw === 'bank_transfer' || raw === 'bank transfer') return 'Bank Transfer';
                                   return raw || '—';
                                 })()}
                               </div>
