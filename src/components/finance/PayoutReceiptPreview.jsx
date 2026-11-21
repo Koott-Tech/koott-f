@@ -57,8 +57,9 @@ export default function PayoutReceiptPreview({ payout, month, year, payoutAmount
           doctor: payout.psychologist ? { first_name: payout.psychologist.first_name, last_name: payout.psychologist.last_name, ...(payout.psychologist.email ? { email: payout.psychologist.email } : {}) } : undefined,
         });
         if (!live) return;
-        setData(r.data); setPeriod(r.period);
-        render(r.data);
+        const fixed = { ...r.data, tdsPercent: '10' }; // TDS on therapist payouts is fixed at 10%
+        setData(fixed); setPeriod(r.period);
+        render(fixed);
       } catch (e) {
         if (live) setError(e?.message || 'Could not build the receipt');
       }
@@ -93,7 +94,7 @@ export default function PayoutReceiptPreview({ payout, month, year, payoutAmount
         pdfBase64: pdfBytesToBase64(bytes),
       });
       setBusy('Marking as paid…');
-      const ok = await onConfirm({ tds_percent: t.tdsPercent, receipt_no: data.receiptNo });
+      const ok = await onConfirm({ receipt_no: data.receiptNo });
       if (!ok) setError(`The receipt was emailed to ${data.recipientEmail}, but marking as paid failed. Use Mark as Paid again (the receipt doesn't need to be re-sent).`);
     } catch (e) {
       setError(`Receipt not sent, nothing marked as paid: ${e?.message || 'email failed'}`);
@@ -136,13 +137,7 @@ export default function PayoutReceiptPreview({ payout, month, year, payoutAmount
                   ))}
                   <tr><td colSpan={3} className="pt-2 text-gray-600">Subtotal</td><td className="pt-2 text-right tabular-nums">{inr(t.subtotal)}</td></tr>
                   <tr>
-                    <td colSpan={3} className="py-1 text-gray-600">
-                      <label className="inline-flex items-center gap-2">Less TDS
-                        <input type="number" min="0" max="30" step="0.5" value={data.tdsPercent} aria-label="TDS percent"
-                          onChange={(e) => setData({ ...data, tdsPercent: e.target.value })}
-                          onBlur={() => render(data)} className="w-16 border border-gray-300 rounded-md px-1.5 py-0.5 text-sm" />%
-                      </label>
-                    </td>
+                    <td colSpan={3} className="py-1 text-gray-600">Less TDS (10%)</td>
                     <td className="py-1 text-right tabular-nums">− {inr(t.tds)}</td>
                   </tr>
                   <tr className="border-t-2 border-gray-800 font-semibold"><td colSpan={3} className="py-2">Amount paid to therapist</td><td className="py-2 text-right tabular-nums text-emerald-700">{inr(t.total)}</td></tr>
@@ -155,7 +150,7 @@ export default function PayoutReceiptPreview({ payout, month, year, payoutAmount
                   <span>The receipt subtotal ({inr(t.subtotal)}) doesn&apos;t match the payout on this screen ({inr(payoutAmount)}). Check the sessions before sending.</span>
                 </div>
               )}
-              <p className="text-[11px] text-gray-500">Same receipt as Finance → Receipts. Marking as paid records the TDS above against this payout.</p>
+              <p className="text-[11px] text-gray-500">Same receipt as Finance → Receipts. TDS is fixed at 10%: it is taken from the therapist&apos;s amount and recorded as TDS payable to the government.</p>
             </div>
           )}
 
