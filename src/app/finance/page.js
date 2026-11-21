@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   DollarSign,
@@ -34,6 +34,7 @@ import DateRangePicker from '@/components/ui/date-range-picker';
 import { Filter } from 'lucide-react';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
 import RazorpaySettlementPanel from '@/components/finance/RazorpaySettlement';
+import ForecastTargetCard from '@/components/finance/ForecastTargetCard';
 import {
   formatIstCalendarYmd,
   istCalendarMonthBounds,
@@ -56,6 +57,14 @@ export default function FinanceDashboard() {
   const [showCharts, setShowCharts] = useState(false);
   const [isLoadingCharts, setIsLoadingCharts] = useState(false);
   const [dateRange, setDateRange] = useState(() => istCalendarMonthBounds(new Date()));
+  // Months the date filter covers, for the target & forecast card ("All time" → this month).
+  const forecastMonths = useMemo(() => {
+    const cur = new Date(Date.now() + 330 * 60000).toISOString().slice(0, 7);
+    if (!dateRange || dateRange.all || !hasDateRangeBounds(dateRange)) return { from: cur, to: cur };
+    const f = (formatIstCalendarYmd(dateRange.from) || '').slice(0, 7) || cur;
+    const t = (formatIstCalendarYmd(dateRange.to) || '').slice(0, 7) || f;
+    return { from: f, to: t };
+  }, [dateRange]);
 
   useEffect(() => {
     if (!authLoading) {
@@ -917,6 +926,9 @@ export default function FinanceDashboard() {
             <p className="text-sm text-gray-600">Doctor Total Wallet</p>
           </div>
         </div>
+
+        {/* Target & forecast for the months the filter covers (default: this month) */}
+        <ForecastTargetCard {...forecastMonths} />
 
         {/* Row 3: Payouts, Refunds and Expenses */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
