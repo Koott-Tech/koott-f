@@ -31,7 +31,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { clientApi } from '@/lib/backendApi';
+import { clientApi, publicApi } from '@/lib/backendApi';
 import RescheduleModal from '@/components/RescheduleModal';
 import { useBookingDraft } from '@/components/ResumeBookingCard';
 import { therapistSlug } from '@/components/TherapistProfile';
@@ -191,8 +191,8 @@ function Ticket({ session, draft, client, onUpdate }) {
           <div className="cdb-t-top">
             <span className="cdb-t-brand">Koott · Session ticket</span>
             {paid
-              ? (session.cancel_request
-                ? <span className="cdb-chip cdb-warn">Cancellation requested</span>
+              ? (session.cancel_request || session.change_request
+                ? <span className="cdb-chip cdb-warn">{statusLabel(session, 'Confirmed')}</span>
                 : <span className="cdb-chip cdb-ok">Confirmed</span>)
               : <span className="cdb-chip cdb-warn">Awaiting payment</span>}
           </div>
@@ -288,12 +288,12 @@ function Ticket({ session, draft, client, onUpdate }) {
 }
 
 /**
- * "Update your session": cancel with the 48-hour rule.
- *   48 h or more before -> cancelled and refunded automatically.
- *   Less than 48 h      -> a request goes to our team; the session stays booked until they reply.
+ * "Cancel this session" (refund policy: 24 hours). Opened only 24 h or more before the session:
+ * cancelled at once and refunded automatically. Closer than that the dashboard opens
+ * LateSheet instead (no refund; send a request or talk to Operations on WhatsApp).
  */
-const CANCEL_HOURS = 48;
-function UpdateSheet({ session, onClose, onDone }) {
+const CANCEL_HOURS = 24;
+function UpdateSheet({ session, onClose, onDone, onLate }) {
   const [step, setStep] = useState('view'); // view | confirm | busy | done
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
@@ -315,7 +315,11 @@ function UpdateSheet({ session, onClose, onDone }) {
       setMsg(res?.message || 'Done.');
       setStep('done');
       onDone();
-    } catch (e) { setErr(e?.message || 'Could not cancel. Please try again or message us.'); setStep('view'); }
+    } catch (e) {
+      // Crossed into the last 24 hours while the sheet was open: show the request / WhatsApp popup.
+      if (e?.code === 'WITHIN_24H' && onLate) { onLate(e.message); return; }
+      setErr(e?.message || 'Could not cancel. Please try again or message us.'); setStep('view');
+    }
   };
 
   return (
@@ -339,11 +343,11 @@ function UpdateSheet({ session, onClose, onDone }) {
           </>
         ) : (
           <>
-            <p className="cdb-sheet-note">To move it to another time, message your therapist or our care team.</p>
+            <p className="cdb-sheet-note">To move it to another time instead, use Change date &amp; time.</p>
             <div className="cdb-policy">
               <b>Cancelling</b>
               <span>{CANCEL_HOURS} hours or more before the session: cancelled at once and refunded automatically.</span>
-              <span>Less than {CANCEL_HOURS} hours before: your request goes to our team, and the session stays booked until they reply.</span>
+              <span>Less than {CANCEL_HOURS} hours before: not refunded. You can send a request to our team or talk to us on WhatsApp.</span>
             </div>
             {err && <p className="cdb-sheet-err">{err}</p>}
             {step === 'view' ? (
@@ -451,7 +455,9 @@ function HistoryRow({ session, open, onToggle, onRate }) {
   const d = startOf(session);
   const status = String(session.status || '').toLowerCase();
   const completed = status === 'completed';
-  const label = completed ? 'Completed' : (status === 'cancelled' ? 'Cancelled' : 'No show');
+  const label = completed ? 'Completed'
+    : (status === 'cancelled' || status === 'canceled' ? 'Cancelled'
+      : (session.no_show_by === 'therapist' ? "Therapist couldn't attend" : 'No show'));
   const rating = Number(session.client_rating || session.rating) || 0;
   const note = session.psychologist_notes || session.session_notes || '';
 
@@ -519,6 +525,165 @@ function HistoryRow({ session, open, onToggle, onRate }) {
 
 const ART = '/design/dashboard';
 const CARE_WHATSAPP = '919539007766';
+// Operations' WhatsApp (NEXT_PUBLIC_OPERATIONS_WHATSAPP, digits only); the care number until it's set.
+const OPS_WHATSAPP = String(process.env.NEXT_PUBLIC_OPERATIONS_WHATSAPP || '').replace(/\D/g, '') || CARE_WHATSAPP;
+const opsLink = (text) => `https://wa.me/${OPS_WHATSAPP}?text=${encodeURIComponent(text)}`;
+
+/** Cancel / reschedule / switch on your own: 24 hours or more before the session. */
+const CHANGE_HOURS = 24;
+const hoursToStart = (s) => { const d = startOf(s); return d ? (d.getTime() - Date.now()) / 3600000 : null; };
+const REQUEST_LABEL = { cancel: 'Cancellation requested', reschedule: 'Reschedule requested', switch: 'Therapist change requested' };
+/** Status shown on a session: a request with the team, else the given label. */
+const statusLabel = (s, fallback) => (s?.change_request ? REQUEST_LABEL[s.change_request.kind] || 'Request sent'
+  : (s?.cancel_request ? 'Cancellation requested' : fallback));
+
+const LATE = {
+  cancel: {
+    title: 'Cancel this session?',
+    body: `Your session is less than ${CHANGE_HOURS} hours away. As per our refund policy, a cancellation now is not refunded.`,
+    ask: 'cancel',
+  },
+  reschedule: {
+    title: 'Change date & time',
+    body: `Your session is less than ${CHANGE_HOURS} hours away, so it can't be moved here.`,
+    ask: 'reschedule',
+  },
+  switch: {
+    title: 'Change therapist',
+    body: `Your session is less than ${CHANGE_HOURS} hours away, so the therapist can't be changed here.`,
+    ask: 'switch',
+  },
+};
+
+/**
+ * Less than 24 hours before (or a change only our team can make): two ways forward.
+ *   Send a request  -> a task on the Operations dashboard; the session stays as it is meanwhile.
+ *   Talk on WhatsApp -> opens a chat with Operations with the details filled in.
+ */
+function LateSheet({ session, kind, reason, onClose, onSent }) {
+  const copy = LATE[kind] || LATE.reschedule;
+  const already = session.change_request?.kind === kind;
+  const [step, setStep] = useState(already ? 'sent' : 'view'); // view | busy | sent
+  const [msg, setMsg] = useState(already ? 'Your request is already with our team. We will contact you soon.' : '');
+  const [err, setErr] = useState('');
+  const start = startOf(session);
+  const who = nameOf(session.psychologist);
+  const when = `${dayLabel(start, true)} at ${timeLabel(start)}`;
+  const what = { cancel: 'cancel', reschedule: 'reschedule', switch: 'change the therapist for' }[kind] || 'change';
+  useEffect(() => {
+    const esc = (e) => { if (e.key === 'Escape' && step !== 'busy') onClose(); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, [onClose, step]);
+  const send = async () => {
+    setStep('busy'); setErr('');
+    try {
+      const res = await clientApi.requestSessionChange(session.id, kind);
+      setMsg(res?.message || 'Your request has been sent to our team. We will contact you soon.');
+      setStep('sent');
+      onSent?.();
+    } catch (e) { setErr(e?.message || 'Could not send your request. Please message us on WhatsApp.'); setStep('view'); }
+  };
+  return (
+    <div className="cdb-sheet-bg" role="dialog" aria-modal="true" aria-label={copy.title} onClick={() => step !== 'busy' && onClose()}>
+      <div className="cdb-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="cdb-sheet-head">
+          <h3>{copy.title}</h3>
+          <button type="button" className="cdb-x" onClick={onClose} aria-label="Close" disabled={step === 'busy'}>✕</button>
+        </div>
+        <p className="cdb-sheet-when">{who} · {dayLabel(start, true)} · {timeLabel(start)}</p>
+        <div className={`cdb-late${kind === 'cancel' ? ' cdb-late-warn' : ''}`}>
+          <b>{kind === 'cancel' ? 'No refund' : 'Less than 24 hours to go'}</b>
+          <span>{reason || copy.body}</span>
+        </div>
+        {step === 'sent' ? (
+          <>
+            <p className="cdb-sheet-ok">{msg}</p>
+            <button type="button" className="cdb-btn cdb-primary cdb-full" onClick={onClose}>Close</button>
+          </>
+        ) : (
+          <>
+            <p className="cdb-sheet-note">Your session stays as it is until our team gets back to you.</p>
+            {err && <p className="cdb-sheet-err">{err}</p>}
+            <div className="cdb-late-actions">
+              <button type="button" className="cdb-btn cdb-primary cdb-full" onClick={send} disabled={step === 'busy'}>
+                {step === 'busy' ? 'Sending…' : 'Send a request to our team'}
+              </button>
+              <a className="cdb-btn cdb-full cdb-wa" href={opsLink(`Hi Koott, I'd like to ${what} my session with ${who} on ${when}.`)} target="_blank" rel="noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden><path d="M20.5 3.5A11 11 0 0 0 3.3 17.2L2 22l4.9-1.3A11 11 0 0 0 20.5 3.5Z" /><path d="M8.5 7.5c.3-.6.6-.6 1-.6h.6c.2 0 .4 0 .6.5l.8 1.9c.1.3 0 .5-.1.7l-.5.6c-.2.2-.2.4 0 .7a7 7 0 0 0 3.3 2.9c.3.1.5.1.7-.1l.7-.8c.2-.3.4-.3.7-.2l1.8.9c.3.1.5.2.5.4 0 .9-.6 2-1.6 2.2-1 .2-2.3.1-4.4-1.1a11 11 0 0 1-4.4-4.9c-.5-1.2-.3-2.3.3-3.1Z" /></svg>
+                Talk to Operations on WhatsApp
+              </a>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * "Change therapist", 24 hours or more before a single session: pick another therapist, then a
+ * time from their availability (the reschedule picker with onSubmitOverride). A package
+ * session, or a therapist who costs more than was paid, goes to the team (LateSheet).
+ */
+function SwitchSheet({ session, onClose, onPick, onNeedsTeam }) {
+  const [list, setList] = useState(null);
+  const [err, setErr] = useState('');
+  const paid = Number(session.price) || 0;
+  const isPackage = Boolean(session.package_group_id || Number(session.session_count) > 1 || String(session.session_type || '').toLowerCase().includes('package'));
+  useEffect(() => {
+    let on = true;
+    publicApi.getPsychologists()
+      .then((r) => { if (on) setList(((r?.data?.psychologists) || r?.psychologists || []).filter((p) => String(p.id) !== String(session.psychologist_id))); })
+      .catch((e) => { if (on) { setErr(e?.message || 'Could not load therapists.'); setList([]); } });
+    return () => { on = false; };
+  }, [session.psychologist_id]);
+  useEffect(() => {
+    const esc = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
+  }, [onClose]);
+  useEffect(() => {
+    if (isPackage) onNeedsTeam('This session is part of a package with your therapist, so our team needs to arrange the switch.');
+  }, [isPackage]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (isPackage) return null;
+  return (
+    <div className="cdb-sheet-bg" role="dialog" aria-modal="true" aria-label="Change therapist" onClick={onClose}>
+      <div className="cdb-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="cdb-sheet-head">
+          <h3>Change therapist</h3>
+          <button type="button" className="cdb-x" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <p className="cdb-sheet-note">Choose who you'd like to see instead, then pick a time that suits you. Your session moves to them; nothing else changes.</p>
+        {err && <p className="cdb-sheet-err">{err}</p>}
+        {!list ? <p className="cdb-sheet-note">Loading therapists…</p> : (
+          <div className="cdb-switch-list">
+            {list.map((p) => {
+              const price = Number(p.individual_session_price) || 0;
+              const pricier = paid > 0 && price > paid;
+              return (
+                <button key={p.id} type="button" className="cdb-switch-row"
+                  onClick={() => (pricier
+                    ? onNeedsTeam(`${p.name || 'This therapist'}'s sessions cost more than you paid, so our team needs to arrange this switch.`)
+                    : onPick(p))}>
+                  {p.cover_image_url
+                    ? <img src={p.cover_image_url} alt="" width={44} height={44} />
+                    : <span className="cdb-switch-av">{String(p.name || '?').slice(0, 1)}</span>}
+                  <span className="cdb-switch-t">
+                    <b>{p.name}</b>
+                    <span>{p.designation || 'Therapist'}{price ? ` · ${inr(price)}` : ''}</span>
+                  </span>
+                  <span className="cdb-switch-go">{pricier ? 'Ask our team' : 'Choose'}</span>
+                </button>
+              );
+            })}
+            {!list.length && !err && <p className="cdb-sheet-note">No other therapists are available right now.</p>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 const endOf = (s) => { const d = startOf(s); return d ? new Date(d.getTime() + DURATION(s) * 60000) : null; };
 const typeOf = (s) => (s?.session_type === 'couple' ? 'Couple Therapy' : 'Individual Therapy');
 const inr2 = (n) => `₹${Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -571,7 +736,7 @@ const SessionTile = ({ session }) => (
  * goes to our care team on WhatsApp, as the booking system cannot change either
  * on its own (every session is a Google Meet video call today).
  */
-function ManageMenu({ session, onClose, onReschedule, onCancel }) {
+function ManageMenu({ session, onClose, onReschedule, onCancel, onSwitch }) {
   const ref = useRef(null);
   const start = startOf(session);
   const who = nameOf(session.psychologist);
@@ -589,10 +754,10 @@ function ManageMenu({ session, onClose, onReschedule, onCancel }) {
       sub: <>{dayLabel(start, true)}<i className="cdx-dot" />{hm(start)}</>,
       onClick: () => { onClose(); onReschedule(session); },
     },
-    {
-      key: 'therapist', icon: 'user', title: 'Change therapist', sub: who,
-      href: careLink(`Hi Koott, I'd like to change the therapist for my session with ${who} on ${when}.`),
-    },
+    onSwitch
+      ? { key: 'therapist', icon: 'user', title: 'Change therapist', sub: who, onClick: () => { onClose(); onSwitch(session); } }
+      : { key: 'therapist', icon: 'user', title: 'Change therapist', sub: who,
+        href: careLink(`Hi Koott, I'd like to change the therapist for my session with ${who} on ${when}.`) },
     {
       key: 'attend', icon: 'video-camera', title: 'Change how to attend', sub: 'Video',
       href: careLink(`Hi Koott, I'd like to change how I attend my session with ${who} on ${when}.`),
@@ -625,7 +790,7 @@ function ManageMenu({ session, onClose, onReschedule, onCancel }) {
         </div>
         {onCancel && (
           <button type="button" className="cdx-menu-cancel" onClick={() => { onClose(); onCancel(session); }}>
-            {session.cancel_request ? 'View cancellation request' : 'Cancel this session'}
+            {session.cancel_request || session.change_request?.kind === 'cancel' ? 'View cancellation request' : 'Cancel this session'}
           </button>
         )}
       </div>
@@ -640,7 +805,7 @@ function SessionCard({ session, menuOpen, onMenu, onOpen, children }) {
     <article className="cdx-card">
       <button type="button" className="cdx-open" aria-label={`Session details: ${nameOf(session.psychologist)}, ${dayLabel(start, true)}`} onClick={onOpen} />
       <div className="cdx-card-top">
-        <Who session={session} status={session.cancel_request ? 'Cancellation requested' : 'Upcoming'} id={`c-${session.id}`} />
+        <Who session={session} status={statusLabel(session, 'Upcoming')} id={`c-${session.id}`} />
         <MoreButton open={menuOpen} onClick={onMenu} label="Manage your session" />
       </div>
       <div className="cdx-tiles">
@@ -707,7 +872,7 @@ function SessionDetails({ session, onBack, menu, onMenu, onToast, preview }) {
       <div className="cdx-dcol">
         <section className="cdx-card is-detail">
           <div className="cdx-card-top">
-            <Who session={session} status={session.cancel_request ? 'Cancellation requested' : 'Scheduled'} id={`d-${session.id}`} />
+            <Who session={session} status={statusLabel(session, 'Scheduled')} id={`d-${session.id}`} />
             <MoreButton open={!!menu} onClick={onMenu} label="Manage your session" />
           </div>
           {menu}
@@ -754,7 +919,7 @@ function SessionDetails({ session, onBack, menu, onMenu, onToast, preview }) {
                 </span>
               </div>
               <div className="cdx-log-r">
-                <span className="cdx-paid">{session.cancel_request ? 'Cancellation requested' : 'Scheduled'}</span>
+                <span className="cdx-paid">{statusLabel(session, 'Scheduled')}</span>
                 <span className="cdx-log-d">{dayLabel(start, true)}<i className="cdx-dot" />{hm(start)}</span>
               </div>
             </li>
@@ -813,6 +978,9 @@ export default function ClientDashboard({ client, fixture = null, previewState =
   const [reload, setReload] = useState(0);
   const [menuFor, setMenuFor] = useState(null); // session id whose "Manage your session" is open
   const [moving, setMoving] = useState(null); // session being rescheduled
+  const [late, setLate] = useState(null); // { session, kind, reason }: less than 24 h / needs the team
+  const [switching, setSwitching] = useState(null); // session whose therapist is being changed
+  const [switchTo, setSwitchTo] = useState(null); // { session, therapist }: picking a time with them
   const { draft, slotState } = useBookingDraft();
   const router = useRouter();
   const params = useSearchParams();
@@ -936,12 +1104,23 @@ export default function ClientDashboard({ client, fixture = null, previewState =
     );
   };
 
+  // Cancel / reschedule / switch: on your own 24 hours or more before; closer than that, or when
+  // a request is already with the team, the LateSheet (send a request / WhatsApp Operations).
+  const act = (kind, s) => {
+    if (s.change_request?.kind === kind) return setLate({ session: s, kind });
+    const h = hoursToStart(s);
+    if (h !== null && h < CHANGE_HOURS) return setLate({ session: s, kind });
+    if (kind === 'reschedule') return setMoving(s);
+    if (kind === 'cancel') return setUpdating(s);
+    return setSwitching(s);
+  };
   const menuOf = (s) => (
     <ManageMenu
       session={s}
       onClose={closeMenu}
-      onReschedule={(x) => (fixture ? say('Changing the time opens here on a real booking.') : setMoving(x))}
-      onCancel={fixture ? null : (x) => setUpdating(x)}
+      onReschedule={(x) => (fixture ? say('Changing the time opens here on a real booking.') : act('reschedule', x))}
+      onCancel={fixture ? null : (x) => act('cancel', x)}
+      onSwitch={fixture ? null : (x) => act('switch', x)}
     />
   );
   const say = (text) => { setToast(text); setTimeout(() => setToast(''), 2400); };
@@ -973,12 +1152,39 @@ export default function ClientDashboard({ client, fixture = null, previewState =
       </main>
       {onPreviewChange && <PreviewSwitch state={previewState} onChange={onPreviewChange} />}
       <div className={`cdb-toast${toast ? ' cdb-on' : ''}`} role="status">{toast}</div>
-      {updating && <UpdateSheet session={updating} onClose={() => setUpdating(null)} onDone={() => setReload((n) => n + 1)} />}
+      {updating && (
+        <UpdateSheet
+          session={updating}
+          onClose={() => setUpdating(null)}
+          onDone={() => setReload((n) => n + 1)}
+          onLate={(reason) => { const s = updating; setUpdating(null); setLate({ session: s, kind: 'cancel', reason }); }}
+        />
+      )}
+      {late && <LateSheet session={late.session} kind={late.kind} reason={late.reason} onClose={() => setLate(null)} onSent={() => setReload((n) => n + 1)} />}
+      {switching && (
+        <SwitchSheet
+          session={switching}
+          onClose={() => setSwitching(null)}
+          onPick={(therapist) => { setSwitchTo({ session: switching, therapist }); setSwitching(null); }}
+          onNeedsTeam={(reason) => { const s = switching; setSwitching(null); setLate({ session: s, kind: 'switch', reason }); }}
+        />
+      )}
       <RescheduleModal
         isOpen={!!moving}
         session={moving}
         onClose={() => setMoving(null)}
         onRescheduleSuccess={() => { setMoving(null); setReload((n) => n + 1); }}
+        onCodeError={(e) => { const s = moving; setMoving(null); setLate({ session: s, kind: 'reschedule', reason: e.message }); }}
+      />
+      <RescheduleModal
+        isOpen={!!switchTo}
+        session={switchTo ? { ...switchTo.session, psychologist_id: switchTo.therapist.id, psychologist: switchTo.therapist } : null}
+        title={switchTo ? `Choose a time with ${switchTo.therapist.name || 'your new therapist'}` : ''}
+        submitLabel="Switch therapist"
+        onSubmitOverride={(data) => clientApi.switchTherapist(switchTo.session.id, { psychologist_id: switchTo.therapist.id, new_date: data.new_date, new_time: data.new_time })}
+        onClose={() => setSwitchTo(null)}
+        onRescheduleSuccess={() => { const name = switchTo?.therapist?.name; setSwitchTo(null); setReload((n) => n + 1); say(`Your session is now with ${name || 'your new therapist'}. The new link is on its way.`); }}
+        onCodeError={(e) => { const s = switchTo?.session; setSwitchTo(null); if (s) setLate({ session: s, kind: 'switch', reason: e.message }); }}
       />
     </div>
   );
@@ -1368,6 +1574,20 @@ const CSS = `
 .cdb-danger{background:#b91c1c !important;color:#fff !important;border-color:#b91c1c !important}
 .cdb-confirm p{margin:0 0 12px;font-size:14px;color:#334155;line-height:1.5}
 .cdb-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cdb-late{display:grid;gap:4px;margin:0 0 12px;padding:12px;border-radius:12px;background:#f0f9f4;border:1px solid #cfe8d9;font-size:14px;color:#1e3a2b;line-height:1.45}
+.cdb-late b{font-size:14px}
+.cdb-late.cdb-late-warn{background:#fff7ed;border-color:#fed7aa;color:#7c2d12}
+.cdb-late-actions{display:grid;gap:10px}
+.cdb-wa{border-color:#25d366!important;color:#128c4b!important}
+.cdb-wa svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6}
+.cdb-switch-list{display:grid;gap:8px}
+.cdb-switch-row{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;text-align:left;cursor:pointer}
+.cdb-switch-row:hover{border-color:var(--brand)}
+.cdb-switch-row img,.cdb-switch-av{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:none;background:#eef5f1;display:grid;place-items:center;font-weight:700;color:#14532d}
+.cdb-switch-t{display:grid;gap:2px;flex:1;min-width:0}
+.cdb-switch-t b{font-size:15px;color:#0f172a}
+.cdb-switch-t span{font-size:13px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cdb-switch-go{font-size:13px;font-weight:600;color:var(--brand-ink);white-space:nowrap}
 .cdb-row2 .cdb-btn{justify-content:center}
 .cdb-uc-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
 .cdb-uc-link{border:0;background:none;padding:2px 0;font-size:13px;font-weight:600;color:#b91c1c;cursor:pointer;text-decoration:underline;text-underline-offset:2px}

@@ -156,6 +156,10 @@ const handleResponse = async (response, options = {}) => {
       // Preserve backend message and attach validation details for 400 so UI can show them
       const errorMsg = error?.message || error?.error || `HTTP error! status: ${response.status}`;
       const err = new Error(errorMsg);
+      // Keep the status and the backend's code (e.g. WITHIN_24H / NEEDS_TEAM) for the UI.
+      err.status = response.status;
+      if (error?.code) err.code = error.code;
+      if (error?.kind) err.kind = error.kind;
       if (response.status === 400 && error?.details && Array.isArray(error.details)) {
         err.details = error.details;
       }
@@ -527,6 +531,23 @@ export const clientApi = {
     return apiRequest(`/clients/sessions/${sessionId}/reschedule`, {
       method: 'PUT',
       body: JSON.stringify(rescheduleData),
+    });
+  },
+
+  // Less than 24 h before (or a change only the team can make): ask Operations.
+  // kind: 'cancel' | 'reschedule' | 'switch'
+  async requestSessionChange(sessionId, kind, note) {
+    return apiRequest(`/clients/sessions/${sessionId}/change-request`, {
+      method: 'POST',
+      body: JSON.stringify({ kind, note: note || undefined }),
+    });
+  },
+
+  // 24 h or more before a single session: move it to another therapist at a free time.
+  async switchTherapist(sessionId, { psychologist_id, new_date, new_time }) {
+    return apiRequest(`/clients/sessions/${sessionId}/switch-therapist`, {
+      method: 'POST',
+      body: JSON.stringify({ psychologist_id, new_date, new_time }),
     });
   },
 
@@ -1325,6 +1346,17 @@ export const adminApi = {
     return apiRequest(`/admin/sessions/${id}/complete`, {
       method: 'PATCH',
       body: JSON.stringify({}),
+    });
+  },
+
+  /**
+   * Admin / Operations: mark a session as a no-show and say whose — 'client' (didn't join) or
+   * 'therapist' (didn't join; a fine is planned). Status stays no_show either way.
+   */
+  async markNoShow(id, noShowBy = 'client') {
+    return apiRequest(`/admin/sessions/${id}/no-show`, {
+      method: 'PUT',
+      body: JSON.stringify({ no_show_by: noShowBy === 'therapist' ? 'therapist' : 'client' }),
     });
   },
 

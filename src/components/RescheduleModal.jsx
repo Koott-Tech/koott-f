@@ -13,7 +13,9 @@ const sessionKindOf = (s) => (
     ? 'couple' : 'individual'
 );
 
-export default function RescheduleModal({ isOpen, onClose, session, onRescheduleSuccess }) {
+// onSubmitOverride(rescheduleData) / title / submitLabel: reuse this picker for another action
+// (the client dashboard's "Change therapist" shows the NEW therapist's free times and switches).
+export default function RescheduleModal({ isOpen, onClose, session, onRescheduleSuccess, onSubmitOverride, title, submitLabel, onCodeError }) {
   const tz = clientTimeZone();
   // Calendar state - EXACT same as therapist profile
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -389,7 +391,9 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
         reason: rescheduleReason || undefined
       };
 
-      const response = await clientApi.rescheduleSession(session.id, rescheduleData);
+      const response = onSubmitOverride
+        ? await onSubmitOverride(rescheduleData)
+        : await clientApi.rescheduleSession(session.id, rescheduleData);
       
       if (response.success) {
         // Check if this was a direct reschedule or a request
@@ -416,7 +420,9 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
       }
     } catch (error) {
       console.error('Error rescheduling session:', error);
-      setError('Failed to reschedule session');
+      // Less than 24 h / needs the team: the parent shows its request / WhatsApp popup.
+      if (error?.code && onCodeError) { onCodeError(error); return; }
+      setError(error?.message || 'Failed to reschedule session');
     } finally {
       setIsRescheduling(false);
       setShowApprovalPopup(false);
@@ -437,7 +443,7 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
       <div className="bg-white rounded-none sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl max-h-[100vh] sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-6 border-b">
-          <h4 className="text-sm sm:text-base font-semibold text-gray-900">Reschedule Session</h4>
+          <h4 className="text-sm sm:text-base font-semibold text-gray-900">{title || 'Reschedule Session'}</h4>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -840,7 +846,7 @@ export default function RescheduleModal({ isOpen, onClose, session, onReschedule
                   }
                 }}
               >
-                {isRescheduling ? 'Rescheduling...' : 'Reschedule Session'}
+                {isRescheduling ? 'Please wait…' : (submitLabel || 'Reschedule Session')}
               </button>
 
               {/* New Session Details Preview */}

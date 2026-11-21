@@ -125,6 +125,7 @@ export default function BookingsPage() {
   const [messageToView, setMessageToView] = useState(null);
   const [showNoShowConfirm, setShowNoShowConfirm] = useState(false);
   const [sessionToMarkNoShow, setSessionToMarkNoShow] = useState(null);
+  const [noShowBy, setNoShowBy] = useState('client'); // whose no-show: 'client' | 'therapist'
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -435,16 +436,18 @@ export default function BookingsPage() {
     if (!sessionToMarkNoShow) return;
 
     try {
-      await sessionsApi.markSessionAsNoShow(sessionToMarkNoShow.id, '');
+      // Admin route (Operations may use it too), with whose no-show it was.
+      await adminApi.markNoShow(sessionToMarkNoShow.id, noShowBy);
       
       // Update the booking in the list
       setBookings(prevBookings => 
         prevBookings.map(booking => 
-          booking.id === sessionToMarkNoShow.id ? { ...booking, status: 'no_show' } : booking
+          booking.id === sessionToMarkNoShow.id ? { ...booking, status: 'no_show', no_show_by: noShowBy } : booking
         )
       );
       
-      showSuccess('Session marked as no-show successfully!', 'No-Show Success');
+      showSuccess(noShowBy === 'therapist' ? 'Marked as a therapist no-show.' : 'Marked as a client no-show.', 'No-Show Success');
+      setNoShowBy('client');
       
       // Close details modal if it's open for this session
       if (selectedSession && selectedSession.id === sessionToMarkNoShow.id) {
@@ -466,6 +469,7 @@ export default function BookingsPage() {
   const handleNoShowCancel = () => {
     setShowNoShowConfirm(false);
     setSessionToMarkNoShow(null);
+    setNoShowBy('client');
   };
 
   const handleCancelRefundConfirm = async () => {
@@ -686,7 +690,7 @@ export default function BookingsPage() {
       case 'on_hold':
         return 'On Hold';
       case 'no_show':
-        return 'No Show';
+        return booking?.no_show_by === 'therapist' ? 'No Show (therapist)' : 'No Show (client)';
       case 'rescheduled':
         if (isBookingPastDue(booking)) {
           return 'Pending';
@@ -1733,9 +1737,22 @@ export default function BookingsPage() {
                 <XCircle className="h-6 w-6 text-orange-600 mr-3" />
                 <div className="text-sm font-semibold text-gray-900" role="heading" aria-level={3}>Confirm No Show</div>
               </div>
-              <p className="text-gray-700 mb-6">
-                Are you sure you want to mark this session as no-show? This action cannot be undone.
-              </p>
+              <p className="text-gray-700 mb-3">Who didn&apos;t join this session?</p>
+              <div className="grid gap-2 mb-4" role="radiogroup" aria-label="Who didn't join">
+                {[
+                  ['client', 'Client didn\u2019t join', 'The client missed the session.'],
+                  ['therapist', 'Therapist didn\u2019t join', 'The therapist missed the session (a fine will be added later).'],
+                ].map(([value, label, hint]) => (
+                  <label key={value} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${noShowBy === value ? 'border-orange-500 bg-orange-50' : 'border-gray-200'}`}>
+                    <input type="radio" name="no-show-by" value={value} checked={noShowBy === value} onChange={() => setNoShowBy(value)} className="mt-1" />
+                    <span>
+                      <span className="block text-sm font-semibold text-gray-900">{label}</span>
+                      <span className="block text-xs text-gray-500">{hint}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-gray-500 text-xs mb-6">This can&apos;t be undone.</p>
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={handleNoShowCancel}
@@ -1747,7 +1764,7 @@ export default function BookingsPage() {
                   onClick={handleNoShowConfirm}
                   className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
                 >
-                  Mark as No Show
+                  {noShowBy === 'therapist' ? 'Mark therapist no-show' : 'Mark client no-show'}
                 </button>
               </div>
             </div>
