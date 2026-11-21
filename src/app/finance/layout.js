@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Users,
   ClipboardList,
+  Target,
 } from 'lucide-react';
 import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
@@ -66,6 +67,7 @@ export default function FinanceLayout({ children }) {
 
   const navigation = [
     { name: 'Dashboard', href: '/finance', icon: BarChart3 },
+    { name: 'Targets & Forecast', href: '/finance/targets', icon: Target },
     { name: 'Sessions', href: '/finance/sessions', icon: Calendar },
     { name: 'Doctors', href: '/finance/doctors', icon: Users },
     { name: 'Groups', href: '/finance/groups', icon: Users },

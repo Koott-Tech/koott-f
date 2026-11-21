@@ -31,7 +31,8 @@ import {
   BookOpen,
   ClipboardList,
   Ticket,
-  PhoneCall
+  PhoneCall,
+  Target
 } from 'lucide-react';
 import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
@@ -130,6 +131,7 @@ export default function SuperAdminLayout({ children }) {
       hasSubmenu: true,
       submenu: [
         { name: 'Dashboard', href: '/superadmin/finance', icon: BarChart3 },
+        { name: 'Targets & Forecast', href: '/superadmin/finance/targets', icon: Target },
         { name: 'Sessions', href: '/superadmin/finance/sessions', icon: Calendar },
         { name: 'Payouts', href: '/superadmin/finance/payouts', icon: Wallet },
         { name: 'Doctors', href: '/superadmin/finance/doctors', icon: UserCheck },

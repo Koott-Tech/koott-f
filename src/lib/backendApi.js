@@ -2300,6 +2300,24 @@ export const financeApi = {
     return apiRequest('/finance/razorpay-settlements/summary');
   },
 
+  // Sales forecast + target for months from..to ('YYYY-MM'); default the current month.
+  async getForecast({ from, to } = {}) {
+    const q = new URLSearchParams();
+    if (from) q.set('from', from);
+    if (to) q.set('to', to);
+    return apiRequest(`/finance/forecast${q.toString() ? `?${q}` : ''}`);
+  },
+
+  async getTargets({ from, to } = {}) {
+    const q = new URLSearchParams({ from, to: to || from });
+    return apiRequest(`/finance/targets?${q}`);
+  },
+
+  // { from, to, amount, mode: 'each' | 'split', notes } — amount '' clears those months.
+  async setTargets(data) {
+    return apiRequest('/finance/targets', { method: 'PUT', body: JSON.stringify(data) });
+  },
+
   async updateExpense(expenseId, data) {
     return apiRequest(`/finance/expenses/${expenseId}`, {
       method: 'PUT',
