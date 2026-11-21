@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreditCard, Eye, Check, Clock, Calendar, User, Loader2, MoreVertical, Filter, Receipt, CheckCircle, Download, Pencil, Save, X, Search, Trash2 } from 'lucide-react';
+import { CreditCard, Eye, Check, Clock, Calendar, User, Loader2, MoreVertical, Filter, Receipt, CheckCircle, Download, Pencil, Save, X, Search, Trash2, FileText } from 'lucide-react';
+import PayoutReceiptPreview from '@/components/finance/PayoutReceiptPreview';
 import { financeApi } from '@/lib/backendApi';
 import { useAuth } from '@/contexts/AuthContext';
 import DateRangePicker from '@/components/ui/date-range-picker';
@@ -159,6 +160,7 @@ export default function FinancePayouts() {
   const [activeTab, setActiveTab] = useState('pending');
   const [markingAsPaid, setMarkingAsPaid] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showReceiptPreview, setShowReceiptPreview] = useState(false); // receipt step of Mark as Paid
   const [payoutToMark, setPayoutToMark] = useState(null);
   // True while the confirm dialog is fetching this doctor's real totals (Pending tab loads a
   // listOnly payload whose amounts are null).
@@ -615,8 +617,12 @@ export default function FinancePayouts() {
     }
   };
 
-  const handleConfirmMarkAsPaid = async () => {
-    if (!payoutToMark) return;
+  const handleConfirmMarkAsPaid = async () => { await runMarkAsPaid(); };
+
+  // extra: { tds_percent, receipt_no } when a payout receipt was sent first.
+  const runMarkAsPaid = async (extra = {}) => {
+    if (!payoutToMark) return false;
+    let ok = false;
 
     try {
       setShowConfirmModal(false);
@@ -645,27 +651,33 @@ export default function FinancePayouts() {
         dateFrom,
         dateTo,
         month: pendingMy.month,
-        year: pendingMy.year
+        year: pendingMy.year,
+        ...extra,
       });
 
       if (response.success) {
+        ok = true;
+        setShowReceiptPreview(false);
         // Switch first, then load completed payouts explicitly to avoid stale-tab fetches.
         setActiveTab('completed');
         await loadPayoutPageData('completed');
-      } else {
+      } else if (!extra.receipt_no) {
         alert(response.message || 'Failed to mark payout as paid');
       }
     } catch (err) {
       console.error('Failed to mark payout as paid:', err);
-      alert('Failed to mark payout as paid. Please try again.');
+      if (!extra.receipt_no) alert('Failed to mark payout as paid. Please try again.');
     } finally {
       setMarkingAsPaid(null);
-      setPayoutToMark(null);
+      // Keep the receipt popup (and its payout) open on failure so it can say what happened.
+      if (ok || !extra.receipt_no) setPayoutToMark(null);
     }
+    return ok;
   };
 
   const handleCancelMarkAsPaid = () => {
     setShowConfirmModal(false);
+    setShowReceiptPreview(false);
     setPayoutToMark(null);
   };
 
@@ -1073,13 +1085,22 @@ export default function FinancePayouts() {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-3 justify-end">
+                <div className="flex flex-wrap gap-3 justify-end">
                   <button
                     onClick={handleCancelMarkAsPaid}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Cancel
                   </button>
+                  {activeTab === 'pending' && (
+                    <button
+                      onClick={() => { setShowConfirmModal(false); setShowReceiptPreview(true); }}
+                      disabled={markDetailsLoading}
+                      className="px-4 py-2 border border-[#025545] text-[#025545] rounded-lg hover:bg-emerald-50 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <FileText className="h-4 w-4" />Preview receipt &amp; send
+                    </button>
+                  )}
                   <button
                     onClick={handleConfirmMarkAsPaid}
                     disabled={markDetailsLoading}
@@ -1094,6 +1115,22 @@ export default function FinancePayouts() {
             </div>
           </div>
         )}
+
+        {/* Mark as Paid → payout receipt: preview, then send + mark as paid */}
+        {showReceiptPreview && payoutToMark && (() => {
+          const my = pendingPayoutIstMonthYear(dateRange?.from);
+          return (
+            <PayoutReceiptPreview
+              payout={payoutToMark}
+              month={my.month}
+              year={my.year}
+              payoutAmount={getPayoutDisplayAmount(payoutToMark, 'pending')}
+              onBack={() => { setShowReceiptPreview(false); setShowConfirmModal(true); }}
+              onClose={handleCancelMarkAsPaid}
+              onConfirm={runMarkAsPaid}
+            />
+          );
+        })()}
 
         {/* Payout Details Modal */}
         {selectedPayout && (
