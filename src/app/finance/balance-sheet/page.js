@@ -231,7 +231,7 @@ function ItemForm({ item, hints, onClose, onSaved }) {
               <input type="date" value={f.as_of} onChange={(e) => setF({ ...f, as_of: e.target.value })} required className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
             </label>
           </div>
-          <p className="text-[11px] text-gray-500">Enter the balance on that date, not the change. Use a negative number for items that reduce a section (e.g. drawings, TDS already paid to government).</p>
+          <p className="text-[11px] text-gray-500">Enter the balance on that date, not the change. Use a negative number for items that reduce a section (e.g. drawings). TDS paid to the government is recorded on the TDS page.</p>
           <label className="block text-sm"><span className="block text-xs font-medium text-gray-600 mb-1">Notes (optional)</span>
             <input value={f.notes || ''} onChange={(e) => setF({ ...f, notes: e.target.value })} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </label>

@@ -23,6 +23,7 @@ import {
   Target,
   Scale,
   Package,
+  Landmark,
 } from 'lucide-react';
 import TaskDock from '@/components/tasks/TaskDock';
 import { useAuth } from '@/contexts/AuthContext';
@@ -78,6 +79,7 @@ export default function FinanceLayout({ children }) {
     { name: 'Profit & Loss', href: '/finance/profit-loss', icon: TrendingUp },
     { name: 'Balance Sheet', href: '/finance/balance-sheet', icon: Scale },
     { name: 'Fixed Assets', href: '/finance/assets', icon: Package },
+    { name: 'TDS', href: '/finance/tds', icon: Landmark },
     { name: 'Income', href: '/finance/income', icon: DollarSign },
     { name: 'Payouts', href: '/finance/payouts', icon: CreditCard },
     { name: 'Receipts', href: '/finance/receipts', icon: FileText },

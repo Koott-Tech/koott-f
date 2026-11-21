@@ -2356,6 +2356,16 @@ export const financeApi = {
   async getExpenseGroups() {
     return apiRequest('/finance/expense-groups');
   },
+  // TDS on therapist payouts (fixed 10%): months, quarters, per-therapist totals, deposits.
+  async getTds(fy) {
+    return apiRequest(`/finance/tds${fy ? `?fy=${fy}` : ''}`);
+  },
+  async addTdsDeposit(data) {
+    return apiRequest('/finance/tds/deposits', { method: 'POST', body: JSON.stringify(data) });
+  },
+  async deleteTdsDeposit(id) {
+    return apiRequest(`/finance/tds/deposits/${id}`, { method: 'DELETE' });
+  },
   async setExpenseGroup(name, plGroup) {
     return apiRequest('/finance/expense-groups', { method: 'PUT', body: JSON.stringify({ name, pl_group: plGroup || null }) });
   },
