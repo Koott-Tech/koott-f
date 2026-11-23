@@ -114,14 +114,14 @@ export default function PayoutReceiptPreview({ payout, month, year, payoutAmount
           <button type="button" onClick={onClose} aria-label="Close" className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></button>
         </div>
 
-        <div className="overflow-y-auto p-5 grid gap-5 lg:grid-cols-2">
+        <div className="overflow-y-auto p-4 sm:p-5 grid grid-cols-1 gap-5 lg:grid-cols-2 [&>*]:min-w-0">
           {!data && !error && <div className="lg:col-span-2 flex items-center gap-2 text-sm text-gray-600 py-10 justify-center"><Loader2 className="h-4 w-4 animate-spin" /> Working out the receipt…</div>}
           {data && (
             <div className="space-y-4 text-sm">
               <div className="rounded-lg border border-gray-200 p-3 space-y-1.5">
                 <div className="flex justify-between gap-3"><span className="text-gray-500">To</span><span className="font-medium text-gray-900 text-right">{data.name}<span className="block text-xs font-normal text-gray-500">{data.designation} · {data.location}</span></span></div>
-                <label className="flex justify-between items-center gap-3"><span className="text-gray-500">Email to</span>
-                  <input type="email" value={data.recipientEmail} onChange={(e) => setData({ ...data, recipientEmail: e.target.value, email: e.target.value })} className={`w-64 max-w-full border rounded-md px-2 py-1 text-sm ${emailOk ? 'border-gray-300' : 'border-rose-400'}`} />
+                <label className="flex justify-between items-center gap-3"><span className="text-gray-500 shrink-0">Email to</span>
+                  <input type="email" value={data.recipientEmail} onChange={(e) => setData({ ...data, recipientEmail: e.target.value, email: e.target.value })} className={`w-full max-w-[16rem] min-w-0 border rounded-md px-2 py-1 text-sm ${emailOk ? 'border-gray-300' : 'border-rose-400'}`} />
                 </label>
                 <div className="flex justify-between gap-3"><span className="text-gray-500">Receipt no.</span><span className="font-mono">{data.receiptNo}</span></div>
                 <div className="flex justify-between gap-3"><span className="text-gray-500">Date</span><span>{data.date}</span></div>

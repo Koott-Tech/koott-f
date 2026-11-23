@@ -207,7 +207,7 @@ export default function FinanceExpenses() {
       }
     } catch (err) {
       console.error('Failed to update expense:', err);
-      alert('Failed to update expense. Please try again.');
+      alert(err?.message || 'Failed to update expense. Please try again.');
     }
   };
 
@@ -233,7 +233,7 @@ export default function FinanceExpenses() {
       }
     } catch (err) {
       console.error('Failed to delete expense:', err);
-      alert('Failed to delete expense. Please try again.');
+      alert(err?.message || 'Failed to delete expense. Please try again.');
     }
   };
 

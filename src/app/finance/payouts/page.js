@@ -666,7 +666,7 @@ export default function FinancePayouts() {
       }
     } catch (err) {
       console.error('Failed to mark payout as paid:', err);
-      if (!extra.receipt_no) alert('Failed to mark payout as paid. Please try again.');
+      if (!extra.receipt_no) alert(err?.message || 'Failed to mark payout as paid. Please try again.');
     } finally {
       setMarkingAsPaid(null);
       // Keep the receipt popup (and its payout) open on failure so it can say what happened.
