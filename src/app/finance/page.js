@@ -912,7 +912,7 @@ export default function FinanceDashboard() {
           />
           <StatCard
             title="Net Profit"
-            value={`₹${Math.round(stats.net_profit || 0).toLocaleString('en-IN')}`}
+            value={`${(stats.net_profit || 0) < 0 ? '−' : ''}₹${Math.abs(Math.round(stats.net_profit || 0)).toLocaleString('en-IN')}`}
             icon={TrendingUp}
             color="purple"
           />
