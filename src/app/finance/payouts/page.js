@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreditCard, Eye, Check, Clock, Calendar, User, Loader2, MoreVertical, Filter, Receipt, CheckCircle, Download, Pencil, Save, X, Search, Trash2, FileText } from 'lucide-react';
 import PayoutReceiptPreview from '@/components/finance/PayoutReceiptPreview';
@@ -149,6 +149,7 @@ export default function FinancePayouts() {
   const { user, isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [doctorPayouts, setDoctorPayouts] = useState([]);
+  const everLoaded = useRef(false);
   const [pendingPayoutRows, setPendingPayoutRows] = useState([]);
   const [completedPayoutRows, setCompletedPayoutRows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -711,7 +712,9 @@ export default function FinancePayouts() {
     getPayoutState(payout, 'pending') === 'pending' &&
     (payout?.can_mark_paid === true || getPayoutDisplayAmount(payout, 'pending') > 0);
 
-  if (authLoading || isLoading) {
+  // Full-page spinner only for the first load; filter / tab changes keep the page on screen.
+  if (!isLoading) everLoaded.current = true;
+  if (authLoading || (isLoading && !everLoaded.current)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderBottomColor: '#025545' }}></div>

@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Target, ArrowRight } from 'lucide-react';
 import { financeApi } from '@/lib/backendApi';
+import { cachedRequest } from '@/lib/requestCache';
 
 const inr = (n) => (n == null ? '—' : `₹${Math.round(Number(n) || 0).toLocaleString('en-IN')}`);
 const monthName = (ym) => new Date(`${ym}-01T00:00:00`).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
@@ -21,7 +22,7 @@ export default function ForecastTargetCard({ from, to }) {
   useEffect(() => {
     let live = true;
     setErr('');
-    financeApi.getForecast({ from, to })
+    cachedRequest(`forecast:${from}:${to}`, () => financeApi.getForecast({ from, to }))
       .then((r) => { if (!live) return; if (r?.success) setD(r.data); else setErr(r?.message || 'Could not load the forecast'); })
       .catch((e) => live && setErr(e?.message || 'Could not load the forecast'));
     return () => { live = false; };

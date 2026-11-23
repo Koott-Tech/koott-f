@@ -35,6 +35,7 @@ import { Filter } from 'lucide-react';
 import { hasDateRangeBounds } from '@/lib/dateRangeBounds';
 import RazorpaySettlementPanel from '@/components/finance/RazorpaySettlement';
 import ForecastTargetCard from '@/components/finance/ForecastTargetCard';
+import { cachedRequest } from '@/lib/requestCache';
 import {
   formatIstCalendarYmd,
   istCalendarMonthBounds,
@@ -84,6 +85,9 @@ export default function FinanceDashboard() {
   // Load dashboard data when date range changes (includes initial load) - without charts
   useEffect(() => {
     if (!authLoading && (hasRole('finance') || hasRole('admin') || hasRole('superadmin'))) {
+      // Start the cards' requests now, alongside the dashboard's own (they reuse these answers).
+      cachedRequest(`forecast:${forecastMonths.from}:${forecastMonths.to}`, () => financeApi.getForecast(forecastMonths));
+      cachedRequest('razorpay-summary', () => financeApi.getRazorpaySettlementSummary());
       // Always load - loadDashboardData has fallback for dates
       loadDashboardData(false); // Don't include charts on initial load
       setShowCharts(false); // Reset charts visibility when date range changes
@@ -216,7 +220,8 @@ export default function FinanceDashboard() {
     }
   };
 
-  if (isLoading || authLoading) {
+  // Full-page spinner only for the very first load; changing the dates keeps the page on screen.
+  if (authLoading || (isLoading && !dashboardData)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderBottomColor: '#025545' }}></div>
@@ -856,7 +861,7 @@ export default function FinanceDashboard() {
         <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <div role="heading" aria-level="2" className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-2">Finance Dashboard</div>
-            <p className="text-xs sm:text-sm text-gray-600">Overview of financial performance and key metrics</p>
+            <p className="text-xs sm:text-sm text-gray-600">Overview of financial performance and key metrics{isLoading && <span className="ml-2 text-[#025545]" role="status">· Updating…</span>}</p>
           </div>
           <ExportButton dateRange={dateRange} />
         </div>

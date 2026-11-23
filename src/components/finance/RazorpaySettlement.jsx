@@ -12,6 +12,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Landmark, Plus, X } from 'lucide-react';
 import { financeApi } from '@/lib/backendApi';
+import { cachedRequest } from '@/lib/requestCache';
 
 const inr = (n) => `₹${Math.round(Number(n) || 0).toLocaleString('en-IN')}`;
 const inr2 = (n) => `₹${(Number(n) || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
@@ -22,15 +23,15 @@ export default function RazorpaySettlementPanel({ compact = false, onSaved, refr
   const [loadError, setLoadError] = useState('');
   const [open, setOpen] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (force = false) => {
     try {
-      const r = await financeApi.getRazorpaySettlementSummary();
+      const r = await cachedRequest('razorpay-summary', () => financeApi.getRazorpaySettlementSummary(), { force });
       if (r?.success) { setSummary(r.data); setLoadError(''); } else setLoadError(r?.message || 'Could not load');
     } catch (e) {
       setLoadError(e?.message || 'Could not load');
     }
   }, []);
-  useEffect(() => { load(); }, [load, refreshKey]);
+  useEffect(() => { load(refreshKey > 0); }, [load, refreshKey]);
 
   const tiles = [
     ['Collected via Razorpay', summary?.collected_via_razorpay, 'All successful Razorpay payments'],
@@ -107,7 +108,7 @@ export default function RazorpaySettlementPanel({ compact = false, onSaved, refr
         <SettlementForm
           stillWith={summary?.still_with_razorpay}
           onClose={() => setOpen(false)}
-          onSaved={() => { setOpen(false); load(); onSaved?.(); }}
+          onSaved={() => { setOpen(false); load(true); onSaved?.(); }}
         />
       )}
     </div>

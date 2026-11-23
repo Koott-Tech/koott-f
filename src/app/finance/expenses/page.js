@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Receipt, Plus, Check, X, Edit, Trash2, MoreVertical, Eye } from 'lucide-react';
 import { financeApi } from '@/lib/backendApi';
@@ -19,6 +19,7 @@ export default function FinanceExpenses() {
   const { user, isAuthenticated, hasRole, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [expenses, setExpenses] = useState([]);
+  const everLoaded = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -237,7 +238,9 @@ export default function FinanceExpenses() {
     }
   };
 
-  if (authLoading || isLoading) {
+  // Full-page spinner only for the first load; filter / tab changes keep the page on screen.
+  if (!isLoading) everLoaded.current = true;
+  if (authLoading || (isLoading && !everLoaded.current)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderBottomColor: '#025545' }}></div>
