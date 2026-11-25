@@ -1,51 +1,31 @@
 'use client';
 
 /**
- * /profile/sessions — the client's sessions, the dashboard built to
- * "koott-client-dashboard (2).html" (components/ClientDashboard.jsx). Every link
- * in the app points here, so this is where the design lives; /dashboard renders
- * the same component at its own URL.
+ * /profile/sessions — the client's sessions, the Koott 2.0 "My sessions" screen
+ * (components/sessions2/Sessions2.jsx).
  *
- * ?preview brings up the prototype's state switch and draws the page from
- * fixtures (lib/dashboardPreview) instead of this client's own sessions, so each
- * state can be checked on the real page.
+ * This used to render ClientDashboard, the page built to
+ * "koott-client-dashboard (2).html". That page is still served at /dashboard, and
+ * is still where reschedule and cancel live, with their 24-hour rules and the
+ * popups that explain them — this screen links there rather than keeping a second
+ * copy of those rules. ?preview also still belongs to that page.
  *
  * The page this replaced is kept beside it as legacy-page.jsx (not a route — Next
- * only serves page.js) for the few things it still does that the dashboard does
- * not: reschedule and cancel dialogs, assessment sessions, paging past 50.
+ * only serves page.js).
  */
 
 import { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSearchParams } from 'next/navigation';
 import ClientDashboard from '@/components/ClientDashboard';
-import { PREVIEWS, previewFromParams, showSwitch } from '@/lib/dashboardPreview';
+import Sessions2 from '@/components/sessions2/Sessions2';
+import { previewFromParams } from '@/lib/dashboardPreview';
 
 function SessionsBody() {
-  const { user } = useAuth();
-  const router = useRouter();
-  const params = useSearchParams();
-  const previewState = previewFromParams(params);
-  const profile = user?.profile || {};
-
-  const client = previewState
-    ? { name: 'Faisal Vysam Purath', email: 'faisal@example.com', phone: '+91 98470 00000' }
-    : {
-      name: [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || user?.name || user?.email,
-      email: user?.email || profile.email,
-      phone: profile.phone_number || user?.phone_number,
-    };
-
-  return (
-    <ClientDashboard
-      client={client}
-      fixture={previewState ? PREVIEWS[previewState] : null}
-      previewState={previewState}
-      onPreviewChange={showSwitch(params)
-        ? (next) => router.replace(next ? `/profile/sessions?preview=${next}` : '/profile/sessions', { scroll: false })
-        : null}
-    />
-  );
+  // ?preview draws the old dashboard from fixtures; it is for looking at that
+  // design, so it keeps working here.
+  const preview = previewFromParams(useSearchParams());
+  if (preview) return <ClientDashboard previewState={preview} />;
+  return <Sessions2 />;
 }
 
 export default function SessionsPage() {

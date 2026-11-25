@@ -566,6 +566,11 @@ export const clientApi = {
     });
   },
 
+  // The client's own refunds, read-only (the admin queue is a different route).
+  async getRefunds() {
+    return apiRequest('/clients/refunds', { method: 'GET' });
+  },
+
   // Get client packages
   async getClientPackages() {
     return apiRequest('/clients/packages', {
