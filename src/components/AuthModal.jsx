@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { authApi } from "@/lib/backendApi";
 import { validatePassword } from "@/utils/passwordValidation";
 import CustomSelect from "@/components/CustomSelect";
+import LoginSheet2 from "@/components/login2/LoginSheet2";
 // import { isClientContactComplete } from "@/lib/contactValidation"; // Removed - contact details collected during signup
 // import GoogleSignIn from "@/components/GoogleSignIn"; // Commented out - users login with email/password only
 
@@ -25,6 +26,9 @@ export default function AuthModal({
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState(defaultTab); // 'login' | 'signup'
+  // The sheet from the Koott 2.0 design signs in with a phone code; "Try another way"
+  // opens this email and password form, which is how staff sign in.
+  const [emailMode, setEmailMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -112,6 +116,7 @@ export default function AuthModal({
   useEffect(() => {
     if (open) {
       setActiveTab(defaultTab);
+      setEmailMode(defaultTab === 'signup');
     }
   }, [open, defaultTab]);
 
@@ -129,6 +134,45 @@ export default function AuthModal({
     }
   }, [open, isRemembered]);
 
+  /**
+   * Everything that follows a successful sign-in, whichever way it was made: the
+   * email form here, or the phone code in LoginSheet2. Kept in one place so the two
+   * behave the same — the callback, a booking waiting to resume, and where to go next.
+   */
+  const completeSignIn = useCallback(async (loggedInUser, how) => {
+    authActed.current = true;
+    trackPopup('auth_modal', how);
+    try {
+      await onAuthSuccess?.(loggedInUser);
+    } catch (err) {
+      console.error('Error in onAuthSuccess callback:', err);
+    }
+
+    // Check if there are pending booking details (from therapist profile page or free assessment page)
+    const pendingBooking = localStorage.getItem('pendingBookingDetails');
+    const pendingFreeAssessment = localStorage.getItem('freeAssessmentPendingBooking');
+    const hasPendingBooking = (pendingBooking || pendingFreeAssessment) && preventReload;
+
+    if (hasPendingBooking) {
+      // The parent (therapist profile, free assessment) closes this and resumes the booking.
+      setError("");
+      setSuccessMessage("");
+      setIsLoading(false);
+      setShowForgot(false);
+      setForgotStep(1);
+      return;
+    }
+    closeAndReset();
+    if (preventReload) return;
+    // Every staff role has its own dashboard (lib/staffRoles); clients stay on the page.
+    // Staff and therapists go to their dashboard inside the already-loaded app (the
+    // sign-in is already in AuthContext): a full page load re-downloaded and restarted
+    // the whole site first, which is most of the wait after "Log in".
+    const dashboard = staffDestination(loggedInUser?.role);
+    if (dashboard) router.push(dashboard);
+    else window.location.reload();
+  }, [closeAndReset, onAuthSuccess, preventReload, router]);
+
   const handleLogin = async (e) => {
     e?.preventDefault?.();
     setIsLoading(true);
@@ -142,64 +186,7 @@ export default function AuthModal({
 
       // Pass remember preference - works for all roles
       login(loggedInUser, token, { remember: rememberMe, method: 'email' });
-      authActed.current = true;
-      trackPopup('auth_modal', 'sign_in');
-      // Call onAuthSuccess first, then check for pending booking
-      try { 
-        await onAuthSuccess?.(loggedInUser); 
-      } catch (err) {
-        console.error('Error in onAuthSuccess callback:', err);
-      }
-      
-      // Check if there are pending booking details (from therapist profile page or free assessment page)
-      const pendingBooking = localStorage.getItem('pendingBookingDetails');
-      const pendingFreeAssessment = localStorage.getItem('freeAssessmentPendingBooking');
-      const hasPendingBooking = (pendingBooking || pendingFreeAssessment) && preventReload;
-      
-      if (hasPendingBooking) {
-        console.log('✅ Login successful with pending booking - parent will handle booking flow');
-        // Reset form state but don't close modal yet (parent will close it)
-        setError("");
-        setSuccessMessage("");
-        setIsLoading(false);
-        setShowForgot(false);
-        setForgotStep(1);
-        setOtp("");
-        setNewPassword("");
-        setConfirmNewPassword("");
-        setResetPasswordValidation({ valid: false, unmetRequirements: [] });
-        setShowNewPassword(false);
-        setShowConfirmNewPassword(false);
-        setRememberMe(false);
-        // Reset signup form
-        setSignup({ 
-          fullName: "", 
-                countryCode: "+91", 
-          phoneNumber: "", 
-          email: "", 
-          password: "",
-          clientMessage: "",
-          termsAccepted: false,
-          therapyAgreementAccepted: false
-        });
-        setSignupPasswordValidation({ valid: false, unmetRequirements: [] });
-        setShowEmailExistsMessage(false);
-        // Don't call onClose here - parent (therapist-profile page) will handle closing and booking
-      } else {
-        // Normal login flow (from header or other pages) - no pending booking
-        console.log('✅ Login successful - normal flow, closing modal');
-      closeAndReset();
-      // Reload the page to refresh auth state
-        if (!preventReload) {
-          // Every staff role has its own dashboard (lib/staffRoles); clients stay on the page.
-          // Staff and therapists go to their dashboard inside the already-loaded app (the
-          // sign-in is already in AuthContext): a full page load re-downloaded and restarted
-          // the whole site first, which is most of the wait after "Log in".
-          const dashboard = staffDestination(loggedInUser?.role);
-          if (dashboard) router.push(dashboard);
-          else window.location.reload();
-        }
-      }
+      await completeSignIn(loggedInUser, 'sign_in');
     } catch (err) {
       const msg = err?.message || "Login failed. Please try again.";
       // Check if it's a "user not found" type error - suggest signup
@@ -456,6 +443,18 @@ export default function AuthModal({
     }
   };
 
+  // The Koott 2.0 sign-in sheet: a phone number and a 6-digit code on WhatsApp.
+  if (open && !emailMode) {
+    return (
+      <LoginSheet2
+        open
+        onClose={closeAndReset}
+        onEmailMode={() => { setError(""); setEmailMode(true); }}
+        onSignedIn={(signedIn) => completeSignIn(signedIn, 'sign_in')}
+      />
+    );
+  }
+
   return (
     <div
       className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 px-2"
@@ -606,6 +605,13 @@ export default function AuthModal({
                     <button type="button" onClick={()=>{ setShowForgot(true); setForgotStep(1); setError(""); }} className="text-[#025545] hover:text-black">Forgot password?</button>
                   </div>
                   <button type="submit" disabled={isLoading} className="w-full rounded-md bg-[#025545] px-3 py-2 text-sm font-semibold text-white disabled:opacity-60">{isLoading ? 'Signing in…' : loginButtonText}</button>
+                  <button
+                    type="button"
+                    onClick={()=>{ setError(""); setEmailMode(false); }}
+                    className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm font-semibold text-[#025545] hover:bg-gray-50"
+                  >
+                    Sign in with your phone instead
+                  </button>
                   <div className="text-center mt-3 text-sm text-gray-600">
                     Don&apos;t have an account?{" "}
                     <button
