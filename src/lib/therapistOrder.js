@@ -19,6 +19,8 @@ export async function fetchTherapistOrder(list = 'default', init = {}) {
     return {
       rank: new Map(order.map((o, i) => [String(o.id), i])),
       nextAt: new Map(order.map((o) => [String(o.id), o.nextAvailableAt || null])),
+      // How many free starts are left on that first free day ("+2 slots" on a card).
+      slotsOnDay: new Map(order.map((o) => [String(o.id), o.slotsOnDay ?? null])),
     };
   } catch (_) {
     return null;

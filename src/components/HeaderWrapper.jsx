@@ -11,7 +11,8 @@ export default function HeaderWrapper() {
   
   // Hide global site header on admin, superadmin, psychologist, finance dashboards
   // Note: /online-child-psychologist (listing page) should show header, only /psychologist (dashboard) should hide it
-  const shouldHideCompletely = isDashboardPath(pathname);
+  // The home page (Koott 2.0) draws its own header inside the green hero, with its own menu.
+  const shouldHideCompletely = isDashboardPath(pathname) || pathname === '/';
   
   if (shouldHideCompletely) return null;
   

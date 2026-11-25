@@ -12,7 +12,7 @@
  * left in place and unused so the swap is easy to reverse.
  */
 
-import KoottHome from '@/components/KoottHome';
+import Home2 from '@/components/home2/Home2';
 import { buildMetadata, PAGE_SEO, organizationJsonLd, JsonLd } from '@/lib/seo';
 
 export const metadata = buildMetadata(PAGE_SEO.home);
@@ -21,10 +21,10 @@ export default function Home() {
   return (
     <>
       <JsonLd data={organizationJsonLd()} />
-      {/* Header.jsx is fixed and reserves no space of its own. */}
-      <div style={{ paddingTop: 63 }}>
-        <KoottHome />
-      </div>
+      {/* Koott 2.0 home (Figma "Home (WIP)"). It carries its own header inside the hero,
+          so HeaderWrapper hides the site header on "/". The previous home (KoottHome) is
+          still in the repository, unused, so the swap is easy to reverse. */}
+      <Home2 />
     </>
   );
 }
