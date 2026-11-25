@@ -329,7 +329,7 @@ export const HOME2_CSS = `
 /* ───────── help card (Figma "Help" 8029:23975) ───────── */
 .h2-helpwrap{display:flex;justify-content:center;padding:0 16px 8px;}
 .h2-help{
-  display:flex;align-items:center;gap:14px;width:100%;max-width:370px;padding:16px;
+  display:flex;align-items:center;gap:14px;width:100%;padding:16px;
   border-radius:24px;background:#F5F7F6;
 }
 .h2-help-tile{
@@ -388,49 +388,74 @@ export const HOME2_CSS = `
 .h2-review-name{font-size:14px;font-weight:600;line-height:20px;color:var(--ink);}
 .h2-review-place{font-size:14px;font-weight:400;line-height:20px;color:var(--ink-soft);}
 
-/* ───────── tablet and laptop ───────── */
+/* ───────── tablet and laptop ─────────
+   The 402 px phone screen above is the design. Nothing here redraws it: every component
+   keeps the size Figma gives it, and the page is only given more room — a shared content
+   width so the bands line up, as many therapist cards per row as fit at their real width,
+   and the menu's own links in the bar once there is space for them. */
 @media (min-width:768px){
+  .h2{--h2-gutter:32px;--h2-content:744px;--h2-cardgap:24px;--h2-cardmin:320px;}
   .h2-hero-glow{left:50%;transform:translateX(-50%);width:900px;}
-  .h2-topbar{height:84px;padding:20px 32px;}
+  .h2-topbar{height:84px;padding:20px var(--h2-gutter);}
   .h2-logo{top:30px;}
   .h2-logo img{width:92px;height:28px;}
-  .h2-searchbar{padding:20px 32px 0;display:flex;justify-content:center;}
+  .h2-searchbar{padding:20px var(--h2-gutter) 0;display:flex;justify-content:center;}
   .h2-search{width:100%;max-width:560px;height:52px;}
   .h2-stage{height:360px;}
   .h2-stage-word{top:64px;width:260px;height:115px;}
-  .h2-dots{top:auto;bottom:60px;right:32px;}
+  .h2-dots{top:auto;bottom:60px;right:var(--h2-gutter);}
   .h2-strip{height:32px;font-size:12px!important;}
-  .h2-tabs-scroll{justify-content:center;padding:24px 32px 0;gap:24px;}
+  .h2-tabs-scroll{justify-content:center;padding:24px var(--h2-gutter) 0;gap:24px;}
   .h2-tabs-more{display:none;}
-  /* Cards keep their Figma width (362) at every size; the grid simply fits as many
-     as the viewport holds, up to four, so none is ever squeezed. */
+
+  /* The card keeps its Figma width (362) and is never stretched past it. The row fits as
+     many as the viewport holds — two on a tablet, four at most — and on a narrow tablet
+     the card shrinks a little rather than leaving one card alone in an empty row. */
   .h2-list{
-    display:grid;grid-template-columns:repeat(auto-fill,362px);justify-content:center;
-    align-items:start;gap:24px;padding:40px 32px;max-width:1608px;margin:0 auto;
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--h2-cardmin),1fr));
+    justify-content:center;align-items:start;gap:var(--h2-cardgap);
+    padding:40px var(--h2-gutter);margin:0 auto;
+    max-width:calc(4*362px + 3*var(--h2-cardgap) + 2*var(--h2-gutter));
   }
+  /* The column may be wider than the card; the card stays 362 and sits in the middle of it.
+     (A 362 px max on the column itself would make auto-fill count columns at 362 and drop a
+     768 px tablet to one card a row.) */
+  .h2-list .tc2{justify-self:center;}
   .h2-note,.h2-viewall{grid-column:1 / -1;justify-self:center;}
+
+  /* Each step's artwork sits at fixed offsets inside the 272-wide Figma card, so the card
+     keeps that width and the row wraps instead of scrolling. (As a centred scroller it
+     put step 1 at -36 px — off the left edge, where scrolling could not reach it.) */
   .h2-how{padding:64px 0;}
-  .h2-how-head,.h2-steps{padding:0 32px;}
-  .h2-steps{justify-content:center;}
-  .h2-helpwrap{padding:0 32px 16px;}
-  .h2-help{max-width:744px;}
-  .h2-trust{padding:56px 32px 0;display:flex;justify-content:center;}
-  .h2-trust-panel{width:100%;max-width:744px;padding:32px;}
+  .h2-how-head{padding:0 var(--h2-gutter);align-items:center;text-align:center;}
+  .h2-steps{
+    flex-wrap:wrap;justify-content:center;overflow:visible;
+    gap:16px;padding:0 var(--h2-gutter);
+  }
+
+  /* One content width for every band under the cards, so their edges line up. */
+  .h2-helpwrap{padding:0 var(--h2-gutter) 16px;}
+  .h2-help{max-width:var(--h2-content);}
+  .h2-trust{padding:56px var(--h2-gutter) 0;display:flex;justify-content:center;}
+  .h2-trust-panel{width:100%;max-width:var(--h2-content);padding:32px;}
   .h2-trust-points{flex-direction:row;gap:24px;}
   .h2-point{flex:1;min-width:0;}
   .h2-reviews{margin:0;padding:0;overflow:visible;}
   .h2-review{flex:1;min-width:0;width:auto;}
-  .h2-faq{padding:64px 32px;align-items:center;}
-  .h2-faq .h2-h2,.h2-faq-list{width:100%;max-width:720px;}
-  .h2-cta-wrap{padding:0 32px;}
-  .h2-cta{max-width:720px;margin:0 auto;height:320px;}
+  .h2-faq{padding:64px var(--h2-gutter);align-items:center;}
+  .h2-faq .h2-h2,.h2-faq-list{width:100%;max-width:var(--h2-content);}
+  .h2-cta-wrap{padding:0 var(--h2-gutter);}
+  .h2-cta{width:100%;max-width:var(--h2-content);margin:0 auto;height:320px;}
   .h2-cta-btn{width:auto;min-width:280px;align-self:center;}
 }
 
 @media (min-width:1100px){
-  .h2-topbar{height:88px;padding:24px 56px;}
-  /* On a laptop the logo sits at the left of the bar and the links take the middle,
-     so the hamburger is not needed. */
+  /* A column floor of 356 keeps every desktop card at its full 362: the row only takes
+     another card once that card can be full size, instead of squeezing four to 351. A
+     tablet needs the lower floor above, where shrinking is better than one card alone. */
+  .h2{--h2-gutter:56px;--h2-content:900px;--h2-cardgap:28px;--h2-cardmin:356px;}
+  .h2-topbar{height:88px;}
+  /* The bar is wide enough for the menu's links, so the hamburger is not needed. */
   .h2-burger{display:none;}
   .h2-logo{position:static;transform:none;margin-right:auto;}
   .h2-nav{
@@ -443,22 +468,12 @@ export const HOME2_CSS = `
   }
   .h2-nav a:hover{color:#fff;}
   .h2-login{height:38px;padding:0 18px;font-size:15px;}
-  .h2-searchbar{padding:24px 56px 0;}
   .h2-stage{height:420px;}
   .h2-stage-word{top:86px;width:300px;height:132px;}
-  .h2-list{gap:28px;padding:56px 32px;}
-  .h2-steps{gap:24px;padding:0 32px;}
-  .h2-step{width:360px;}
-  .h2-step-visual{height:180px;}
-  .h2-faces{left:50%;transform:translateX(-50%);}
-  .h2-step-play{left:50%;top:50%;transform:translate(-50%,-50%);}
-  .h2-how .h2-h2,.h2-faq .h2-h2{font-size:32px!important;line-height:40px!important;letter-spacing:-.32px!important;}
-  .h2-how-head{align-items:center;text-align:center;}
-  .h2-faq{align-items:center;}
-  .h2-trust-panel{max-width:900px;}
-  .h2-trust .h2-h2{font-size:32px!important;line-height:40px!important;letter-spacing:-.32px!important;}
-  .h2-help{max-width:900px;}
-  .h2-cta{height:340px;max-width:900px;}
+  .h2-list{padding:56px var(--h2-gutter);}
+  .h2-steps{gap:24px;}
+  .h2-how .h2-h2,.h2-faq .h2-h2,.h2-trust .h2-h2{font-size:32px!important;line-height:40px!important;letter-spacing:-.32px!important;}
+  .h2-cta{height:340px;}
   .h2-cta-title{font-size:32px!important;line-height:40px!important;}
   .h2-cta-body{font-size:16px!important;line-height:24px!important;}
 }
