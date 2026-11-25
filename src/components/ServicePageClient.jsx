@@ -3,8 +3,9 @@
 /**
  * /service-page/<slug> — the therapist profile, at the same URL koott.in uses.
  *
- * The layout is a clone of https://www.koott.in/service-page/irene-mariam; the
- * measurements live in TherapistProfile.jsx. The record is matched out of
+ * The layout is the Koott 2.0 Figma screen "Profile v3" (7858:80652); the measurements
+ * live in profile2/profile2.css.js. (The previous page, a clone of koott.in, is still in
+ * the repository as TherapistProfile.jsx.) The record is matched out of
  * /api/public/psychologists on a slug derived from the name, so no new backend
  * route is needed. "Book Now" hands off to the app's existing booking flow.
  * (app/service-page/[slug]/page.js 404s unknown slugs before this renders.)
@@ -12,7 +13,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import TherapistProfile, { therapistSlug } from '@/components/TherapistProfile';
+import { therapistSlug } from '@/components/TherapistProfile';
+import TherapistProfile2 from '@/components/profile2/TherapistProfile2';
 import LogoLoader from '@/components/LogoLoader';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
@@ -45,7 +47,7 @@ export default function ServicePageClient() {
     return (
       // Header.jsx is fixed and reserves no space of its own.
       <div style={{ paddingTop: 63 }}>
-        <TherapistProfile
+        <TherapistProfile2
           therapist={state.therapist}
           bookHref={`/book/${slug}`}
         />
