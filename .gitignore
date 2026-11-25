@@ -65,3 +65,4 @@ next-env.d.ts
 *.pyc
 *.pkl
 __pycache__/
+.next-check/

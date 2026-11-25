@@ -197,6 +197,13 @@ const nextConfig = {
       },
     ];
   },
+
+  // A production build normally writes to .next, which the dev server is holding
+  // open, so building while `npm run dev` runs breaks that server until it is
+  // restarted. Set NEXT_DIST_DIR to send a build somewhere else and check it
+  // without touching the running one:
+  //   $env:NEXT_DIST_DIR = '.next-check'; npm run build
+  ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
 };
 
 export default nextConfig;
