@@ -129,10 +129,19 @@ export default function Account2() {
   const [note, setNote] = useState('');
   const menuRef = useRef(null);
 
-  const tz = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata', []);
+  /* The client's own zone, which they set on Personal details, is what their times are
+     shown in — not the clock of whatever machine they happen to be on. A client who
+     moved to Dubai should see Dubai time from an Indian laptop too. The browser's zone
+     is only the fallback, before the profile arrives or when they never set one. */
+  const browserTz = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata', []);
+  const tz = profile?.time_zone || browserTz;
   /* The therapist works to IST. Only show it as a second line when the client is actually
      on another clock — a client in India would otherwise read the same time twice. */
   const showSecondZone = useMemo(() => offsetOf(tz) !== 330, [tz]);
+  /* The design writes this row as a country ("INDIA"). There is no reliable way to get
+     a country from a zone in the browser, and "KOLKATA" would be an odd thing to call
+     it, so the row carries the same short zone the session's time badges use. */
+  const tzLabel = useMemo(() => SHORT_TZ(tz) || tz, [tz]);
 
   useEffect(() => {
     let live = true;
@@ -155,8 +164,9 @@ export default function Account2() {
           .sort((a, b) => a.at - b.at)[0];
         setSession(upcoming ? { ...upcoming.x, _at: upcoming.at } : null);
 
-        // The pack with sessions still on it.
-        const packs = k?.data?.packages || k?.data || [];
+        // The pack with sessions still on it. The endpoint answers with
+        // data.clientPackages; the other two names are older shapes.
+        const packs = k?.data?.clientPackages || k?.data?.packages || k?.data || [];
         const open = (Array.isArray(packs) ? packs : [])
           .filter((q) => Number(q.remaining_sessions) > 0)
           .sort((a, b) => new Date(b.purchased_at || 0) - new Date(a.purchased_at || 0))[0];
@@ -257,6 +267,9 @@ export default function Account2() {
             </button>
           </div>
 
+          {/* On a laptop these two become the main column; on a phone the wrapper is
+              display:contents, so they sit straight in the body's column as before. */}
+          <div className="a2-main">
           {/* 3 — session pack */}
           {loading && !pack ? <div className="a2-skeleton" /> : pack ? (
             <div className="a2-card a2-pack">
@@ -347,12 +360,14 @@ export default function Account2() {
             </div>
           ) : null}
 
+          </div>
+
           {/* 5 — the rest */}
           <div className="a2-more">
             {row(I.user, 'Personal details', () => router.push('/profile/profile'))}
             {row(I.asterisk, 'Self Help & Assessments', () => router.push('/assessments'))}
             {row(I.globe, 'Time zone', () => router.push('/profile/profile'), {
-              right: <span className="a2-more-right"><span className="a2-more-tz">{SHORT_TZ(tz) || tz}</span></span>,
+              right: <span className="a2-more-right"><span className="a2-more-tz">{tzLabel}</span></span>,
             })}
             {row(I.logout, 'Log out', () => { logout?.(); router.push('/'); }, { danger: true, hideChev: true })}
           </div>

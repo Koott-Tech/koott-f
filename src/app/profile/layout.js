@@ -31,8 +31,11 @@ import { previewFromParams } from '@/lib/dashboardPreview';
  * pages beside it do not run the full width of a large screen.
  */
 const Shell = ({ children }) => {
-  // The sessions page is drawn to Figma's 1180 column (plus gutters); the rest stay at 1024.
-  const wide = (usePathname() || '').startsWith('/profile/sessions');
+  // The sessions page is drawn to Figma's 1180 column (plus gutters), and the account
+  // page lays itself out in two columns on a laptop, so both need the wider shell; the
+  // rest stay at 1024.
+  const path = usePathname() || '';
+  const wide = path.startsWith('/profile/sessions') || path === '/profile';
   return (
     <div style={{ paddingTop: 63, minHeight: 'calc(100vh - 63px)', background: '#fff' }}>
       <div style={{ position: 'relative', maxWidth: wide ? 1228 : 1024, margin: '0 auto', minHeight: 'calc(100vh - 63px)' }}>

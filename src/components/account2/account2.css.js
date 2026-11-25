@@ -34,6 +34,7 @@ export const ACCOUNT2_CSS = `
 
 /* ───────── body (col gap 24, pad 8/16/40) ───────── */
 .a2-body{display:flex;flex-direction:column;gap:24px;padding:8px 16px 40px;}
+.a2-main{display:contents;}
 
 /* 1 — who you are (row 370x60, gap 12) */
 .a2-id{display:flex;gap:12px;align-items:center;}
@@ -78,12 +79,12 @@ export const ACCOUNT2_CSS = `
 .a2-pips{display:flex;align-items:center;gap:8px;}
 .a2-pips svg{width:18px;height:18px;}
 .a2-slots{
-  display:inline-flex;align-items:center;justify-content:center;padding:2px 6px;border-radius:9999px;
+  display:inline-flex;align-items:center;justify-content:center;min-height:22px;padding:2px 6px;border-radius:9999px;
   background:linear-gradient(180deg,#FFFFFF 0%,#E2F7E7 100%);box-shadow:inset 0 0 0 1px #46C57A;
   font-size:12px;font-weight:500;line-height:16px;color:var(--green);white-space:nowrap;
 }
 .a2-btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:4px;height:32px;padding:0 8px 0 12px;
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;height:32px;min-width:142px;padding:0 8px 0 12px;
   border-radius:9999px;background:linear-gradient(180deg,#5DC189 0%,#39AC71 100%);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.40),0 1px 3px rgba(15,72,54,.08),0 11px 7px rgba(15,72,54,.04),0 19px 8px rgba(15,72,54,.02),inset 0 7px 7.2px rgba(255,255,255,.25);
   color:#fff;font-size:14px;font-weight:600;line-height:18px;white-space:nowrap;
@@ -121,7 +122,7 @@ export const ACCOUNT2_CSS = `
   font-size:14px;font-weight:500;line-height:20px;color:var(--ink-soft);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.a2-ses-note{display:flex;align-items:center;padding:16px;}
+.a2-ses-note{display:flex;align-items:center;min-height:79px;padding:16px;}
 .a2-ses-note input{
   width:100%;border:0;background:none;outline:none;
   font-size:14px;font-weight:500;line-height:20px;color:var(--ink);
@@ -171,17 +172,51 @@ export const ACCOUNT2_CSS = `
 .a2-skeleton{height:149px;border-radius:24px;background:var(--tile);animation:a2pulse 1.4s ease-in-out infinite;}
 @keyframes a2pulse{0%,100%{opacity:1}50%{opacity:.55}}
 
-/* ───────── tablet and laptop ─────────
-   The 402 px phone screen is the design. It is not redrawn here: the column simply gets
-   a little more room and stays centred, the way a one-column account page should. */
+/* ───────── tablet ─────────
+   Still one column: a tablet has room to breathe but not for two columns of this
+   design, whose cards are 370 wide. */
 @media (min-width:768px){
-  .a2-shell{max-width:480px;}
+  .a2-shell{max-width:560px;}
   .a2-top{height:64px;padding:12px 16px;}
   .a2-body{gap:28px;padding:8px 16px 56px;}
 }
-@media (min-width:1100px){
-  .a2-shell{max-width:560px;}
-  .a2-body{padding:16px 16px 72px;}
+
+/* ───────── laptop and desktop ─────────
+   The Figma has no frame above 402, so this is the same design laid out for a wide
+   screen, not a new one. Who you are runs across the top; below it the page splits.
+   The left column carries what changes — the three shortcuts, then the next session
+   and the pack. The settings list stands beside them, down the right, at the 370 the
+   design already gives those cards. Every component keeps its own sizes. */
+@media (min-width:1024px){
+  .a2-shell{max-width:1100px;padding:0 32px;}
+  .a2-top{height:72px;padding:16px 0;}
+  .a2-body{
+    display:grid;gap:24px;padding:8px 0 72px;
+    grid-template-columns:minmax(0,1fr) 370px;
+    grid-template-areas:
+      "who       who"
+      "shortcuts side"
+      "main      side";
+    align-items:start;
+  }
+  .a2-id{grid-area:who;gap:16px;}
+  .a2-shortcuts{grid-area:shortcuts;}
+  /* On a phone this wrapper is not a box at all (display:contents above), so the
+     cards sit straight in the body's column. Here it becomes the main column. */
+  .a2-main{grid-area:main;display:flex;flex-direction:column;gap:24px;min-width:0;}
+  .a2-more{grid-area:side;}
+  .a2-avatar{width:72px;height:72px;}
+  .a2-avatar span{font-size:26px;}
+  .a2-name{font-size:32px!important;line-height:40px!important;letter-spacing:-.32px!important;}
+  /* A wider card can show the whole meet link, so it stops being clipped. */
+  .a2-ses-link{overflow:visible;text-overflow:clip;}
+}
+
+/* Past about 1400 the extra width goes to the left column; the settings list keeps
+   the 370 the design gives it, so its rows do not stretch into empty space. */
+@media (min-width:1400px){
+  .a2-body{gap:32px;}
+  .a2-main{gap:32px;}
 }
 
 /* ───────── tracking ─────────
