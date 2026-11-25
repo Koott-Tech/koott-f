@@ -324,6 +324,68 @@ export const HOME2_CSS = `
 .h2-menu-sub{display:flex;flex-direction:column;gap:16px;padding:0 0 18px;margin-top:-4px;}
 .h2-menu-sub a{font-size:16px;font-weight:400;line-height:24px;color:var(--ink-soft);}
 
+/* ───────── help card (Figma "Help" 8029:23975) ───────── */
+.h2-helpwrap{display:flex;justify-content:center;padding:0 16px 8px;}
+.h2-help{
+  display:flex;align-items:center;gap:14px;width:100%;max-width:370px;padding:16px;
+  border-radius:24px;background:#F5F7F6;
+}
+.h2-help-tile{
+  flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;
+  border-radius:14px;background:#fff;
+}
+.h2-help-tile svg{width:22px;height:22px;}
+.h2-help-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.h2-help-title{font-size:16px;font-weight:600;line-height:24px;color:var(--ink);}
+.h2-help-body{font-size:14px;font-weight:400;line-height:20px;color:var(--ink-soft);}
+.h2-help-btn{
+  flex:none;display:inline-flex;align-items:center;justify-content:center;height:32px;min-width:57px;padding:0 12px;
+  border-radius:9999px;background:#fff;box-shadow:inset 0 0 0 1px var(--line),
+    0 1px 2px rgba(28,36,31,.04),0 3px 3px rgba(28,36,31,.03),0 8px 5px rgba(28,36,31,.02),0 14px 5px rgba(28,36,31,.01);
+  font-size:14px;font-weight:600;line-height:18px;color:var(--ink);
+}
+
+/* ───────── why people trust Koott (Figma "Trust" 8029:23898) ───────── */
+.h2-trust{padding:40px 16px 0;}
+.h2-trust-panel{
+  display:flex;flex-direction:column;gap:24px;padding:28px 20px 24px;border-radius:32px;
+  background:linear-gradient(180deg,#F0FBED 0%,#EAF3ED 55%,#FFFFFF 100%);
+}
+.h2-trust-points{display:flex;flex-direction:column;gap:20px;}
+.h2-point{display:flex;gap:14px;}
+.h2-point-tile{
+  flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;
+  border-radius:12px;background:#fff;
+}
+.h2-point-tile svg{width:20px;height:20px;}
+.h2-point-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.h2-point-title{font-size:16px;font-weight:600;line-height:24px;color:var(--ink);}
+.h2-point-body{font-size:14px;font-weight:400;line-height:20px;color:var(--ink-soft);}
+.h2-trust-stats{display:flex;gap:8px;}
+.h2-trust-stat{
+  flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding:14px 16px;
+  border-radius:20px;background:#fff;
+}
+.h2-trust-value{font-size:18px;font-weight:600;line-height:24px;color:var(--ink);}
+.h2-trust-label{font-size:12px;font-weight:400;line-height:16px;color:var(--ink-soft);}
+/* The reviews scroll sideways, as they do in the Figma: two cards are 556 wide
+   inside a 330 panel. */
+.h2-reviews{
+  display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;
+  margin:0 -20px;padding:0 20px;scroll-snap-type:x mandatory;
+}
+.h2-reviews::-webkit-scrollbar{display:none;}
+.h2-review{
+  flex:none;width:272px;display:flex;flex-direction:column;gap:12px;padding:16px;
+  border-radius:20px;background:#fff;scroll-snap-align:start;
+}
+.h2-stars{display:flex;gap:2px;}
+.h2-stars svg{width:14px;height:14px;}
+.h2-review-text{margin:0!important;font-size:14px!important;font-weight:400!important;line-height:20px!important;color:#3D4842!important;}
+.h2-review-by{display:flex;gap:4px;}
+.h2-review-name{font-size:14px;font-weight:600;line-height:20px;color:var(--ink);}
+.h2-review-place{font-size:14px;font-weight:400;line-height:20px;color:var(--ink-soft);}
+
 /* ───────── tablet and laptop ───────── */
 @media (min-width:768px){
   .h2-hero-glow{left:50%;transform:translateX(-50%);width:900px;}
@@ -348,6 +410,14 @@ export const HOME2_CSS = `
   .h2-how{padding:64px 0;}
   .h2-how-head,.h2-steps{padding:0 32px;}
   .h2-steps{justify-content:center;}
+  .h2-helpwrap{padding:0 32px 16px;}
+  .h2-help{max-width:744px;}
+  .h2-trust{padding:56px 32px 0;display:flex;justify-content:center;}
+  .h2-trust-panel{width:100%;max-width:744px;padding:32px;}
+  .h2-trust-points{flex-direction:row;gap:24px;}
+  .h2-point{flex:1;min-width:0;}
+  .h2-reviews{margin:0;padding:0;overflow:visible;}
+  .h2-review{flex:1;min-width:0;width:auto;}
   .h2-faq{padding:64px 32px;align-items:center;}
   .h2-faq .h2-h2,.h2-faq-list{width:100%;max-width:720px;}
   .h2-cta-wrap{padding:0 32px;}
@@ -383,6 +453,9 @@ export const HOME2_CSS = `
   .h2-how .h2-h2,.h2-faq .h2-h2{font-size:32px!important;line-height:40px!important;letter-spacing:-.32px!important;}
   .h2-how-head{align-items:center;text-align:center;}
   .h2-faq{align-items:center;}
+  .h2-trust-panel{max-width:900px;}
+  .h2-trust .h2-h2{font-size:32px!important;line-height:40px!important;letter-spacing:-.32px!important;}
+  .h2-help{max-width:900px;}
   .h2-cta{height:340px;max-width:900px;}
   .h2-cta-title{font-size:32px!important;line-height:40px!important;}
   .h2-cta-body{font-size:16px!important;line-height:24px!important;}

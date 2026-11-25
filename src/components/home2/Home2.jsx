@@ -46,6 +46,41 @@ const TABS = [
   { key: 'psychiatry', label: 'Psychiatry Department', icon: '/design/home/tab-psychiatrist.png', w: 97, kind: 'role', match: ['psychiatr'] },
 ];
 
+// The care team's WhatsApp, the same number the client dashboard uses.
+const CARE_WHATSAPP = '919539007766';
+
+// Figma "Trust" (8029:23898). Icons are drawn here rather than imported so the
+// section carries no extra request.
+const TRUST_POINTS = [
+  {
+    title: 'Verified therapists',
+    body: 'Qualified and checked by our clinical team.',
+    icon: <path d="M10 2.2 3.8 4.6v4.8c0 3.4 2.4 6.1 6.2 8.4 3.8-2.3 6.2-5 6.2-8.4V4.6L10 2.2Zm-2.3 7.3 1.8 1.8 3.3-3.4" stroke="#39AC71" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" fill="none" />,
+  },
+  {
+    title: 'Only you and your therapist',
+    body: 'What you share stays between you two.',
+    icon: <path d="M6.3 8.6V6.4a3.7 3.7 0 1 1 7.4 0v2.2M5 8.6h10v8.1H5V8.6Z" stroke="#39AC71" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" fill="none" />,
+  },
+  {
+    title: 'In your language',
+    body: 'Malayalam, English and more.',
+    icon: <path d="M2.5 4.6h7.1M6 3v1.6m2 0c0 3.1-2.4 5.7-5.5 5.7m5.5-5.7c0 1.7-.9 3.3-2.3 4.4M7.3 9.1 5 6.9m5.4 8.2h6.1m-7.3 2.3 4.2-9.1 4.1 9.1" stroke="#39AC71" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" fill="none" />,
+  },
+];
+
+const TRUST_STATS = [
+  { value: '30,000+', label: 'sessions so far' },
+  { value: '4.9 / 5', label: 'Google rating' },
+];
+
+// Marked "placeholder copy" in the Figma, so they are the design's words, not
+// quotes from real clients. Swap them here once the real ones are chosen.
+const REVIEWS = [
+  { text: '“Saying it in Malayalam made all the difference. I felt understood from the first session.”', name: 'Anjali', place: 'Dubai' },
+  { text: '“Booked at night and talked the same evening. Simple and private.”', name: 'Rahul', place: 'Kochi' },
+];
+
 const FAQS = [
   {
     q: 'How much does a session cost?',
@@ -97,7 +132,7 @@ export default function Home2() {
   const [tab, setTab] = useState('all');
   const [query, setQuery] = useState('');
   const [openFaq, setOpenFaq] = useState(0);
-  const [slide, setSlide] = useState(0);
+  const [slide] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const tabsRef = useRef(null);
@@ -120,11 +155,9 @@ export default function Home2() {
     return () => { off = true; };
   }, []);
 
-  /* The hero's landscape is one of three slides in the design; the dots follow it. */
-  useEffect(() => {
-    const id = setInterval(() => setSlide((s) => (s + 1) % 3), 6000);
-    return () => clearInterval(id);
-  }, []);
+  /* The Figma draws three dots but ships one landscape, so the dots stay on the
+     first slide rather than animating over an image that never changes. Once the
+     other two artworks exist, give SLIDES their sources and turn the timer back on. */
 
   const cards = useMemo(() => rows.map((p) => {
     const tags = Array.isArray(p.area_of_expertise) ? p.area_of_expertise : [];
@@ -277,7 +310,31 @@ export default function Home2() {
         {status === 'ready' && visible.length > 0 && (
           <Link className="h2-viewall" href="/book-malayali-psychologists">View all therapists</Link>
         )}
+
       </section>
+
+
+      {/* Figma "Help" (8029:23975). Its own section, not part of the list, because
+          the Figma gives it a 16 gutter where the cards have 20. */}
+      {status === 'ready' && visible.length > 0 && (
+        <section className="h2-helpwrap">
+            <a
+              className="h2-help"
+              href={`https://wa.me/${CARE_WHATSAPP}?text=${encodeURIComponent('Hi Koott, I am not sure which therapist to choose.')}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="h2-help-tile" aria-hidden="true">
+                <svg viewBox="0 0 22 22"><path d="M4 16.5 2.8 18.9c-.3.5.1 1.1.7 1.1H11a8 8 0 1 0-8-8c0 1.6.5 3.2 1.3 4.5Z" stroke="#39AC71" strokeWidth="1.83" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
+              </span>
+              <span className="h2-help-text">
+                <span className="h2-help-title">Not sure who to choose?</span>
+                <span className="h2-help-body">Ask our care team on WhatsApp.</span>
+              </span>
+              <span className="h2-help-btn">Chat</span>
+            </a>
+        </section>
+      )}
 
       {/* ───────────────── how it works ───────────────── */}
       <section className="h2-how" id="how">
@@ -323,6 +380,54 @@ export default function Home2() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      {/* ───────────────── why people trust Koott ─────────────────
+          Figma "Trust" (8029:23898). The Figma stages it beside the screen rather
+          than inside it, so it is placed here, after the steps and before the FAQ.
+          Its numbers and the two reviews are the design's own copy; the reviews are
+          marked "placeholder copy" there, so they are kept in one list to swap. */}
+      <section className="h2-trust">
+        <div className="h2-trust-panel">
+          <h2 className="h2-h2">Why people trust Koott</h2>
+          <div className="h2-trust-points">
+            {TRUST_POINTS.map((t) => (
+              <div className="h2-point" key={t.title}>
+                <span className="h2-point-tile" aria-hidden="true">
+                  <svg viewBox="0 0 20 20">{t.icon}</svg>
+                </span>
+                <span className="h2-point-text">
+                  <span className="h2-point-title">{t.title}</span>
+                  <span className="h2-point-body">{t.body}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="h2-trust-stats">
+            {TRUST_STATS.map((s2) => (
+              <div className="h2-trust-stat" key={s2.label}>
+                <span className="h2-trust-value">{s2.value}</span>
+                <span className="h2-trust-label">{s2.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="h2-reviews">
+            {REVIEWS.map((r) => (
+              <article className="h2-review" key={r.name + r.place}>
+                <span className="h2-stars" aria-label="Five out of five">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <svg key={i} viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1l1.8 3.7 4.1.6-3 2.9.7 4.1L7 10.4 3.4 12.3l.7-4.1-3-2.9 4.1-.6L7 1Z" fill="#825B00" /></svg>
+                  ))}
+                </span>
+                <p className="h2-review-text">{r.text}</p>
+                <span className="h2-review-by">
+                  <span className="h2-review-name">{r.name}</span>
+                  <span className="h2-review-place">· {r.place}</span>
+                </span>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
