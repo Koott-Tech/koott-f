@@ -22,7 +22,11 @@ export const ACCOUNT2_CSS = `
 .a2 :where(img){display:block;}
 .a2 :is(p,h1,h2,h3,h4,h5,h6):not(#_){font-family:inherit!important;margin:0!important;}
 
-.a2-shell{max-width:402px;margin:0 auto;}
+/* 402 is where the design is drawn, not a ceiling: the column grows with the
+   viewport up to 640 and only then centres, so there is no width at which the page
+   sits in a narrow strip of its own. At exactly 402 the content is 370, the Figma
+   width, because the body's own 16 padding takes the rest. */
+.a2-shell{width:100%;max-width:640px;margin:0 auto;}
 
 /* ───────── top bar (402x56, pad 8/16) ───────── */
 .a2-top{display:flex;align-items:center;justify-content:space-between;height:56px;padding:8px 16px;}
@@ -59,7 +63,13 @@ export const ACCOUNT2_CSS = `
 }
 .a2-shortcut-icon{display:flex;justify-content:flex-end;}
 .a2-shortcut-icon svg{width:20px;height:20px;}
-.a2-shortcut-label{font-size:16px;font-weight:600;line-height:20px;color:var(--ink-soft);}
+/* The label held 16 px while its tile shrank, so "Prescription" ran out of a 320 px
+   tile and broke mid-word. This line is 16 px at 402 — the Figma value — and eases
+   to 11 px at 320, where the longest word still fits the tile whole. */
+.a2-shortcut-label{
+  font-size:clamp(11px,calc(11px + (100vw - 320px) * 0.061),16px);
+  font-weight:600;line-height:1.25;color:var(--ink-soft);hyphens:auto;overflow-wrap:break-word;
+}
 
 /* 3 — session pack (370x149, pad 20, gap 16) */
 .a2-card{
@@ -75,7 +85,7 @@ export const ACCOUNT2_CSS = `
 .a2-pack-label{font-size:12px;font-weight:400;line-height:16px;color:var(--ink-mute);}
 .a2-pack-value{font-size:16px;font-weight:600;line-height:24px;color:var(--ink-2);}
 .a2-pack-line{height:1px;background:var(--line);}
-.a2-pack-bottom{display:flex;align-items:center;justify-content:space-between;gap:32px;}
+.a2-pack-bottom{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px;}
 .a2-pips{display:flex;align-items:center;gap:8px;}
 .a2-pips svg{width:18px;height:18px;}
 .a2-slots{
@@ -111,7 +121,14 @@ export const ACCOUNT2_CSS = `
 .a2-div{height:1px;background:var(--line);}
 .a2-ses-when{display:flex;flex-direction:column;gap:12px;padding:16px;}
 .a2-ses-row{display:flex;align-items:center;gap:8px;min-width:0;}
-.a2-ses-row svg{flex:none;width:20px;height:20px;}
+/* Figma sets each of these icons in a 25x26 tile with a hairline and an 8 radius. */
+.a2-ses-tile{
+  flex:none;display:flex;align-items:center;justify-content:center;width:25px;height:26px;
+  border-radius:8px;box-shadow:inset 0 0 0 1px var(--line);
+}
+.a2-ses-tile svg{width:16px;height:16px;}
+.a2-ses-copy{flex:none;display:flex;align-items:center;justify-content:center;width:16px;height:16px;}
+.a2-ses-copy svg{width:16px;height:16px;}
 .a2-ses-time{font-size:14px;font-weight:500;line-height:20px;color:var(--ink-soft);}
 .a2-tz{
   display:inline-flex;align-items:center;justify-content:center;height:16px;padding:0 4px;border-radius:4px;
@@ -172,22 +189,13 @@ export const ACCOUNT2_CSS = `
 .a2-skeleton{height:149px;border-radius:24px;background:var(--tile);animation:a2pulse 1.4s ease-in-out infinite;}
 @keyframes a2pulse{0%,100%{opacity:1}50%{opacity:.55}}
 
-/* ───────── tablet ─────────
-   Still one column: a tablet has room to breathe but not for two columns of this
-   design, whose cards are 370 wide. */
-@media (min-width:768px){
-  .a2-shell{max-width:560px;}
-  .a2-top{height:64px;padding:12px 16px;}
-  .a2-body{gap:28px;padding:8px 16px 56px;}
-}
-
-/* ───────── laptop and desktop ─────────
+/* ───────── laptop and desktop (from 900, where two columns fit) ─────────
    The Figma has no frame above 402, so this is the same design laid out for a wide
    screen, not a new one. Who you are runs across the top; below it the page splits.
    The left column carries what changes — the three shortcuts, then the next session
    and the pack. The settings list stands beside them, down the right, at the 370 the
    design already gives those cards. Every component keeps its own sizes. */
-@media (min-width:1024px){
+@media (min-width:900px){
   .a2-shell{max-width:1100px;padding:0 32px;}
   .a2-top{height:72px;padding:16px 0;}
   .a2-body{

@@ -103,8 +103,10 @@ const I = {
   plusCircle: <svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#CDD3CF" strokeWidth="1.5" /><path d="M9 6.2v5.6M6.2 9h5.6" fill="none" stroke="#CDD3CF" strokeWidth="1.5" strokeLinecap="round" /></svg>,
   arrowRight: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.33 8h9.34M9.33 4.67 12.67 8l-3.34 3.33" {...S} strokeWidth={1.5} /></svg>,
   dots: <svg viewBox="0 0 20 20" aria-hidden="true"><g fill="currentColor"><circle cx="10" cy="4.2" r="1.5" /><circle cx="10" cy="10" r="1.5" /><circle cx="10" cy="15.8" r="1.5" /></g></svg>,
-  clock: <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" {...S} /><path d="M10 5.83V10l2.5 1.67" {...S} /></svg>,
-  video: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M18.33 7.5 14.17 10l4.16 2.5v-5Z" {...S} /><rect x="1.67" y="5" width="12.5" height="10" rx="2.5" {...S} /></svg>,
+  clock: <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" {...S} stroke="#9CA49F" strokeWidth={1.5} /><path d="M8 4.67V8l2 1.33" {...S} stroke="#9CA49F" strokeWidth={1.5} /></svg>,
+  video: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M14.67 6 11.33 8l3.34 2V6Z" {...S} stroke="#9CA49F" strokeWidth={1.5} /><rect x="1.33" y="4" width="10" height="8" rx="2" {...S} stroke="#9CA49F" strokeWidth={1.5} /></svg>,
+  checkSmall: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" {...S} stroke="#2E7D5A" strokeWidth={1.6} /></svg>,
+  copy: <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.33" y="5.33" width="8.67" height="8.67" rx="2" {...S} stroke="#6B746F" strokeWidth={1.33} /><path d="M10.67 5.33V4c0-1.1-.9-2-2-2H4a2 2 0 0 0-2 2v4.67c0 1.1.9 2 2 2h1.33" {...S} stroke="#6B746F" strokeWidth={1.33} /></svg>,
   calendarPlus: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M14 6.67H2M10.67 1.33v2.67M5.33 1.33v2.67M8 8.67v4M6 10.67h4" {...S} strokeWidth={1.4} /><rect x="2" y="2.67" width="12" height="12" rx="2.5" {...S} strokeWidth={1.4} /></svg>,
   clockRefresh: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.4 6a6.67 6.67 0 0 1 11.3-3.1L14.6 4.7M14.6 2v2.7h-2.7M14.6 10a6.67 6.67 0 0 1-11.3 3.1L1.4 11.3M1.4 14v-2.7h2.7M8 4.7V8l2 1.3" {...S} strokeWidth={1.4} /></svg>,
   cardRefresh: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M14.67 6.67H1.33M7.33 12H4M14.67 7.2V5.07c0-.75 0-1.12-.15-1.41a1.33 1.33 0 0 0-.58-.58c-.29-.15-.66-.15-1.41-.15H3.47c-.75 0-1.12 0-1.41.15-.25.13-.45.33-.58.58-.15.29-.15.66-.15 1.41v5.86c0 .75 0 1.12.15 1.41.13.25.33.45.58.58.29.15.66.15 1.41.15H8M11 14.67l1.33-1.34L11 12M14 10.67l-1.33 1.33 1.33 1.33" {...S} strokeWidth={1.3} /></svg>,
@@ -127,6 +129,7 @@ export default function Account2() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [note, setNote] = useState('');
+  const [copied, setCopied] = useState(false);
   const menuRef = useRef(null);
 
   /* The client's own zone, which they set on Personal details, is what their times are
@@ -200,6 +203,16 @@ export default function Account2() {
 
   const packTotal = Number(pack?.total_sessions || pack?.session_count || pack?.package?.session_count || 0);
   const packLeft = Number(pack?.remaining_sessions || 0);
+
+  /* Copying the link matters on a phone, where selecting that much text by hand is
+     awkward. The tick falls back to nothing if the clipboard is blocked. */
+  const copyMeet = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(meet);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch { /* no clipboard permission — the link is still a link */ }
+  }, [meet]);
 
   const addToCalendar = useCallback(() => {
     if (!session?._at) return;
@@ -316,7 +329,7 @@ export default function Account2() {
               <div className="a2-div" />
               <div className="a2-ses-when">
                 <div className="a2-ses-row">
-                  {I.clock}
+                  <span className="a2-ses-tile" aria-hidden="true">{I.clock}</span>
                   <span className="a2-ses-time">{whenIn(session._at, tz)}</span>
                   <span className="a2-tz">{SHORT_TZ(tz) || 'Local'}</span>
                   {showSecondZone && (
@@ -328,8 +341,12 @@ export default function Account2() {
                 </div>
                 {meet && (
                   <div className="a2-ses-row">
-                    {I.video}
+                    <span className="a2-ses-tile" aria-hidden="true">{I.video}</span>
                     <a className="a2-ses-link" href={meet} target="_blank" rel="noopener noreferrer">{meet}</a>
+                    <button type="button" className="a2-ses-copy" onClick={copyMeet}
+                      aria-label={copied ? 'Link copied' : 'Copy the meeting link'}>
+                      {copied ? I.checkSmall : I.copy}
+                    </button>
                   </div>
                 )}
               </div>
