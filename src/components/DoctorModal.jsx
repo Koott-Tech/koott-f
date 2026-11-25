@@ -196,6 +196,12 @@ export default function DoctorModal({
     languages: [''],
     offersOffline: false,
     coverImage: null,
+    registration_number: '',
+    intro_video_url: '',
+    intro_video_thumb: '',
+    approaches: '',
+    profile_videos: '',
+    profile_media: '',
     faq_question_1: '',
     faq_answer_1: '',
     faq_question_2: '',
@@ -525,6 +531,12 @@ export default function DoctorModal({
         languages_json: filteredLanguagesForOriginal.length > 0 ? JSON.stringify(filteredLanguagesForOriginal) : null,
         cover_image_url: resolveDoctorImage(doctor) || null,
         session_modes: doctor.session_modes?.length ? doctor.session_modes : ['online'],
+        registration_number: doctor.registration_number || null,
+        intro_video_url: doctor.intro_video_url || null,
+        intro_video_thumb: doctor.intro_video_thumb || null,
+        approaches: doctor.approaches || null,
+        profile_videos: doctor.profile_videos || null,
+        profile_media: doctor.profile_media || null,
         faq_question_1: doctor.faq_question_1 || null,
         faq_answer_1: doctor.faq_answer_1 || null,
         faq_question_2: doctor.faq_question_2 || null,
@@ -572,6 +584,12 @@ export default function DoctorModal({
         languages: derivedLanguages,
         offersOffline: Boolean(doctor.session_modes?.includes('offline')),
         coverImage: resolveDoctorImage(doctor),
+        registration_number: doctor.registration_number || '',
+        intro_video_url: doctor.intro_video_url || '',
+        intro_video_thumb: doctor.intro_video_thumb || '',
+        approaches: doctor.approaches || '',
+        profile_videos: doctor.profile_videos || '',
+        profile_media: doctor.profile_media || '',
         faq_question_1: doctor.faq_question_1 || '',
         faq_answer_1: doctor.faq_answer_1 || '',
         faq_question_2: doctor.faq_question_2 || '',
@@ -1230,6 +1248,13 @@ export default function DoctorModal({
         designation: formData.designation?.trim() || null,
         cover_image_url: safeImageUrl,
         session_modes: formData.offersOffline ? ['online', 'offline'] : ['online'],
+        // The Koott 2.0 profile blocks (SQL 0031). Empty means the block stays hidden.
+        registration_number: formData.registration_number?.trim() || null,
+        intro_video_url: formData.intro_video_url?.trim() || null,
+        intro_video_thumb: formData.intro_video_thumb?.trim() || null,
+        approaches: formData.approaches?.trim() || null,
+        profile_videos: formData.profile_videos?.trim() || null,
+        profile_media: formData.profile_media?.trim() || null,
       };
 
       // Handle password for edit/add mode
@@ -1516,6 +1541,84 @@ export default function DoctorModal({
 
 
 
+
+          {/* Profile page (Koott 2.0) — each block is hidden on the profile until filled in */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">Profile page</h3>
+            <p className="text-xs text-gray-500 mb-4">
+              These fill the therapist&apos;s public profile. Leave one empty and that part simply
+              does not appear. For the list boxes, put one item on each line and separate the parts with |
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Registration number</label>
+                <input
+                  type="text"
+                  value={formData.registration_number}
+                  onChange={(e) => handleInputChange('registration_number', e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm"
+                  placeholder="KMC90539"
+                />
+                <p className="text-xs text-gray-400 mt-1">Shows as a pill under the name.</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Intro video link</label>
+                <input
+                  type="url"
+                  value={formData.intro_video_url}
+                  onChange={(e) => handleInputChange('intro_video_url', e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm"
+                  placeholder="https://youtu.be/..."
+                />
+                <p className="text-xs text-gray-400 mt-1">The &quot;Meet them&quot; card at the top.</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Intro video still</label>
+                <input
+                  type="url"
+                  value={formData.intro_video_thumb}
+                  onChange={(e) => handleInputChange('intro_video_thumb', e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm"
+                  placeholder="Optional — their photo is used otherwise"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Approaches I use</label>
+                <textarea
+                  rows={3}
+                  value={formData.approaches}
+                  onChange={(e) => handleInputChange('approaches', e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm font-mono"
+                  placeholder={'CBT | Thoughts, habits and what keeps them going\nEFT for couples'}
+                />
+                <p className="text-xs text-gray-400 mt-1">One a line: name | short note (the note is optional).</p>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Videos</label>
+                <textarea
+                  rows={3}
+                  value={formData.profile_videos}
+                  onChange={(e) => handleInputChange('profile_videos', e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm font-mono"
+                  placeholder={'What a first session looks like | https://img... | https://youtu.be/...'}
+                />
+                <p className="text-xs text-gray-400 mt-1">One a line: title | still image link | video link.</p>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Writing and media</label>
+                <textarea
+                  rows={3}
+                  value={formData.profile_media}
+                  onChange={(e) => handleInputChange('profile_media', e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#025545]/20 focus:border-[#025545] text-sm font-mono"
+                  placeholder={'article | Why overthinking gets louder at night | 5 min read · Oct 2026 | https://... | https://img...'}
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  One a line: article, video or podcast | title | small print | link | image link.
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Submit Error */}
           {errors.submit && (

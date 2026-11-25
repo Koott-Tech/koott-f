@@ -89,6 +89,8 @@ export default function TherapistProfile2({ therapist, bookHref }) {
   const [openFaq, setOpenFaq] = useState(0);
   const [bioOpen, setBioOpen] = useState(false);
   const [allChips, setAllChips] = useState(false);
+  const [allApproaches, setAllApproaches] = useState(false);
+  const [mediaKind, setMediaKind] = useState('article');
   const [shared, setShared] = useState(false);
 
   const d = useMemo(() => ({ ...t, ...(details || {}) }), [t, details]);
@@ -110,6 +112,12 @@ export default function TherapistProfile2({ therapist, bookHref }) {
     })();
     return () => { live = false; };
   }, [t?.id]);
+
+  /* Open the media tab on a kind that actually has something in it. */
+  useEffect(() => {
+    const kinds = ['article', 'video', 'podcast'].filter((k) => (d.profile_media || []).some((m) => m.type === k));
+    if (kinds.length && !kinds.includes(mediaKind)) setMediaKind(kinds[0]);
+  }, [d.profile_media, mediaKind]);
 
   const share = useCallback(async () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
@@ -135,6 +143,15 @@ export default function TherapistProfile2({ therapist, bookHref }) {
     .map((n) => ({ q: d[`faq_question_${n}`], a: d[`faq_answer_${n}`] }))
     .filter((f) => f.q && String(f.q).trim());
   const bio = String(d.description || '').trim();
+  /* The three list fields arrive parsed from /details (backend utils/profileLists.js). */
+  const approaches = Array.isArray(d.approaches) ? d.approaches : [];
+  const shownApproaches = allApproaches ? approaches : approaches.slice(0, 3);
+  const videos = Array.isArray(d.profile_videos) ? d.profile_videos : [];
+  const allMedia = Array.isArray(d.profile_media) ? d.profile_media : [];
+  const mediaCounts = allMedia.reduce((o, m) => ({ ...o, [m.type]: (o[m.type] || 0) + 1 }), {});
+  const mediaKinds = [['article', 'Articles'], ['video', 'Videos'], ['podcast', 'Podcasts']]
+    .filter(([k]) => mediaCounts[k]);
+  const mediaShown = allMedia.filter((m) => m.type === mediaKind);
   const reg = d.registration_number || d.reg_no || '';
   const href = bookHref || `/book/${t.slug || ''}`;
 
@@ -221,6 +238,26 @@ export default function TherapistProfile2({ therapist, bookHref }) {
                 </section>
               )}
 
+              {approaches.length > 0 && (
+                <section className="tpf-sec" style={{ gap: 8 }}>
+                  <div className="tpf-sec-head"><h2 className="tpf-h2">Approaches I use</h2></div>
+                  <div className="tpf-rows">
+                    {shownApproaches.map((a) => (
+                      <div className="tpf-row" key={a.title}>
+                        <span className="tpf-row-ic">{I.spark}</span>
+                        <span className="tpf-row-text">
+                          <span className="tpf-row-title">{a.title}</span>
+                          {a.note && <span className="tpf-row-sub">{a.note}</span>}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  {!allApproaches && approaches.length > 3 && (
+                    <button type="button" className="tpf-link" onClick={() => setAllApproaches(true)}>View more</button>
+                  )}
+                </section>
+              )}
+
               {quals.length > 0 && (
                 <section className="tpf-sec" style={{ gap: 8 }}>
                   <div className="tpf-sec-head"><h2 className="tpf-h2">Qualifications</h2></div>
@@ -259,6 +296,21 @@ export default function TherapistProfile2({ therapist, bookHref }) {
                 </section>
               )}
 
+              {videos.length > 0 && (
+                <section className="tpf-sec" style={{ gap: 16 }}>
+                  <div className="tpf-sec-head"><h2 className="tpf-h2">See how {first} works</h2></div>
+                  <div className="tpf-rail">
+                    {videos.map((v) => (
+                      <a className="tpf-tile" key={v.title} href={v.url || undefined}
+                        target={v.url ? '_blank' : undefined} rel="noopener noreferrer">
+                        <img className="tpf-tile-thumb" src={v.thumb || photoOf(d)} alt="" />
+                        <span>{v.title}</span>
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               {faqs.length > 0 && (
                 <section className="tpf-sec" style={{ gap: 4 }}>
                   <div className="tpf-sec-head"><h2 className="tpf-h2">You might be wondering</h2></div>
@@ -281,9 +333,36 @@ export default function TherapistProfile2({ therapist, bookHref }) {
               <div className="tpf-break" />
               <div className="tpf-media">
                 <div className="tpf-sec-head"><h2 className="tpf-h2">Writing and media</h2></div>
-                <div className="tpf-panel">
-                  <p className="tpf-mmeta">{first} has not published anything here yet.</p>
-                </div>
+                {mediaKinds.length > 0 ? (
+                  <>
+                    <div className="tpf-switch">
+                      {mediaKinds.map(([k, label]) => (
+                        <button type="button" key={k} onClick={() => setMediaKind(k)}
+                          className={`tpf-swc${mediaKind === k ? ' is-on' : ''}`}>
+                          {label}<b>{mediaCounts[k]}</b>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="tpf-panel">
+                      {mediaShown.map((m) => (
+                        <a className="tpf-mcard" key={m.title} href={m.url || undefined}
+                          target={m.url ? '_blank' : undefined} rel="noopener noreferrer">
+                          <span className="tpf-mcard-text">
+                            <span className="tpf-mtype">{m.type}</span>
+                            <span className="tpf-mtitle">{m.title}</span>
+                            {m.meta && <span className="tpf-mmeta">{m.meta}</span>}
+                          </span>
+                          {m.thumb && <img className="tpf-mthumb" src={m.thumb} alt="" />}
+                        </a>
+                      ))}
+                      {mediaShown.length === 0 && <p className="tpf-mmeta">Nothing here yet.</p>}
+                    </div>
+                  </>
+                ) : (
+                  <div className="tpf-panel">
+                    <p className="tpf-mmeta">{first} has not published anything here yet.</p>
+                  </div>
+                )}
               </div>
             </>
           )}
