@@ -17,7 +17,6 @@
 
 import { notFound } from 'next/navigation';
 import ConditionPageTemplate from '@/components/ConditionPageTemplate';
-import Landing2 from '@/components/landing2/Landing2';
 import StaticPageTemplate from '@/components/StaticPageTemplate';
 import { findConditionPage, CONDITION_SLUGS } from '@/data/conditions';
 import { findStaticPage, KOOTT_STATIC_PAGES } from '@/data/koottStaticPages';
@@ -127,11 +126,10 @@ export default async function ConditionPage({ params }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Koott 2.0 landing (Figma "Landing Page (WIP)" / "Anxiety landing · v2").
-          It carries its own header, so the site header is hidden on these pages.
-          ConditionPageTemplate, built to the older PDFs, is still imported above
-          and unused, so the swap is one line to reverse. */}
-      <Landing2 page={row} />
+      {/* Header.jsx is position:fixed and reserves no space of its own. */}
+      <div style={{ paddingTop: 64 }}>
+        <ConditionPageTemplate data={data} />
+      </div>
     </>
   );
 }

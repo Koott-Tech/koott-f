@@ -5,7 +5,6 @@ import { isDashboardPath } from '@/lib/staffRoles';
 // KoottHeader is the cloned koott.in header. The previous Koott header is kept
 // in Header.jsx, unused, so the swap is easy to reverse.
 import Header from './KoottHeader';
-import { CONDITION_SLUGS } from '@/data/conditions';
 
 export default function HeaderWrapper() {
   const pathname = usePathname();
@@ -13,11 +12,12 @@ export default function HeaderWrapper() {
   // Hide global site header on admin, superadmin, psychologist, finance dashboards
   // Note: /online-child-psychologist (listing page) should show header, only /psychologist (dashboard) should hide it
   // The home page (Koott 2.0) draws its own header inside the green hero, with its own menu.
-  // The condition landing pages (Koott 2.0) draw their own header, as the home
-  // page does. Everything at the top level that is not a known app route is one
-  // of them; CONDITION_SLUGS is the list those pages are built from.
-  const isLanding = CONDITION_SLUGS.includes((pathname || '').replace(/^\//, ''));
-  const shouldHideCompletely = isDashboardPath(pathname) || pathname === '/' || isLanding;
+  // The home page and the ad landing pages (/lp/…) draw their own header inside
+  // the design, so the site header stands down on those. The specialisation
+  // pages at the top level keep it.
+  const shouldHideCompletely = isDashboardPath(pathname)
+    || pathname === '/'
+    || (pathname || '').startsWith('/lp/');
   
   if (shouldHideCompletely) return null;
   

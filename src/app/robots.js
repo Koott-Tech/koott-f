@@ -10,7 +10,7 @@ export default function robots() {
           {
             userAgent: "*",
             allow: "/",
-            disallow: ["/admin", "/superadmin", "/finance", "/psychologist", "/profile", "/event-organizer", "/dev", "/api", "/operations", "/hr", "/staff", "/marketing", "/tasks", "/payment", "/staff-login"],
+            disallow: ["/admin", "/superadmin", "/finance", "/psychologist", "/profile", "/event-organizer", "/dev", "/api", "/operations", "/hr", "/staff", "/marketing", "/tasks", "/payment", "/staff-login", "/lp"],
           },
         ]
       : [
