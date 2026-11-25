@@ -68,7 +68,7 @@ export const HOME2_CSS = `
 .h2-stage{position:relative;height:270px;}
 .h2-stage-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center bottom;}
 .h2-stage-word{position:absolute;left:50%;top:42px;transform:translateX(-50%);width:202px;height:89px;
-  filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));}
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));margin:0;padding:0;}
 .h2-dots{position:absolute;right:16px;top:215px;display:flex;align-items:center;gap:8px;}
 .h2-dots i{width:8px;height:8px;border-radius:9999px;background:#fff;opacity:.5;transition:width .3s ease,opacity .3s ease;}
 .h2-dots i.is-on{width:24px;opacity:1;}
@@ -280,7 +280,7 @@ export const HOME2_CSS = `
 .h2-cta{
   display:flex;flex-direction:column;justify-content:space-between;gap:24px;height:301px;
   padding:40px 24px 24px;border-radius:24px;overflow:hidden;text-align:center;
-  background:linear-gradient(180deg,rgba(6,51,39,.72) 0%,rgba(6,51,39,.35) 100%),#063327 url('/design/home2/hero-landscape.png') center/cover no-repeat;
+  background:linear-gradient(180deg,rgba(6,51,39,.72) 0%,rgba(6,51,39,.35) 100%),#063327 url('/design/home2/hero-landscape.webp') center/cover no-repeat;
 }
 .h2-cta-text{display:flex;flex-direction:column;gap:8px;}
 .h2-cta-title{
@@ -323,6 +323,8 @@ export const HOME2_CSS = `
 .h2-menu-row svg{flex:none;width:22px;height:22px;transition:transform .2s ease;}
 .h2-menu-sub{display:flex;flex-direction:column;gap:16px;padding:0 0 18px;margin-top:-4px;}
 .h2-menu-sub a{font-size:16px;font-weight:400;line-height:24px;color:var(--ink-soft);}
+
+.h2-stage-word img{display:block;width:100%;height:100%;}
 
 /* ───────── help card (Figma "Help" 8029:23975) ───────── */
 .h2-helpwrap{display:flex;justify-content:center;padding:0 16px 8px;}

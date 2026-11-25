@@ -252,8 +252,13 @@ export default function Home2() {
         </div>
 
         <div className="h2-stage">
-          <img className="h2-stage-img" src={`${ART}/hero-landscape.png`} alt="" width={402} height={270} />
-          <img className="h2-stage-word" src={`${ART}/malayalam-wordmark.svg`} alt="കൂടെയുണ്ടാവും കൂട്ടായി" width={202} height={89} />
+          <img className="h2-stage-img" src={`${ART}/hero-landscape.webp`} alt="" width={402} height={270} />
+          {/* The design's headline is drawn artwork, so it is wrapped in the page's
+              one h1 and the alt carries the words. Without this the home page has
+              no h1 at all. */}
+          <h1 className="h2-stage-word">
+            <img src={`${ART}/malayalam-wordmark.svg`} alt="കൂടെയുണ്ടാവും കൂട്ടായി" width={202} height={89} />
+          </h1>
           <div className="h2-dots" role="presentation">
             {[0, 1, 2].map((i) => <i key={i} className={i === slide ? 'is-on' : ''} />)}
           </div>
@@ -349,7 +354,7 @@ export default function Home2() {
                 {s.visual === 'faces' && (
                   <div className="h2-faces">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <img key={i} className={`h2-face f${i}`} src={`${ART}/face-${i}.png`} alt="" width={67} height={67} loading="lazy" />
+                      <img key={i} className={`h2-face f${i}`} src={`${ART}/face-${i}.webp`} alt="" width={67} height={67} loading="lazy" />
                     ))}
                     <img className="h2-cursor" src={`${ART}/cursor.svg`} alt="" width={37} height={37} loading="lazy" />
                   </div>
@@ -366,7 +371,7 @@ export default function Home2() {
                 )}
                 {s.visual === 'video' && (
                   <>
-                    <img className="h2-step-photo" src={`${ART}/step3-video.png`} alt="" width={258} height={140} loading="lazy" />
+                    <img className="h2-step-photo" src={`${ART}/step3-video.webp`} alt="" width={258} height={140} loading="lazy" />
                     <span className="h2-step-play" aria-hidden="true">
                       <svg viewBox="0 0 24 24"><path d="M8 5.1v13.8c0 .6.6 1 1.1.7l10.5-6.9c.5-.3.5-1.1 0-1.4L9.1 4.4c-.5-.3-1.1 0-1.1.7Z" fill="#1C241F" /></svg>
                     </span>
