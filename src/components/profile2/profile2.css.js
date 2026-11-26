@@ -37,8 +37,11 @@ export const PROFILE2_CSS = `
 .tpf-round svg{width:20px;height:20px;}
 .tpf-avatar-wrap{position:relative;display:flex;align-items:center;justify-content:center;height:150px;margin-top:16px;}
 /* The ring is Figma's 4px angular gradient; the white gap inside it is the frame's padding. */
+/* The ring opens the story viewer, so the avatar sits inside a button; without a display
+   of its own it would go inline there and collapse. */
+.tpf-avatar-open{display:block;}
 .tpf-avatar{
-  position:relative;width:150px;height:150px;border-radius:9999px;padding:6px;background:#fff;
+  display:block;position:relative;width:150px;height:150px;border-radius:9999px;padding:6px;background:#fff;
   box-shadow:0 4px 10px rgba(156,156,156,.10),0 17px 17px rgba(156,156,156,.09),0 39px 23px rgba(156,156,156,.05);
 }
 .tpf-avatar::before{
@@ -103,8 +106,8 @@ body:has(.tpf){overflow-x:clip!important;}
 
 /* the "meet me" video card */
 .tpf-meet{
-  display:flex;align-items:center;gap:16px;margin:0 16px;padding:12px 16px 12px 12px;
-  border-radius:16px;background:var(--tile);
+  display:flex;align-items:center;gap:16px;width:auto;margin:0 16px;padding:12px 16px 12px 12px;
+  border-radius:16px;background:var(--tile);text-align:left;
 }
 .tpf-meet-thumb{flex:none;width:84px;height:84px;border-radius:12px;object-fit:cover;background:var(--tile-2);}
 .tpf-meet-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;}

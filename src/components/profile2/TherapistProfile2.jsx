@@ -25,6 +25,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { PROFILE2_CSS } from './profile2.css';
+import StoryViewer2 from './StoryViewer2';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
@@ -108,6 +109,8 @@ export default function TherapistProfile2({ therapist, bookHref }) {
   const [allApproaches, setAllApproaches] = useState(false);
   const [mediaKind, setMediaKind] = useState('article');
   const [shared, setShared] = useState(false);
+  /* { mode: 'story' | 'video', start } while a viewer is open (StoryViewer2). */
+  const [viewer, setViewer] = useState(null);
   const secs = useRef({});
 
   const d = useMemo(() => ({ ...t, ...(details || {}) }), [t, details]);
@@ -213,6 +216,12 @@ export default function TherapistProfile2({ therapist, bookHref }) {
   const mediaKinds = [['article', 'Articles'], ['video', 'Videos'], ['podcast', 'Podcasts']]
     .filter(([k]) => mediaCounts[k]);
   const mediaShown = allMedia.filter((m) => m.type === mediaKind);
+  /* What the two viewers play: the hello first, then their videos. */
+  const intro = d.intro_video_url
+    ? [{ title: `Meet ${first}`, url: d.intro_video_url, thumb: d.intro_video_thumb || photoOf(d) }]
+    : [];
+  const clips = [...intro, ...videos];
+
   /* Sessions: three day cards and the chosen day's starts, like the design's picker. */
   const today = ymd(new Date());
   const dayCards = days.slice(0, 3);
@@ -247,11 +256,27 @@ export default function TherapistProfile2({ therapist, bookHref }) {
             <button type="button" className="tpf-round" onClick={share} aria-label={shared ? 'Link copied' : 'Share this profile'}>{I.share}</button>
           </div>
           <div className="tpf-avatar-wrap">
-            <div className="tpf-avatar">
-              {photoOf(d)
-                ? <img src={photoOf(d)} alt={name} />
-                : <span className="tpf-initials">{initials(name)}</span>}
-            </div>
+            {/* The ring is a story ring when there is something behind it. */}
+            {clips.length > 0 ? (
+              <button
+                type="button"
+                className="tpf-avatar-open"
+                onClick={() => setViewer({ mode: 'story', start: 0 })}
+                aria-label={`Watch ${first}'s story`}
+              >
+                <span className="tpf-avatar">
+                  {photoOf(d)
+                    ? <img src={photoOf(d)} alt={name} />
+                    : <span className="tpf-initials">{initials(name)}</span>}
+                </span>
+              </button>
+            ) : (
+              <div className="tpf-avatar">
+                {photoOf(d)
+                  ? <img src={photoOf(d)} alt={name} />
+                  : <span className="tpf-initials">{initials(name)}</span>}
+              </div>
+            )}
           </div>
           <div className="tpf-intro">
             <h1 className="tpf-name">{name}</h1>
@@ -278,14 +303,14 @@ export default function TherapistProfile2({ therapist, bookHref }) {
               {/* intro video + the three numbers */}
               <div className="tpf-top">
                 {d.intro_video_url && (
-                  <a className="tpf-meet" href={d.intro_video_url} target="_blank" rel="noopener noreferrer">
+                  <button type="button" className="tpf-meet" onClick={() => setViewer({ mode: 'video', start: 0 })}>
                     <img className="tpf-meet-thumb" src={d.intro_video_thumb || photoOf(d)} alt="" />
                     <span className="tpf-meet-text">
                       <span className="tpf-meet-title">Meet {first}</span>
                       <span className="tpf-meet-sub">A short hello before you book</span>
                     </span>
                     <span className="tpf-play">{I.play}</span>
-                  </a>
+                  </button>
                 )}
                 {(years > 0 || languages.length > 0 || price > 0) && (
                   <div className="tpf-stats">
@@ -371,12 +396,12 @@ export default function TherapistProfile2({ therapist, bookHref }) {
                 <section className="tpf-sec" style={{ gap: 16 }}>
                   <div className="tpf-sec-head"><h2 className="tpf-h2">See how {first} works</h2></div>
                   <div className="tpf-rail">
-                    {videos.map((v) => (
-                      <a className="tpf-tile" key={v.title} href={v.url || undefined}
-                        target={v.url ? '_blank' : undefined} rel="noopener noreferrer">
+                    {videos.map((v, i) => (
+                      <button type="button" className="tpf-tile" key={v.title}
+                        onClick={() => setViewer({ mode: 'video', start: intro.length + i })}>
                         <img className="tpf-tile-thumb" src={v.thumb || photoOf(d)} alt="" />
                         <span>{v.title}</span>
-                      </a>
+                      </button>
                     ))}
                   </div>
                 </section>
@@ -561,6 +586,19 @@ export default function TherapistProfile2({ therapist, bookHref }) {
         </div>
       </div>
       </div>
+
+      {viewer && (
+        <StoryViewer2
+          items={clips}
+          start={viewer.start}
+          mode={viewer.mode}
+          name={name}
+          photo={photoOf(d)}
+          verified={!!reg}
+          onClose={() => setViewer(null)}
+          onBook={() => { setViewer(null); router.push(href); }}
+        />
+      )}
     </div>
   );
 }
