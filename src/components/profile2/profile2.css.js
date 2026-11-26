@@ -14,7 +14,7 @@ export const PROFILE2_CSS = `
   --ink:#1C241F; --ink-2:#3D4842; --ink-soft:#535E58; --ink-mute:#6B746F; --ink-faint:#9CA49F;
   --line:#E3E7E5; --tile:#F5F7F6; --tile-2:#F0F3F1; --page:#F9FAFA;
   --green:#2E7D5A; --bright:#39AC71; --dark:#083226;
-  --tpf-w:402px; --tpf-pad:16px;
+  --tpf-w:402px; --tpf-pad:16px; --tpf-top:64px; /* the site header is fixed and 63 tall */
   background:var(--page);color:var(--ink);min-height:100vh;
   font-family:'Figtree',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
   -webkit-font-smoothing:antialiased;
@@ -69,9 +69,20 @@ export const PROFILE2_CSS = `
 }
 .tpf-handle{display:flex;justify-content:center;padding:8px 0 4px;}
 .tpf-handle span{width:36px;height:4px;border-radius:2px;background:#CDD3CF;}
-.tpf-tabs{display:flex;gap:4px;height:52px;padding:0 16px;background:#fff;}
+/* The three tabs ride at the top of the sheet while the page scrolls under them; a tap
+   jumps to that section and the indicator follows whichever section is on screen. */
+/* globals.css sets overflow-x:hidden on <body>, which makes body a scroll container and
+   silently stops position:sticky working inside it. clip hides the same overflow without
+   the scroll container, and only on a page carrying this profile. */
+body:has(.tpf){overflow-x:clip!important;}
+.tpf-tabs{
+  position:sticky;top:var(--tpf-top);z-index:4;display:flex;gap:4px;height:52px;padding:0 16px;
+  background:#fff;border-radius:24px 24px 0 0;
+}
+/* Each tab is as wide as its own label plus 12 either side (Figma: About 70, Sessions 87,
+   Media 68), left-aligned in the bar — not three equal thirds. */
 .tpf-tab{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
   padding:0 12px;height:51px;
 }
 .tpf-tab span{margin-top:14px;font-size:16px;font-weight:500;line-height:20px;color:var(--ink-mute);}
@@ -217,15 +228,142 @@ export const PROFILE2_CSS = `
 /* ───────── tablet and laptop ─────────
    The 402 px phone screen is the design. It is not redrawn: the column is simply given
    more room and stays centred, and the bar at the bottom lines up with it. */
+/* ───────── Sessions (402x763 · gap 48 · pad 40/56) ─────────
+   Availability, how you can meet, and what a session costs. The day cards, the slot grid
+   and the plans card are the sizes Figma gives them; the content is the therapist's real
+   working hours (/availability/public/psychologist/:id/slots) and packages. */
+.tpf-sessions{display:flex;flex-direction:column;gap:48px;padding:40px 0 56px;}
+.tpf-picker{display:flex;flex-direction:column;gap:24px;padding:0 16px;}
+.tpf-days{display:flex;align-items:center;gap:16px;}
+.tpf-day{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  width:74px;height:84px;flex:none;padding:10px 0;border-radius:12px;
+  background:#fff;border:1px solid var(--line);
+}
+.tpf-day b{font-size:11px;font-weight:600;line-height:16px;letter-spacing:.55px;text-transform:uppercase;color:var(--ink-soft);}
+.tpf-day span{font-size:24px;font-weight:500;line-height:32px;letter-spacing:-.24px;color:var(--ink);}
+.tpf-day i{display:block;width:28px;height:4px;border-radius:2px;background:#EAEEEC;overflow:hidden;}
+.tpf-day i em{display:block;height:4px;border-radius:2px;background:#5DC189;}
+.tpf-day.is-on{border-color:var(--bright);box-shadow:0 0 0 1px var(--bright);}
+/* A day with nothing free: grey card, "Full" in place of the bar. */
+.tpf-day.is-full{background:var(--tile);border-color:transparent;}
+.tpf-day.is-full b,.tpf-day.is-full span{color:var(--ink-faint);}
+.tpf-full{
+  padding:3px 8px;border-radius:999px;background:#FFF4F3;
+  font-size:12px;font-weight:600;line-height:16px;color:#A93534;
+}
+.tpf-viewall{
+  display:flex;align-items:center;justify-content:center;gap:4px;flex:1 1 0;min-width:88px;height:84px;
+  border-radius:12px;background:#fff;border:1px solid var(--line);
+  font-size:14px;font-weight:600;line-height:18px;color:var(--ink-mute);
+}
+.tpf-viewall svg{width:16px;height:16px;}
+.tpf-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.tpf-slot{
+  display:flex;align-items:center;justify-content:center;height:48px;border-radius:12px;
+  background:#fff;border:1px solid var(--line);
+  font-size:14px;font-weight:500;line-height:18px;color:var(--ink);
+}
+.tpf-slot:disabled{background:var(--tile-2);border-color:var(--tile-2);color:var(--ink-faint);cursor:default;}
+.tpf-none{padding:0 16px;font-size:14px;line-height:20px;color:var(--ink-mute);}
+
+/* Session plans — one card, a row per plan (370x143 for two rows) */
+.tpf-plans{margin:0 16px;padding:4px 16px;background:#fff;border:1px solid var(--line);border-radius:16px;}
+.tpf-plan{
+  display:flex;align-items:center;gap:12px;width:100%;padding:14px 0;text-align:left;
+  border-bottom:1px solid var(--line);
+}
+.tpf-plan:last-child{border-bottom:0;}
+.tpf-plan-text{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;}
+.tpf-plan-text b{font-size:14px;font-weight:500;line-height:20px;color:var(--ink);}
+.tpf-plan-text small{font-size:12px;font-weight:400;line-height:16px;color:var(--ink-mute);}
+.tpf-plan-text small.is-save{color:var(--green);}
+.tpf-plan-price{font-size:16px;font-weight:600;line-height:20px;color:var(--ink);white-space:nowrap;}
+.tpf-plan svg{width:16px;height:16px;color:var(--ink-mute);flex:none;}
+
+/* ───────── Koott Verified (402x362 · pad 56/40/32) ───────── */
+.tpf-verified{display:flex;flex-direction:column;align-items:center;gap:8px;padding:56px 40px 32px;text-align:center;}
+.tpf-badge{position:relative;display:flex;align-items:center;justify-content:center;width:132px;height:132px;margin-bottom:4px;}
+.tpf-badge::before,.tpf-badge::after{content:'';position:absolute;border-radius:9999px;}
+.tpf-badge::before{inset:0;background:rgba(239,252,242,.7);filter:blur(22px);}
+.tpf-badge::after{inset:15px;background:rgba(226,247,231,.8);opacity:.5;}
+.tpf-badge-core{
+  position:relative;display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:9999px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#EFFCF2 100%);border:1.5px solid #fff;
+  box-shadow:0 10px 24px -6px rgba(46,125,89,.16),0 2px 4px rgba(13,18,15,.06);
+}
+.tpf-badge-core svg{width:34px;height:34px;}
+.tpf-checks{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:8px;}
+.tpf-check{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:500;line-height:16px;color:var(--ink-soft);}
+.tpf-check svg{width:14px;height:14px;color:var(--bright);}
+.tpf-verified p:not(#_){max-width:300px;font-size:14px!important;font-weight:400!important;line-height:20px!important;color:var(--ink-soft)!important;}
+.tpf-verified .tpf-link{align-self:center;margin:0;}
+
+/* ───────── tablet ─────────
+   Figma draws this page at 402 and nothing wider, so everything from here on is ours.
+   A tablet is still one column: the page simply gets more room. */
 @media (min-width:768px){
   .tpf{--tpf-w:560px;}
   .tpf-bookbar-in{max-width:528px;}
   .tpf-about{gap:56px;}
+  .tpf-slots{grid-template-columns:repeat(4,minmax(0,1fr));}
 }
-@media (min-width:1100px){
-  .tpf{--tpf-w:640px;}
-  .tpf-bookbar-in{max-width:608px;}
-  .tpf-hero{padding-bottom:48px;}
+
+/* ───────── laptop ─────────
+   Two columns. Who they are stays on the left, with the booking card under it, both
+   sticky; the sheet scrolls beside them with its tabs. One column of this at 1200 px
+   is a wide phone, which is what this page used to be. Every component keeps the size
+   Figma gives it — only the page around them changes. */
+@media (min-width:1024px){
+  .tpf{--tpf-w:1120px;}
+  .tpf-wrap{
+    display:grid;grid-template-columns:360px minmax(0,1fr);grid-template-rows:auto auto 1fr;gap:40px;
+    align-items:start;padding:24px 40px 56px;
+  }
+  /* The site header is fixed and 63 tall, so everything sticky clears it. */
+  .tpf{--tpf-top:88px;}
+  .tpf-hero{
+    position:sticky;top:88px;grid-column:1;grid-row:1;
+    padding:8px 24px 28px;background:#fff;border:1px solid var(--line);border-radius:24px;
+    box-shadow:0 4px 12px rgba(28,36,31,.04),0 16px 24px rgba(28,36,31,.04);
+  }
+  .tpf-head{padding:0;}
+  .tpf-avatar-wrap{margin-top:12px;}
+  /* The booking bar stops floating and becomes the card under the hero, sticking just
+     below it (hero 330 + the grid's 40 gap + its own 16 of padding). */
+  .tpf-bookbar{
+    /* The wrapper runs the full height of the column (a one-row grid area is only as
+       tall as the card, and nothing can stick inside that); the card itself sticks in it,
+       just under the hero — hero 330 + the grid's 40 gap + this 16 of padding. */
+    display:block;position:static;grid-column:1;grid-row:2 / span 2;align-self:stretch;
+    inset:auto;padding:16px 0 0;background:none;border:0;box-shadow:none;pointer-events:auto;
+  }
+  .tpf-bookbar-in{
+    max-width:none;padding:16px;background:#fff;border:1px solid var(--line);border-radius:20px;
+    box-shadow:0 4px 12px rgba(28,36,31,.04),0 16px 24px rgba(28,36,31,.04);
+    position:sticky;top:474px;
+  }
+  .tpf-sheet{grid-column:2;grid-row:1 / span 3;border-radius:24px;box-shadow:0 4px 12px rgba(28,36,31,.04),0 16px 24px rgba(28,36,31,.04);}
+  .tpf-handle{display:none;}
+  .tpf-tabs{padding:0 24px;}
+  /* The sheet is wider than a phone, so its own 16 px gutter grows with it. */
+  .tpf-sec-head,.tpf-rows,.tpf-chips,.tpf-modes,.tpf-picker,.tpf-bio,.tpf-panel,.tpf-switch,.tpf-faq{padding-left:24px;padding-right:24px;}
+  .tpf-plans{margin:0 24px;}
+  .tpf-link{margin-left:24px;}
+  .tpf-rail{padding-left:24px;padding-right:24px;}
+  /* Nothing is hidden behind a fixed bar any more. */
+  .tpf-spacer{height:24px;}
+  .tpf-slots{grid-template-columns:repeat(4,minmax(0,1fr));}
+  /* On a phone "View all" fills the rest of the row; a laptop row is far wider than
+     three days, so it keeps the size the design gives it and the row starts left. */
+  .tpf-days{justify-content:flex-start;}
+  .tpf-viewall{flex:0 0 auto;min-width:112px;padding:0 16px;}
+}
+
+@media (min-width:1280px){
+  .tpf{--tpf-w:1200px;}
+  .tpf-wrap{grid-template-columns:380px minmax(0,1fr);gap:48px;}
+  .tpf-slots{grid-template-columns:repeat(5,minmax(0,1fr));}
 }
 
 /* ───────── tracking ─────────

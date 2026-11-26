@@ -21,7 +21,7 @@
  * area_of_expertise, the colleges, session modes, description, three FAQs) is live.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { PROFILE2_CSS } from './profile2.css';
@@ -58,6 +58,16 @@ function slotLabel(iso) {
   return `${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}, ${time}`;
 }
 
+const rupees = (n) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+const ymd = (dt) => dt.toLocaleDateString('en-CA');
+/** The label over a day card: TODAY, TOMORROW, then SAT / SUN. */
+function dayCap(date, today) {
+  const diff = Math.round((Date.parse(`${date}T00:00:00`) - Date.parse(`${today}T00:00:00`)) / 864e5);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tmrw';
+  return new Date(`${date}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'short' });
+}
+
 /* ── icons ───────────────────────────────────────────────────────────────── */
 
 const S = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' };
@@ -69,6 +79,9 @@ const I = {
   play: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 4.3v11.4l9.2-5.7-9.2-5.7Z" fill="currentColor" /></svg>,
   arrow: <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7h8M7.6 3.4 11.2 7l-3.6 3.6" {...S16} /></svg>,
   chevDown: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7.5 5 5 5-5" {...S} strokeWidth={1.6} /></svg>,
+  chevRight: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" {...S16} /></svg>,
+  tick: <svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="currentColor" /><path d="m4.4 7.2 1.8 1.8 3.4-3.6" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>,
+  shield: <svg viewBox="0 0 34 34" aria-hidden="true"><path d="M17 3.2 28 7v9.3c0 6.8-4.5 11.9-11 14.5-6.5-2.6-11-7.7-11-14.5V7l11-3.8Z" fill="url(#p2v)" /><path d="m12.2 17.4 3.4 3.4 6.4-6.8" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /><defs><linearGradient id="p2v" x1="6" y1="3" x2="28" y2="31"><stop stopColor="#5DC189" /><stop offset="1" stopColor="#2E7D5A" /></linearGradient></defs></svg>,
   spark: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.5v15M2.5 10h15M4.7 4.7l10.6 10.6M15.3 4.7 4.7 15.3" {...S} strokeWidth={1.6} /></svg>,
   cap: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 7.5 10 4.2l7.5 3.3L10 10.8 2.5 7.5Z" {...S} strokeWidth={1.6} /><path d="M5.8 9v4.2c0 1.2 1.9 2.1 4.2 2.1s4.2-.9 4.2-2.1V9" {...S} strokeWidth={1.6} /></svg>,
   phone: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.3 2.3H3.2c-.6 0-1 .5-1 1.1a10.2 10.2 0 0 0 9.4 9.4c.6 0 1.1-.4 1.1-1v-2.1l-2.4-.8-1.2 1.2a7.7 7.7 0 0 1-3.2-3.2l1.2-1.2-.8-2.4Z" {...S16} /></svg>,
@@ -86,12 +99,16 @@ export default function TherapistProfile2({ therapist, bookHref }) {
   const [details, setDetails] = useState(null);
   const [next, setNext] = useState(null);     // { at, slots }
   const [tab, setTab] = useState('about');
+  const [days, setDays] = useState([]);       // [{ date, slots: [{displayTime, startsAt}] }]
+  const [day, setDay] = useState('');         // the date whose slots are shown
+  const [packs, setPacks] = useState([]);
   const [openFaq, setOpenFaq] = useState(0);
   const [bioOpen, setBioOpen] = useState(false);
   const [allChips, setAllChips] = useState(false);
   const [allApproaches, setAllApproaches] = useState(false);
   const [mediaKind, setMediaKind] = useState('article');
   const [shared, setShared] = useState(false);
+  const secs = useRef({});
 
   const d = useMemo(() => ({ ...t, ...(details || {}) }), [t, details]);
   const name = nameOf(d);
@@ -112,6 +129,50 @@ export default function TherapistProfile2({ therapist, bookHref }) {
     })();
     return () => { live = false; };
   }, [t?.id]);
+
+  /* The Sessions section: the therapist's real free starts for the next two weeks, and
+     what they charge. Both are public and cached by the API. */
+  useEffect(() => {
+    if (!t?.id) return undefined;
+    let live = true;
+    const from = new Date();
+    const to = new Date(Date.now() + 13 * 864e5);
+    (async () => {
+      const [slotRes, packRes] = await Promise.all([
+        fetch(`${API}/availability/public/psychologist/${t.id}/slots?startDate=${ymd(from)}&endDate=${ymd(to)}`)
+          .then((r) => r.json()).catch(() => null),
+        fetch(`${API}/public/psychologists/${t.id}/packages`).then((r) => r.json()).catch(() => null),
+      ]);
+      if (!live) return;
+      const rows = slotRes?.data?.days || [];
+      setDays(rows);
+      setDay((rows.find((r) => (r.slots || []).length) || rows[0] || {}).date || '');
+      setPacks(packRes?.data?.packages || packRes?.packages || []);
+    })();
+    return () => { live = false; };
+  }, [t?.id]);
+
+  /* The tab indicator follows whichever section the page is looking at. */
+  useEffect(() => {
+    const onScroll = () => {
+      const at = ['about', 'sessions', 'media']
+        .filter((k) => secs.current[k])
+        // Below the fixed site header (64) and this sheet's own tab bar (52).
+        .filter((k) => secs.current[k].offsetParent !== null)
+        .reduce((on, k) => (secs.current[k].getBoundingClientRect().top <= 124 ? k : on), 'about');
+      setTab((was) => (was === at ? was : at));
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const goTo = useCallback((key) => {
+    const el = secs.current[key];
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 116;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, []);
 
   /* Open the media tab on a kind that actually has something in it. */
   useEffect(() => {
@@ -152,6 +213,26 @@ export default function TherapistProfile2({ therapist, bookHref }) {
   const mediaKinds = [['article', 'Articles'], ['video', 'Videos'], ['podcast', 'Podcasts']]
     .filter(([k]) => mediaCounts[k]);
   const mediaShown = allMedia.filter((m) => m.type === mediaKind);
+  /* Sessions: three day cards and the chosen day's starts, like the design's picker. */
+  const today = ymd(new Date());
+  const dayCards = days.slice(0, 3);
+  const busiest = Math.max(1, ...days.map((x) => (x.slots || []).length));
+  const chosen = days.find((x) => x.date === day) || null;
+  const chosenSlots = (chosen?.slots || []).slice(0, 6);
+  /* Plans, from the therapist's own packages: one row per single session, then the packs. */
+  const singles = packs.filter((p) => Number(p.session_count) === 1 && p.is_active !== false);
+  const bundles = packs.filter((p) => Number(p.session_count) > 1 && p.is_active !== false
+    && !String(p.package_type).startsWith('couple'));
+  const perSession = (p) => Number(p.price) / Number(p.session_count);
+  const cheapest = bundles.length ? bundles.reduce((a, b) => (perSession(a) <= perSession(b) ? a : b)) : null;
+  const base = Number(singles.find((p) => p.package_type === 'individual')?.price) || price;
+  const bestSave = cheapest ? base * Number(cheapest.session_count) - Number(cheapest.price) : 0;
+  const packCounts = [...new Set(bundles.map((p) => Number(p.session_count)))].sort((a, b) => a - b);
+
+  /* A record with no hours, no modes and no price has nothing to put under Sessions,
+     so neither the section nor its tab is drawn. */
+  const hasSessions = days.length > 0 || modes.length > 0 || singles.length > 0 || price > 0;
+
   const reg = d.registration_number || d.reg_no || '';
   const href = bookHref || `/book/${t.slug || ''}`;
 
@@ -183,18 +264,17 @@ export default function TherapistProfile2({ therapist, bookHref }) {
           <div className="tpf-handle"><span /></div>
 
           <div className="tpf-tabs" role="tablist">
-            <button type="button" role="tab" aria-selected={tab === 'about'}
-              className={`tpf-tab${tab === 'about' ? ' is-on' : ''}`} onClick={() => setTab('about')}>
-              <span>Overview</span><i />
-            </button>
-            <button type="button" role="tab" aria-selected={tab === 'media'}
-              className={`tpf-tab${tab === 'media' ? ' is-on' : ''}`} onClick={() => setTab('media')}>
-              <span>Media</span><i />
-            </button>
+            {[['about', 'About'], ...(hasSessions ? [['sessions', 'Sessions']] : []), ['media', 'Media']].map(([key, label]) => (
+              <button type="button" role="tab" key={key} aria-selected={tab === key}
+                className={`tpf-tab${tab === key ? ' is-on' : ''}`} onClick={() => goTo(key)}>
+                <span>{label}</span><i />
+              </button>
+            ))}
           </div>
 
-          {tab === 'about' ? (
-            <div className="tpf-about">
+          {/* One scroll, three sections — the tabs jump to them, which is what the
+              design's "Tab break" dividers between the sections show. */}
+          <div className="tpf-about" ref={(el) => { secs.current.about = el; }}>
               {/* intro video + the three numbers */}
               <div className="tpf-top">
                 {d.intro_video_url && (
@@ -275,15 +355,6 @@ export default function TherapistProfile2({ therapist, bookHref }) {
                 </section>
               )}
 
-              {modes.length > 0 && (
-                <section className="tpf-sec" style={{ gap: 16 }}>
-                  <div className="tpf-sec-head"><h2 className="tpf-h2">How you can meet</h2></div>
-                  <div className="tpf-modes">
-                    {modes.map((m) => <span className="tpf-mode" key={m}>{MODE_ICON[m] || I.video}{m}</span>)}
-                  </div>
-                </section>
-              )}
-
               {bio && (
                 <section className="tpf-sec" style={{ gap: 12 }}>
                   <div className="tpf-sec-head"><h2 className="tpf-h2">About {first}</h2></div>
@@ -327,11 +398,107 @@ export default function TherapistProfile2({ therapist, bookHref }) {
                   </div>
                 </section>
               )}
-            </div>
-          ) : (
-            <>
-              <div className="tpf-break" />
-              <div className="tpf-media">
+          </div>
+
+          {/* ── Sessions: when they are free, how you can meet, what it costs ── */}
+          {hasSessions && <div className="tpf-break" />}
+          <div
+            className="tpf-sessions"
+            ref={(el) => { secs.current.sessions = el; }}
+            style={hasSessions ? undefined : { display: 'none' }}
+          >
+            {days.length > 0 && (
+              <section className="tpf-sec" style={{ gap: 20 }}>
+                <div className="tpf-sec-head">
+                  <h2 className="tpf-h2">Next available</h2>
+                  <button type="button" className="tpf-see" onClick={() => router.push(href)}>All dates</button>
+                </div>
+                <div className="tpf-picker">
+                  <div className="tpf-days">
+                    {dayCards.map((x) => {
+                      const free = (x.slots || []).length;
+                      return (
+                        <button
+                          type="button"
+                          key={x.date}
+                          className={`tpf-day${free ? '' : ' is-full'}${x.date === day ? ' is-on' : ''}`}
+                          onClick={() => free && setDay(x.date)}
+                          aria-pressed={x.date === day}
+                        >
+                          <b>{dayCap(x.date, today)}</b>
+                          <span>{Number(x.date.slice(8))}</span>
+                          {free
+                            ? <i><em style={{ width: `${Math.max(25, (free / busiest) * 100)}%` }} /></i>
+                            : <span className="tpf-full">Full</span>}
+                        </button>
+                      );
+                    })}
+                    <button type="button" className="tpf-viewall" onClick={() => router.push(href)}>
+                      View all{I.chevRight}
+                    </button>
+                  </div>
+                  {chosenSlots.length > 0 ? (
+                    <div className="tpf-slots">
+                      {chosenSlots.map((sl) => (
+                        <button type="button" className="tpf-slot" key={sl.startsAt || sl.time}
+                          onClick={() => router.push(href)}>
+                          {sl.displayTime}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="tpf-none">No free starts on this day. Try another date.</p>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {modes.length > 0 && (
+              <section className="tpf-sec" style={{ gap: 16 }}>
+                <div className="tpf-sec-head"><h2 className="tpf-h2">How you can meet</h2></div>
+                <div className="tpf-modes">
+                  {modes.map((m) => <span className="tpf-mode" key={m}>{MODE_ICON[m] || I.video}{m}</span>)}
+                </div>
+              </section>
+            )}
+
+            {(singles.length > 0 || price > 0) && (
+              <section className="tpf-sec" style={{ gap: 20 }}>
+                <div className="tpf-sec-head"><h2 className="tpf-h2">Session plans</h2></div>
+                <div className="tpf-plans">
+                  {(singles.length ? singles : [{ id: 'single', name: 'Single session', price, description: '' }])
+                    .map((p) => (
+                      <button type="button" className="tpf-plan" key={p.id} onClick={() => router.push(href)}>
+                        <span className="tpf-plan-text">
+                          <b>{p.name}</b>
+                          {p.description && <small>{p.description}</small>}
+                        </span>
+                        <span className="tpf-plan-price">{rupees(p.price)}</span>
+                        {I.chevRight}
+                      </button>
+                    ))}
+                  {cheapest && (
+                    <button type="button" className="tpf-plan" onClick={() => router.push(href)}>
+                      <span className="tpf-plan-text">
+                        <b>{packCounts.join(', ')} session packs</b>
+                        {bestSave > 0 && (
+                          <small className="is-save">
+                            Save up to {rupees(bestSave)} on a {cheapest.session_count} session pack
+                          </small>
+                        )}
+                      </span>
+                      <span className="tpf-plan-price">from {rupees(perSession(cheapest))}</span>
+                      {I.chevRight}
+                    </button>
+                  )}
+                </div>
+              </section>
+            )}
+          </div>
+
+          {/* ── Media ── */}
+          <div className="tpf-break" />
+          <div className="tpf-media" ref={(el) => { secs.current.media = el; }}>
                 <div className="tpf-sec-head"><h2 className="tpf-h2">Writing and media</h2></div>
                 {mediaKinds.length > 0 ? (
                   <>
@@ -363,13 +530,23 @@ export default function TherapistProfile2({ therapist, bookHref }) {
                     <p className="tpf-mmeta">{first} has not published anything here yet.</p>
                   </div>
                 )}
-              </div>
-            </>
-          )}
+          </div>
+
+          {/* ── Koott Verified ── */}
+          <section className="tpf-verified">
+            <span className="tpf-badge"><span className="tpf-badge-core">{I.shield}</span></span>
+            <h2 className="tpf-h2">Koott Verified</h2>
+            <div className="tpf-checks">
+              {['Licensed', 'Interviewed', 'Reviewed'].map((c) => (
+                <span className="tpf-check" key={c}>{I.tick}{c}</span>
+              ))}
+            </div>
+            <p>Every therapist is checked by our clinical team before they join.</p>
+            <a className="tpf-link" href="/about-us">How we choose therapists</a>
+          </section>
 
           <div className="tpf-spacer" />
         </div>
-      </div>
 
       <div className="tpf-bookbar">
         <div className="tpf-bookbar-in">
@@ -382,6 +559,7 @@ export default function TherapistProfile2({ therapist, bookHref }) {
           </div>
           <button type="button" className="tpf-book" onClick={() => router.push(href)}>Book a session</button>
         </div>
+      </div>
       </div>
     </div>
   );
