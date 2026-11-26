@@ -21,6 +21,6 @@ export default function ClientMessagesPage() {
     }
   }, [user, authLoading, router]);
 
-  // Don't render a loading UI - root PageLoadingOverlay already shows on navigation to avoid double/overlapping loaders
+  // Don't render a loading UI here: the page draws its own once it has data.
   return null;
 }

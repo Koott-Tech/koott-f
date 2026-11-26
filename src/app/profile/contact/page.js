@@ -9,6 +9,6 @@ export default function ContactRedirectPage() {
     router.replace('/profile/profile');
   }, [router]);
 
-  // Don't render a loading spinner - root PageLoadingOverlay already shows on navigation to avoid double/overlapping loaders
+  // Don't render a loading spinner here: the profile shell already holds the loader.
   return null;
 }

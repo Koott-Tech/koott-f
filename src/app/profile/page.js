@@ -26,7 +26,7 @@ function ProfileHome() {
     router.replace(`/profile/${path}`);
   }, [router, searchParams]);
 
-  // While a ?tab= link redirects, the root PageLoadingOverlay is already on screen.
+  // While a ?tab= link redirects, the profile shell's loader is already on screen.
   if (redirecting) return null;
   return <Account2 />;
 }

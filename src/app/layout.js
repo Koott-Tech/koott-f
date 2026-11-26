@@ -1,5 +1,4 @@
 import "./globals.css";
-import { Suspense } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 import HeaderWrapper from "@/components/HeaderWrapper";
@@ -7,7 +6,6 @@ import FooterWrapper from "@/components/FooterWrapper";
 import ConditionalProviders from "@/components/ConditionalProviders";
 import ConditionalPadding from "@/components/ConditionalPadding";
 import WhatsAppWidgetWrapper from "@/components/WhatsAppWidgetWrapper";
-import PageLoadingOverlay from "@/components/PageLoadingOverlay";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { PostHogProvider } from "@/components/PostHogProvider";
 import AnalyticsProvider from "@/components/analytics/AnalyticsProvider";
@@ -89,7 +87,10 @@ export const viewport = {
 
 export default async function RootLayout({ children }) {
   return (
-    <html lang="en">
+    /* The inline script below marks <html> with `splash-done` before React
+       hydrates, which React would otherwise report as an attribute the server
+       did not send. */
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Favicon */}
         <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
@@ -284,17 +285,48 @@ export default async function RootLayout({ children }) {
               visibility: hidden !important;
               transition: opacity 300ms ease-out !important;
             }
-            /* Seen it already this session: never render it, so there is no flash. */
-            html.splash-done #initial-loader { display: none !important; }
-            html.splash-done body:not(.loaded) { overflow: auto !important; }
-            html.splash-done body:not(.loaded) > *:not(#initial-loader) { pointer-events: auto !important; }
-
-            /* ── the preloader (Figma "Preloader" 7858:79501) ── */
-            #initial-loader {
-              background: #083226 !important;
-              flex-direction: column !important;
+            /* ── the loader these pages share (unchanged) ── */
+             #initial-loader .loading-logo {
+              /* The tab icon itself — one square mark, so it is the same thing
+                 people see in the browser tab and on a home screen. */
+              width: 180px;
+              height: 180px;
+              margin: 0 auto;
+              background-image: url('/loader-mark.webp'); /* 360 px copy of favicon-512.png (14 KB, was 57 KB) */
+              background-size: contain;
+              background-repeat: no-repeat;
+              background-position: center;
+              animation: pulseScale 2s ease-in-out infinite;
             }
-            #initial-loader .kl-glow {
+            @keyframes pulseScale {
+              0% { transform: scale(1); opacity: 0.9; }
+              50% { transform: scale(1.05); opacity: 1; }
+              100% { transform: scale(1); opacity: 0.9; }
+            }
+            @media (max-width: 767px) {
+              #initial-loader .loading-logo {
+                width: 128px !important;
+                height: 128px !important;
+              }
+            }
+
+            /* ── the preloader (Figma "Preloader" 7858:79501) ──
+               Over the loader, on the first visit of a session only. */
+            html.splash-done #koott-splash { display: none !important; }
+            #koott-splash {
+              position: fixed;
+              inset: 0;
+              z-index: 1000000;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              background: #083226;
+              overflow: hidden;
+              opacity: 1;
+              transition: opacity 400ms ease-out, transform 400ms ease-out;
+            }
+            #koott-splash .kl-glow {
               position: absolute;
               left: 50%;
               bottom: -60px;
@@ -306,17 +338,17 @@ export default async function RootLayout({ children }) {
               opacity: .85;
               pointer-events: none;
             }
-            #initial-loader .kl-mark {
+            #koott-splash .kl-mark {
               position: relative;
               width: 153px;
               height: 51px;
               /* Figma sits the wordmark a little above the middle of the screen. */
               margin-top: -34px;
             }
-            #initial-loader .kl-mark img { display: block; width: 153px; height: 51px; }
-            #initial-loader .kl-mark-base { opacity: .2; }
+            #koott-splash .kl-mark img { display: block; width: 153px; height: 51px; }
+            #koott-splash .kl-mark-base { opacity: .2; }
             /* The wipe: a window over the finished wordmark that opens left to right. */
-            #initial-loader .kl-mark-wipe {
+            #koott-splash .kl-mark-wipe {
               position: absolute;
               inset: 0;
               width: 0;
@@ -324,7 +356,7 @@ export default async function RootLayout({ children }) {
               animation: klWipe 1100ms cubic-bezier(.22,.61,.36,1) 120ms forwards;
             }
             @keyframes klWipe { to { width: 153px; } }
-            #initial-loader .kl-badge {
+            #koott-splash .kl-badge {
               position: absolute;
               left: 50%;
               bottom: 60px;
@@ -338,7 +370,7 @@ export default async function RootLayout({ children }) {
               animation: klFade 600ms ease-out 900ms forwards;
             }
             @keyframes klFade { to { opacity: .4; } }
-            #initial-loader .kl-badge-i {
+            #koott-splash .kl-badge-i {
               display: flex;
               align-items: center;
               justify-content: center;
@@ -347,8 +379,8 @@ export default async function RootLayout({ children }) {
               border-radius: 9999px;
               background: rgba(255,255,255,.08);
             }
-            #initial-loader .kl-badge-i svg { width: 20px; height: 20px; }
-            #initial-loader .kl-badge-t {
+            #koott-splash .kl-badge-i svg { width: 20px; height: 20px; }
+            #koott-splash .kl-badge-t {
               font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
               font-size: 14px;
               font-weight: 600;
@@ -358,14 +390,16 @@ export default async function RootLayout({ children }) {
             }
             /* It lifts away rather than only fading, as the design shows the page
                arriving from underneath it. */
-            body.loaded #initial-loader {
-              transform: translateY(-24px) !important;
-              transition: opacity 400ms ease-out, transform 400ms ease-out !important;
+            body.loaded #koott-splash {
+              opacity: 0;
+              transform: translateY(-24px);
+              pointer-events: none;
+              visibility: hidden;
             }
             @media (prefers-reduced-motion: reduce) {
-              #initial-loader .kl-mark-wipe { animation: none; width: 153px; }
-              #initial-loader .kl-badge { animation: none; opacity: .4; }
-              body.loaded #initial-loader { transform: none !important; }
+              #koott-splash .kl-mark-wipe { animation: none; width: 153px; }
+              #koott-splash .kl-badge { animation: none; opacity: .4; }
+              body.loaded #koott-splash { transform: none; }
             }
           `,
           }}
@@ -408,13 +442,19 @@ export default async function RootLayout({ children }) {
       <body className="antialiased bg-gray-50" suppressHydrationWarning>
         {/* INSTANT - Server-rendered loader (appears at 0ms, no hydration needed) */}
         {/* Position:fixed overlay - NEVER affects layout flow, prevents CLS */}
-        {/* The Koott 2.0 preloader (Figma "Preloader", 7858:79501): the wordmark
-            wipes in left to right over a dark green field, its two dots land in
-            #4FE18B, and a soft green glow sits along the bottom. It is shown once
-            per browser session — the script above adds `splash-done` to <html>
-            on every visit after the first, which hides this outright, so moving
-            between pages never brings it back. */}
+        {/* The loader these pages share: the inline script above holds it over
+            the first paint, and LogoLoader holds it while a client page fetches
+            what it needs (/profile, /dashboard, the service pages). */}
         <div id="initial-loader">
+          <div className="loading-logo"></div>
+        </div>
+        {/* The Koott 2.0 preloader (Figma "Preloader", 7858:79501), over the top
+            of it: the wordmark wipes in left to right, its two dots land in
+            #4FE18B, and a soft green glow sits along the bottom. Shown once per
+            browser session — the script above adds `splash-done` to <html> on
+            every visit after the first, which keeps this out of the page
+            entirely, so moving between pages never brings it back. */}
+        <div id="koott-splash">
           <div className="kl-glow" aria-hidden="true"></div>
           <div className="kl-mark" role="img" aria-label="Koott">
             <img className="kl-mark-base" src="/design/home/logo-white.svg" alt="" width={153} height={51} />
@@ -429,10 +469,6 @@ export default async function RootLayout({ children }) {
             <span className="kl-badge-t">India&rsquo;s trusted Therapy App</span>
           </div>
         </div>
-        {/* Client-side PageLoadingOverlay - handles navigation transitions */}
-        <Suspense fallback={null}>
-          <PageLoadingOverlay />
-        </Suspense>
         {/* No page-wide <Suspense> here: it made every notFound() page stream a
             200. PostHogProvider keeps its own small boundary for useSearchParams. */}
         <ErrorBoundary>

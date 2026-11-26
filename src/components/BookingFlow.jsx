@@ -723,7 +723,7 @@ export default function BookingFlow({ slug }) {
       if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
       e.preventDefault();
       e.stopPropagation();
-      e.koottHeld = true; // PageLoadingOverlay: no loader for a held click
+      e.koottHeld = true; // marks the click as handled here, not a real navigation
       setLeaveAsk({ href: url.pathname + url.search + url.hash });
     };
     document.addEventListener('click', onClick, true);
