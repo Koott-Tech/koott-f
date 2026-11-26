@@ -61,6 +61,8 @@ const usablePhone = (p) => (String(p || '').replace(/\D/g, '').length >= 8 ? Str
 const readType = (p) => packageKind(p);
 
 const THERAPY_TYPES = [['individual', 'Individual therapy'], ['couple', 'Couple therapy']];
+// Koott 2.0 draws each kind with its own 42 px illustration (public/design/book2).
+const K2_TYPE_ART = { individual: 'individual', couple: 'couple', psychiatry_15: 'psychiatry', psychiatry_30: 'psychiatry' };
 const PSYCHIATRY_TYPES = [['psychiatry_15', '15-min consultation'], ['psychiatry_30', '30-min consultation']];
 const TYPE_LABEL = {
   individual: 'Individual therapy', couple: 'Couple therapy',
@@ -955,11 +957,21 @@ export default function BookingFlow({ slug }) {
             <img src="/design/booking/arrow-left.svg" alt="" width={24} height={24} />
           </button>
         ) : (!paidDone && !booked && !authLoading && step < 4) ? (
-          <div className="bfx-top">
+          /* Koott 2.0 header (Figma "Booking Flow" 7858:85649): a round back
+             button, the therapist in a pill, and a spacer the same size as the
+             button so the pill sits centred. The step dots the old design used
+             are kept in StepDots, unused, so the swap is easy to reverse. */
+          <div className="bfx-top is-k2">
             <button type="button" className="bfx-back" onClick={back} aria-label="Back">
-              <img src="/design/booking/arrow-left.svg" alt="" width={24} height={24} />
+              <img src="/design/booking/arrow-left.svg" alt="" width={20} height={20} />
             </button>
-            <StepDots at={step} />
+            <span className="bfx-who">
+              {photo
+                ? <img src={photo} alt="" width={24} height={24} />
+                : <span className="bfx-who-i" aria-hidden>{initials}</span>}
+              <span className="bfx-who-n">{name}</span>
+            </span>
+            <span className="bfx-top-spacer" aria-hidden />
           </div>
         ) : null}
 
@@ -1117,7 +1129,17 @@ export default function BookingFlow({ slug }) {
             <div className="bfx-types">
               {typeChoices.map(([k, label]) => (
                 <button key={k} type="button" className={`bfx-type ${kind === k ? 'is-on' : ''}`} onClick={() => chooseType(k)}>
-                  <span className="bfx-ic" style={{ '--ic': `url(/design/booking/${FX_TYPE_ICON[k] || 'user-03'}.svg)` }} aria-hidden />
+                  {/* The illustration is hidden rather than broken if its file is not
+                      there yet: individual.png and couple.png are still to be exported
+                      from Figma, and the label alone reads fine without them. */}
+                  <img
+                    className="bfx-type-ic"
+                    src={`/design/book2/${K2_TYPE_ART[k] || 'individual'}.png`}
+                    alt=""
+                    width={42}
+                    height={42}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
                   <span className="bfx-type-l">{FX_TYPE_LABEL[k] || label}</span>
                 </button>
               ))}
@@ -1849,6 +1871,43 @@ const CSS = `
 .bfx-type.is-on,.bfx-type:hover{border-color:#189E4F;box-shadow:0 8px 12px #EBF3EE;}
 .bfx-type.is-on .bfx-type-l,.bfx-type:hover .bfx-type-l{font-weight:500!important;color:#0F0F0F!important;}
 .bfx-type.is-on .bfx-ic,.bfx-type:hover .bfx-ic{background:#189E4F;}
+
+/* ───────── Koott 2.0, step 0 (Figma "Booking Flow", 7858:85649 at 402) ─────────
+   Header 402x56 with pad 4/16/12/16; the pill 139x38; options 370x76 at r12 with
+   a 42 px illustration and a 16/24 label. These come after the rules above so
+   they win without those having to be deleted while the other steps still use
+   them. */
+.bfx-top.is-k2{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  height:56px;margin:0 0 24px;padding:4px 0 12px;
+}
+.bfx-top.is-k2 .bfx-back{
+  display:flex;align-items:center;justify-content:center;width:40px;height:40px;flex:none;
+  border-radius:9999px;background:#fff;
+  box-shadow:inset 0 0 0 1px #E3E7E5,0 1px 2px rgba(28,36,31,.04),0 3px 3px rgba(28,36,31,.03),0 8px 5px rgba(28,36,31,.02);
+}
+.bfx-top-spacer{width:34px;height:34px;flex:none;}
+.bfx-who{
+  display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 12px 0 8px;flex:none;
+  border-radius:9999px;background:#fff;
+  box-shadow:inset 0 0 0 1px #E3E7E5,0 1px 2px rgba(28,36,31,.04),0 3px 3px rgba(28,36,31,.03),0 8px 5px rgba(28,36,31,.02);
+}
+.bfx-who img,.bfx-who-i{width:24px;height:24px;border-radius:9999px;object-fit:cover;flex:none;}
+.bfx-who-i{display:inline-flex;align-items:center;justify-content:center;background:#E9F1E4;color:#1B6930;font:600 11px/1 'Figtree',sans-serif;}
+.bfx-who-n{font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:18px!important;color:#535E58!important;white-space:nowrap;}
+
+.bfx-types{width:370px;max-width:100%;gap:16px;}
+.bfx-type{
+  height:76px;gap:12px;padding:16px;border:0;border-radius:12px;
+  box-shadow:inset 0 0 0 1px #E3E7E5;
+}
+.bfx-type-ic{width:42px;height:42px;flex:none;}
+.bfx-type-l{
+  font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#1C241F!important;
+}
+.bfx-type.is-on,.bfx-type:hover{box-shadow:inset 0 0 0 1.5px #39AC71,0 8px 12px #EBF3EE;}
+.bfx-type.is-on .bfx-type-l,.bfx-type:hover .bfx-type-l{font-weight:600!important;color:#1C241F!important;}
 
 /* step 1: schedule */
 .bfx-title-who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
