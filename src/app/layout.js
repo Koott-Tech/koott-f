@@ -130,12 +130,26 @@ export default async function RootLayout({ children }) {
                 if (typeof window === 'undefined') return;
                 
                 const LOADER_ID = 'initial-loader';
+                /* The preloader belongs to arriving at Koott, not to moving around
+                   inside it. It plays once per browser session: every visit after
+                   the first marks <html> before anything paints, so there is no
+                   flash of it on a second page. */
+                var SPLASH_KEY = 'koott_splash_seen';
+                var firstVisit = true;
+                try { firstVisit = sessionStorage.getItem(SPLASH_KEY) !== '1'; } catch (e) { /* private mode */ }
+                if (!firstVisit) {
+                  document.documentElement.classList.add('splash-done');
+                } else {
+                  try { sessionStorage.setItem(SPLASH_KEY, '1'); } catch (e) { /* private mode */ }
+                }
                 // This runs in <head>, before <body> and the loader exist — both are
                 // looked up again when the loader is hidden.
                 let body = document.body;
                 let loader = document.getElementById(LOADER_ID);
                 // No minimum: the loader only covers the time the page really needs.
-                const MIN_DISPLAY_TIME = 0;
+                // Long enough for the wipe to finish when the preloader does play;
+                // nothing at all on every later page, where it is already hidden.
+                const MIN_DISPLAY_TIME = firstVisit ? 1500 : 0;
                 let showTime = null; // Track when loader was shown
                 
                 // Show loader immediately on every page load/refresh with smooth fade in
@@ -270,28 +284,88 @@ export default async function RootLayout({ children }) {
               visibility: hidden !important;
               transition: opacity 300ms ease-out !important;
             }
-             #initial-loader .loading-logo {
-              /* The tab icon itself — one square mark, so it is the same thing
-                 people see in the browser tab and on a home screen. */
-              width: 180px;
-              height: 180px;
-              margin: 0 auto;
-              background-image: url('/loader-mark.webp'); /* 360 px copy of favicon-512.png (14 KB, was 57 KB) */
-              background-size: contain;
-              background-repeat: no-repeat;
-              background-position: center;
-              animation: pulseScale 2s ease-in-out infinite;
+            /* Seen it already this session: never render it, so there is no flash. */
+            html.splash-done #initial-loader { display: none !important; }
+            html.splash-done body:not(.loaded) { overflow: auto !important; }
+            html.splash-done body:not(.loaded) > *:not(#initial-loader) { pointer-events: auto !important; }
+
+            /* ── the preloader (Figma "Preloader" 7858:79501) ── */
+            #initial-loader {
+              background: #083226 !important;
+              flex-direction: column !important;
             }
-            @keyframes pulseScale {
-              0% { transform: scale(1); opacity: 0.9; }
-              50% { transform: scale(1.05); opacity: 1; }
-              100% { transform: scale(1); opacity: 0.9; }
+            #initial-loader .kl-glow {
+              position: absolute;
+              left: 50%;
+              bottom: -60px;
+              width: 140%;
+              height: 190px;
+              transform: translateX(-50%);
+              background: #39AC71;
+              filter: blur(120px);
+              opacity: .85;
+              pointer-events: none;
             }
-            @media (max-width: 767px) {
-              #initial-loader .loading-logo {
-                width: 128px !important;
-                height: 128px !important;
-              }
+            #initial-loader .kl-mark {
+              position: relative;
+              width: 153px;
+              height: 51px;
+              /* Figma sits the wordmark a little above the middle of the screen. */
+              margin-top: -34px;
+            }
+            #initial-loader .kl-mark img { display: block; width: 153px; height: 51px; }
+            #initial-loader .kl-mark-base { opacity: .2; }
+            /* The wipe: a window over the finished wordmark that opens left to right. */
+            #initial-loader .kl-mark-wipe {
+              position: absolute;
+              inset: 0;
+              width: 0;
+              overflow: hidden;
+              animation: klWipe 1100ms cubic-bezier(.22,.61,.36,1) 120ms forwards;
+            }
+            @keyframes klWipe { to { width: 153px; } }
+            #initial-loader .kl-badge {
+              position: absolute;
+              left: 50%;
+              bottom: 60px;
+              width: 160px;
+              transform: translateX(-50%);
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 5px;
+              opacity: 0;
+              animation: klFade 600ms ease-out 900ms forwards;
+            }
+            @keyframes klFade { to { opacity: .4; } }
+            #initial-loader .kl-badge-i {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 40px;
+              height: 40px;
+              border-radius: 9999px;
+              background: rgba(255,255,255,.08);
+            }
+            #initial-loader .kl-badge-i svg { width: 20px; height: 20px; }
+            #initial-loader .kl-badge-t {
+              font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+              font-size: 14px;
+              font-weight: 600;
+              line-height: 18px;
+              text-align: center;
+              color: #C9FFDB;
+            }
+            /* It lifts away rather than only fading, as the design shows the page
+               arriving from underneath it. */
+            body.loaded #initial-loader {
+              transform: translateY(-24px) !important;
+              transition: opacity 400ms ease-out, transform 400ms ease-out !important;
+            }
+            @media (prefers-reduced-motion: reduce) {
+              #initial-loader .kl-mark-wipe { animation: none; width: 153px; }
+              #initial-loader .kl-badge { animation: none; opacity: .4; }
+              body.loaded #initial-loader { transform: none !important; }
             }
           `,
           }}
@@ -334,8 +408,26 @@ export default async function RootLayout({ children }) {
       <body className="antialiased bg-gray-50" suppressHydrationWarning>
         {/* INSTANT - Server-rendered loader (appears at 0ms, no hydration needed) */}
         {/* Position:fixed overlay - NEVER affects layout flow, prevents CLS */}
+        {/* The Koott 2.0 preloader (Figma "Preloader", 7858:79501): the wordmark
+            wipes in left to right over a dark green field, its two dots land in
+            #4FE18B, and a soft green glow sits along the bottom. It is shown once
+            per browser session — the script above adds `splash-done` to <html>
+            on every visit after the first, which hides this outright, so moving
+            between pages never brings it back. */}
         <div id="initial-loader">
-          <div className="loading-logo"></div>
+          <div className="kl-glow" aria-hidden="true"></div>
+          <div className="kl-mark" role="img" aria-label="Koott">
+            <img className="kl-mark-base" src="/design/home/logo-white.svg" alt="" width={153} height={51} />
+            <span className="kl-mark-wipe">
+              <img src="/design/home/logo-splash.svg" alt="" width={153} height={51} />
+            </span>
+          </div>
+          <div className="kl-badge" aria-hidden="true">
+            <span className="kl-badge-i">
+              <svg viewBox="0 0 20 20"><path d="M2.5 4.6h7.1M6 3v1.6m2 0c0 3.1-2.4 5.7-5.5 5.7m5.5-5.7c0 1.7-.9 3.3-2.3 4.4M7.3 9.1 5 6.9m5.4 8.2h6.1m-7.3 2.3 4.2-9.1 4.1 9.1" fill="none" stroke="#C9FFDB" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </span>
+            <span className="kl-badge-t">India&rsquo;s trusted Therapy App</span>
+          </div>
         </div>
         {/* Client-side PageLoadingOverlay - handles navigation transitions */}
         <Suspense fallback={null}>
