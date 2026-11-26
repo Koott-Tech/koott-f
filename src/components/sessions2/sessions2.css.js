@@ -59,6 +59,9 @@ export const SESSIONS2_CSS = `
 
 /* ───────── green hero, on the two detail screens ───────── */
 .s2-hero{background:var(--bright);padding-bottom:32px;}
+/* A refund is not a finished session: Figma gives its hero the amber of money on its
+   way back (8063:4596), not the green of a session that happened. */
+.s2-hero.is-refund{background:#964D09;}
 .s2-hero .s2-back{background:rgba(255,255,255,.18);}
 .s2-hero .s2-back svg *{stroke:#fff;}
 .s2-hero .s2-help{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);color:#fff;}
@@ -118,6 +121,41 @@ export const SESSIONS2_CSS = `
 .s2-id button{flex:none;display:flex;width:16px;height:16px;}
 .s2-id svg{width:16px;height:16px;}
 .s2-div{height:1px;background:var(--line);}
+
+/* ───────── the next session, drawn in full (Figma 8064:26300 · 370x295) ─────────
+   Who it is with, when it is in both zones, the meeting link, a note to send, and
+   the way in. Every other card on the list stays in its compact form. */
+.s2-card.is-next{box-shadow:0 4px 12px rgba(28,36,31,.04),0 16px 24px rgba(28,36,31,.04),0 32px 40px rgba(28,36,31,.02);}
+.s2-next-head{display:flex;align-items:center;gap:12px;padding:16px;}
+.s2-next-head .s2-photo{width:48px;height:48px;}
+.s2-next-who{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
+.s2-next-name{font-size:18px;font-weight:600;line-height:24px;letter-spacing:-.09px;color:var(--ink);}
+.s2-next-role{font-size:11px;font-weight:600;line-height:16px;letter-spacing:.55px;text-transform:uppercase;color:var(--ink-soft);}
+.s2-when-block{display:flex;flex-direction:column;gap:12px;padding:16px;}
+.s2-when-row{display:flex;align-items:center;gap:8px;min-width:0;}
+.s2-tile{
+  display:flex;align-items:center;justify-content:center;flex:none;width:25px;height:26px;
+  border:1px solid var(--line);border-radius:8px;
+}
+.s2-tile svg{width:14px;height:14px;color:var(--ink-mute);}
+.s2-time{font-size:14px;font-weight:500;line-height:20px;color:var(--ink-soft);white-space:nowrap;}
+.s2-zone{
+  flex:none;padding:0 4px;border-radius:4px;background:var(--ink-faint);color:#fff;
+  font-size:11px;font-weight:700;line-height:16px;letter-spacing:.55px;text-transform:uppercase;
+}
+.s2-meet{
+  flex:1;min-width:0;font-size:14px;font-weight:500;line-height:20px;color:var(--ink-soft);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.s2-note-row{display:flex;align-items:center;gap:8px;padding:16px;}
+.s2-note-row input{
+  flex:1;min-width:0;border:0;background:none;outline:0;font:inherit;
+  font-size:14px;font-weight:500;line-height:20px;color:var(--ink);
+}
+.s2-note-row input::placeholder{color:var(--ink-faint);}
+.s2-note-send{flex:none;font-size:14px;font-weight:600;line-height:20px;color:var(--green);}
+.s2-note-send[disabled]{color:var(--ink-faint);cursor:default;}
+.s2-note-said{font-size:12px;font-weight:500;line-height:16px;color:var(--green);}
 .s2-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;}
 .s2-foot-label{flex:1;min-width:0;font-size:14px;font-weight:600;line-height:20px;color:var(--ink-soft);}
 .s2-foot-note{flex:1;min-width:0;font-size:14px;font-weight:400;line-height:20px;color:var(--ink-2);}

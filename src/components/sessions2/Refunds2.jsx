@@ -183,7 +183,7 @@ export function RefundDetails2({ refundId }) {
   return (
     <div className="s2">
       <style dangerouslySetInnerHTML={{ __html: SESSIONS2_CSS }} />
-      <div className="s2-hero">
+      <div className="s2-hero is-refund">
         <div className="s2-shell">
           <div className="s2-top">
             <button type="button" className="s2-back" onClick={() => router.push('/profile/refunds')} aria-label="Go back">{Icon.back}</button>

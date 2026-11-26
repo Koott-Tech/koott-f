@@ -20,6 +20,7 @@ export const Icon = {
   chevGreen: <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M6.75 4.5 11.25 9l-4.5 4.5" {...S} stroke="#39AC71" /></svg>,
   clock: <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" {...S} stroke="#9CA49F" /><path d="M8 4.67V8l2 1.33" {...S} stroke="#9CA49F" /></svg>,
   copy: <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.33" y="5.33" width="8.67" height="8.67" rx="2" {...S} stroke="#6B746F" strokeWidth={1.33} /><path d="M10.67 5.33V4c0-1.1-.9-2-2-2H4a2 2 0 0 0-2 2v4.67c0 1.1.9 2 2 2h1.33" {...S} stroke="#6B746F" strokeWidth={1.33} /></svg>,
+  video: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M14.7 5.3 11.3 8l3.4 2.7V5.3Z" {...S} stroke="#6B746F" strokeWidth={1.4} /><rect x="1.3" y="4" width="10" height="8" rx="2" {...S} stroke="#6B746F" strokeWidth={1.4} /></svg>,
   tick: <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" {...S} stroke="#2E7D5A" strokeWidth={1.6} /></svg>,
   refresh: <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3.3 13.3A13 13 0 0 1 25.3 7l3.4 3.3M28.7 4v6.7h-6.7M28.7 18.7A13 13 0 0 1 6.7 25l-3.4-3.3M3.3 28v-6.7H10" {...S} stroke="#39AC71" strokeWidth={2} /></svg>,
   receipt: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.17 2.5v15l2.08-1.67 1.67 1.67 1.67-1.67 1.66 1.67 1.67-1.67 2.08 1.67v-15l-2.08 1.67-1.67-1.67-1.66 1.67-1.67-1.67L6.25 4.17 4.17 2.5Z" {...S} stroke="#2E7D5A" /><path d="m7.5 10 1.67 1.67L12.5 8.33" {...S} stroke="#2E7D5A" /></svg>,
@@ -86,6 +87,44 @@ export function whenOf(date, tz, withYear = false) {
   }).format(date);
   const time = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(date);
   return `${day} · ${time}`;
+}
+
+/** How far a zone is from UTC right now, in minutes (IST = 330). */
+export function offsetOf(tz, at = new Date()) {
+  try {
+    const p = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(at).reduce((o, x) => (x.type === 'literal' ? o : { ...o, [x.type]: x.value }), {});
+    const asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
+    // The clock's own milliseconds are not part of the offset; without dropping them
+    // India comes out 329 minutes and every time is drawn twice.
+    return Math.round((asUtc - Math.floor(at.getTime() / 1000) * 1000) / 60000);
+  } catch { return 0; }
+}
+
+/** The badge on a time. Intl calls India "GMT+5:30"; the design (and everyone) says IST. */
+export function zoneLabel(tz) {
+  if (offsetOf(tz) === 330) return 'IST';
+  const name = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'short' })
+    .formatToParts(new Date()).find((p) => p.type === 'timeZoneName')?.value || '';
+  return name.replace('GMT', 'GMT ').trim();
+}
+
+/** "7:00 PM" in the given zone. */
+export const timeIn = (date, tz) => (date
+  ? new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(date)
+  : '');
+
+/** "Today, 7:00 PM" / "Tomorrow, 7:00 PM" / "Fri 27 Nov, 7:00 PM" */
+export function nearWhen(date, tz) {
+  if (!date) return '';
+  const key = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(d);
+  const now = new Date();
+  if (key(date) === key(now)) return `Today, ${timeIn(date, tz)}`;
+  if (key(date) === key(new Date(now.getTime() + 864e5))) return `Tomorrow, ${timeIn(date, tz)}`;
+  const day = new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short', day: '2-digit', month: 'short' }).format(date);
+  return `${day}, ${timeIn(date, tz)}`;
 }
 
 /** "16 Nov 2026" */
