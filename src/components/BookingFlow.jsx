@@ -223,6 +223,12 @@ export default function BookingFlow({ slug }) {
   const [mode, setMode] = useState('packages');           // 'packages' | 'single'
   const [plan, setPlan] = useState(null);
   const [pendingPlanId, setPendingPlanId] = useState(null); // from a saved draft, applied once packages load
+  /* The coupon on "Review and pay". The code is all the client ever sends: the
+     server re-checks it when the order is created and decides the amount. */
+  const [couponText, setCouponText] = useState('');
+  const [coupon, setCoupon] = useState(null);      // { code, label, discountAmount, finalAmount }
+  const [couponState, setCouponState] = useState(''); // '' | 'checking' | 'bad'
+  const [couponErr, setCouponErr] = useState('');
   const [verifyRestoredSlot, setVerifyRestoredSlot] = useState(false);
   const [slotNotice, setSlotNotice] = useState('');        // 'passed' | 'taken' — a saved time that no longer stands
   const [lostSlot, setLostSlot] = useState(null);          // that time, to suggest the nearest free one
@@ -273,6 +279,10 @@ export default function BookingFlow({ slug }) {
   const isClient = user?.role === 'client';
   const accountPhone = usablePhone(user?.profile?.phone_number || user?.phone_number);
   const needsPhone = !verified && !(isAuthenticated() && isClient && accountPhone);
+  /* "About yourself" is not in the Koott 2.0 flow: a signed-in client already gave
+     their name and email when they signed in, so the step is skipped for them and
+     kept for anyone booking without an account. */
+  const needsAbout = !(isAuthenticated() && isClient && about.name.trim() && about.email.trim());
   // Staff, therapists and admins can't book (sessions belong to a client account): say so on
   // "About yourself" rather than leaving them stuck. The email box is locked only when the
   // signed-in client's account actually supplies it; otherwise it stays typeable.
@@ -736,7 +746,10 @@ export default function BookingFlow({ slug }) {
   const back = () => {
     if (modeOpen) { setModeOpen(false); return; }
     if (pkgMode) { if (step <= 1) router.back(); else setStep(1); return; }
-    if (needsPhone || step === 0) router.back(); else setStep((s) => s - 1);
+    if (needsPhone || step === 0) router.back();
+    // Step 3 is skipped on the way forward for a signed-in client, so it is skipped
+    // on the way back too, or Back would land on a page they never saw.
+    else setStep((s) => (s === 4 && !needsAbout ? 2 : s - 1));
   };
 
   const chooseType = (nextKind) => {
@@ -747,6 +760,38 @@ export default function BookingFlow({ slug }) {
     setMode('packages');
     setStep(1);
   };
+
+  /* ------------------------------ coupon -------------------------------- */
+
+  const applyCoupon = useCallback(async (amount) => {
+    const code = couponText.trim().toUpperCase();
+    if (!code || couponState === 'checking') return;
+    setCouponState('checking'); setCouponErr('');
+    try {
+      const res = await fetch(`${API}/coupons/validate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ code, amount }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json.success === false) {
+        setCoupon(null); setCouponState('bad');
+        setCouponErr(json.message || 'That code did not work.');
+        return;
+      }
+      setCoupon(json.data || null);
+      setCouponState('');
+      setCouponText('');
+      track('coupon_applied', { code });
+    } catch (_) {
+      setCouponState('bad');
+      setCouponErr('We could not check that code just now.');
+    }
+  }, [couponText, couponState, token]);
+
+  const removeCoupon = useCallback(() => {
+    setCoupon(null); setCouponState(''); setCouponErr(''); setCouponText('');
+  }, []);
 
   /* ---------------------------- payment --------------------------------- */
 
@@ -781,6 +826,8 @@ export default function BookingFlow({ slug }) {
         sessionMode,
         sessionPlace,
         analytics: analyticsContext(), // where this booking came from (frozen server-side)
+        // Only ever the code: createPaymentOrder validates it again and sets the price.
+        couponCode: coupon?.code || undefined,
       });
       if (order && order.success === false) throw new Error(order.message);
       const o = order?.data ?? order;
@@ -1308,7 +1355,7 @@ export default function BookingFlow({ slug }) {
                 <button
                   key={k} type="button"
                   className={`bfx-mode${sessionMode === k ? ' is-on' : ''}`}
-                  onClick={() => { setSessionMode(k); setModeOpen(false); setStep(3); }}
+                  onClick={() => { setSessionMode(k); setModeOpen(false); setStep(needsAbout ? 3 : 4); }}
                 >
                   <span className="bfx-mode-ic" aria-hidden>{K2_MODE_ICON[k]}</span>
                   <span className="bfx-mode-l">{label}</span>
@@ -1485,9 +1532,42 @@ export default function BookingFlow({ slug }) {
                 </button>
               </div>
 
-              {/* The bill. Only the lines that have a number are drawn: the flow
-                  does not offer a coupon yet, and nothing adds tax, so those two
-                  lines of the design stay out rather than showing a zero. */}
+              {/* A coupon, if they have one. The design's row (7858:85934): the code
+                  goes in, and once it holds the row says so with a way to take it off.
+                  Nothing adds tax here, so that line of the design stays out rather
+                  than showing a zero. */}
+              <div className="bfx-coupon">
+                {coupon ? (
+                  <>
+                    <span className="bfx-coupon-ok" aria-hidden>✦</span>
+                    <span className="bfx-coupon-on">{coupon.code} applied</span>
+                    <button type="button" className="bfx-coupon-off" onClick={removeCoupon}>Remove</button>
+                  </>
+                ) : (
+                  <>
+                    <input
+                      value={couponText}
+                      onChange={(e) => { setCouponText(e.target.value); setCouponErr(''); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') applyCoupon(total); }}
+                      placeholder="Coupon code"
+                      aria-label="Coupon code"
+                      autoCapitalize="characters"
+                      spellCheck={false}
+                    />
+                    <button
+                      type="button"
+                      className="bfx-coupon-go"
+                      disabled={!couponText.trim() || couponState === 'checking'}
+                      onClick={() => applyCoupon(total)}
+                    >
+                      {couponState === 'checking' ? 'Checking…' : 'Apply'}
+                    </button>
+                  </>
+                )}
+              </div>
+              {couponErr && <p className="bfx-coupon-err">{couponErr}</p>}
+
+              {/* The bill. Only the lines that have a number are drawn. */}
               <div className="bfx-billc">
                 <div className="bfx-bill-lines">
                   <div className="bfx-bl">
@@ -1506,10 +1586,19 @@ export default function BookingFlow({ slug }) {
                       </div>
                     </>
                   )}
+                  {coupon && (
+                    <>
+                      <span className="bfx-bl-rule" />
+                      <div className="bfx-bl">
+                        <span className="bfx-bl-tag">Coupon {coupon.code}</span>
+                        <span className="bfx-bl-v is-off">− {inr(coupon.discountAmount)}</span>
+                      </div>
+                    </>
+                  )}
                   <span className="bfx-bl-rule" />
                   <div className="bfx-bl">
                     <span className="bfx-bl-k is-total">Total</span>
-                    <span className="bfx-bl-v is-total">{inr(total)}</span>
+                    <span className="bfx-bl-v is-total">{inr(coupon ? coupon.finalAmount : total)}</span>
                   </div>
                 </div>
                 {saving > 0 && (
@@ -1543,7 +1632,7 @@ export default function BookingFlow({ slug }) {
                   </button>
                 ) : (
                   <button type="button" className="bfx-btn" disabled={paying || !slot || !plan} onClick={pay}>
-                    {paying ? 'Starting payment…' : `Pay ${inr(total)}`}
+                    {paying ? 'Starting payment…' : `Pay ${inr(coupon ? coupon.finalAmount : total)}`}
                   </button>
                 )}
               </div>
@@ -2117,6 +2206,38 @@ const CSS = `
 .bfx-rv-k{font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:16px!important;color:#6B746F!important;}
 .bfx-rv-v{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#1C241F!important;}
 
+/* The coupon row above the bill (Figma 7858:85934). Before a code holds it is a
+   field and Apply; once it holds it says so, with a way to take it off. */
+.bfx-coupon{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:12px;
+  border:1px solid #E3E7E5;border-radius:16px;background:#fff;
+}
+.bfx-coupon input{
+  flex:1;min-width:0;border:0;outline:0;background:none;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;
+  line-height:20px!important;color:#1C241F!important;text-transform:uppercase;
+}
+.bfx-coupon input::placeholder{color:#9CA49F!important;text-transform:none;}
+.bfx-coupon-go{
+  flex:none;border:0;background:none;cursor:pointer;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;
+  line-height:20px!important;color:#2E7D5A!important;
+}
+.bfx-coupon-go[disabled]{color:#9CA49F!important;cursor:default;}
+.bfx-coupon-ok{flex:none;color:#2E7D5A;}
+.bfx-coupon-on{
+  flex:1;min-width:0;font-family:'Figtree',sans-serif!important;font-size:14px!important;
+  font-weight:500!important;line-height:20px!important;color:#2E7D5A!important;
+}
+.bfx-coupon-off{
+  flex:none;border:0;background:none;cursor:pointer;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;
+  line-height:18px!important;color:#6B746F!important;
+}
+.bfx-coupon-err{
+  margin:-6px 0 12px!important;font-family:'Figtree',sans-serif!important;font-size:12px!important;
+  font-weight:500!important;line-height:16px!important;color:#A93534!important;
+}
 .bfx-billc{border-radius:24px;background:#fff;overflow:hidden;border:1px solid #E3E7E5;}
 .bfx-bill-lines{display:flex;flex-direction:column;gap:12px;padding:16px;}
 .bfx-bl{display:flex;align-items:center;justify-content:space-between;gap:12px;}
