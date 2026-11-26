@@ -65,6 +65,13 @@ const THERAPY_TYPES = [['individual', 'Individual therapy'], ['couple', 'Couple 
 const K2_TYPE_ART = { individual: 'individual', couple: 'couple', psychiatry_15: 'psychiatry', psychiatry_30: 'psychiatry' };
 // The day cards name the weekday in full caps, as the design does.
 const FX_DOW_FULL = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// Figma "6 · Session mode" (7858:85858), in its order.
+const K2_MODES = [['audio', 'Audio call'], ['video', 'Video call'], ['chat', 'Chat']];
+const K2_MODE_ICON = {
+  audio: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M18 14.1v2.5a1.7 1.7 0 0 1-1.8 1.7 16.5 16.5 0 0 1-7.2-2.6 16.2 16.2 0 0 1-5-5A16.5 16.5 0 0 1 1.4 3.4 1.7 1.7 0 0 1 3.1 1.5h2.5a1.7 1.7 0 0 1 1.7 1.4c.1.8.3 1.6.6 2.4a1.7 1.7 0 0 1-.4 1.7l-1 1a13.3 13.3 0 0 0 5 5l1-1a1.7 1.7 0 0 1 1.8-.4c.8.3 1.6.5 2.4.6a1.7 1.7 0 0 1 1.4 1.8Z" fill="#4C9F62" /></svg>,
+  video: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M18.3 6.7 14.2 10l4.1 3.3V6.7Z" fill="#4C9F62" /><rect x="1.7" y="5" width="11.7" height="10" rx="2.5" fill="#4C9F62" /></svg>,
+  chat: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.3 4.2A2.5 2.5 0 0 1 5.8 1.7h8.4a2.5 2.5 0 0 1 2.5 2.5v6.6a2.5 2.5 0 0 1-2.5 2.5H8.1l-3.4 2.9a.8.8 0 0 1-1.4-.6V4.2Z" fill="#4C9F62" /></svg>,
+};
 const PSYCHIATRY_TYPES = [['psychiatry_15', '15-min consultation'], ['psychiatry_30', '30-min consultation']];
 const TYPE_LABEL = {
   individual: 'Individual therapy', couple: 'Couple therapy',
@@ -573,6 +580,12 @@ export default function BookingFlow({ slug }) {
   /* The design leads with a strip of days rather than a month. A fortnight is
      enough for almost every booking; the month calendar is behind "View all". */
   const [showMonth, setShowMonth] = useState(false);
+  /* Figma "6 · Session mode": how and where the session is held. It sits between
+     the plan and About yourself without renumbering the steps — the plan step
+     opens it, and choosing a mode moves on. */
+  const [modeOpen, setModeOpen] = useState(false);
+  const [sessionPlace, setSessionPlace] = useState('online');
+  const [sessionMode, setSessionMode] = useState('video');
   const k2Days = useMemo(() => {
     const out = [];
     const d0 = new Date();
@@ -720,6 +733,7 @@ export default function BookingFlow({ slug }) {
   useEffect(() => { if (step === 4) setLeaveAsked(false); }, [step]);
 
   const back = () => {
+    if (modeOpen) { setModeOpen(false); return; }
     if (pkgMode) { if (step <= 1) router.back(); else setStep(1); return; }
     if (needsPhone || step === 0) router.back(); else setStep((s) => s - 1);
   };
@@ -761,6 +775,10 @@ export default function BookingFlow({ slug }) {
         clientAge: about.age || null,
         emergencyContact: about.emergency || null,
         clientTimeZone: tz, // confirmation email/WhatsApp show the time in this zone
+        // the answers to "How would you like to talk?"; they ride the order and
+        // are written onto the session when the payment succeeds
+        sessionMode,
+        sessionPlace,
         analytics: analyticsContext(), // where this booking came from (frozen server-side)
       });
       if (order && order.success === false) throw new Error(order.message);
@@ -1270,7 +1288,36 @@ export default function BookingFlow({ slug }) {
           </>
         )}
 
-        {step === 2 && (
+        {step === 2 && modeOpen && (
+          <>
+            <div className="bfx-title" role="heading" aria-level={1}>How would you like to talk?</div>
+            <div className="bfx-seg">
+              {[['online', 'Online'], ['in_person', 'In-person']].map(([k, label]) => (
+                <button
+                  key={k} type="button"
+                  className={`bfx-seg-b ${sessionPlace === k ? 'is-on' : ''}`}
+                  onClick={() => setSessionPlace(k)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="bfx-modes">
+              {K2_MODES.map(([k, label]) => (
+                <button
+                  key={k} type="button"
+                  className={`bfx-mode${sessionMode === k ? ' is-on' : ''}`}
+                  onClick={() => { setSessionMode(k); setModeOpen(false); setStep(3); }}
+                >
+                  <span className="bfx-mode-ic" aria-hidden>{K2_MODE_ICON[k]}</span>
+                  <span className="bfx-mode-l">{label}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 2 && !modeOpen && (
           <>
             {/* Koott 2.0 (Figma 7858:85805): the title carries a badge with the
                 session length and how many are in the plan, and each plan is a
@@ -1314,7 +1361,7 @@ export default function BookingFlow({ slug }) {
                       key={p.id} type="button"
                       className={`bfx-planr${(plan ? plan.id === p.id : i === 0) ? ' is-on' : ''}`}
                       // Picking a plan is the answer to this step — no Continue.
-                      onClick={() => { setPlan(p); track('plan_selected', { item_kind: itemKindOf(p) }, { psychologistId: therapist?.id, value: Number(p.price) || 0 }); setStep(3); }}
+                      onClick={() => { setPlan(p); track('plan_selected', { item_kind: itemKindOf(p) }, { psychologistId: therapist?.id, value: Number(p.price) || 0 }); setModeOpen(true); }}
                     >
                       <span className="bfx-planr-l">
                         <span className="bfx-planr-top">
@@ -2017,6 +2064,21 @@ const CSS = `
 .bfx-planr-r{flex:none;display:flex;flex-direction:column;align-items:flex-end;}
 .bfx-planr-p{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:600!important;line-height:24px!important;color:#1C241F!important;}
 .bfx-planr-was{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:20px!important;color:#9CA49F!important;}
+
+/* ───────── Koott 2.0, step 6 · Session mode (Figma 7858:85858) ───────── */
+/* Figma's Content column is 24 apart; the segmented control sits above these. */
+.bfx-modes{display:flex;flex-direction:column;gap:12px;width:370px;max-width:100%;margin-top:24px;}
+.bfx-mode{
+  display:flex;align-items:center;gap:12px;width:100%;height:74px;padding:16px;border:0;border-radius:12px;
+  background:#fff;box-shadow:inset 0 0 0 1px #E3E7E5;cursor:pointer;text-align:left;
+}
+.bfx-mode.is-on{background:linear-gradient(180deg,#FFFFFF 0%,#EAF3ED 100%);box-shadow:inset 0 0 0 1.5px #39AC71;}
+.bfx-mode-ic{
+  flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;
+  border-radius:8px;background:#EFFCF2;
+}
+.bfx-mode-ic svg{width:20px;height:20px;}
+.bfx-mode-l{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#1C241F!important;}
 
 /* step 1: schedule */
 .bfx-title-who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
