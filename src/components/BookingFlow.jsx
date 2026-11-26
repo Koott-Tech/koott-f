@@ -63,6 +63,8 @@ const readType = (p) => packageKind(p);
 const THERAPY_TYPES = [['individual', 'Individual therapy'], ['couple', 'Couple therapy']];
 // Koott 2.0 draws each kind with its own 42 px illustration (public/design/book2).
 const K2_TYPE_ART = { individual: 'individual', couple: 'couple', psychiatry_15: 'psychiatry', psychiatry_30: 'psychiatry' };
+// The day cards name the weekday in full caps, as the design does.
+const FX_DOW_FULL = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const PSYCHIATRY_TYPES = [['psychiatry_15', '15-min consultation'], ['psychiatry_30', '30-min consultation']];
 const TYPE_LABEL = {
   individual: 'Individual therapy', couple: 'Couple therapy',
@@ -567,6 +569,17 @@ export default function BookingFlow({ slug }) {
   // Psychiatrists offer 15/30-min consultations; therapists individual/couple.
   const isPsychiatrist = isPsychiatristRecord(therapist);
   const typeChoices = isPsychiatrist ? PSYCHIATRY_TYPES : THERAPY_TYPES;
+
+  /* The design leads with a strip of days rather than a month. A fortnight is
+     enough for almost every booking; the month calendar is behind "View all". */
+  const [showMonth, setShowMonth] = useState(false);
+  const k2Days = useMemo(() => {
+    const out = [];
+    const d0 = new Date();
+    d0.setHours(0, 0, 0, 0);
+    for (let i = 0; i < 14; i += 1) out.push(new Date(d0.getFullYear(), d0.getMonth(), d0.getDate() + i));
+    return out;
+  }, []);
   useEffect(() => {
     if (!therapist) return;
     if (isPsychiatrist !== kind.startsWith('psychiatry_')) {
@@ -1149,13 +1162,7 @@ export default function BookingFlow({ slug }) {
 
         {step === 1 && (
           <>
-            <div className="bfx-title bfx-title-who" role="heading" aria-level={1}>
-              <span>When would you like to meet</span>
-              {photo
-                ? <img className="bfx-who-photo" src={photo} alt="" width={32} height={32} />
-                : <span className="bfx-who-photo is-empty" aria-hidden>{initials}</span>}
-              <span>{name}?</span>
-            </div>
+            <div className="bfx-title" role="heading" aria-level={1}>Select slot</div>
             {slotNotice && (
               <SlotUnavailablePopup
                 reason={slotNotice}
@@ -1170,101 +1177,93 @@ export default function BookingFlow({ slug }) {
                 onClose={() => { trackPopup('slot_unavailable', 'dismissed'); setSlotNotice(''); }}
               />
             )}
-            <div className="bfx-sched">
-              <div className="bfx-cal">
-                <div className="bfx-cal-top">
-                  <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month">
-                    <img src="/design/booking/chevron-left.svg" alt="" width={20} height={20} />
-                  </button>
-                  <span>{MONTHS[month.getMonth()]} {month.getFullYear()}</span>
-                  <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month">
-                    <img src="/design/booking/chevron-right.svg" alt="" width={20} height={20} />
-                  </button>
-                </div>
-                <div className="bfx-cal-dow">{FX_DOW.map((d) => <span key={d}>{d}</span>)}</div>
-                <div className={`bfx-cal-days ${daysBusy ? 'is-busy' : ''}`}>
-                  {grid.map((d, i) => {
-                    if (!d) return <span key={`x${i}`} />;
-                    const key = ymd(d);
-                    const free = openDays[key]?.length || 0;
-                    // A day is open only when it has a free start: past days,
-                    // days off and fully booked days all stay disabled.
-                    const off = daysBusy || key < todayKey || free === 0;
-                    return (
-                      <button
-                        key={key} type="button" disabled={off}
-                        className={`bfx-day ${day === key ? 'is-on' : ''} ${!off ? 'has-slots' : ''}`}
-                        onClick={() => setDay(key)}
-                      >
-                        {d.getDate()}
-                      </button>
-                    );
-                  })}
-                </div>
-                {!daysBusy && daysErr && <p className="bf-note">We could not load the free times. Please try again.</p>}
-                {!daysBusy && !daysErr && Object.keys(openDays).length === 0 && (
-                  <p className="bf-note">No free times this month — try the next one.</p>
-                )}
+            <div className="bfx-sched is-k2">
+              {/* The next fortnight as cards, the way the design leads with them.
+                  A day with no free start is shown as full rather than hidden, so
+                  the strip does not change length while the slots load. */}
+              <div className="bfx-days" role="group" aria-label="Choose a day">
+                {k2Days.map((d) => {
+                  const key = ymd(d);
+                  const free = openDays[key]?.length || 0;
+                  const past = key < todayKey;
+                  const off = past || (!daysBusy && free === 0);
+                  return (
+                    <button
+                      key={key} type="button" disabled={off || daysBusy}
+                      className={`bfx-dayc${day === key ? ' is-on' : ''}${off ? ' is-off' : ''}`}
+                      onClick={() => setDay(key)}
+                    >
+                      <span className="bfx-dayc-k">{key === todayKey ? 'Today' : FX_DOW_FULL[d.getDay()]}</span>
+                      <span className="bfx-dayc-n">{d.getDate()}</span>
+                      {off && !past ? <span className="bfx-dayc-full">Full</span> : <span className="bfx-dayc-bar" aria-hidden />}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  className={`bfx-viewall${showMonth ? ' is-on' : ''}`}
+                  aria-expanded={showMonth}
+                  onClick={() => setShowMonth((v) => !v)}
+                >
+                  {showMonth ? 'Close' : 'View all'}
+                  <img src="/design/booking/chevron-right.svg" alt="" width={16} height={16} />
+                </button>
               </div>
 
-              <div className="bfx-slots">
-                {day ? (() => {
-                  const dd = fromYmd(day);
-                  const picked = slot && slots.some((x) => x.startsAt === slot.startsAt) ? slot : null;
-                  const hourOf = (x) => Number(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hourCycle: 'h23', timeZone: tz }).format(new Date(x.startsAt)));
-                  const byPeriod = {
-                    morning: slots.filter((x) => hourOf(x) < 12),
-                    afternoon: slots.filter((x) => hourOf(x) >= 12 && hourOf(x) < 17),
-                    evening: slots.filter((x) => hourOf(x) >= 17),
-                  };
-                  const mins = SESSION_MINUTES[kind] || 50;
-                  return (
-                    <>
-                      <div className="bfx-sum">
-                        <div className="bfx-sum-h">
-                          {dd.getDate()} {MONTHS[dd.getMonth()]}, {dd.toLocaleDateString('en-GB', { weekday: 'long' })}
-                          {picked ? `, ${timeLabel(picked.startsAt, tz)}` : ''}
-                        </div>
-                        {picked ? (
-                          <div className="bfx-sum-s">
-                            <img src="/design/booking/clock.svg" alt="" width={20} height={20} />
-                            {timeLabel(picked.startsAt, tz)} - {timeLabel(new Date(new Date(picked.startsAt).getTime() + mins * 60000).toISOString(), tz)}
-                          </div>
-                        ) : (
-                          <div className="bfx-sum-s">
-                            {daysBusy ? 'checking…' : `${slots.length} ${slots.length === 1 ? 'time' : 'times'} available`}
-                            <i aria-hidden />
-                            {mins} minutes each
-                          </div>
-                        )}
-                      </div>
-                      <div className="bfx-periods">
-                        {FX_PERIODS.map(([p, icon, label]) => (byPeriod[p].length ? (
-                          <div key={p} className="bfx-period">
-                            <img src={`/design/booking/${icon}.svg`} alt={label} width={20} height={20} />
-                            <div className="bfx-period-row">
-                              {pairsOf(byPeriod[p]).map((pair) => (
-                                <div key={pair[0].startsAt} className="bfx-pair">
-                                  {pair.map((x) => (
-                                    <button
-                                      key={x.startsAt} type="button"
-                                      className={`bfx-slot ${slot?.startsAt === x.startsAt ? 'is-on' : ''}`}
-                                      // Picking a time is the answer to this step.
-                                      onClick={() => { setSlot(x); setSlotNotice(''); setSlotSuggestion(null); track('slot_selected', {}, { psychologistId: therapist?.id }); setStep(pkgMode ? 4 : 2); }}
-                                    >
-                                      {x.label}
-                                    </button>
-                                  ))}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : null))}
-                        {!daysBusy && slots.length === 0 && <p className="bf-note">No free times that day.</p>}
-                      </div>
-                    </>
-                  );
-                })() : <p className="bf-note">Pick a date to see the times.</p>}
+              {showMonth && (
+                <div className="bfx-cal">
+                  <div className="bfx-cal-top">
+                    <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} aria-label="Previous month">
+                      <img src="/design/booking/chevron-left.svg" alt="" width={20} height={20} />
+                    </button>
+                    <span>{MONTHS[month.getMonth()]} {month.getFullYear()}</span>
+                    <button type="button" onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} aria-label="Next month">
+                      <img src="/design/booking/chevron-right.svg" alt="" width={20} height={20} />
+                    </button>
+                  </div>
+                  <div className="bfx-cal-dow">{FX_DOW.map((d) => <span key={d}>{d}</span>)}</div>
+                  <div className={`bfx-cal-days ${daysBusy ? 'is-busy' : ''}`}>
+                    {grid.map((d, i) => {
+                      if (!d) return <span key={`x${i}`} />;
+                      const key = ymd(d);
+                      const free = openDays[key]?.length || 0;
+                      const off = daysBusy || key < todayKey || free === 0;
+                      return (
+                        <button
+                          key={key} type="button" disabled={off}
+                          className={`bfx-day ${day === key ? 'is-on' : ''} ${!off ? 'has-slots' : ''}`}
+                          onClick={() => { setDay(key); setShowMonth(false); }}
+                        >
+                          {d.getDate()}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {!daysBusy && daysErr && <p className="bf-note">We could not load the free times. Please try again.</p>}
+                </div>
+              )}
+
+              <div className="bfx-rule" aria-hidden />
+
+              <div className="bfx-times">
+                <p className="bfx-times-h">Select start time of therapy</p>
+                {day ? (
+                  <>
+                    <div className="bfx-grid">
+                      {slots.map((x) => (
+                        <button
+                          key={x.startsAt} type="button"
+                          className={`bfx-tslot${slot?.startsAt === x.startsAt ? ' is-on' : ''}`}
+                          onClick={() => { setSlot(x); setSlotNotice(''); setSlotSuggestion(null); track('slot_selected', {}, { psychologistId: therapist?.id }); setStep(pkgMode ? 4 : 2); }}
+                        >
+                          {x.label}
+                        </button>
+                      ))}
+                    </div>
+                    {daysBusy && <p className="bf-note">Checking…</p>}
+                    {!daysBusy && slots.length === 0 && <p className="bf-note">No free times that day.</p>}
+                  </>
+                ) : <p className="bf-note">Pick a day to see the times.</p>}
                 <div className="bfx-tz">Times shown in your time zone<i aria-hidden />{zoneParen}</div>
               </div>
             </div>
@@ -1273,18 +1272,30 @@ export default function BookingFlow({ slug }) {
 
         {step === 2 && (
           <>
-            <div className="bfx-head">
-              <div className="bfx-title" role="heading" aria-level={1}>Select a session plan</div>
-              <p className="bfx-sub">{FX_TYPE_SHORT[kind]} {SESSION_LENGTH_LABEL[kind]}</p>
+            {/* Koott 2.0 (Figma 7858:85805): the title carries a badge with the
+                session length and how many are in the plan, and each plan is a
+                row — name, what it saves, the per-session price, and the total
+                beside the price it would have been. */}
+            <div className="bfx-head is-k2">
+              <div className="bfx-title" role="heading" aria-level={1}>Select session plan</div>
+              <span className="bfx-badge">
+                <span className="bfx-badge-t">{SESSION_LENGTH_LABEL[kind]}</span>
+                <span className="bfx-badge-b">
+                  {(() => {
+                    const n = plan ? readType(plan).sessions : (shown[0] ? readType(shown[0]).sessions : 1);
+                    return `${n} ${isPsychiatrist ? (n === 1 ? 'Consultation' : 'Consultations') : (n === 1 ? 'Session' : 'Sessions')}`;
+                  })()}
+                </span>
+              </span>
             </div>
 
             <div className="bfx-plan-wrap">
               {singles.length > 0 && bundles.length > 0 && (
-                <div className="bfx-tabs">
+                <div className="bfx-seg">
                   {['packages', 'single'].map((m) => (
                     <button
                       key={m} type="button"
-                      className={`bfx-tab ${effectiveMode === m ? 'is-on' : ''}`}
+                      className={`bfx-seg-b ${effectiveMode === m ? 'is-on' : ''}`}
                       onClick={() => { setMode(m); setPlan(null); }}
                     >
                       {m === 'packages' ? 'Packages' : 'Single'}
@@ -1293,27 +1304,33 @@ export default function BookingFlow({ slug }) {
                 </div>
               )}
 
-              <div className="bfx-plans">
+              <div className="bfx-plans is-k2">
                 {shown.map((p, i) => {
                   const { sessions } = readType(p);
                   const full = unit * sessions;
+                  const saved = Math.max(Math.round(full - Number(p.price || 0)), 0);
                   return (
                     <button
                       key={p.id} type="button"
-                      className={`bfx-plan ${(plan ? plan.id === p.id : i === 0) ? 'is-on' : ''}`}
+                      className={`bfx-planr${(plan ? plan.id === p.id : i === 0) ? ' is-on' : ''}`}
                       // Picking a plan is the answer to this step — no Continue.
                       onClick={() => { setPlan(p); track('plan_selected', { item_kind: itemKindOf(p) }, { psychologistId: therapist?.id, value: Number(p.price) || 0 }); setStep(3); }}
                     >
-                      <span className="bfx-plan-chip">
-                        {isPsychiatrist
-                          ? (sessions === 1 ? '1 consultation' : `${sessions} consultations`)
-                          : (sessions === 1 ? '1 session' : `${sessions} sessions`)}
+                      <span className="bfx-planr-l">
+                        <span className="bfx-planr-top">
+                          <span className="bfx-planr-n">
+                            {isPsychiatrist
+                              ? (sessions === 1 ? '1 consultation' : `${sessions} consultations`)
+                              : (sessions === 1 ? '1 session' : `${sessions} sessions`)}
+                          </span>
+                          {saved > 0 && <span className="bfx-planr-save">Save {inr(saved)}</span>}
+                        </span>
+                        <span className="bfx-planr-u">{inr(Math.round(p.price / sessions))} /session</span>
                       </span>
-                      <span className="bfx-plan-p">
-                        {inr(p.price)}
-                        {full > p.price && <s>{inr(full)}</s>}
+                      <span className="bfx-planr-r">
+                        <span className="bfx-planr-p">{inr(p.price)}</span>
+                        {full > p.price && <s className="bfx-planr-was">{inr(full)}</s>}
                       </span>
-                      <span className="bfx-plan-u">Per session {inr(Math.round(p.price / sessions))}</span>
                     </button>
                   );
                 })}
@@ -1908,6 +1925,98 @@ const CSS = `
 }
 .bfx-type.is-on,.bfx-type:hover{box-shadow:inset 0 0 0 1.5px #39AC71,0 8px 12px #EBF3EE;}
 .bfx-type.is-on .bfx-type-l,.bfx-type:hover .bfx-type-l{font-weight:600!important;color:#1C241F!important;}
+
+/* ───────── Koott 2.0, step 1 · Select slot (Figma 7858:85753) ─────────
+   A strip of 74x84 day cards with a "View all" card, a hairline, then the times
+   in two columns of 181x48. */
+.bfx-sched.is-k2{display:flex;flex-direction:column;gap:24px;width:370px;max-width:100%;}
+.bfx-days{
+  /* a flex child's min-width is auto, so without this the strip pushes the
+     column wide instead of scrolling inside it */
+  min-width:0;max-width:100%;
+  display:flex;align-items:center;gap:16px;overflow-x:auto;scrollbar-width:none;
+  padding-bottom:2px;scroll-snap-type:x mandatory;
+}
+.bfx-days::-webkit-scrollbar{display:none;}
+.bfx-dayc{
+  flex:none;width:74px;height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  border:0;border-radius:12px;background:#fff;box-shadow:inset 0 0 0 1px #E3E7E5;cursor:pointer;scroll-snap-align:start;
+}
+.bfx-dayc-k{font-family:'Figtree',sans-serif!important;font-size:11px!important;font-weight:600!important;line-height:16px!important;letter-spacing:.55px!important;text-transform:uppercase;color:#535E58!important;}
+.bfx-dayc-n{font-family:'Figtree',sans-serif!important;font-size:24px!important;font-weight:500!important;line-height:32px!important;letter-spacing:-.24px!important;color:#1C241F!important;}
+.bfx-dayc-bar{width:28px;height:4px;border-radius:2px;background:#E3E7E5;}
+.bfx-dayc-full{
+  padding:3px 8px;border-radius:999px;background:#FFF4F3;box-shadow:0 0 0 2px #fff;
+  font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:600!important;line-height:16px!important;color:#A93534!important;
+}
+.bfx-dayc.is-on{background:linear-gradient(180deg,#FFFFFF 0%,#EAF3ED 100%);box-shadow:inset 0 0 0 1.5px #39AC71;}
+.bfx-dayc.is-off{background:#F5F7F6;box-shadow:none;cursor:default;}
+.bfx-dayc.is-off .bfx-dayc-k,.bfx-dayc.is-off .bfx-dayc-n{color:#9CA49F!important;}
+.bfx-dayc:disabled{cursor:default;}
+.bfx-viewall{
+  flex:none;min-width:100px;height:84px;display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  border:0;border-radius:12px;background:#fff;box-shadow:inset 0 0 0 1px #E3E7E5;cursor:pointer;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:18px!important;color:#6B746F!important;
+}
+.bfx-viewall.is-on{box-shadow:inset 0 0 0 1.5px #39AC71;}
+.bfx-rule{height:1px;background:#E3E7E5;}
+.bfx-times{display:flex;flex-direction:column;gap:16px;}
+.bfx-times-h{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:600!important;line-height:20px!important;color:#1C241F!important;margin:0!important;}
+.bfx-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.bfx-tslot{
+  height:48px;display:flex;align-items:center;justify-content:center;border:0;border-radius:12px;
+  background:#fff;box-shadow:inset 0 0 0 1px #E3E7E5;cursor:pointer;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:18px!important;color:#1C241F!important;
+}
+.bfx-tslot.is-on{background:linear-gradient(180deg,#FFFFFF 0%,#EAF3ED 100%);box-shadow:inset 0 0 0 1.5px #39AC71;}
+.bfx-sched.is-k2 .bfx-cal{width:100%;}
+
+/* ───────── Koott 2.0, step 2 · Select session plan (Figma 7858:85805) ───────── */
+/* The old head stacks and centres; the design puts the title and the badge on
+   one line, title left. */
+.bfx-head.is-k2{
+  display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;
+  width:370px;max-width:100%;text-align:left;
+}
+.bfx-head.is-k2 .bfx-title{text-align:left;}
+.bfx-badge{
+  flex:none;display:flex;flex-direction:column;align-items:stretch;min-width:76px;
+  border-radius:12px;overflow:hidden;box-shadow:inset 0 0 0 1px #E3E7E5;
+}
+.bfx-badge-t{
+  padding:4px 12px;background:#E2F7E7;text-align:center;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:18px!important;color:#2E7D5A!important;
+}
+.bfx-badge-b{
+  padding:4px 12px;text-align:center;
+  font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:500!important;line-height:16px!important;color:#535E58!important;
+}
+.bfx-seg{display:inline-flex;gap:4px;padding:4px;border-radius:9999px;background:#F0F3F1;align-self:flex-start;}
+.bfx-seg-b{
+  min-width:100px;height:32px;padding:0 12px;border:0;border-radius:9999px;background:none;cursor:pointer;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:18px!important;color:#535E58!important;
+}
+.bfx-seg-b.is-on{
+  background:#fff;color:#1C241F!important;
+  box-shadow:0 1px 2px rgba(28,36,31,.04),0 3px 3px rgba(28,36,31,.03),0 8px 5px rgba(28,36,31,.02);
+}
+.bfx-plans.is-k2{display:flex;flex-direction:column;gap:16px;width:370px;max-width:100%;}
+.bfx-planr{
+  display:flex;align-items:center;gap:12px;width:100%;padding:16px;border:0;border-radius:12px;background:#fff;
+  box-shadow:inset 0 0 0 1px #E3E7E5;cursor:pointer;text-align:left;
+}
+.bfx-planr.is-on{background:linear-gradient(180deg,#FFFFFF 0%,#EAF3ED 100%);box-shadow:inset 0 0 0 1.5px #39AC71;}
+.bfx-planr-l{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.bfx-planr-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.bfx-planr-n{font-family:'Figtree',sans-serif!important;font-size:18px!important;font-weight:500!important;line-height:24px!important;letter-spacing:-.09px!important;color:#1C241F!important;}
+.bfx-planr-save{
+  padding:2px 6px;border-radius:9999px;background:#E1F1FF;
+  font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:600!important;line-height:16px!important;color:#2986CA!important;
+}
+.bfx-planr-u{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:20px!important;color:#9CA49F!important;}
+.bfx-planr-r{flex:none;display:flex;flex-direction:column;align-items:flex-end;}
+.bfx-planr-p{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:600!important;line-height:24px!important;color:#1C241F!important;}
+.bfx-planr-was{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:20px!important;color:#9CA49F!important;}
 
 /* step 1: schedule */
 .bfx-title-who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
