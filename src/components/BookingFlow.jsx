@@ -60,9 +60,14 @@ const usablePhone = (p) => (String(p || '').replace(/\D/g, '').length >= 8 ? Str
 /** package_type -> { kind, sessions } (see lib/sessionSlots packageKind) */
 const readType = (p) => packageKind(p);
 
-const THERAPY_TYPES = [['individual', 'Individual therapy'], ['couple', 'Couple therapy']];
+/* Figma draws a third option, "Others", beside the two therapy kinds. It has no
+   length and no plans of its own, so it opens a conversation with the care team
+   rather than a booking that could not be priced. */
+const THERAPY_TYPES = [['individual', 'Individual therapy'], ['couple', 'Couple therapy'], ['others', 'Others']];
 // Koott 2.0 draws each kind with its own 42 px illustration (public/design/book2).
-const K2_TYPE_ART = { individual: 'individual', couple: 'couple', psychiatry_15: 'psychiatry', psychiatry_30: 'psychiatry' };
+// "others" has no illustration of its own in Figma yet; borrowing another kind's
+// picture would say the wrong thing, so it shows none (the img hides itself).
+const K2_TYPE_ART = { individual: 'individual', couple: 'couple', others: 'others', psychiatry_15: 'psychiatry', psychiatry_30: 'psychiatry' };
 // The day cards name the weekday in full caps, as the design does.
 const FX_DOW_FULL = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 // Figma "6 · Session mode" (7858:85858), in its order.
@@ -242,6 +247,29 @@ export default function BookingFlow({ slug }) {
   const [pendingPay, setPendingPay] = useState(false);
   const [paying, setPaying] = useState(false);
   const [payErr, setPayErr] = useState('');
+  /* Figma "12 · Payment failed" (7858:86086). The slot really is held — the order
+     takes a lock in slot_locks for 15 minutes — so the screen says so and counts
+     down to that moment rather than inventing a number. */
+  const [payFailed, setPayFailed] = useState(null);
+  /* A real payment failure cannot be produced to order, so in development
+     ?payfail=1 draws that screen with the slot and plan already chosen. It is
+     compiled out of a production build. */
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    if (typeof window === 'undefined') return;
+    if (new URLSearchParams(window.location.search).get('payfail') !== '1') return;
+    setPayFailed({ reason: 'preview' });
+    setHeldUntil(new Date(Date.now() + 9 * 60000 + 42000).toISOString());
+  }, []);
+  const [heldUntil, setHeldUntil] = useState(null);
+  const [heldLeft, setHeldLeft] = useState('');
+  /* Figma "Notes to your therapist" (8074:13727) and the "Booking for someone
+     else? Add details" row on step 1 are the same sheet: one line the therapist
+     reads before the session, kept on the client as client_message. */
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteText, setNoteText] = useState('');
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [noteSaved, setNoteSaved] = useState(false);
   const [payStage, setPayStage] = useState(null);         // 'order' | 'opening' | 'confirming'
 
   // Booking a session from a package the client already holds (?package=<client_packages id>)
@@ -597,6 +625,22 @@ export default function BookingFlow({ slug }) {
   const [modeOpen, setModeOpen] = useState(false);
   const [sessionPlace, setSessionPlace] = useState('online');
   const [sessionMode, setSessionMode] = useState('video');
+  /* The countdown on the payment-failed screen. It runs only while that screen is
+     up, and it counts to the real expiry of the hold the order took. */
+  useEffect(() => {
+    if (!payFailed || !heldUntil) return undefined;
+    const tick = () => {
+      const left = new Date(heldUntil).getTime() - Date.now();
+      if (left <= 0) { setHeldLeft(''); return; }
+      const m = Math.floor(left / 60000);
+      const sec = Math.floor((left % 60000) / 1000);
+      setHeldLeft(`${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [payFailed, heldUntil]);
+
   const k2Days = useMemo(() => {
     const out = [];
     const d0 = new Date();
@@ -831,6 +875,7 @@ export default function BookingFlow({ slug }) {
       });
       if (order && order.success === false) throw new Error(order.message);
       const o = order?.data ?? order;
+      if (o?.slotHeldUntil) setHeldUntil(o.slotHeldUntil);
 
       setPayStage('opening');
       await razorpayReady;
@@ -864,7 +909,8 @@ export default function BookingFlow({ slug }) {
         // Razorpay's error code only — never its free-text description.
         const reason = String(resp?.error?.reason || resp?.error?.code || 'unknown').toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 60);
         track('payment_attempt_failed', { code: /^[a-z]/.test(reason) ? reason : 'unknown' });
-        setPayErr(resp?.error?.description || 'The payment did not go through. Please try again.');
+        setPayErr('');
+        setPayFailed({ reason: resp?.error?.description || '' });
         setPaying(false);
         setPayStage(null);
         fetch(`${BACKEND}/payment/failure`, {
@@ -1202,12 +1248,23 @@ export default function BookingFlow({ slug }) {
           </>
         ) : (
         <>
-        {step === 0 && (
+        {!payFailed && step === 0 && (
           <>
             <div className="bfx-title" role="heading" aria-level={1}>What kind of session are you looking for?</div>
             <div className="bfx-types">
               {typeChoices.map(([k, label]) => (
-                <button key={k} type="button" className={`bfx-type ${kind === k ? 'is-on' : ''}`} onClick={() => chooseType(k)}>
+                <button
+                  key={k}
+                  type="button"
+                  className={`bfx-type ${kind === k ? 'is-on' : ''}`}
+                  onClick={() => {
+                    if (k === 'others') {
+                      window.open(`https://wa.me/919539007766?text=${encodeURIComponent('Hi Koott, I am looking for a kind of session that is not listed.')}`, '_blank', 'noopener');
+                      return;
+                    }
+                    chooseType(k);
+                  }}
+                >
                   {/* The illustration is hidden rather than broken if its file is not
                       there yet: individual.png and couple.png are still to be exported
                       from Figma, and the label alone reads fine without them. */}
@@ -1223,10 +1280,19 @@ export default function BookingFlow({ slug }) {
                 </button>
               ))}
             </div>
+
+            {/* Figma 7858:85649: the hairline, then the row that opens the note. */}
+            <div className="bfx-else-rule" aria-hidden />
+            <div className="bfx-else">
+              <span className="bfx-else-t">Booking for someone else?</span>
+              <button type="button" className="bfx-else-b" onClick={() => { setNoteOpen(true); setNoteSaved(false); }}>
+                Add details
+              </button>
+            </div>
           </>
         )}
 
-        {step === 1 && (
+        {!payFailed && step === 1 && (
           <>
             <div className="bfx-title" role="heading" aria-level={1}>Select slot</div>
             {slotNotice && (
@@ -1336,7 +1402,53 @@ export default function BookingFlow({ slug }) {
           </>
         )}
 
-        {step === 2 && modeOpen && (
+        {payFailed && (
+          <div className="bfx-failed">
+            <span className="bfx-failed-i" aria-hidden>
+              <svg viewBox="0 0 24 24"><path d="M12 7v6" stroke="#D74745" strokeWidth="2.2" strokeLinecap="round" fill="none" /><circle cx="12" cy="16.5" r="1.2" fill="#D74745" /></svg>
+            </span>
+            <h1 className="bfx-failed-h">Payment didn&rsquo;t go through</h1>
+            <p className="bfx-failed-p">
+              No money was taken. If your bank deducted anything, it is usually returned within 5 to 7 working days.
+            </p>
+
+            {slot && (
+              <div className="bfx-failed-slot">
+                <span className="bfx-failed-slot-t">
+                  {dateLabel(slot.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short' })} · {timeLabel(slot.startsAt, tz)}
+                </span>
+                <span className="bfx-failed-slot-s">
+                  {plan ? `${readType(plan).sessions > 1 ? `${readType(plan).sessions} session pack` : 'Single session'} · ${inr(plan.price)}` : ''}
+                </span>
+              </div>
+            )}
+
+            <div className="bfx-failed-actions">
+              {heldLeft && (
+                <div className="bfx-held">
+                  <span className="bfx-held-txt">
+                    <span className="bfx-held-t">We are holding your slot</span>
+                    <span className="bfx-held-s">
+                      {slot && `${dateLabel(slot.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short' })} · ${timeLabel(slot.startsAt, tz)}`}
+                      {name ? ` with ${name.split(' ')[0]}` : ''}
+                    </span>
+                  </span>
+                  <span className="bfx-held-c">{heldLeft}</span>
+                </div>
+              )}
+              <button type="button" className="bfx-btn" disabled={paying} onClick={() => { setPayFailed(null); pay(); }}>
+                {paying ? 'Starting payment…' : 'Try again'}
+              </button>
+              {/* Razorpay shows every method it has in one sheet, so "another
+                  method" is the same sheet opened again, not a different flow. */}
+              <button type="button" className="bfx-failed-alt" onClick={() => { setPayFailed(null); pay(); }}>
+                Use another payment method
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!payFailed && step === 2 && modeOpen && (
           <>
             <div className="bfx-title" role="heading" aria-level={1}>How would you like to talk?</div>
             <div className="bfx-seg">
@@ -1365,7 +1477,7 @@ export default function BookingFlow({ slug }) {
           </>
         )}
 
-        {step === 2 && !modeOpen && (
+        {!payFailed && step === 2 && !modeOpen && (
           <>
             {/* Koott 2.0 (Figma 7858:85805): the title carries a badge with the
                 session length and how many are in the plan, and each plan is a
@@ -1435,7 +1547,7 @@ export default function BookingFlow({ slug }) {
           </>
         )}
 
-        {step === 3 && (
+        {!payFailed && step === 3 && (
           <>
             <div className="bfx-title" role="heading" aria-level={1}>About yourself</div>
             <div className="bfx-form">
@@ -1480,7 +1592,7 @@ export default function BookingFlow({ slug }) {
           </>
         )}
 
-        {step === 4 && (() => {
+        {!payFailed && step === 4 && (() => {
           const sessions = pkgMode ? 1 : planSessions;
           const total = pkgMode ? 0 : Number(plan?.price || 0);
           const saving = !pkgMode && sessions > 1 ? Math.max(Math.round(unit * sessions - total), 0) : 0;
@@ -1642,6 +1754,45 @@ export default function BookingFlow({ slug }) {
         </>
         )}
       </div>
+
+      {noteOpen && (
+        <div className="bfx-sheet-wrap" role="dialog" aria-modal="true" aria-label="Notes to your therapist">
+          <button type="button" className="bfx-sheet-veil" aria-label="Close" onClick={() => setNoteOpen(false)} />
+          <div className="bfx-sheet">
+            <span className="bfx-sheet-grip" aria-hidden />
+            <h2 className="bfx-sheet-h">Notes to your therapist</h2>
+            <p className="bfx-sheet-p">
+              Anything that would help them prepare — who the session is for, or what you would like to talk about.
+            </p>
+            <textarea
+              className="bfx-sheet-t"
+              value={noteText}
+              maxLength={1000}
+              placeholder="Write here…"
+              onChange={(e) => { setNoteText(e.target.value); setNoteSaved(false); }}
+            />
+            <button
+              type="button"
+              className="bfx-btn"
+              disabled={noteSaving || !noteText.trim()}
+              onClick={async () => {
+                setNoteSaving(true);
+                try {
+                  await clientApi.updateProfile({ client_message: noteText.trim().slice(0, 1000) });
+                  setNoteSaved(true);
+                  setNoteOpen(false);
+                } catch (_) {
+                  // It is a note, not the booking: say nothing and leave the sheet open.
+                } finally {
+                  setNoteSaving(false);
+                }
+              }}
+            >
+              {noteSaving ? 'Sending…' : 'Send'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {leaveAsk && (
         <div className="bfx-leave" role="dialog" aria-modal="true" aria-labelledby="bfx-leave-h">
@@ -2273,6 +2424,80 @@ const CSS = `
   padding:16px 16px 40px;background:#fff;box-shadow:0 -1px 0 #E3E7E5;
 }
 .bfx-paybar .bfx-btn{width:370px;max-width:100%;height:48px;}
+
+/* ───────── Koott 2.0, step 12 · Payment failed (Figma 7858:86086) ───────── */
+.bfx-failed{display:flex;flex-direction:column;gap:16px;width:370px;max-width:100%;padding-bottom:220px;}
+.bfx-failed-i{
+  display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:999px;background:#FFF4F3;
+}
+.bfx-failed-i svg{width:24px;height:24px;}
+.bfx-failed-h{
+  margin:40px 0 0!important;
+  font-family:'Figtree',sans-serif!important;font-size:24px!important;font-weight:600!important;line-height:32px!important;
+  letter-spacing:-.24px!important;color:#1C241F!important;
+}
+.bfx-failed-p{
+  margin:-10px 0 0!important;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:20px!important;color:#535E58!important;
+}
+.bfx-failed-slot{
+  display:flex;flex-direction:column;gap:2px;margin-top:12px;padding:16px;border-radius:16px;background:#fff;
+  border:1px solid #E3E7E5;
+}
+.bfx-failed-slot-t{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#1C241F!important;}
+.bfx-failed-slot-s{font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:16px!important;color:#6B746F!important;}
+/* The design fixes these to the bottom of the screen. */
+.bfx-failed-actions{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:12px 16px 30px;background:#fff;
+}
+.bfx-failed-actions .bfx-btn{width:370px;max-width:100%;height:48px;margin:0;}
+.bfx-held{
+  display:flex;align-items:center;gap:12px;width:370px;max-width:100%;
+  padding:14px 16px;border-radius:16px;background:#F5F7F6;margin-bottom:8px;
+}
+.bfx-held-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.bfx-held-t{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:20px!important;color:#1C241F!important;}
+.bfx-held-s{font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:16px!important;color:#6B746F!important;}
+.bfx-held-c{
+  flex:none;font-family:'Figtree',sans-serif!important;font-size:18px!important;font-weight:600!important;line-height:24px!important;
+  letter-spacing:-.09px!important;color:#2E7D5A!important;font-variant-numeric:tabular-nums;
+}
+.bfx-failed-alt{
+  width:370px;max-width:100%;height:48px;border:0;background:none;cursor:pointer;
+  font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:600!important;line-height:20px!important;color:#2E7D5A!important;
+}
+
+/* ───────── Koott 2.0, step 1 extras and the note sheet ───────── */
+.bfx-else-rule{width:370px;max-width:100%;height:1px;background:#E3E7E5;margin-top:24px;}
+.bfx-else{display:flex;align-items:center;justify-content:space-between;gap:12px;width:370px;max-width:100%;margin-top:24px;}
+.bfx-else-t{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:20px!important;color:#9CA49F!important;}
+.bfx-else-b{
+  flex:none;height:36px;padding:8px 14px 8px 16px;border:0;border-radius:999px;background:#F5F7F6;cursor:pointer;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:20px!important;color:#6B746F!important;
+}
+.bfx-sheet-wrap{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;}
+.bfx-sheet-veil{position:absolute;inset:0;border:0;padding:0;background:rgba(13,20,15,.55);cursor:pointer;}
+.bfx-sheet{
+  position:relative;width:100%;max-width:402px;display:flex;flex-direction:column;gap:12px;
+  padding:12px 16px 30px;border-radius:24px 24px 0 0;background:#fff;
+}
+.bfx-sheet-grip{width:44px;height:4px;border-radius:2px;background:#E3E7E5;align-self:center;margin-bottom:4px;}
+.bfx-sheet-h{
+  margin:0!important;font-family:'Figtree',sans-serif!important;font-size:18px!important;font-weight:600!important;
+  line-height:24px!important;letter-spacing:-.09px!important;color:#1C241F!important;
+}
+.bfx-sheet-p{
+  margin:0!important;font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:400!important;
+  line-height:20px!important;color:#535E58!important;
+}
+.bfx-sheet-t{
+  width:100%;min-height:120px;padding:12px;border-radius:12px;border:1px solid #E3E7E5;resize:vertical;outline:none;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:20px!important;color:#1C241F!important;
+}
+.bfx-sheet-t:focus{border-color:#39AC71;}
+.bfx-sheet .bfx-btn{width:100%;height:48px;margin:0;}
 
 /* step 1: schedule */
 .bfx-title-who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
