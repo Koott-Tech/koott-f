@@ -67,6 +67,7 @@ const K2_TYPE_ART = { individual: 'individual', couple: 'couple', psychiatry_15:
 const FX_DOW_FULL = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 // Figma "6 · Session mode" (7858:85858), in its order.
 const K2_MODES = [['audio', 'Audio call'], ['video', 'Video call'], ['chat', 'Chat']];
+const K2_MODE_LABEL = { audio: 'Audio call', video: 'Video call', chat: 'Chat' };
 const K2_MODE_ICON = {
   audio: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M18 14.1v2.5a1.7 1.7 0 0 1-1.8 1.7 16.5 16.5 0 0 1-7.2-2.6 16.2 16.2 0 0 1-5-5A16.5 16.5 0 0 1 1.4 3.4 1.7 1.7 0 0 1 3.1 1.5h2.5a1.7 1.7 0 0 1 1.7 1.4c.1.8.3 1.6.6 2.4a1.7 1.7 0 0 1-.4 1.7l-1 1a13.3 13.3 0 0 0 5 5l1-1a1.7 1.7 0 0 1 1.8-.4c.8.3 1.6.5 2.4.6a1.7 1.7 0 0 1 1.4 1.8Z" fill="#4C9F62" /></svg>,
   video: <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M18.3 6.7 14.2 10l4.1 3.3V6.7Z" fill="#4C9F62" /><rect x="1.7" y="5" width="11.7" height="10" rx="2.5" fill="#4C9F62" /></svg>,
@@ -1440,95 +1441,111 @@ export default function BookingFlow({ slug }) {
             ? `Session ${pkgSessionNo} of ${pkgTotal}`
             : sessions === 1 ? (isPsychiatrist ? 'Single consultation' : 'Single session') : `Package Sessions(${sessions})`;
           return (
-            <div className="bfx-review">
-              <div className="bfx-rv-left">
-                <div className="bfx-rv-inner">
-                  <StepDots at={4} />
-                  <div className="bfx-title" role="heading" aria-level={1}>Almost there, Review &amp; confirm</div>
-                  <div className="bfx-bill">
-                    <div className="bfx-bill-h">Bill summary</div>
-                    <div className="bfx-bill-row"><span>{pkgMode ? 'From your package' : sessions === 1 ? 'Single session' : `${sessions} sessions package`}</span><strong>{inr2(total)}</strong></div>
-                  </div>
-                  <div className="bfx-total">
-                    <div className="bfx-total-row"><span>Total</span><strong>{inr2(total)}</strong></div>
-                    {saving > 0 && <p>You’re saving {inr(saving)} with this package.</p>}
-                    {pkgMode && <p>Included in your package.</p>}
-                  </div>
-                  <div className="bfx-terms">
-                    <span>
-                      I agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer">Terms&amp; Conditions</a>,
-                      {' '}<a href="/terms-and-conditions" target="_blank" rel="noreferrer">Consent to Therapy</a> and
-                      {' '}<a href="/refund-policy" target="_blank" rel="noreferrer">Refund Policy</a>.
+            <div className="bfx-rv2">
+              <div className="bfx-title" role="heading" aria-level={1}>Review and pay</div>
+
+              {/* What you are booking. Every row is a way back to the step that
+                  set it, which is what the chevrons mean in the design. */}
+              <div className="bfx-rvcard">
+                <button type="button" className="bfx-rvrow is-who" onClick={() => router.push('/book-malayali-psychologists')}>
+                  {photo
+                    ? <img className="bfx-rv-photo" src={photo} alt="" width={48} height={48} />
+                    : <span className="bfx-rv-photo is-empty" aria-hidden>{initials}</span>}
+                  <span className="bfx-rv-whotxt">
+                    <span className="bfx-rv-name">{name}</span>
+                    {role && <span className="bfx-rv-role">{role}</span>}
+                  </span>
+                  <img src="/design/booking/chevron-right.svg" alt="" width={16} height={16} />
+                </button>
+                <span className="bfx-rv-div" />
+                <button type="button" className="bfx-rvrow" onClick={() => setStep(1)}>
+                  <span className="bfx-rv-kv">
+                    <span className="bfx-rv-k">Date and time</span>
+                    <span className="bfx-rv-v">
+                      {slot && `${dateLabel(slot.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short' })} · ${timeLabel(slot.startsAt, tz)}`}
                     </span>
-                    {!pkgMode && (
-                      <span className="bfx-secure">Secure payment via <img src="/design/booking/razorpay.svg" alt="Razorpay" width={76} height={21} /></span>
-                    )}
-                  </div>
-                  {payErr && <p className="bf-err">{payErr}</p>}
-                  {pkgMode ? (
-                    <button type="button" className="bfx-btn" disabled={confirming || !slot} onClick={confirmPackageSession}>
-                      {confirming ? 'Booking…' : 'Confirm booking'}
-                    </button>
-                  ) : (
-                    <button type="button" className="bfx-btn" disabled={paying || !slot || !plan} onClick={pay}>
-                      {paying ? 'Starting payment…' : 'Agree & Pay'}
-                    </button>
-                  )}
-                </div>
+                  </span>
+                  <img src="/design/booking/chevron-right.svg" alt="" width={16} height={16} />
+                </button>
+                <span className="bfx-rv-div" />
+                <button type="button" className="bfx-rvrow" onClick={() => setStep(0)}>
+                  <span className="bfx-rv-kv">
+                    <span className="bfx-rv-k">Session</span>
+                    <span className="bfx-rv-v">{K2_MODE_LABEL[sessionMode] || 'Video call'} · {SESSION_MINUTES[kind]} min</span>
+                  </span>
+                  <img src="/design/booking/chevron-right.svg" alt="" width={16} height={16} />
+                </button>
+                <span className="bfx-rv-div" />
+                <button type="button" className="bfx-rvrow" onClick={() => setStep(pkgMode ? 1 : 2)}>
+                  <span className="bfx-rv-kv">
+                    <span className="bfx-rv-k">Plan</span>
+                    <span className="bfx-rv-v">{planName}</span>
+                  </span>
+                  <img src="/design/booking/chevron-right.svg" alt="" width={16} height={16} />
+                </button>
               </div>
-              <div className="bfx-rv-right">
-                <div className="bfx-ticket">
-                  <div className="bfx-tk-band" aria-hidden />
-                  <div className="bfx-tk-who">
-                    {photo
-                      ? <img className="bfx-tk-photo" src={photo} alt={name} width={72} height={72} />
-                      : <span className="bfx-tk-photo is-empty" aria-hidden>{initials}</span>}
-                    <div className="bfx-tk-whotxt">
-                      <span className="bfx-tk-lbl">
-                        Your {isPsychiatrist ? 'Psychiatrist' : 'Therapist'}
-                        <button type="button" className="bfx-edit" aria-label="Change therapist" onClick={() => router.push('/book-malayali-psychologists')}>
-                          <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
-                        </button>
-                      </span>
-                      <span className="bfx-tk-name">{name}</span>
-                      {role && <span className="bfx-tk-role">{role}</span>}
-                    </div>
+
+              {/* The bill. Only the lines that have a number are drawn: the flow
+                  does not offer a coupon yet, and nothing adds tax, so those two
+                  lines of the design stay out rather than showing a zero. */}
+              <div className="bfx-billc">
+                <div className="bfx-bill-lines">
+                  <div className="bfx-bl">
+                    <span className="bfx-bl-k">
+                      Plan Total
+                      {sessions > 1 && <i>({sessions} sessions × {inr(unit)})</i>}
+                    </span>
+                    <span className="bfx-bl-v is-strong">{inr(pkgMode ? 0 : Math.round(unit * sessions))}</span>
                   </div>
-                  <div className="bfx-tear" aria-hidden><i /><b /><i /></div>
-                  <div className="bfx-tiles">
-                    <div className="bfx-tile">
-                      <span className="bfx-tl">Date</span>
-                      <strong>{slot && dateLabel(slot.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</strong>
-                      <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change date and time" onClick={() => setStep(1)}>
-                        <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
-                      </button>
-                    </div>
-                    <div className="bfx-tile">
-                      <span className="bfx-tl">Time</span>
-                      <strong>{slot && timeLabel(slot.startsAt, tz)}</strong>
-                      <em>{zoneSpace}</em>
-                      <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change time" onClick={() => setStep(1)}>
-                        <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
-                      </button>
-                    </div>
-                    <div className="bfx-tile">
-                      <span className="bfx-tl">Session</span>
-                      <strong>{FX_TYPE_LABEL[kind]}</strong>
-                      <em>{SESSION_MINUTES[kind]} min<i aria-hidden />Google Meet</em>
-                      <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change session type" onClick={() => setStep(0)}>
-                        <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
-                      </button>
-                    </div>
-                    <div className="bfx-tile">
-                      <span className="bfx-tl">Plan</span>
-                      <strong>{planName}</strong>
-                      <button type="button" className="bfx-edit bfx-tile-edit" aria-label="Change plan" onClick={() => setStep(pkgMode ? 1 : 2)}>
-                        <img src="/design/booking/edit.svg" alt="" width={16} height={16} />
-                      </button>
-                    </div>
+                  {saving > 0 && (
+                    <>
+                      <span className="bfx-bl-rule" />
+                      <div className="bfx-bl">
+                        <span className="bfx-bl-tag">Pack discount</span>
+                        <span className="bfx-bl-v is-off">− {inr(saving)}</span>
+                      </div>
+                    </>
+                  )}
+                  <span className="bfx-bl-rule" />
+                  <div className="bfx-bl">
+                    <span className="bfx-bl-k is-total">Total</span>
+                    <span className="bfx-bl-v is-total">{inr(total)}</span>
                   </div>
                 </div>
-                <img className="bfx-rv-mark" src="/design/booking/review-mark.svg" alt="" aria-hidden />
+                {saving > 0 && (
+                  <div className="bfx-savings">
+                    <span className="bfx-savings-i" aria-hidden>✦</span>
+                    You&apos;re saving {inr(saving)} on this booking
+                  </div>
+                )}
+              </div>
+
+              <div className="bfx-gtk">
+                <p className="bfx-gtk-h">Good to know</p>
+                {['Reschedule free up to 12 hours before your session.',
+                  'Cancel up to 24 hours before for a full refund.',
+                  'You will get the meeting link by email and WhatsApp.'].map((t) => (
+                    <p className="bfx-gtk-p" key={t}><i aria-hidden />{t}</p>
+                  ))}
+                <p className="bfx-gtk-t">
+                  By paying you agree to the <a href="/terms-and-conditions" target="_blank" rel="noreferrer">Terms</a>,
+                  {' '}<a href="/therapy-agreement" target="_blank" rel="noreferrer">Consent to therapy</a> and
+                  {' '}<a href="/refund-policy" target="_blank" rel="noreferrer">Refund policy</a>.
+                </p>
+              </div>
+
+              {payErr && <p className="bf-err">{payErr}</p>}
+
+              <div className="bfx-paybar">
+                {pkgMode ? (
+                  <button type="button" className="bfx-btn" disabled={confirming || !slot} onClick={confirmPackageSession}>
+                    {confirming ? 'Booking…' : 'Confirm booking'}
+                  </button>
+                ) : (
+                  <button type="button" className="bfx-btn" disabled={paying || !slot || !plan} onClick={pay}>
+                    {paying ? 'Starting payment…' : `Pay ${inr(total)}`}
+                  </button>
+                )}
               </div>
             </div>
           );
@@ -2079,6 +2096,62 @@ const CSS = `
 }
 .bfx-mode-ic svg{width:20px;height:20px;}
 .bfx-mode-l{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#1C241F!important;}
+
+/* ───────── Koott 2.0, step 7 · Review and pay (Figma 7858:86010) ───────── */
+.bfx-rv2{display:flex;flex-direction:column;gap:20px;width:370px;max-width:100%;padding-bottom:110px;}
+.bfx-rvcard{
+  border-radius:24px;background:#fff;overflow:hidden;border:1px solid #E3E7E5;
+  box-shadow:0 4px 12px rgba(28,36,31,.04),0 16px 24px rgba(28,36,31,.04),0 32px 40px rgba(28,36,31,.02);
+}
+.bfx-rvrow{
+  display:flex;align-items:center;gap:12px;width:100%;padding:16px;border:0;background:none;cursor:pointer;text-align:left;
+}
+.bfx-rvrow > img{flex:none;width:16px;height:16px;opacity:.6;}
+.bfx-rv-div{display:block;height:1px;background:#E3E7E5;}
+.bfx-rv-photo{flex:none;width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px #F5F7F6;}
+.bfx-rv-photo.is-empty{display:inline-flex;align-items:center;justify-content:center;background:#E9F1E4;color:#1B6930;font:600 16px/1 'Figtree',sans-serif;}
+.bfx-rv-whotxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;}
+.bfx-rv-name{font-family:'Figtree',sans-serif!important;font-size:18px!important;font-weight:600!important;line-height:24px!important;letter-spacing:-.09px!important;color:#1C241F!important;}
+.bfx-rv-role{font-family:'Figtree',sans-serif!important;font-size:11px!important;font-weight:600!important;line-height:16px!important;letter-spacing:.55px!important;text-transform:uppercase;color:#535E58!important;}
+.bfx-rv-kv{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.bfx-rv-k{font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:16px!important;color:#6B746F!important;}
+.bfx-rv-v{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#1C241F!important;}
+
+.bfx-billc{border-radius:24px;background:#fff;overflow:hidden;border:1px solid #E3E7E5;}
+.bfx-bill-lines{display:flex;flex-direction:column;gap:12px;padding:16px;}
+.bfx-bl{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.bfx-bl-k{display:inline-flex;align-items:center;gap:8px;font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:20px!important;color:#535E58!important;}
+.bfx-bl-k i{font-style:normal;color:#6B746F!important;}
+.bfx-bl-k.is-total{font-size:16px!important;font-weight:600!important;line-height:20px!important;}
+.bfx-bl-tag{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:20px!important;color:#535E58!important;}
+.bfx-bl-v{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:20px!important;color:#1C241F!important;}
+.bfx-bl-v.is-strong{font-weight:600!important;}
+.bfx-bl-v.is-off{color:#2E7D5A!important;}
+.bfx-bl-v.is-total{font-size:16px!important;font-weight:600!important;line-height:20px!important;}
+.bfx-bl-rule{display:block;height:1px;background:#E3E7E5;}
+.bfx-savings{
+  display:flex;align-items:center;gap:10px;padding:14px 16px;background:#EFFCF2;
+  box-shadow:inset 0 0 0 1px #E2F7E7;
+  font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:20px!important;color:#2E7D5A!important;
+}
+.bfx-savings-i{color:#39AC71;font-size:16px;line-height:1;}
+
+.bfx-gtk{display:flex;flex-direction:column;gap:8px;padding:8px 0 0 4px;}
+.bfx-gtk-h{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:18px!important;color:#9CA49F!important;margin:0!important;}
+.bfx-gtk-p{
+  display:flex;gap:8px;margin:0!important;
+  font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:16px!important;color:#9CA49F!important;
+}
+.bfx-gtk-p i{flex:none;width:4px;height:4px;margin-top:6px;border-radius:50%;background:#9CA49F;}
+.bfx-gtk-t{margin:0!important;font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:16px!important;color:#9CA49F!important;}
+.bfx-gtk-t a{color:#6B746F!important;text-decoration:underline;}
+
+/* The pay bar is fixed to the bottom of the screen, as the design has it. */
+.bfx-paybar{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;
+  padding:16px 16px 40px;background:#fff;box-shadow:0 -1px 0 #E3E7E5;
+}
+.bfx-paybar .bfx-btn{width:370px;max-width:100%;height:48px;}
 
 /* step 1: schedule */
 .bfx-title-who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
