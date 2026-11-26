@@ -2499,6 +2499,30 @@ const CSS = `
 .bfx-sheet-t:focus{border-color:#39AC71;}
 .bfx-sheet .bfx-btn{width:100%;height:48px;margin:0;}
 
+/* ───────── Koott 2.0 on a tablet and a laptop ─────────
+   The Figma draws these steps at 402 and nothing wider. Rather than stretch a
+   370 column across a 1228 shell, the step is centred in it and the header is
+   held to the same column, so the back button lines up with the cards instead
+   of sitting alone at the far left. */
+@media (min-width:768px){
+  .bf-in.is-fx{display:flex;flex-direction:column;align-items:center;}
+  .bf-in.is-fx > *{width:100%;max-width:370px;}
+  .bfx-top.is-k2{width:100%;max-width:370px;}
+  /* Review and pay sets its own width; the shell must not squeeze it. */
+  .bf-in.is-fx > .bfx-rv2,
+  .bf-in.is-fx > .bfx-failed{max-width:370px;}
+  .bfx-sched.is-k2,.bfx-types,.bfx-plans.is-k2,.bfx-modes,.bfx-else,.bfx-else-rule{margin-left:auto;margin-right:auto;}
+  /* The bars the design fixes to the bottom of a phone stay centred here. */
+  .bfx-paybar,.bfx-failed-actions{padding-left:0;padding-right:0;}
+  .bfx-sheet{border-radius:24px;margin-bottom:24px;}
+  .bfx-sheet-wrap{align-items:center;}
+}
+@media (min-width:1100px){
+  /* A step is a short column of cards; a wide shell only pushes it about, so the
+     column keeps its width and sits in the middle of the page. */
+  .bf-in.is-fx{padding-top:40px;}
+}
+
 /* step 1: schedule */
 .bfx-title-who{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .bfx-who-photo{width:32px;height:32px;border-radius:40px;object-fit:cover;flex:none;}
