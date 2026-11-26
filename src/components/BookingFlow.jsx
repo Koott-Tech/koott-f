@@ -1248,6 +1248,59 @@ export default function BookingFlow({ slug }) {
           </>
         ) : (
         <>
+        {/* The summary column, on a tablet and a laptop only. A booking is a short
+            column of choices; beside it there is room to keep showing who and what
+            is being booked, which a phone has to drop. It is hidden on Review and
+            pay, where the page already is the summary. */}
+        {!payFailed && step < 4 && !modeOpen && (
+          <aside className="bfx-aside" aria-label="Your booking so far">
+            <div className="bfx-aside-card">
+              <div className="bfx-aside-who">
+                {photo
+                  ? <img src={photo} alt="" width={48} height={48} />
+                  : <span className="bfx-aside-ph" aria-hidden>{initials}</span>}
+                <span className="bfx-aside-whotxt">
+                  <span className="bfx-aside-n">{name}</span>
+                  {role && <span className="bfx-aside-r">{role}</span>}
+                </span>
+              </div>
+              <div className="bfx-aside-div" />
+              <dl className="bfx-aside-rows">
+                <div className="bfx-aside-row">
+                  <dt>Session</dt>
+                  <dd>{kind ? `${FX_TYPE_LABEL[kind] || kind} · ${SESSION_MINUTES[kind] || 50} min` : <i>Not chosen yet</i>}</dd>
+                </div>
+                <div className="bfx-aside-row">
+                  <dt>Date and time</dt>
+                  <dd>
+                    {slot
+                      ? `${dateLabel(slot.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short' })} · ${timeLabel(slot.startsAt, tz)}`
+                      : <i>Not chosen yet</i>}
+                  </dd>
+                </div>
+                <div className="bfx-aside-row">
+                  <dt>How</dt>
+                  <dd>{K2_MODE_LABEL[sessionMode] || 'Video call'}</dd>
+                </div>
+                <div className="bfx-aside-row">
+                  <dt>Plan</dt>
+                  <dd>{plan ? `${readType(plan).sessions > 1 ? `${readType(plan).sessions} sessions` : 'Single session'}` : <i>Not chosen yet</i>}</dd>
+                </div>
+              </dl>
+              {plan && (
+                <>
+                  <div className="bfx-aside-div" />
+                  <div className="bfx-aside-total">
+                    <span>Total</span>
+                    <strong>{inr(plan.price)}</strong>
+                  </div>
+                </>
+              )}
+            </div>
+            <p className="bfx-aside-note">You can change any of this before you pay.</p>
+          </aside>
+        )}
+
         {!payFailed && step === 0 && (
           <>
             <div className="bfx-title" role="heading" aria-level={1}>What kind of session are you looking for?</div>
@@ -2500,27 +2553,76 @@ const CSS = `
 .bfx-sheet .bfx-btn{width:100%;height:48px;margin:0;}
 
 /* ───────── Koott 2.0 on a tablet and a laptop ─────────
-   The Figma draws these steps at 402 and nothing wider. Rather than stretch a
-   370 column across a 1228 shell, the step is centred in it and the header is
-   held to the same column, so the back button lines up with the cards instead
-   of sitting alone at the far left. */
+   The Figma draws these steps at 402 and nothing wider. A phone has to show one
+   thing at a time; a wider screen does not, so from 1024 the step keeps its own
+   column and what has been chosen so far stands beside it instead of being out
+   of sight until Review. Below that the step is simply centred — there is not
+   room for two columns of this design on a tablet. */
 @media (min-width:768px){
   .bf-in.is-fx{display:flex;flex-direction:column;align-items:center;}
   .bf-in.is-fx > *{width:100%;max-width:370px;}
   .bfx-top.is-k2{width:100%;max-width:370px;}
-  /* Review and pay sets its own width; the shell must not squeeze it. */
   .bf-in.is-fx > .bfx-rv2,
   .bf-in.is-fx > .bfx-failed{max-width:370px;}
   .bfx-sched.is-k2,.bfx-types,.bfx-plans.is-k2,.bfx-modes,.bfx-else,.bfx-else-rule{margin-left:auto;margin-right:auto;}
-  /* The bars the design fixes to the bottom of a phone stay centred here. */
   .bfx-paybar,.bfx-failed-actions{padding-left:0;padding-right:0;}
   .bfx-sheet{border-radius:24px;margin-bottom:24px;}
   .bfx-sheet-wrap{align-items:center;}
+  /* The summary belongs to the two-column layout below; a tablet shows the step
+     alone, as a phone does. */
+  .bfx-aside{display:none;}
 }
-@media (min-width:1100px){
-  /* A step is a short column of cards; a wide shell only pushes it about, so the
-     column keeps its width and sits in the middle of the page. */
-  .bf-in.is-fx{padding-top:40px;}
+
+@media (min-width:1024px){
+  .bf-in.is-fx{
+    display:grid;align-items:start;justify-content:center;
+    grid-template-columns:minmax(0,402px) 340px;column-gap:48px;
+    max-width:1100px;padding:40px 24px 120px;
+  }
+  /* Every step's blocks are siblings here, so they all take the first column and
+     stack by rows; the summary takes the second and stays put while they change. */
+  .bf-in.is-fx > *{grid-column:1;width:100%;max-width:402px;}
+  .bf-in.is-fx > .bfx-top{grid-column:1 / -1;max-width:none;}
+  .bf-in.is-fx > .bfx-aside{
+    /* A row end of -1 would be the end of the explicit grid, which has no rows
+       declared here, so the span is written out instead. */
+    grid-column:2;grid-row:2 / span 50;display:block;max-width:340px;
+    position:sticky;top:96px;align-self:start;
+  }
+  .bfx-aside-card{
+    display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:24px;background:#fff;
+    border:1px solid #E3E7E5;
+    box-shadow:0 2px 5px rgba(28,36,31,.02),0 9px 9px rgba(28,36,31,.02),0 20px 12px rgba(28,36,31,.02);
+  }
+  .bfx-aside-who{display:flex;align-items:center;gap:12px;}
+  .bfx-aside-who img,.bfx-aside-ph{
+    width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none;
+    box-shadow:0 0 0 3px #F5F7F6;background:#E9F1E4;
+    display:flex;align-items:center;justify-content:center;color:#1B6930;font:600 16px/1 'Figtree',sans-serif;
+  }
+  .bfx-aside-whotxt{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .bfx-aside-n{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:600!important;line-height:24px!important;color:#1C241F!important;}
+  .bfx-aside-r{font-family:'Figtree',sans-serif!important;font-size:11px!important;font-weight:600!important;line-height:16px!important;letter-spacing:.55px!important;text-transform:uppercase;color:#535E58!important;}
+  .bfx-aside-div{height:1px;background:#E3E7E5;}
+  .bfx-aside-rows{display:flex;flex-direction:column;gap:12px;margin:0;}
+  .bfx-aside-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+  .bfx-aside-row dt{font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:16px!important;color:#6B746F!important;margin:0;}
+  .bfx-aside-row dd{
+    margin:0;text-align:right;
+    font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:20px!important;color:#1C241F!important;
+  }
+  .bfx-aside-row dd i{font-style:normal;color:#9CA49F!important;font-weight:400!important;}
+  .bfx-aside-total{display:flex;align-items:center;justify-content:space-between;}
+  .bfx-aside-total span{font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:20px!important;color:#535E58!important;}
+  .bfx-aside-total strong{font-family:'Figtree',sans-serif!important;font-size:18px!important;font-weight:600!important;line-height:24px!important;letter-spacing:-.09px!important;color:#1C241F!important;}
+  .bfx-aside-note{
+    margin:12px 4px 0!important;
+    font-family:'Figtree',sans-serif!important;font-size:12px!important;font-weight:400!important;line-height:16px!important;color:#9CA49F!important;
+  }
+  /* Review and pay and the failure screen have no summary beside them, so they
+     take the middle of the page rather than sitting off to one side. */
+  .bf-in.is-fx:not(:has(.bfx-aside)){grid-template-columns:minmax(0,402px);}
+  .bfx-paybar .bfx-btn,.bfx-failed-actions .bfx-btn,.bfx-failed-alt{max-width:402px;}
 }
 
 /* step 1: schedule */
