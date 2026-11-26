@@ -247,6 +247,23 @@ export const SESSIONS2_CSS = `
 .s2-skeleton{height:207px;border-radius:24px;background:var(--tile);animation:s2pulse 1.4s ease-in-out infinite;}
 @keyframes s2pulse{0%,100%{opacity:1}50%{opacity:.55}}
 
+/* ───────── tablet (768 to 899) ─────────
+   Not enough width for a side column, but plenty for two cards across, which is
+   what My sessions and Refunds are mostly made of. */
+@media (min-width:768px) and (max-width:899px){
+  .s2-shell{max-width:720px;}
+  .s2-body.is-list .s2-list{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;
+  }
+  .s2-hero-title{font-size:32px!important;line-height:40px!important;letter-spacing:-.64px!important;}
+  /* The detail screens get their side column here too, narrower than the 370 the
+     design gives it, so the panels are not stretched across the whole tablet. */
+  .s2-body.is-detail{
+    display:grid;gap:20px;grid-template-columns:minmax(0,1fr) 300px;align-items:start;
+  }
+  .s2-main,.s2-side{gap:20px;}
+}
+
 /* ───────── laptop and desktop (from 900, where two columns fit) ─────────
    The Figma has no frame above 402, so this is the same design laid out wide, not
    a new one. The list keeps its own 370-wide cards and simply takes two columns
@@ -276,7 +293,7 @@ export const SESSIONS2_CSS = `
   .s2-hero-title{font-size:40px!important;line-height:48px!important;letter-spacing:-.8px!important;}
 }
 .s2-main,.s2-side{display:contents;}
-@media (min-width:900px){.s2-main,.s2-side{display:flex;}}
+@media (min-width:768px){.s2-main,.s2-side{display:flex;flex-direction:column;min-width:0;}}
 
 /* ───────── tracking ─────────
    globals.css sets letter-spacing on body text (0.01em) and paragraphs (-0.5px)

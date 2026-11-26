@@ -189,6 +189,30 @@ export const ACCOUNT2_CSS = `
 .a2-skeleton{height:149px;border-radius:24px;background:var(--tile);animation:a2pulse 1.4s ease-in-out infinite;}
 @keyframes a2pulse{0%,100%{opacity:1}50%{opacity:.55}}
 
+/* ───────── tablet (768 to 899) ─────────
+   720 is enough for the split the laptop uses, with the settings list at 300
+   rather than the 370 the design gives it — its rows are flexible, the cards in
+   the left column are not, so the narrowing goes to the side. */
+@media (min-width:768px) and (max-width:899px){
+  .a2-shell{max-width:720px;}
+  .a2-body{
+    display:grid;gap:20px;padding:8px 16px 56px;
+    grid-template-columns:minmax(0,1fr) 300px;
+    grid-template-areas:
+      "who       who"
+      "shortcuts side"
+      "main      side";
+    align-items:start;
+  }
+  .a2-id{grid-area:who;gap:14px;}
+  .a2-shortcuts{grid-area:shortcuts;}
+  .a2-main{grid-area:main;display:flex;flex-direction:column;gap:20px;min-width:0;}
+  .a2-more{grid-area:side;}
+  .a2-avatar{width:64px;height:64px;}
+  .a2-avatar span{font-size:24px;}
+  .a2-name{font-size:26px!important;line-height:34px!important;letter-spacing:-.26px!important;}
+}
+
 /* ───────── laptop and desktop (from 900, where two columns fit) ─────────
    The Figma has no frame above 402, so this is the same design laid out for a wide
    screen, not a new one. Who you are runs across the top; below it the page splits.

@@ -277,6 +277,20 @@ export const LANDING2_CSS = `
 }
 .l2-final-note{font-size:12px!important;font-weight:500!important;line-height:16px!important;color:#fff!important;text-align:center;}
 
+/* ───────── tablet (768 to 899) ─────────
+   A tablet is not a wide phone and not a small laptop. The hero stays stacked,
+   because the video beside the headline needs more width than this, but the
+   column grows and everything that was a list of one becomes two across. */
+@media (min-width:768px) and (max-width:899px){
+  .l2-wrap{max-width:720px;}
+  .l2-h1{font-size:34px!important;line-height:42px!important;letter-spacing:-.68px!important;}
+  .l2-sec{padding:48px 0;}
+  .l2-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start;}
+  .l2-cards > *{width:auto;max-width:none;}
+  .l2-cards .l2-more{grid-column:1 / -1;max-width:420px;justify-self:center;}
+  .l2-split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start;}
+}
+
 /* ───────── tablet and laptop ─────────
    The Figma draws only the 402 screen. Above it the page is given room rather
    than redrawn: the column grows to 640, then the rails stop scrolling sideways
@@ -301,8 +315,12 @@ export const LANDING2_CSS = `
   .l2-h1{font-size:44px!important;line-height:52px!important;letter-spacing:-.88px!important;}
   .l2-sec{padding:64px 0;}
   .l2-sec.is-tight{padding:56px 0;}
+  /* The therapist card is 362 wide by design, so the columns are 362 and the row
+     is centred — an auto-fill of 1fr columns would leave each card adrift at the
+     left of a column much wider than itself. */
   .l2-cards{
-    display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px;align-items:start;
+    display:grid;grid-template-columns:repeat(auto-fill,362px);gap:24px;
+    align-items:start;justify-content:center;
   }
   .l2-cards .l2-more{grid-column:1 / -1;max-width:560px;justify-self:center;}
   .l2-reviews-wrap{padding:0;}
