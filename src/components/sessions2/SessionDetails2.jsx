@@ -26,10 +26,39 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { clientApi } from '@/lib/backendApi';
 import { SESSIONS2_CSS } from './sessions2.css';
+// The Join card is the account page's own card — same design, same numbers — so
+// it is drawn with that stylesheet under a nested `.a2` rather than copied here.
+import { ACCOUNT2_CSS } from '@/components/account2/account2.css';
 import {
   CopyButton, Icon, Stars, dayOf, initials, kindOf, minutesOf, money, nameOf, photoOf, refOf,
   stampOf, startOf, statusOf, whenOf,
 } from './shared';
+
+/** The clock time in a zone, for the card's second line. */
+const timeIn = (date, tz) => (date
+  ? new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(date)
+  : '');
+
+/** How far `tz` is from UTC right now, in minutes (IST = 330). */
+function offsetOf(tz, at = new Date()) {
+  try {
+    const p = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(at).reduce((o, x) => (x.type === 'literal' ? o : { ...o, [x.type]: x.value }), {});
+    const asUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
+    return Math.round((asUtc - Math.floor(at.getTime() / 1000) * 1000) / 60000);
+  } catch { return 0; }
+}
+
+/** Intl calls India "GMT+5:30"; the design (and everyone) says IST. */
+function shortZone(tz) {
+  if (offsetOf(tz) === 330) return 'IST';
+  try {
+    return (new Intl.DateTimeFormat('en-GB', { timeZone: tz, timeZoneName: 'short' })
+      .formatToParts(new Date()).find((p) => p.type === 'timeZoneName')?.value || '').replace('GMT', 'GMT ');
+  } catch { return ''; }
+}
 
 const CARE_WHATSAPP = '919539007766';
 
@@ -42,7 +71,7 @@ function heroFor(session, at, tz) {
   if (s === 'completed') return ['Session completed', `${mins} minutes with ${who} on ${when}.`];
   if (s === 'cancelled' || s === 'canceled') return ['Session cancelled', `Your session with ${who} on ${when} was cancelled.`];
   if (s === 'no_show' || s === 'missed') return ['Session missed', `Nobody joined the session with ${who} on ${when}.`];
-  return ['Session booked', `${mins} minutes with ${who} on ${when}.`];
+  return ['Session Booked', `${mins} minutes with ${who} on ${when}.`];
 }
 
 export default function SessionDetails2({ sessionId }) {
@@ -52,6 +81,7 @@ export default function SessionDetails2({ sessionId }) {
   const [receipt, setReceipt] = useState(null);
   const [status, setStatus] = useState('loading');
   const [stars, setStars] = useState(0);
+  const [note, setNote] = useState('');
 
   const tz = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata', []);
 
@@ -116,6 +146,11 @@ export default function SessionDetails2({ sessionId }) {
   const [title, line] = heroFor(session, at, tz);
   const who = session.psychologist;
   const over = ['completed'].includes(String(session.status || '').toLowerCase());
+  const openStatus = ['booked', 'rescheduled', 'confirmed', 'pending'].includes(String(session.status || '').toLowerCase());
+  const upcoming = openStatus && !!at && at.getTime() > Date.now() - 60 * 60 * 1000;
+  const meet = session.google_meet_link || session.google_meet_join_url || session.google_calendar_link || '';
+  // The link opens a quarter of an hour before the session, not before that.
+  const joinable = !!at && at.getTime() - Date.now() < 15 * 60 * 1000;
   const fee = Number(session.price ?? session.amount) || 0;
   const off = Number(session.discount_amount) || 0;
   const paid = Number(session.amount ?? fee) || 0;
@@ -124,7 +159,8 @@ export default function SessionDetails2({ sessionId }) {
 
   return (
     <div className="s2">
-      <style dangerouslySetInnerHTML={{ __html: SESSIONS2_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: `${SESSIONS2_CSS}
+${ACCOUNT2_CSS}` }} />
       <div className="s2-hero">
         <div className="s2-shell">
           <div className="s2-top">
@@ -147,6 +183,60 @@ export default function SessionDetails2({ sessionId }) {
               <div className="s2-panel">
                 <h2 className="s2-panel-title">How was your session?</h2>
                 <Stars value={stars} onRate={rate} big />
+              </div>
+            )}
+
+            {/* The Join card, for a session that has not happened yet: both clocks,
+                the meeting link, a note, and the way in. Figma 8080:31367 makes
+                this the whole point of the screen after a booking. */}
+            {upcoming && (
+              <div className="a2">
+                <div className="a2-card a2-session">
+                  <div className="a2-ses-head">
+                    <div className="a2-ses-avatar">
+                      {photoOf(who) ? <img src={photoOf(who)} alt="" /> : <span>{initials(nameOf(who))}</span>}
+                    </div>
+                    <div className="a2-ses-who">
+                      <span className="a2-ses-name">{nameOf(who) || 'Your therapist'}</span>
+                      <span className="a2-ses-role">{who?.designation || 'Psychologist'}</span>
+                    </div>
+                  </div>
+                  <div className="a2-div" />
+                  <div className="a2-ses-when">
+                    <div className="a2-ses-row">
+                      <span className="a2-ses-tile" aria-hidden="true">{Icon.clock}</span>
+                      <span className="a2-ses-time">{whenOf(at, tz)}</span>
+                      <span className="a2-tz">{shortZone(tz) || 'Local'}</span>
+                      {offsetOf(tz) !== 330 && (
+                        <>
+                          <span className="a2-ses-time">or {timeIn(at, 'Asia/Kolkata')}</span>
+                          <span className="a2-tz">IST</span>
+                        </>
+                      )}
+                    </div>
+                    {meet && (
+                      <div className="a2-ses-row">
+                        <span className="a2-ses-tile" aria-hidden="true">{Icon.video}</span>
+                        <a className="a2-ses-link" href={meet} target="_blank" rel="noopener noreferrer">{meet}</a>
+                        <CopyButton value={meet} label="Copy the meeting link" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="a2-div" />
+                  <div className="a2-ses-note">
+                    <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Send a note..." aria-label="Send a note to your therapist" />
+                  </div>
+                  {/* It opens 15 minutes before; until then it says so rather than
+                      looking broken when nothing happens. */}
+                  <button
+                    type="button"
+                    className="a2-join"
+                    disabled={!meet || !joinable}
+                    onClick={() => meet && window.open(meet, '_blank', 'noopener')}
+                  >
+                    {joinable ? 'Join Session' : 'Join Session'}
+                  </button>
+                </div>
               </div>
             )}
 

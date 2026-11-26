@@ -29,6 +29,9 @@ export const SESSIONS2_CSS = `
 .s2 :where(a){text-decoration:none;color:inherit;}
 .s2 :where(img){display:block;}
 .s2 :is(p,h1,h2,h3,h4,h5,h6):not(#_){font-family:inherit!important;margin:0!important;}
+/* The Join card is drawn with the account page's stylesheet (see
+   SessionDetails2); nested here it must not claim a screen of its own. */
+.s2 .a2{min-height:0;background:transparent;}
 /* Every chevron in these screens is 18; without this an svg with no size rule of
    its own fills whatever box it lands in. */
 .s2 .s2-chev{flex:none;width:18px;height:18px;}

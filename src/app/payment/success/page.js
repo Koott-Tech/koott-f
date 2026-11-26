@@ -550,6 +550,18 @@ function PaymentSuccessContent() {
         console.log('📊 Booking status:', { status, hasSession: !!session, message });
 
         if (status === 'COMPLETED' && session?.id) {
+          /* The booking is real: the Koott 2.0 design makes the session's own page
+             the thing you land on afterwards ("Session Booked", the Join card, the
+             pack and the billing), so go there rather than drawing a second,
+             older confirmation screen here. The polling above stays — it is what
+             covers the wait while the webhook writes the session. */
+          router.replace(`/profile/sessions/${session.id}`);
+          return;
+        }
+
+        // Below here is the previous confirmation screen. The redirect above returns,
+        // so it no longer runs; it is left in place so the change is one line to undo.
+        if (status === 'COMPLETED' && session?.id) {
           // Session created! Fetch full session details (require real session id — never trust placeholder objects)
           console.log('✅ Session created, fetching details...', { sessionId: session.id, hasSessionId: !!session.id, sessionType: session.session_type, packageId: session.package_id });
           
