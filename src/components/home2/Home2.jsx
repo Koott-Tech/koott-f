@@ -137,6 +137,9 @@ export default function Home2() {
   const [authOpen, setAuthOpen] = useState(false);
   const tabsRef = useRef(null);
   const [tabsScrolled, setTabsScrolled] = useState(false);
+  const [stuck, setStuck] = useState(false);
+  const [slim, setSlim] = useState(false);
+  const listRef = useRef(null);
 
   useEffect(() => {
     let off = false;
@@ -198,6 +201,24 @@ export default function Home2() {
     const el = tabsRef.current;
     if (el) el.scrollBy({ left: tabsScrolled ? -200 : 200, behavior: 'smooth' });
   };
+
+  /* The block above the therapist list collapses as the list comes up, the way the
+     design draws it (7858:80302 → 8036:30214, 202 → 145 → 64): the search joins the
+     category row at the top, then the categories fold away and the search stays. */
+  useEffect(() => {
+    const onScroll = () => {
+      const top = listRef.current?.getBoundingClientRect().top ?? Infinity;
+      setStuck(top <= 180);
+      setSlim(top <= -120);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
 
   const days = useMemo(nextDays, []);
   const bookHref = (c) => (c.slug ? `/book/${c.slug}` : `/therapist-profile?doctor=${encodeURIComponent(c.id)}`);
@@ -266,8 +287,23 @@ export default function Home2() {
         </div>
       </header>
 
-      {/* ───────────────── category tabs ───────────────── */}
-      <nav className="h2-tabs" aria-label="Kinds of therapy">
+      {/* ───────────────── the bar that follows the list ───────────────── */}
+      <div className={`h2-stick${stuck ? ' is-on' : ''}${slim ? ' is-slim' : ''}`}>
+        <div className="h2-stick-search" aria-hidden={!stuck}>
+          <label className="h2-search is-slim">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="#6B746F" strokeWidth="2" fill="none" /><path d="m11 11 3 3" stroke="#6B746F" strokeWidth="2" strokeLinecap="round" /></svg>
+            <input
+              type="search"
+              className="ph-no-capture"
+              value={query}
+              placeholder="Search for therapist, concerns"
+              aria-label="Search for a therapist or a concern"
+              tabIndex={stuck ? 0 : -1}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </label>
+        </div>
+        <nav className="h2-tabs" aria-label="Kinds of therapy">
         <div className="h2-tabs-scroll" ref={tabsRef} onScroll={onTabScroll}>
           {TABS.map((x) => (
             <button
@@ -289,10 +325,11 @@ export default function Home2() {
             <path d="m6 3 5 5-5 5" stroke="#0A243F" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" fill="none" />
           </svg>
         </button>
-      </nav>
+        </nav>
+      </div>
 
       {/* ───────────────── therapists ───────────────── */}
-      <section className="h2-list" id="therapists" aria-label="Therapists">
+      <section className="h2-list" id="therapists" aria-label="Therapists" ref={listRef}>
         {status === 'loading' && <p className="h2-note">Loading therapists…</p>}
         {status === 'error' && <p className="h2-note">We couldn’t load the therapists just now. Please refresh to try again.</p>}
         {status === 'ready' && visible.length === 0 && (

@@ -80,6 +80,32 @@ export const HOME2_CSS = `
 }
 
 /* ───────── category tabs ───────── */
+/* globals.css sets overflow-x:hidden on <body>, which makes body a scroll container and
+   stops position:sticky working inside it; clip hides the same overflow without that. */
+body:has(.h2){overflow-x:clip!important;}
+
+/* ───────── the bar that follows the list (7858:80302 → 8036:30214) ─────────
+   The block above the therapist list is 202 tall at rest: the search row (64) and the
+   category row (138). As the list comes up it sticks to the top, and then the categories
+   fold away, leaving the 64 the design's last state shows. */
+.h2-stick{position:sticky;top:0;z-index:6;background:#fff;}
+.h2-stick-search{
+  height:0;overflow:hidden;padding:0 16px;background:#fff;
+  transition:height .22s ease,padding .22s ease;
+}
+.h2-stick.is-on .h2-stick-search{height:64px;padding:8px 16px;}
+.h2-search.is-slim{
+  height:48px;background:#F5F7F6;border:1px solid #E3E7E5;box-shadow:none;
+}
+.h2-search.is-slim input{color:#1C241F;}
+.h2-search.is-slim input::placeholder{color:#6B746F;}
+/* The categories fold away once the list is properly in view. */
+.h2-stick .h2-tabs{
+  max-height:200px;overflow:hidden;
+  transition:max-height .24s ease,opacity .18s ease;
+}
+.h2-stick.is-slim .h2-tabs{max-height:0;opacity:0;border-bottom-color:transparent;}
+
 .h2-tabs{
   position:relative;background:#fff;border-bottom:1px solid #EBEBEB;
   box-shadow:0 9px 19px rgba(244,244,244,.10),0 34px 34px rgba(244,244,244,.09),0 77px 46px rgba(244,244,244,.05);
