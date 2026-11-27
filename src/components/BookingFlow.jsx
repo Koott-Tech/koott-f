@@ -2513,10 +2513,14 @@ const CSS = `
   position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;
   padding:44px 16px 34px;background:#fff;box-shadow:0 -1px 0 #E3E7E5;
 }
+/* Payment failed starts its content 24 below the header, not the 48 the input
+   steps use (Content pad=24 on 7858:86086). */
+.bf-in:has(.bfx-failed) .bfx-top.is-k2{margin-bottom:24px;}
+
 /* Figma's "Button" on the pay bar: a 370x48 pill with the green gradient, a white
    inside hairline and the stacked green shadows — not the flat 8px slab the
    pre-2.0 .bfx-btn draws. */
-.bfx-paybar .bfx-btn{
+.bfx-paybar .bfx-btn,.bfx-failed-actions .bfx-btn{
   width:370px;max-width:100%;height:48px;border-radius:9999px;
   background:linear-gradient(180deg,#5DC189 0%,#39AC71 100%);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 7px 7.2px rgba(255,255,255,.25),
@@ -2524,7 +2528,7 @@ const CSS = `
   font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
   font-size:16px!important;font-weight:600!important;line-height:20px!important;
 }
-.bfx-paybar .bfx-btn:disabled{background:#9CA49F;box-shadow:none;}
+.bfx-paybar .bfx-btn:disabled,.bfx-failed-actions .bfx-btn:disabled{background:#9CA49F;box-shadow:none;}
 
 /* ───────── Koott 2.0, step 12 · Payment failed (Figma 7858:86086) ───────── */
 .bfx-failed{display:flex;flex-direction:column;gap:16px;width:370px;max-width:100%;padding-bottom:220px;}
@@ -2532,8 +2536,10 @@ const CSS = `
   display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:999px;background:#FFF4F3;
 }
 .bfx-failed-i svg{width:24px;height:24px;}
+/* The design's Hero puts 16 between the status icon and the text (7858:86086);
+   the extra 40 here made it 56 and pushed the heading from 214 to 254. */
 .bfx-failed-h{
-  margin:40px 0 0!important;
+  margin:0!important;
   font-family:'Figtree',sans-serif!important;font-size:24px!important;font-weight:600!important;line-height:32px!important;
   letter-spacing:-.24px!important;color:#1C241F!important;
 }
