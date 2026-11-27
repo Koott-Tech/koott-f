@@ -2232,7 +2232,8 @@ const CSS = `
   font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:24px!important;font-weight:500!important;
   line-height:1.66!important;color:#0F0F0F!important;letter-spacing:0!important;margin:0 0 24px;
 }
-.bfx-head{margin:0 0 24px;display:flex;flex-direction:column;gap:4px;}
+/* The plan step's title row is 370x52 (7858:85805) and the badge fills it. */
+.bfx-head{margin:0 0 24px;display:flex;flex-direction:column;gap:4px;min-height:52px;}
 .bfx-head .bfx-title{margin:0;}
 .bfx-sub{font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;font-weight:400!important;line-height:22px!important;color:#373737!important;margin:0;}
 .bfx-btn{
@@ -2282,7 +2283,7 @@ const CSS = `
 /* Every 2.0 step titles the same way (Figma 7858:85649 and its siblings): Figtree
    600 at 24/32 with -0.24 tracking. The pre-2.0 rule above is Poppins 500 at
    1.66 line-height, which was still winning here. */
-.bf-in.is-fx .bfx-title{
+.bf-in.is-fx .bfx-title,.bf-in.is-wide .bfx-title{
   font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
   font-size:24px!important;font-weight:600!important;line-height:32px!important;
   letter-spacing:-.24px!important;color:#1C241F!important;
@@ -2315,7 +2316,7 @@ const CSS = `
      column wide instead of scrolling inside it */
   min-width:0;max-width:100%;
   display:flex;align-items:center;gap:16px;overflow-x:auto;scrollbar-width:none;
-  padding-bottom:2px;scroll-snap-type:x mandatory;
+  scroll-snap-type:x mandatory;
 }
 .bfx-days::-webkit-scrollbar{display:none;}
 .bfx-dayc{
@@ -2342,7 +2343,7 @@ const CSS = `
 /* The hairline between the day strip and the times: Figma draws it 362 wide,
    inset 4 either side of the 370 column (7858:85753, "Frame 2147231026"). It had
    no width of its own and was collapsing to nothing. */
-.bfx-rule{align-self:stretch;width:auto;height:1px;margin:0 4px;background:#E3E7E5;}
+.bfx-rule{align-self:stretch;width:auto;height:1px;margin:8px 4px 0;background:#E3E7E5;}
 .bfx-times{display:flex;flex-direction:column;gap:16px;}
 .bfx-times-h{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:600!important;line-height:20px!important;color:#1C241F!important;margin:0!important;}
 .bfx-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
@@ -2363,7 +2364,7 @@ const CSS = `
 }
 .bfx-head.is-k2 .bfx-title{text-align:left;}
 .bfx-badge{
-  flex:none;display:flex;flex-direction:column;align-items:stretch;min-width:76px;
+  flex:none;display:flex;flex-direction:column;align-items:stretch;min-width:76px;height:52px;
   border-radius:12px;overflow:hidden;box-shadow:inset 0 0 0 1px #E3E7E5;
 }
 .bfx-badge-t{
@@ -2420,7 +2421,12 @@ const CSS = `
 .bfx-mode-l{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#1C241F!important;}
 
 /* ───────── Koott 2.0, step 7 · Review and pay (Figma 7858:86010) ───────── */
-.bfx-rv2{display:flex;flex-direction:column;gap:20px;width:370px;max-width:100%;padding-bottom:110px;}
+/* "is-wide" drops the container's padding, so Review was sitting flush at x=0
+   with 32 of dead space on its right. It centres itself instead. Its own 20 gap
+   sets the rhythm here, so the title drops the 24 margin the other steps need
+   (Figma Body gap=20: title ends 198, the session card starts 218). */
+.bfx-rv2 > .bfx-title{margin:0;}
+.bfx-rv2{display:flex;flex-direction:column;gap:20px;width:370px;max-width:100%;margin:0 auto;padding-bottom:110px;}
 .bfx-rvcard{
   border-radius:24px;background:#fff;overflow:hidden;border:1px solid #E3E7E5;
   box-shadow:0 4px 12px rgba(28,36,31,.04),0 16px 24px rgba(28,36,31,.04),0 32px 40px rgba(28,36,31,.02);
@@ -2442,8 +2448,10 @@ const CSS = `
 /* The coupon row above the bill (Figma 7858:85934). Before a code holds it is a
    field and Apply; once it holds it says so, with a way to take it off. */
 .bfx-coupon{
-  display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:12px;
-  border:1px solid #E3E7E5;border-radius:16px;background:#fff;
+  /* The column's own 20 gap spaces this; the extra 12 pushed the bill below the
+     635 the design puts it at. */
+  display:flex;align-items:center;gap:12px;min-height:70px;padding:14px 16px;
+  border:1px solid #E3E7E5;border-radius:24px;background:#fff;
 }
 .bfx-coupon input{
   flex:1;min-width:0;border:0;outline:0;background:none;
@@ -2503,9 +2511,20 @@ const CSS = `
 /* The pay bar is fixed to the bottom of the screen, as the design has it. */
 .bfx-paybar{
   position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:center;
-  padding:16px 16px 40px;background:#fff;box-shadow:0 -1px 0 #E3E7E5;
+  padding:44px 16px 34px;background:#fff;box-shadow:0 -1px 0 #E3E7E5;
 }
-.bfx-paybar .bfx-btn{width:370px;max-width:100%;height:48px;}
+/* Figma's "Button" on the pay bar: a 370x48 pill with the green gradient, a white
+   inside hairline and the stacked green shadows — not the flat 8px slab the
+   pre-2.0 .bfx-btn draws. */
+.bfx-paybar .bfx-btn{
+  width:370px;max-width:100%;height:48px;border-radius:9999px;
+  background:linear-gradient(180deg,#5DC189 0%,#39AC71 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 7px 7.2px rgba(255,255,255,.25),
+    0 1px 3px rgba(15,72,54,.08),0 11px 7px rgba(15,72,54,.04),0 19px 8px rgba(15,72,54,.02);
+  font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:16px!important;font-weight:600!important;line-height:20px!important;
+}
+.bfx-paybar .bfx-btn:disabled{background:#9CA49F;box-shadow:none;}
 
 /* ───────── Koott 2.0, step 12 · Payment failed (Figma 7858:86086) ───────── */
 .bfx-failed{display:flex;flex-direction:column;gap:16px;width:370px;max-width:100%;padding-bottom:220px;}
@@ -2703,7 +2722,9 @@ const CSS = `
 .bfx-tz i{display:block;width:4px;height:4px;border-radius:50%;background:#D6DCD8;margin:0 2px;}
 
 /* step 2: plans */
-.bfx-plan-wrap{display:flex;flex-direction:column;gap:32px;}
+/* Content gap on these steps is 24 throughout (7858:85805); this was 32, which
+   pushed the plan rows 8 below where the design has them. */
+.bfx-plan-wrap{display:flex;flex-direction:column;gap:24px;}
 .bfx-tabs{display:flex;gap:12px;}
 .bfx-tab{
   height:32px;padding:5px 16px;border:1px solid #E3E2E2;border-radius:56px;background:none;cursor:pointer;
