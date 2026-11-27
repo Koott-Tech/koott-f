@@ -36,12 +36,15 @@ export const PROFILE2_CSS = `
 }
 .tpf-round svg{width:20px;height:20px;}
 .tpf-avatar-wrap{position:relative;display:flex;align-items:center;justify-content:center;height:150px;margin-top:16px;}
-/* The ring is Figma's 4px angular gradient; the white gap inside it is the frame's padding. */
+/* The ring is Figma's 4px angular gradient, drawn as an inside stroke, with the
+   frame's own 6px of white padding inside it — 4 + 6 is the 10 that takes the
+   150 frame down to the 130 image the design places at 10,10. That white gap is
+   what makes it read as a story ring and not a border around the photo. */
 /* The ring opens the story viewer, so the avatar sits inside a button; without a display
    of its own it would go inline there and collapse. */
 .tpf-avatar-open{display:block;}
 .tpf-avatar{
-  display:block;position:relative;width:150px;height:150px;border-radius:9999px;padding:6px;background:#fff;
+  display:block;position:relative;width:150px;height:150px;border-radius:9999px;padding:10px;background:#fff;
   box-shadow:0 4px 10px rgba(156,156,156,.10),0 17px 17px rgba(156,156,156,.09),0 39px 23px rgba(156,156,156,.05);
 }
 .tpf-avatar::before{

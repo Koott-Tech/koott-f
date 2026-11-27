@@ -69,6 +69,12 @@ export default function StoryViewer2({
   const [done, setDone] = useState(0);     // 0–1 through the clip on screen
   const video = useRef(null);
   const touch = useRef(0);
+  /* How far through the clip we were when a press paused it, so the bar carries on
+     from there instead of starting again, and whether the press was long enough to
+     count as a hold rather than a tap. */
+  const through = useRef(0);
+  const held = useRef(false);
+  const holdTimer = useRef(null);
 
   const clip = clips[at] || null;
   const kind = kindOf(clip?.url);
@@ -83,6 +89,7 @@ export default function StoryViewer2({
       if (n >= clips.length) { close(); return i; }
       return n;
     });
+    through.current = 0;
     setDone(0);
     setPlaying(true);
   }, [clips.length, close]);
@@ -109,11 +116,13 @@ export default function StoryViewer2({
   /* A clip we cannot time — an embed, or a still — runs on a timer so the story moves on. */
   useEffect(() => {
     if (!story || kind === 'file' || !playing) return undefined;
+    const from = through.current;
     const started = Date.now();
     const tick = setInterval(() => {
-      const through = (Date.now() - started) / (STORY_SECONDS * 1000);
-      if (through >= 1) { go(1); return; }
-      setDone(through);
+      const now = from + (Date.now() - started) / (STORY_SECONDS * 1000);
+      if (now >= 1) { go(1); return; }
+      through.current = now;
+      setDone(now);
     }, 80);
     return () => clearInterval(tick);
   }, [story, kind, playing, at, go]);
@@ -139,6 +148,23 @@ export default function StoryViewer2({
     el.currentTime = to * el.duration;
     setDone(to);
   };
+
+  /* Press and hold anywhere to pause, the way a story does; let go and it carries on.
+     A press under a fifth of a second is a tap, and the tap halves still step through. */
+  const holdStart = () => {
+    if (!story) return;
+    held.current = false;
+    holdTimer.current = setTimeout(() => { held.current = true; setPlaying(false); }, 200);
+  };
+  const holdEnd = () => {
+    if (!story) return;
+    clearTimeout(holdTimer.current);
+    if (held.current) setPlaying(true);
+  };
+  /* A tap that was really a hold must not also step the story on. */
+  const step = (n) => { if (held.current) { held.current = false; return; } go(n); };
+
+  useEffect(() => () => clearTimeout(holdTimer.current), []);
 
   /* swipe up for the next video, down for the one before */
   const onTouchStart = (e) => { touch.current = e.touches[0].clientY; };
@@ -185,6 +211,10 @@ export default function StoryViewer2({
       aria-label={`${name} — ${story ? 'story' : 'video'}`}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
+      onPointerDown={holdStart}
+      onPointerUp={holdEnd}
+      onPointerCancel={holdEnd}
+      onPointerLeave={holdEnd}
     >
       <style dangerouslySetInnerHTML={{ __html: VIEWER2_CSS }} />
 
@@ -196,8 +226,8 @@ export default function StoryViewer2({
               leaves the picture alone — there, a tap is play and pause. */}
           {story && clips.length > 1 && (
             <>
-              <button type="button" className="svw-tap is-back" onClick={() => go(-1)} aria-label="Previous" />
-              <button type="button" className="svw-tap is-next" onClick={() => go(1)} aria-label="Next" />
+              <button type="button" className="svw-tap is-back" onClick={() => step(-1)} aria-label="Previous" />
+              <button type="button" className="svw-tap is-next" onClick={() => step(1)} aria-label="Next" />
             </>
           )}
 
