@@ -85,10 +85,14 @@ body:has(.tpf){overflow-x:clip!important;}
   position:sticky;top:var(--tpf-top);z-index:4;display:flex;gap:4px;height:52px;padding:0 16px;
   background:#fff;border-radius:24px 24px 0 0;
 }
-/* Each tab is as wide as its own label plus 12 either side (Figma: About 70, Sessions 87,
-   Media 68), left-aligned in the bar — not three equal thirds. */
+/* Profile v3 has two tabs, each filling half the bar: 183 wide inside the 16 of side
+   padding with 4 between them, the label centred, and the 2px indicator running the
+   full 159 the tab leaves after its own 12 either side. The 183 is also a cap, so on
+   a laptop, where the sheet is much wider than the 402 the design is drawn at, the two
+   stay their own size at the left instead of being stretched half a column each. */
 .tpf-tab{
-  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  flex:1 1 0;min-width:0;max-width:183px;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
   padding:0 12px;height:51px;
 }
 .tpf-tab span{margin-top:14px;font-size:16px;font-weight:500;line-height:20px;color:var(--ink-mute);}

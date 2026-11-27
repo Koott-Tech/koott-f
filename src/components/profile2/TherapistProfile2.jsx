@@ -59,15 +59,6 @@ function slotLabel(iso) {
   return `${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}, ${time}`;
 }
 
-const rupees = (n) => `₹${Math.round(n).toLocaleString('en-IN')}`;
-const ymd = (dt) => dt.toLocaleDateString('en-CA');
-/** The label over a day card: TODAY, TOMORROW, then SAT / SUN. */
-function dayCap(date, today) {
-  const diff = Math.round((Date.parse(`${date}T00:00:00`) - Date.parse(`${today}T00:00:00`)) / 864e5);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Tmrw';
-  return new Date(`${date}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'short' });
-}
 
 /* ── icons ───────────────────────────────────────────────────────────────── */
 
@@ -100,9 +91,6 @@ export default function TherapistProfile2({ therapist, bookHref }) {
   const [details, setDetails] = useState(null);
   const [next, setNext] = useState(null);     // { at, slots }
   const [tab, setTab] = useState('about');
-  const [days, setDays] = useState([]);       // [{ date, slots: [{displayTime, startsAt}] }]
-  const [day, setDay] = useState('');         // the date whose slots are shown
-  const [packs, setPacks] = useState([]);
   const [openFaq, setOpenFaq] = useState(0);
   const [bioOpen, setBioOpen] = useState(false);
   const [allChips, setAllChips] = useState(false);
@@ -133,32 +121,10 @@ export default function TherapistProfile2({ therapist, bookHref }) {
     return () => { live = false; };
   }, [t?.id]);
 
-  /* The Sessions section: the therapist's real free starts for the next two weeks, and
-     what they charge. Both are public and cached by the API. */
-  useEffect(() => {
-    if (!t?.id) return undefined;
-    let live = true;
-    const from = new Date();
-    const to = new Date(Date.now() + 13 * 864e5);
-    (async () => {
-      const [slotRes, packRes] = await Promise.all([
-        fetch(`${API}/availability/public/psychologist/${t.id}/slots?startDate=${ymd(from)}&endDate=${ymd(to)}`)
-          .then((r) => r.json()).catch(() => null),
-        fetch(`${API}/public/psychologists/${t.id}/packages`).then((r) => r.json()).catch(() => null),
-      ]);
-      if (!live) return;
-      const rows = slotRes?.data?.days || [];
-      setDays(rows);
-      setDay((rows.find((r) => (r.slots || []).length) || rows[0] || {}).date || '');
-      setPacks(packRes?.data?.packages || packRes?.packages || []);
-    })();
-    return () => { live = false; };
-  }, [t?.id]);
-
   /* The tab indicator follows whichever section the page is looking at. */
   useEffect(() => {
     const onScroll = () => {
-      const at = ['about', 'sessions', 'media']
+      const at = ['about', 'media']
         .filter((k) => secs.current[k])
         // Below the fixed site header (64) and this sheet's own tab bar (52).
         .filter((k) => secs.current[k].offsetParent !== null)
@@ -222,26 +188,6 @@ export default function TherapistProfile2({ therapist, bookHref }) {
     : [];
   const clips = [...intro, ...videos];
 
-  /* Sessions: three day cards and the chosen day's starts, like the design's picker. */
-  const today = ymd(new Date());
-  const dayCards = days.slice(0, 3);
-  const busiest = Math.max(1, ...days.map((x) => (x.slots || []).length));
-  const chosen = days.find((x) => x.date === day) || null;
-  const chosenSlots = (chosen?.slots || []).slice(0, 6);
-  /* Plans, from the therapist's own packages: one row per single session, then the packs. */
-  const singles = packs.filter((p) => Number(p.session_count) === 1 && p.is_active !== false);
-  const bundles = packs.filter((p) => Number(p.session_count) > 1 && p.is_active !== false
-    && !String(p.package_type).startsWith('couple'));
-  const perSession = (p) => Number(p.price) / Number(p.session_count);
-  const cheapest = bundles.length ? bundles.reduce((a, b) => (perSession(a) <= perSession(b) ? a : b)) : null;
-  const base = Number(singles.find((p) => p.package_type === 'individual')?.price) || price;
-  const bestSave = cheapest ? base * Number(cheapest.session_count) - Number(cheapest.price) : 0;
-  const packCounts = [...new Set(bundles.map((p) => Number(p.session_count)))].sort((a, b) => a - b);
-
-  /* A record with no hours, no modes and no price has nothing to put under Sessions,
-     so neither the section nor its tab is drawn. */
-  const hasSessions = days.length > 0 || modes.length > 0 || singles.length > 0 || price > 0;
-
   const reg = d.registration_number || d.reg_no || '';
   const href = bookHref || `/book/${t.slug || ''}`;
 
@@ -289,7 +235,7 @@ export default function TherapistProfile2({ therapist, bookHref }) {
           <div className="tpf-handle"><span /></div>
 
           <div className="tpf-tabs" role="tablist">
-            {[['about', 'About'], ...(hasSessions ? [['sessions', 'Sessions']] : []), ['media', 'Media']].map(([key, label]) => (
+            {[['about', 'Overview'], ['media', 'Media']].map(([key, label]) => (
               <button type="button" role="tab" key={key} aria-selected={tab === key}
                 className={`tpf-tab${tab === key ? ' is-on' : ''}`} onClick={() => goTo(key)}>
                 <span>{label}</span><i />
@@ -297,8 +243,8 @@ export default function TherapistProfile2({ therapist, bookHref }) {
             ))}
           </div>
 
-          {/* One scroll, three sections — the tabs jump to them, which is what the
-              design's "Tab break" dividers between the sections show. */}
+          {/* One scroll, two sections, as Profile v3 has it: Overview carries everything
+              about the person, Media everything they have written or recorded. */}
           <div className="tpf-about" ref={(el) => { secs.current.about = el; }}>
               {/* intro video + the three numbers */}
               <div className="tpf-top">
@@ -380,6 +326,15 @@ export default function TherapistProfile2({ therapist, bookHref }) {
                 </section>
               )}
 
+              {modes.length > 0 && (
+                <section className="tpf-sec" style={{ gap: 16 }}>
+                  <div className="tpf-sec-head"><h2 className="tpf-h2">How you can meet</h2></div>
+                  <div className="tpf-modes">
+                    {modes.map((m) => <span className="tpf-mode" key={m}>{MODE_ICON[m] || I.video}{m}</span>)}
+                  </div>
+                </section>
+              )}
+
               {bio && (
                 <section className="tpf-sec" style={{ gap: 12 }}>
                   <div className="tpf-sec-head"><h2 className="tpf-h2">About {first}</h2></div>
@@ -425,101 +380,9 @@ export default function TherapistProfile2({ therapist, bookHref }) {
               )}
           </div>
 
-          {/* ── Sessions: when they are free, how you can meet, what it costs ── */}
-          {hasSessions && <div className="tpf-break" />}
-          <div
-            className="tpf-sessions"
-            ref={(el) => { secs.current.sessions = el; }}
-            style={hasSessions ? undefined : { display: 'none' }}
-          >
-            {days.length > 0 && (
-              <section className="tpf-sec" style={{ gap: 20 }}>
-                <div className="tpf-sec-head">
-                  <h2 className="tpf-h2">Next available</h2>
-                  <button type="button" className="tpf-see" onClick={() => router.push(href)}>All dates</button>
-                </div>
-                <div className="tpf-picker">
-                  <div className="tpf-days">
-                    {dayCards.map((x) => {
-                      const free = (x.slots || []).length;
-                      return (
-                        <button
-                          type="button"
-                          key={x.date}
-                          className={`tpf-day${free ? '' : ' is-full'}${x.date === day ? ' is-on' : ''}`}
-                          onClick={() => free && setDay(x.date)}
-                          aria-pressed={x.date === day}
-                        >
-                          <b>{dayCap(x.date, today)}</b>
-                          <span>{Number(x.date.slice(8))}</span>
-                          {free
-                            ? <i><em style={{ width: `${Math.max(25, (free / busiest) * 100)}%` }} /></i>
-                            : <span className="tpf-full">Full</span>}
-                        </button>
-                      );
-                    })}
-                    <button type="button" className="tpf-viewall" onClick={() => router.push(href)}>
-                      View all{I.chevRight}
-                    </button>
-                  </div>
-                  {chosenSlots.length > 0 ? (
-                    <div className="tpf-slots">
-                      {chosenSlots.map((sl) => (
-                        <button type="button" className="tpf-slot" key={sl.startsAt || sl.time}
-                          onClick={() => router.push(href)}>
-                          {sl.displayTime}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="tpf-none">No free starts on this day. Try another date.</p>
-                  )}
-                </div>
-              </section>
-            )}
-
-            {modes.length > 0 && (
-              <section className="tpf-sec" style={{ gap: 16 }}>
-                <div className="tpf-sec-head"><h2 className="tpf-h2">How you can meet</h2></div>
-                <div className="tpf-modes">
-                  {modes.map((m) => <span className="tpf-mode" key={m}>{MODE_ICON[m] || I.video}{m}</span>)}
-                </div>
-              </section>
-            )}
-
-            {(singles.length > 0 || price > 0) && (
-              <section className="tpf-sec" style={{ gap: 20 }}>
-                <div className="tpf-sec-head"><h2 className="tpf-h2">Session plans</h2></div>
-                <div className="tpf-plans">
-                  {(singles.length ? singles : [{ id: 'single', name: 'Single session', price, description: '' }])
-                    .map((p) => (
-                      <button type="button" className="tpf-plan" key={p.id} onClick={() => router.push(href)}>
-                        <span className="tpf-plan-text">
-                          <b>{p.name}</b>
-                          {p.description && <small>{p.description}</small>}
-                        </span>
-                        <span className="tpf-plan-price">{rupees(p.price)}</span>
-                        {I.chevRight}
-                      </button>
-                    ))}
-                  {cheapest && (
-                    <button type="button" className="tpf-plan" onClick={() => router.push(href)}>
-                      <span className="tpf-plan-text">
-                        <b>{packCounts.join(', ')} session packs</b>
-                        {bestSave > 0 && (
-                          <small className="is-save">
-                            Save up to {rupees(bestSave)} on a {cheapest.session_count} session pack
-                          </small>
-                        )}
-                      </span>
-                      <span className="tpf-plan-price">from {rupees(perSession(cheapest))}</span>
-                      {I.chevRight}
-                    </button>
-                  )}
-                </div>
-              </section>
-            )}
-          </div>
+          {/* Profile v3 has no Sessions section: the slot picker and the session plans
+              live in the booking flow, which the book bar below opens, and the bar
+              already carries the next free start and how many there are. */}
 
           {/* ── Media ── */}
           <div className="tpf-break" />
