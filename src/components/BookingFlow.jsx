@@ -1081,7 +1081,7 @@ export default function BookingFlow({ slug }) {
           <button type="button" className="bf-back" onClick={back} aria-label="Back">
             <img src="/design/booking/arrow-left.svg" alt="" width={24} height={24} />
           </button>
-        ) : (!paidDone && !booked && !authLoading && step < 4) ? (
+        ) : (!paidDone && !booked && !authLoading && step <= 4) ? (
           /* Koott 2.0 header (Figma "Booking Flow" 7858:85649): a round back
              button, the therapist in a pill, and a spacer the same size as the
              button so the pill sits centred. The step dots the old design used
@@ -1327,7 +1327,10 @@ export default function BookingFlow({ slug }) {
                     alt=""
                     width={42}
                     height={42}
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    /* Three of these illustrations are not exported yet. Hiding the
+                       image would pull the label left out of the design's 71; going
+                       transparent keeps the 42 the row is built around. */
+                    onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }}
                   />
                   <span className="bfx-type-l">{FX_TYPE_LABEL[k] || label}</span>
                 </button>
@@ -1776,7 +1779,11 @@ export default function BookingFlow({ slug }) {
 
               <div className="bfx-gtk">
                 <p className="bfx-gtk-h">Good to know</p>
-                {['Reschedule free up to 12 hours before your session.',
+                {/* The design says 12 hours here, but a client can only reschedule or
+                    cancel on their own 24 hours or more ahead (backend
+                    utils/clientRequests.js); inside that it goes to the team for
+                    approval. Printing 12 would promise something we do not do. */}
+                {['Reschedule free up to 24 hours before your session.',
                   'Cancel up to 24 hours before for a full refund.',
                   'You will get the meeting link by email and WhatsApp.'].map((t) => (
                     <p className="bfx-gtk-p" key={t}><i aria-hidden />{t}</p>
@@ -2251,9 +2258,11 @@ const CSS = `
    a 42 px illustration and a 16/24 label. These come after the rules above so
    they win without those having to be deleted while the other steps still use
    them. */
+/* The header is 402x56 and every step's Content starts 48 below it (pad=48 on
+   "Content" in 7858:85649 and its siblings), not 24. */
 .bfx-top.is-k2{
   display:flex;align-items:center;justify-content:space-between;gap:16px;
-  height:56px;margin:0 0 24px;padding:4px 0 12px;
+  height:56px;margin:0 0 48px;padding:4px 0 12px;
 }
 .bfx-top.is-k2 .bfx-back{
   display:flex;align-items:center;justify-content:center;width:40px;height:40px;flex:none;
@@ -2270,6 +2279,15 @@ const CSS = `
 .bfx-who-i{display:inline-flex;align-items:center;justify-content:center;background:#E9F1E4;color:#1B6930;font:600 11px/1 'Figtree',sans-serif;}
 .bfx-who-n{font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;font-size:14px!important;font-weight:500!important;line-height:18px!important;color:#535E58!important;white-space:nowrap;}
 
+/* Every 2.0 step titles the same way (Figma 7858:85649 and its siblings): Figtree
+   600 at 24/32 with -0.24 tracking. The pre-2.0 rule above is Poppins 500 at
+   1.66 line-height, which was still winning here. */
+.bf-in.is-fx .bfx-title{
+  font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:24px!important;font-weight:600!important;line-height:32px!important;
+  letter-spacing:-.24px!important;color:#1C241F!important;
+}
+
 .bfx-types{width:370px;max-width:100%;gap:16px;}
 .bfx-type{
   height:76px;gap:12px;padding:16px;border:0;border-radius:12px;
@@ -2280,8 +2298,13 @@ const CSS = `
   font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
   font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#1C241F!important;
 }
-.bfx-type.is-on,.bfx-type:hover{box-shadow:inset 0 0 0 1.5px #39AC71,0 8px 12px #EBF3EE;}
-.bfx-type.is-on .bfx-type-l,.bfx-type:hover .bfx-type-l{font-weight:600!important;color:#1C241F!important;}
+/* Selected (7858:85701): a white-to-pale-green fill and a 1.5 #39AC71 inside
+   stroke. No glow in the design, and the label keeps its 500 — only the card
+   changes. */
+.bfx-type.is-on,.bfx-type:hover{
+  background:linear-gradient(180deg,#FFFFFF 0%,#EAF3ED 100%);
+  box-shadow:inset 0 0 0 1.5px #39AC71;
+}
 
 /* ───────── Koott 2.0, step 1 · Select slot (Figma 7858:85753) ─────────
    A strip of 74x84 day cards with a "View all" card, a hairline, then the times
@@ -2316,7 +2339,10 @@ const CSS = `
   font-family:'Figtree',sans-serif!important;font-size:14px!important;font-weight:600!important;line-height:18px!important;color:#6B746F!important;
 }
 .bfx-viewall.is-on{box-shadow:inset 0 0 0 1.5px #39AC71;}
-.bfx-rule{height:1px;background:#E3E7E5;}
+/* The hairline between the day strip and the times: Figma draws it 362 wide,
+   inset 4 either side of the 370 column (7858:85753, "Frame 2147231026"). It had
+   no width of its own and was collapsing to nothing. */
+.bfx-rule{align-self:stretch;width:auto;height:1px;margin:0 4px;background:#E3E7E5;}
 .bfx-times{display:flex;flex-direction:column;gap:16px;}
 .bfx-times-h{font-family:'Figtree',sans-serif!important;font-size:16px!important;font-weight:600!important;line-height:20px!important;color:#1C241F!important;margin:0!important;}
 .bfx-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
@@ -2358,8 +2384,11 @@ const CSS = `
   box-shadow:0 1px 2px rgba(28,36,31,.04),0 3px 3px rgba(28,36,31,.03),0 8px 5px rgba(28,36,31,.02);
 }
 .bfx-plans.is-k2{display:flex;flex-direction:column;gap:16px;width:370px;max-width:100%;}
+/* 370x80 in the design (7858:85805, "Option · 3 sessions"): 16 of padding around
+   a 46-tall block, plus the stroke Figma reserves. The ring here is inset, so the
+   80 is asked for rather than arrived at. */
 .bfx-planr{
-  display:flex;align-items:center;gap:12px;width:100%;padding:16px;border:0;border-radius:12px;background:#fff;
+  display:flex;align-items:center;gap:12px;width:100%;min-height:80px;padding:16px;border:0;border-radius:12px;background:#fff;
   box-shadow:inset 0 0 0 1px #E3E7E5;cursor:pointer;text-align:left;
 }
 .bfx-planr.is-on{background:linear-gradient(180deg,#FFFFFF 0%,#EAF3ED 100%);box-shadow:inset 0 0 0 1.5px #39AC71;}
@@ -2552,6 +2581,13 @@ const CSS = `
 .bfx-sheet-t:focus{border-color:#39AC71;}
 .bfx-sheet .bfx-btn{width:100%;height:48px;margin:0;}
 
+/* The summary beside the step belongs to the two-column layout at 1024 and up.
+   Everything narrower — every phone, and a tablet — shows the step alone, the way
+   the Figma draws it, so the panel is off by default and only the 1024 band turns
+   it on. It used to be switched off inside the 768 band, which left it rendering
+   unstyled above the question on a phone. */
+.bfx-aside{display:none;}
+
 /* ───────── Koott 2.0 on a tablet and a laptop ─────────
    The Figma draws these steps at 402 and nothing wider. A phone has to show one
    thing at a time; a wider screen does not, so from 1024 the step keeps its own
@@ -2568,9 +2604,6 @@ const CSS = `
   .bfx-paybar,.bfx-failed-actions{padding-left:0;padding-right:0;}
   .bfx-sheet{border-radius:24px;margin-bottom:24px;}
   .bfx-sheet-wrap{align-items:center;}
-  /* The summary belongs to the two-column layout below; a tablet shows the step
-     alone, as a phone does. */
-  .bfx-aside{display:none;}
 }
 
 @media (min-width:1024px){
