@@ -261,6 +261,21 @@ export default function BookingFlow({ slug }) {
     setPayFailed({ reason: 'preview' });
     setHeldUntil(new Date(Date.now() + 9 * 60000 + 42000).toISOString());
   }, []);
+  /* Same reason, same guard: ?preview=confirming and ?preview=booked draw the two
+     screens that otherwise need a real payment to reach. Compiled out in a
+     production build. */
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    if (typeof window === 'undefined') return;
+    const what = new URLSearchParams(window.location.search).get('preview');
+    if (what === 'confirming') setPayStage('confirming');
+    if (what === 'booked') {
+      setPaidDone({
+        startsAt: new Date(Date.now() + 864e5).toISOString(), sessionId: null,
+        orderId: 'preview', amount: 3500, kind: 'individual', saved: 498,
+      });
+    }
+  }, []);
   const [heldUntil, setHeldUntil] = useState(null);
   const [heldLeft, setHeldLeft] = useState('');
   /* Figma "Notes to your therapist" (8074:13727) and the "Booking for someone
@@ -279,6 +294,9 @@ export default function BookingFlow({ slug }) {
   const [confirming, setConfirming] = useState(false);
   const [booked, setBooked] = useState(null);
   const [paidDone, setPaidDone] = useState(null);         // { startsAt, sessionId } after a paid booking
+  /* Booked plays in two beats, as the section does: the sparkle frame
+     (7858:85911) and then the check (7858:85923). */
+  const [bookedSettled, setBookedSettled] = useState(false);
             // { startsAt, left } after Confirm booking
 
   /* ------------------------- mobile number + code ------------------------ */
@@ -787,6 +805,13 @@ export default function BookingFlow({ slug }) {
   // Review has its own question ("still reserved"), so it may ask once more there.
   useEffect(() => { if (step === 4) setLeaveAsked(false); }, [step]);
 
+  /* The sparkle holds for a beat, then the check lands and the words come up. */
+  useEffect(() => {
+    if (!paidDone) { setBookedSettled(false); return undefined; }
+    const t = setTimeout(() => setBookedSettled(true), 700);
+    return () => clearTimeout(t);
+  }, [paidDone]);
+
   const back = () => {
     if (modeOpen) { setModeOpen(false); return; }
     if (pkgMode) { if (step <= 1) router.back(); else setStep(1); return; }
@@ -900,7 +925,13 @@ export default function BookingFlow({ slug }) {
           if (!done) return; // handed over to the success page
           setPaying(false); setPayStage(null);
           if (done.taken) { setPayErr(done.message); return; }
-          setPaidDone({ startsAt: slot.startsAt, sessionId: done.sessionId, orderId: resp.razorpay_order_id, amount: plan?.price, kind });
+          setPaidDone({
+            startsAt: slot.startsAt, sessionId: done.sessionId, orderId: resp.razorpay_order_id,
+            amount: plan?.price, kind,
+            // The design's "You saved ₹498". Drawn only when there is one.
+            saved: !pkgMode && planSessions > 1
+              ? Math.max(Math.round(unit * planSessions - Number(plan?.price || 0)), 0) : 0,
+          });
           try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch (_) { /* old browsers */ }
         },
         modal: { ondismiss: () => { setPaying(false); track('payment_dismissed'); } },
@@ -1110,32 +1141,49 @@ export default function BookingFlow({ slug }) {
             )}
           </div>
         ) : paidDone ? (
-          <div className="bfx-done">
-            <div className="bfx-done-head">
-              <img src="/design/booking/check-verified.svg" alt="" width={64} height={64} />
-              <div className="bfx-title" role="heading" aria-level={1}>Session Confirmed</div>
-            </div>
-            <div className="bfx-ticket is-done">
-              <div className="bfx-tk-band" aria-hidden />
-              <div className="bfx-done-who">
-                {photo
-                  ? <img className="bfx-tk-photo" src={photo} alt={name} width={64} height={64} />
-                  : <span className="bfx-tk-photo is-empty" aria-hidden>{initials}</span>}
-                <span className="bfx-tk-name">{name}</span>
-                {role && <span className="bfx-tk-role">{role}</span>}
+          <div className="bfx-booked">
+            {/* Figma "10 Booked" (7858:85911 then 7858:85923): the sparkle lands
+                first with the words still faint, then it becomes the check and they
+                come up. Animation 3 in the section is Session details, so that is
+                where this goes next. */}
+            <div className={`bfx-booked-mid${bookedSettled ? ' is-settled' : ''}`}>
+              <span className="bfx-badge-soft" aria-hidden>
+                <i className="bfx-ripple-2" />
+                <i className="bfx-ripple-1" />
+                <span className="bfx-core">
+                  {bookedSettled ? (
+                    <svg className="bfx-core-mark" viewBox="0 0 34 34" aria-hidden>
+                      <defs>
+                        <linearGradient id="bfxTick" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stopColor="#5DC189" /><stop offset="1" stopColor="#2E7D5A" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M17 1.6a15.4 15.4 0 1 0 0 30.8 15.4 15.4 0 0 0 0-30.8Zm7.3 11.2-9 9.1a1.6 1.6 0 0 1-2.3 0l-4.3-4.4a1.6 1.6 0 1 1 2.3-2.2l3.1 3.2 7.9-8a1.6 1.6 0 0 1 2.3 2.3Z" fill="url(#bfxTick)" />
+                    </svg>
+                  ) : (
+                    <svg className="bfx-core-mark is-sparkle" viewBox="0 0 44 44" aria-hidden>
+                      <path d="M22 6.5c1.1 6.4 3.6 9 10 10.1-6.4 1.1-8.9 3.7-10 10.1-1.1-6.4-3.6-9-10-10.1 6.4-1.1 8.9-3.7 10-10.1Z" fill="url(#bfxTick2)" />
+                      <path d="M32.6 27.4c.6 3.2 1.8 4.5 5 5.1-3.2.6-4.4 1.9-5 5.1-.6-3.2-1.8-4.5-5-5.1 3.2-.6 4.4-1.9 5-5.1Z" fill="url(#bfxTick2)" />
+                      <defs>
+                        <linearGradient id="bfxTick2" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stopColor="#5DC189" /><stop offset="1" stopColor="#2E7D5A" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <div className="bfx-booked-text">
+                <p className="bfx-booked-h">Session booked</p>
+                {paidDone.saved > 0 && <p className="bfx-booked-save">You saved {inr(paidDone.saved)}</p>}
               </div>
-              <div className="bfx-tear" aria-hidden><i /><b /><i /></div>
-              <div className="bfx-tiles is-small">
-                <div className="bfx-tile"><span className="bfx-tl">Amount paid</span><strong>{inr2(paidDone.amount)}</strong></div>
-                <div className="bfx-tile"><span className="bfx-tl">Session type</span><strong>{FX_TYPE_SHORT[paidDone.kind || kind]}</strong></div>
-                <div className="bfx-tile"><span className="bfx-tl">Date</span><strong>{dateLabel(paidDone.startsAt, tz, { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}</strong></div>
-                <div className="bfx-tile"><span className="bfx-tl">Time &amp; Duration</span><strong>{timeLabel(paidDone.startsAt, tz)}, {SESSION_MINUTES[paidDone.kind || kind]} Minutes</strong></div>
-              </div>
-              {paidDone.orderId && (
-                <div className="bfx-order"><span>Order ID</span><strong>{paidDone.orderId}</strong></div>
-              )}
             </div>
-            <button type="button" className="bfx-btn" onClick={() => router.push('/profile/sessions')}>View my booking</button>
+            <img className="bfx-hills" src="/design/home2/hero-landscape.webp" alt="" aria-hidden />
+            <span className="bfx-hills-fade" aria-hidden />
+            <button type="button" className="bfx-booked-go"
+              onClick={() => router.push(paidDone.sessionId ? `/profile/sessions/${paidDone.sessionId}` : '/profile/sessions')}>
+              View my booking
+            </button>
           </div>
         ) : booked ? (
           <div className="bf-done">
@@ -1887,10 +1935,29 @@ export default function BookingFlow({ slug }) {
       )}
 
       {payStage === 'confirming' && (
-        <div className="bfx-verify" role="status" aria-live="polite">
-          <img className="bfx-verify-ic" src="/design/booking/loading.svg" alt="" width={48} height={48} />
-          <div className="bfx-verify-h">Verifying your payment and booking...</div>
-          <p className="bfx-verify-s">Please wait, do not close this. We confirm with the payment provider before showing success.</p>
+        <div className="bfx-cfm" role="status" aria-live="polite">
+          {/* Figma "9 Confirming payment" (7858:85895): a 100 ring on white, the two
+              lines under it, and the therapist and the slot on pills near the foot. */}
+          <div className="bfx-cfm-mid">
+            <span className="bfx-cfm-ring" aria-hidden />
+            <div className="bfx-cfm-text">
+              <p className="bfx-cfm-h">Confirming your payment</p>
+              <p className="bfx-cfm-s">This takes a few seconds. Please don&rsquo;t close this page.</p>
+            </div>
+          </div>
+          <div className="bfx-cfm-feet">
+            <span className="bfx-who">
+              {photo
+                ? <img src={photo} alt="" width={24} height={24} />
+                : <span className="bfx-who-i" aria-hidden>{initials}</span>}
+              <span className="bfx-who-n">{name}</span>
+            </span>
+            {slot && (
+              <span className="bfx-cfm-slot">
+                {dateLabel(slot.startsAt, tz, { weekday: 'short', day: 'numeric', month: 'short' })} &middot; {timeLabel(slot.startsAt, tz)}
+              </span>
+            )}
+          </div>
         </div>
       )}
       {payStage && payStage !== 'confirming' && (
@@ -2837,6 +2904,91 @@ const CSS = `
 @keyframes bfxSpin{to{transform:rotate(360deg);}}
 .bfx-verify-h{margin-top:0;font-family:'Poppins',ui-sans-serif,system-ui,sans-serif!important;font-size:20px!important;font-weight:500!important;line-height:30px!important;color:#0F0F0F!important;text-align:center;}
 .bfx-verify-s{margin:0;max-width:384px;text-align:center;font-family:'Inter',system-ui,sans-serif!important;font-size:14px!important;line-height:22px!important;color:#373737!important;}
+
+/* ───────── Koott 2.0, Confirming payment (Figma 7858:85895) ─────────
+   A white page: the 100 ring, the two lines, and the therapist and slot on
+   pills near the foot. The design sits the ring block at 249 of an 874 frame,
+   which is 88 above the middle, so it is centred and nudged up by that. */
+.bfx-cfm{
+  position:fixed;inset:0;z-index:60;background:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:249px 16px 0;
+}
+.bfx-cfm-mid{display:flex;flex-direction:column;align-items:center;gap:28px;width:280px;}
+.bfx-cfm-ring{
+  display:block;width:100px;height:100px;border-radius:50%;
+  border:8px solid #E2F7E7;border-top-color:#39AC71;animation:bfxSpin 1s linear infinite;
+}
+.bfx-cfm-text{display:flex;flex-direction:column;align-items:center;gap:8px;width:280px;}
+.bfx-cfm-h{
+  margin:0!important;font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:18px!important;font-weight:600!important;line-height:24px!important;
+  letter-spacing:-.09px!important;color:#1C241F!important;text-align:center;
+}
+.bfx-cfm-s{
+  margin:0!important;font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:14px!important;font-weight:400!important;line-height:20px!important;
+  color:#6B746F!important;text-align:center;
+}
+.bfx-cfm-feet{position:absolute;left:0;right:0;bottom:60px;display:flex;align-items:center;justify-content:center;gap:9px;}
+.bfx-cfm-slot{
+  display:inline-flex;align-items:center;height:36px;padding:0 12px;flex:none;border-radius:9999px;background:#fff;
+  box-shadow:inset 0 0 0 1px #E3E7E5,0 1px 2px rgba(28,36,31,.04),0 3px 3px rgba(28,36,31,.03),0 8px 5px rgba(28,36,31,.02);
+  font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:14px!important;font-weight:500!important;line-height:20px!important;color:#535E58!important;white-space:nowrap;
+}
+
+/* ───────── Koott 2.0, Booked (Figma 7858:85911 → 7858:85923) ─────────
+   The soft badge is three circles: a blurred 132 wash, a 102 ring at half
+   strength, and the 72 core the mark sits in. The brand hills sit across the
+   foot at a third strength under a white fade. */
+.bfx-booked{
+  /* The design puts the badge at 210 of an 874 frame whose first 62 is the status
+     bar, so it starts 148 below where our own page content begins. */
+  position:relative;min-height:calc(100vh - 63px);background:#fff;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:148px 16px 0;
+}
+.bfx-booked-mid{display:flex;flex-direction:column;align-items:center;gap:28px;width:168px;z-index:2;}
+.bfx-badge-soft{position:relative;display:block;width:132px;height:132px;flex:none;}
+.bfx-badge-soft i{position:absolute;border-radius:50%;display:block;}
+.bfx-ripple-2{inset:0;background:rgba(239,252,242,.7);filter:blur(22px);}
+.bfx-ripple-1{inset:15px;background:rgba(226,247,231,.8);opacity:.5;}
+.bfx-core{
+  position:absolute;inset:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:linear-gradient(180deg,#FFFFFF 0%,#EFFCF2 100%);box-shadow:inset 0 0 0 1.5px #fff,
+    0 10px 24px -6px rgba(46,125,89,.16),0 2px 4px rgba(13,18,15,.06);
+  animation:bfxPop .45s cubic-bezier(.2,.9,.3,1.4) both;
+}
+.bfx-core-mark{display:block;width:34px;height:34px;}
+.bfx-core-mark.is-sparkle{width:44px;height:44px;}
+.bfx-booked-text{display:flex;flex-direction:column;align-items:center;gap:6px;width:168px;opacity:.35;transition:opacity .4s ease;}
+.bfx-booked-mid.is-settled .bfx-booked-text{opacity:1;}
+.bfx-booked-h{
+  margin:0!important;font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:24px!important;font-weight:600!important;line-height:32px!important;
+  letter-spacing:-.24px!important;color:#1C241F!important;text-align:center;white-space:nowrap;
+}
+.bfx-booked-save{
+  margin:0!important;font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:16px!important;font-weight:500!important;line-height:24px!important;color:#2E7D5A!important;text-align:center;
+}
+.bfx-hills{position:absolute;left:0;right:0;bottom:0;width:100%;height:300px;object-fit:cover;object-position:50% 100%;opacity:.34;z-index:0;}
+.bfx-hills-fade{position:absolute;left:0;right:0;bottom:0;height:300px;background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,0) 100%);z-index:1;}
+.bfx-booked-go{
+  position:absolute;left:16px;right:16px;bottom:40px;z-index:2;height:48px;max-width:370px;margin:0 auto;border:0;border-radius:9999px;cursor:pointer;
+  background:linear-gradient(180deg,#5DC189 0%,#39AC71 100%);color:#fff!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 7px 7.2px rgba(255,255,255,.25),
+    0 1px 3px rgba(15,72,54,.08),0 11px 7px rgba(15,72,54,.04),0 19px 8px rgba(15,72,54,.02);
+  font-family:'Figtree',ui-sans-serif,system-ui,sans-serif!important;
+  font-size:16px!important;font-weight:600!important;line-height:20px!important;
+}
+@keyframes bfxPop{from{transform:scale(.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+@media (prefers-reduced-motion:reduce){
+  .bfx-core{animation:none;}
+  .bfx-cfm-ring{animation-duration:2.4s;}
+  .bfx-booked-text{transition:none;}
+}
 
 /* payment success */
 .bfx-done{min-height:calc(100vh - 63px);background:#E9F1E4;display:flex;flex-direction:column;align-items:center;padding:56px 16px 120px;box-sizing:border-box;}
